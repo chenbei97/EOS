@@ -22,15 +22,24 @@
 #include "qprogressbar.h"
 #include "qtableview.h"
 #include "qheaderview.h"
+#include "qslider.h"
+
+#include "qlayout.h"
+#include "qboxlayout.h"
+#include "qformlayout.h"
+#include "qgridlayout.h"
 
 #include "qvalidator.h"
 #include "qevent.h"
+#include "qdatetime.h"
+#include "qdebug.h"
 // (2) 常量定义
 #define SplitterHandleWidth 10
 #define ProgressBarMinHeight 40
 #define SplitterStyle ("QSplitter::handle { background-color: #F2A072 }")
 #define ProgressBarStyle ("QProgressBar{border:2px solid grey;border-radius:5px;text-align:center;}"\
                                     "QProgressBar::chunk{background-color: #CD96CD;width: 10px;margin: 0.5px;}")
+#define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 
 // (3) 导出定义
 #if defined(COMPONENT_LIBRARY)

@@ -21,30 +21,46 @@
 #include "qpair.h"
 #include "qqueue.h"
 
-typedef  const QVariant& QCVariant;
-typedef  const QString& QCString;
-typedef  const QPoint& QCPoint;
-typedef  const QPointF& QCPointF;
-typedef  const QColor& QCColor;
+#include <random>
+using std::sort;
+using std::random_device;
+using std::mt19937;
+using std::uniform_int_distribution;
 
-typedef  QVector<QColor> QColorVector;
-typedef  const QVector<QColor>& QCColorVector;
+typedef const QVariant& QCVariant;
+typedef const QString& QCString;
+typedef const QPoint& QCPoint;
+typedef const QPointF& QCPointF;
+typedef const QColor& QCColor;
+
+typedef QVector<QColor> QColorVector;
+typedef const QVector<QColor>& QCColorVector;
 typedef QVector<QPoint> QPointVector;
 typedef const QVector<QPoint>& QCPointVector;
 typedef QVector<QPointF> QPointFVector;
 typedef const QVector<QPointF>& QCPointFVector;
 typedef QVector<QString> QStringVector;
 typedef const QVector<QString>& QCStringVector;
+typedef QVector<QString> QFieldQVector;
+typedef const QVector<QString>& QCFieldVector;
+typedef QVector<QString> QValueVector;
+typedef const QVector<QString>& QCValueVector;
 typedef QVector<bool> QBoolVector;
 
-typedef  QList<QColor> QColorList;
-typedef  const QList<QColor>& QCColorList;
+typedef QList<QColor> QColorList;
+typedef const QList<QColor>& QCColorList;
 typedef QList<QPoint> QPointList;
 typedef const QList<QPoint>& QCPointList;
 typedef QList<QPointF> QPointFList;
-typedef const QVector<QPointF>& QCPointFVector;
-//typedef QList<QString> QStringList;
+typedef const QList<QPointF>& QCPointFList;
+typedef QList<QString> QFieldList;
+typedef const QList<QString>& QCFieldList;
+typedef QList<QString> QValueList;
+typedef const QList<QString>& QCValueList;
 typedef const QList<QString>& QCStringList;
 typedef QList<bool> QBoolList;
+
+typedef QVector<QVector<QString>> QValue2DVector;
+typedef  const QVector<QVector<QString>>& QCValue2DVector;
 
 #endif //EOSI_ALIAS_H

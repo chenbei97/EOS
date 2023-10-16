@@ -7,11 +7,16 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include <QApplication>
+#include "slider.h"
 #include "groupbox.h"
+
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    GroupBox w;
+    Slider w;
+    w.setSuffix("ms");
+    w.setPrefix("曝光时间: ");
+    w.setRange(0,15000);
     w.show();
     return QApplication::exec();
 }

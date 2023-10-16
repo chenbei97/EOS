@@ -13,6 +13,12 @@
 #include "qstandarditemmodel.h"
 #include "qsqltablemodel.h"
 #include "qeventloop.h"
+#include "qdatetime.h"
+#include "qdebug.h"
+
+// (2) 定义常量
+#define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
+
 
 // (3) 导出定义
 #if defined(COMPONENT_LIBRARY)
