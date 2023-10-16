@@ -40,7 +40,9 @@ set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
 set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
 set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
 
-set(COMPONENT_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/component/include)
+set(COMPONENT_INCLUDE_PATH
+        ${PROJECT_SOURCE_DIR}/component/include
+        ${PROJECT_SOURCE_DIR}/component/include/widgets)
 
 file(GLOB MAIN_FILES  "${PROJECT_SOURCE_DIR}/*.h" "${PROJECT_SOURCE_DIR}/*.cpp")
 

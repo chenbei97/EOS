@@ -12,7 +12,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 add_definitions(-DCOMPONENT_LIBRARY=0) # 添加预定义宏,=号不能有空格,用于指定类导出或导入
 
-file(GLOB_RECURSE COMPONENT_HEADERS "inc/*.h")
+file(GLOB_RECURSE COMPONENT_HEADERS "include/*.h")
 file(GLOB_RECURSE COMPONENT_SOURCES "src/*.cpp")
 
 find_package(Qt5 COMPONENTS
@@ -29,8 +29,7 @@ find_package(Qt5 COMPONENTS
 
 add_library(${DLLNAME} SHARED
         ${COMPONENT_SOURCES}
-        ${COMPONENT_HEADERS}
-        )
+        ${COMPONENT_HEADERS})
 
 target_link_libraries(${DLLNAME}
         Qt5::Core
@@ -46,7 +45,7 @@ target_link_libraries(${DLLNAME}
 
 target_include_directories(${DLLNAME}
         PUBLIC
-#        ${PROJECT_SOURCE_DIR}/component/inc/widgets
+        ${PROJECT_SOURCE_DIR}/component/include/widgets
 #        ${PROJECT_SOURCE_DIR}/component/inc/utilities
 #        ${PROJECT_SOURCE_DIR}/component/inc/tcp
 #        ${PROJECT_SOURCE_DIR}/component/inc/tables
