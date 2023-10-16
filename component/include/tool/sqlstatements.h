@@ -16,10 +16,14 @@ Q_ENUMS(SQLType)
 
 // 驱动的相关设置
 static const char* SqliteDriver = "sqlite";
+static const char* QSqliteDriver = "QSLITE";
 static const char* SqlcipherDriver = "sqlcipher";
+static const char* QSqlcipherDriver = "SQLITECIPHER";
 static const char* MysqlDriver = "mysql";
+static const char* QMysqlDriver = "QMYSQL";
 static const char* ConfigFileSuffix = ".eos";
 static const char* MatchConfigFileSuffix = "*.eos";
+static const char* SqliteFileSuffix = ".db3";
 //#define UseSqlcipher true
 static const char*  SqliteDataBasePassword = "cb199791";
 static const char*  MysqlDataBaseConnections = "MYSQL_OPT_CONNECT_TIMEOUT=1;";

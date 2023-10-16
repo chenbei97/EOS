@@ -41,4 +41,12 @@
 #else
 #  define COMPONENT_IMEXPORT Q_DECL_IMPORT
 #endif
+
+extern SQLType CurrentSqlType; // 包含本头文件的能够使用这个变量
+#define CurrentSqliteType (CurrentSqlType==SQLType::Sqlite)
+// 读写的指针
+class SqliteReadWrite;
+class MySqlReadWrite;
+#define SqliteReadWritePointer (&SqliteReadWrite::instance())
+#define MysqlReadWritePointer (&MySqlReadWrite::instance())
 #endif //EOSI_TOOL_H
