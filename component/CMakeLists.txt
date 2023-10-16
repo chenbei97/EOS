@@ -46,6 +46,7 @@ target_link_libraries(${DLLNAME}
 target_include_directories(${DLLNAME}
         PUBLIC
         ${PROJECT_SOURCE_DIR}/component/include/widgets
+        ${PROJECT_SOURCE_DIR}/component/include/datastructure
 #        ${PROJECT_SOURCE_DIR}/component/inc/utilities
 #        ${PROJECT_SOURCE_DIR}/component/inc/tcp
 #        ${PROJECT_SOURCE_DIR}/component/inc/tables

@@ -33,7 +33,6 @@
 #include "qtimer.h"
 #include "qdatetime.h"
 
-#include "qevent.h"
 #include "qthread.h"
 #include "qdebug.h"
 

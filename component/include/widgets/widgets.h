@@ -20,11 +20,15 @@
 #include "qsplitter.h"
 #include "qspinbox.h"
 #include "qprogressbar.h"
+#include "qtableview.h"
+#include "qheaderview.h"
 
 #include "qvalidator.h"
 #include "qevent.h"
 // (2) 常量定义
+#define SplitterHandleWidth 10
 #define ProgressBarMinHeight 40
+#define SplitterStyle ("QSplitter::handle { background-color: #F2A072 }")
 #define ProgressBarStyle ("QProgressBar{border:2px solid grey;border-radius:5px;text-align:center;}"\
                                     "QProgressBar::chunk{background-color: #CD96CD;width: 10px;margin: 0.5px;}")
 
