@@ -16,8 +16,6 @@
 #include "tool.h"
 
 #include "qapplication.h"
-
-#include "qaction.h"
 #include "qtimer.h"
 
 #include "qthread.h"

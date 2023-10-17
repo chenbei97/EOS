@@ -32,6 +32,8 @@ typedef const QString& QCString;
 typedef const QPoint& QCPoint;
 typedef const QPointF& QCPointF;
 typedef const QColor& QCColor;
+typedef const QRect& QCRect;
+typedef const QRectF& QCRectF;
 
 typedef QVector<QColor> QColorVector;
 typedef const QVector<QColor>& QCColorVector;
@@ -39,6 +41,12 @@ typedef QVector<QPoint> QPointVector;
 typedef const QVector<QPoint>& QCPointVector;
 typedef QVector<QPointF> QPointFVector;
 typedef const QVector<QPointF>& QCPointFVector;
+typedef QVector<QRectF> QRectFVector;
+typedef const QVector<QRectF>& QCRectFVector;
+typedef QVector<QVector<QPointF>> QPointF2DVector;
+typedef const QVector<QVector<QPointF>>& QCPointF2DVector;
+typedef QVector<QVector<QRectF>> QRectF2DVector;
+typedef const QVector<QVector<QRectF>>& QCRectF2DVector;
 typedef QVector<QString> QStringVector;
 typedef const QVector<QString>& QCStringVector;
 typedef QVector<QString> QFieldQVector;
@@ -46,21 +54,40 @@ typedef const QVector<QString>& QCFieldVector;
 typedef QVector<QString> QValueVector;
 typedef const QVector<QString>& QCValueVector;
 typedef QVector<bool> QBoolVector;
+typedef const QVector<bool>& QCBoolVector;
+typedef QVector<QVector<bool>> QBool2DVector;
+typedef const QVector<QVector<bool>>& QCBool2DVector;
 
 typedef QList<QColor> QColorList;
 typedef const QList<QColor>& QCColorList;
 typedef QList<QPoint> QPointList;
 typedef const QList<QPoint>& QCPointList;
 typedef QList<QPointF> QPointFList;
+typedef QList<QRectF> QRectFList;
+typedef const QList<QRectF>& QCRectFList;
 typedef const QList<QPointF>& QCPointFList;
+typedef QList<QList<QPointF>> QPointF2DList;
+typedef const QList<QList<QPointF>>& QCPointF2DList;
+typedef QList<QList<QRectF>> QRectF2DList;
+typedef const QList<QList<QRectF>>& QCRectF2DList;
 typedef QList<QString> QFieldList;
 typedef const QList<QString>& QCFieldList;
 typedef QList<QString> QValueList;
 typedef const QList<QString>& QCValueList;
 typedef const QList<QString>& QCStringList;
 typedef QList<bool> QBoolList;
+typedef const QList<bool>& QCBoolList;
+typedef QList<QList<bool>> QBool2DList;
+typedef const QList<QList<bool>>& QCBool2DList;
 
 typedef QVector<QVector<QString>> QValue2DVector;
 typedef  const QVector<QVector<QString>>& QCValue2DVector;
+
+typedef QPair<bool,QColor> QBoolColorPair;
+typedef const QPair<bool,QColor>& QCBoolColorPair;
+typedef QVector<QPair<bool,QColor>> QBoolColorPairVector;
+typedef const QVector<QPair<bool,QColor>>& QCBoolColorPairVector;
+typedef QVector<QVector<QBoolColorPair>> QBoolColorPair2DVector;
+typedef const QVector<QVector<QBoolColorPair>>& QCBoolColorPair2DVector;
 
 #endif //EOSI_ALIAS_H
