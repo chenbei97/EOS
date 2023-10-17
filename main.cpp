@@ -15,11 +15,12 @@ int main(int argc, char *argv[]) {
     LogInit;
     QApplication a(argc, argv);
     LOG << "Screen Width:" << UserScreenWidth << "Screen Height:" << UserScreenHeight;
-    Pattern w(16,24);
-    w.toggleState(Pattern::TickState);
-    w.selectPoints(QPointVector()<<QPoint(1,1)<<QPoint(2,2));
-    //w.clearPoints();
-    w.resize(2000,1200);
+//    Pattern w(16,24);
+//    w.toggleState(Pattern::TickState);
+//    w.selectPoints(QPointVector()<<QPoint(1,1)<<QPoint(2,2));
+//    //w.clearPoints();
+//    w.resize(2000,1200);
+    SocketPanel w;
     w.show();
     return QApplication::exec();
 }

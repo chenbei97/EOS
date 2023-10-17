@@ -10,6 +10,7 @@
 #define EOSI_PUBLIC_H
 
 // (1) 头文件包含
+#include "tcpsocket.h"
 
 #include "eventloop.h"
 #include "sqlquerymodel.h"
@@ -33,6 +34,8 @@
 #include "splitter.h"
 #include "slider.h"
 #include "tableview.h"
+#include "colorbutton.h"
+#include "socketpanel.h"
 
 #include "qtimer.h"
 

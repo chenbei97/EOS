@@ -90,4 +90,8 @@ typedef const QVector<QPair<bool,QColor>>& QCBoolColorPairVector;
 typedef QVector<QVector<QBoolColorPair>> QBoolColorPair2DVector;
 typedef const QVector<QVector<QBoolColorPair>>& QCBoolColorPair2DVector;
 
+typedef QQueue<QByteArray> QByteQueue;
+typedef const QVariantMap& QCVariantMap;
+typedef QVariant(*TcpParseFuncPointer)(QCVariantMap m);
+typedef QByteArray(*TcpAssembleFuncPointer)(QCVariantMap m);
 #endif //EOSI_ALIAS_H

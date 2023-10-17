@@ -37,13 +37,6 @@
 #define SqlExecFailedLOG (qDebug()<<"[" \
     <<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] sql exec failed! error is ")
 
-// (3) 导出定义
-#if defined(COMPONENT_LIBRARY)
-#  define COMPONENT_IMEXPORT Q_DECL_EXPORT
-#else
-#  define COMPONENT_IMEXPORT Q_DECL_IMPORT
-#endif
-
 extern SQLType CurrentSqlType; // 包含本头文件的能够使用这个变量
 #define CurrentSqliteType (CurrentSqlType==SQLType::Sqlite)
 // 读写的指针
@@ -54,4 +47,12 @@ class Log;
 #define MysqlReadWritePointer (&MySqlReadWrite::instance())
 #define LogInit (Log::instance())
 #define LogPointer (&Log::instance())
+
+// (3) 导出定义
+#if defined(COMPONENT_LIBRARY)
+#  define COMPONENT_IMEXPORT Q_DECL_EXPORT
+#else
+#  define COMPONENT_IMEXPORT Q_DECL_IMPORT
+#endif
+
 #endif //EOSI_TOOL_H

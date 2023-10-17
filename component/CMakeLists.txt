@@ -48,7 +48,7 @@ target_include_directories(${DLLNAME}
         ${PROJECT_SOURCE_DIR}/component/include/widgets
         ${PROJECT_SOURCE_DIR}/component/include/datastructure
         ${PROJECT_SOURCE_DIR}/component/include/tool
-#        ${PROJECT_SOURCE_DIR}/component/inc/tables
+        ${PROJECT_SOURCE_DIR}/component/include/socket
 #        ${PROJECT_SOURCE_DIR}/component/inc/video
         ${PROJECT_SOURCE_DIR}/component/include # 这里要包含,否则main.cpp不能引用目录
         )

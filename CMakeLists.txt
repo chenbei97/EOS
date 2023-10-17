@@ -44,7 +44,8 @@ set(COMPONENT_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/component/include
         ${PROJECT_SOURCE_DIR}/component/include/widgets
         ${PROJECT_SOURCE_DIR}/component/include/datastructure
-        ${PROJECT_SOURCE_DIR}/component/include/tool)
+        ${PROJECT_SOURCE_DIR}/component/include/tool
+        ${PROJECT_SOURCE_DIR}/component/include/socket)
 
 file(GLOB MAIN_FILES  "${PROJECT_SOURCE_DIR}/*.h" "${PROJECT_SOURCE_DIR}/*.cpp")
 
