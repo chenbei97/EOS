@@ -10,15 +10,31 @@
 #define EOSI_PUBLIC_H
 
 // (1) 头文件包含
-#include "widgets.h"
-#include "datastructure.h"
-#include "utilities.h"
-#include "tool.h"
 
-#include "qapplication.h"
+#include "eventloop.h"
+#include "sqlquerymodel.h"
+#include "sqltablemodel.h"
+#include "standarditemmodel.h"
+
+#include "sqlreadwrite.h"
+#include "mysqlreadwrite.h"
+#include "sqlitereadwrite.h"
+#include "jsonreadwrite.h"
+#include "log.h"
+
+#include "colorbutton.h"
+#include "combobox.h"
+#include "groupinfo.h"
+#include "groupbox.h"
+#include "pattern.h"
+#include "label.h"
+#include "progressbar.h"
+#include "spinbox.h"
+#include "splitter.h"
+#include "slider.h"
+#include "tableview.h"
+
 #include "qtimer.h"
-
-#include "qthread.h"
 
 // (2) 常量定义
 

@@ -20,6 +20,12 @@ QColor ColorButton::color() const
     return btncolor;
 }
 
+void ColorButton::setColor(const QColor& color)
+{
+    btncolor = color;
+    setStyleSheet(ColorButtonStyle.arg(color.name()));
+}
+
 QColorDialog* ColorButton::colorDialog(const QColor&initColor)
 {
     QColorDialog * dlg = new QColorDialog(initColor);

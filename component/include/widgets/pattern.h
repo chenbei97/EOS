@@ -38,19 +38,18 @@ private:
     void clearMousePoint();//清除鼠标选中的圆
 private:
     PatternState mState; // 当前状态,默认UnInitialState
-    int mrows;
-    int mcols;
+    int mrows = 0;
+    int mcols = 0;
     const int mGap = 30; // 圆之间的间隔
     const int mSpace = 10; // 到窗口边框留出的距离
     QColor mInnerCircleColor =  Qt::darkGray; // 默认填充内圆的颜色
     QColor mMouseClickColor = Qt::green; // 鼠标点击填充内圆的颜色
-    QColor mSelectedColor = QColor("#A0FEFF"); // 已被选中的颜色
     bool mMouseEvent; // 是否启用鼠标事件
     QPoint mMousePos; // 鼠标点击的坐标,不是真实物理坐标
     QPoint mLastPos; // 鼠标左键点击的真实物理坐标
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true
-    QBoolColorPair2DVector mSelectPoints; // 被选中的所有点赋值true
+    QBoolColorPair2DVector mSelectPoints; // 被选中的所有点赋值true,color 2个信息
 private:
     void select(QCColor color);
     void unselect();

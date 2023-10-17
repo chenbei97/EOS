@@ -63,8 +63,6 @@ void Pattern::drawHighlight(QPainter&painter)
     }
 }
 
-
-
 void Pattern::mousePressEvent(QMouseEvent *event)
 {
     if (mMouseEvent) {
@@ -112,7 +110,9 @@ void Pattern::mouseReleaseEvent(QMouseEvent *event)
 {
     if (mMouseEvent) {
         if (event->button() == Qt::LeftButton) {
+            auto c = mSelectPoints[mMousePos.x()][mMousePos.y()].second;
             auto dlg = new GroupInfo;
+            dlg->setBtnColor(c); // 鼠标单击时可以让按钮跟随当前的孔颜色
             //dlg->setAttribute(Qt::WA_DeleteOnClose);
             int ret = dlg->exec();
             if (ret == QDialog::Accepted)
@@ -294,7 +294,6 @@ void Pattern::init()
     mState = UnInitialState;
     mMouseEvent = false;
     mMousePos = {-1,-1};
-    mSelectedColor.setAlpha(PatternColorAlpha);
     mInnerCircleColor.setAlpha(PatternColorAlpha);
     mMouseClickColor.setAlpha(PatternColorAlpha);
 
@@ -322,13 +321,9 @@ void Pattern::toggleState(PatternState state)
     switch (mState) {
         case UnInitialState:
             mMouseEvent = false;
-            //mSelectAllAct->setEnabled(false);
-            //mUnSelectAllAct->setEnabled(false);
             break;
         case TickState:
             mMouseEvent = true;
-            //mSelectAllAct->setEnabled(true);
-            //mUnSelectAllAct->setEnabled(true);
             break;
     }
 }
@@ -367,7 +362,6 @@ void Pattern::initSelectPoints()
 
 void Pattern::select(QCColor color)
 { // 把拖拽的点都选中
-    LOG<<"color = "<<color.name();
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){
             auto pt = mDrapPoints[row][col];
@@ -382,6 +376,7 @@ void Pattern::select(QCColor color)
                || mMousePos.y()<0 || mMousePos.y()>mcols-1;
     if (!ret) {// 防止越界,选择和取消选择需要在未初始化时禁用动作,
         mSelectPoints[mMousePos.x()][mMousePos.y()].first = true; // 没启用鼠标事件,这是{-1,-1}会越界
+        mSelectPoints[mMousePos.x()][mMousePos.y()].second = color;
         mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
     }
     update();

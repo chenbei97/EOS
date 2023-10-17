@@ -19,6 +19,7 @@ class COMPONENT_IMEXPORT GroupInfo: public QDialog
 public:
     explicit GroupInfo(QWidget*parent= nullptr);
     QColor groupColor() const;
+    void setBtnColor(const QColor& color);
 private:
     void initObjects();
     void onClick();

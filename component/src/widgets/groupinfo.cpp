@@ -13,12 +13,16 @@ GroupInfo::GroupInfo(QWidget *parent) : QDialog(parent)
 {
     initObjects();
     connect(btn,&PushButton::clicked,this,&GroupInfo::onClick);
-    resize(600,250);
 }
 
 QColor GroupInfo::groupColor() const
 {
     return cbtn->color();
+}
+
+void GroupInfo::setBtnColor(const QColor& color)
+{
+    cbtn->setColor(color);
 }
 
 void GroupInfo::onClick()

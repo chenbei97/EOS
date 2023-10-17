@@ -39,18 +39,25 @@
 #include "qmath.h"
 #include "qdatetime.h"
 #include "qdebug.h"
+#include "qscreen.h"
+#include "qdesktopwidget.h"
+#include "qapplication.h"
+
 // (2) 常量定义
 #define DefaultFontSize 12
 #define DefaultFontFamily ("Times New Roman")
 #define PatternColorAlpha 125
 #define SplitterHandleWidth 10
-#define ProgressBarMinHeight 40
 #define SplitterStyle ("QSplitter::handle { background-color: #F2A072 }")
 #define ProgressBarStyle ("QProgressBar{border:2px solid grey;border-radius:5px;text-align:center;}"\
                                     "QProgressBar::chunk{background-color: #CD96CD;width: 10px;margin: 0.5px;}")
 #define ColorButtonStyle QString("border:2px solid black;border-radius:20px;background-color:%1;")
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 
+#define UserScreenWidth (QApplication::desktop()->screenGeometry().width())
+#define UserScreenHeight (QApplication::desktop()->screenGeometry().height())
+#define ProgressBarMinHeight 40
+#define ColorButtonSize 40
 // (3) 导出定义
 #if defined(COMPONENT_LIBRARY)
 #  define COMPONENT_IMEXPORT Q_DECL_EXPORT

@@ -27,6 +27,8 @@
 #include "qtextstream.h"
 #include "qdebug.h"
 #include "qdatetime.h"
+#include "qmutex.h"
+#include "qthread.h"
 
 #include "sqlstatements.h"
 
@@ -47,6 +49,9 @@ extern SQLType CurrentSqlType; // 包含本头文件的能够使用这个变量
 // 读写的指针
 class SqliteReadWrite;
 class MySqlReadWrite;
+class Log;
 #define SqliteReadWritePointer (&SqliteReadWrite::instance())
 #define MysqlReadWritePointer (&MySqlReadWrite::instance())
+#define LogInit (Log::instance())
+#define LogPointer (&Log::instance())
 #endif //EOSI_TOOL_H

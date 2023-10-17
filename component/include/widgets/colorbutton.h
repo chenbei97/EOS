@@ -18,8 +18,9 @@ public:
     explicit ColorButton(QWidget*parent= nullptr);
     QColorDialog* colorDialog(const QColor&initColor);
     QColor color() const;
+    void setColor(const QColor& color);
 private:
-    const int btnsize = 40;
+    const int btnsize = ColorButtonSize ;
     QColor btncolor = Qt::white;
     void onClick();
 };
