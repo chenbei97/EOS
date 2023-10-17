@@ -15,6 +15,8 @@
 #include "qjsonobject.h"
 #include "qdebug.h"
 #include "qdatetime.h"
+#include "qmutex.h"
+#include "qthread.h"
 #include "alias.h"
 
 // (2) 定义常量
