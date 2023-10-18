@@ -9,7 +9,7 @@
 #ifndef EOSI_TEST_H
 #define EOSI_TEST_H
 
-#include "public.h"
+#include "interface.h"
 
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 

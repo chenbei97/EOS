@@ -47,11 +47,15 @@ set(COMPONENT_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/component/include/tool
         ${PROJECT_SOURCE_DIR}/component/include/socket)
 
+set(INTERFACE_INCLUDE_PATH
+        ${PROJECT_SOURCE_DIR}/interface/include
+        ${PROJECT_SOURCE_DIR}/interface/include/window)
+
 file(GLOB MAIN_FILES  "${PROJECT_SOURCE_DIR}/*.h" "${PROJECT_SOURCE_DIR}/*.cpp")
 
 # （3）2个子目录
 add_subdirectory(component)
-#add_subdirectory(Interface)
+add_subdirectory(interface)
 #（4）链接的库目录 必须add_executable之前
 link_directories(${PYTHON310_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib)
 
@@ -62,7 +66,7 @@ find_package(Qt5 COMPONENTS Core Gui Widgets Sql Network
 add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH}) # ${THEME_PATH}
 
 #（6）包含头文件目录，必须add_executable之后
-target_include_directories(${PROJECT_NAME} PUBLIC COMPONENT_INCLUDE_PATH
+target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
         ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
 # （7）清理4个文件夹并重新复制
 # 1. remove_directory
@@ -127,7 +131,7 @@ endforeach(file)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Sql Qt5::Network Qt5::Concurrent
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
-        component python310) # mingw必须显示指定python310,msvc指定与否都可  interface
+        component interface python310) # mingw必须显示指定python310,msvc指定与否都可
 
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)

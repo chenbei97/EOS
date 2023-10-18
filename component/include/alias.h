@@ -94,4 +94,17 @@ typedef QQueue<QByteArray> QByteQueue;
 typedef const QVariantMap& QCVariantMap;
 typedef QVariant(*TcpParseFuncPointer)(QCVariantMap m);
 typedef QByteArray(*TcpAssembleFuncPointer)(QCVariantMap m);
+
+struct HoleInfo {
+    bool isSelected;
+    QPoint point;
+    QColor color;
+    QString group;
+};
+
+typedef QVector<HoleInfo> QHoleInfoVector;
+typedef const QVector<HoleInfo>& QCHoleInfoVector;
+typedef QVector<QVector<HoleInfo>> QHoleInfo2DVector;
+typedef const QVector<QVector<HoleInfo>>& QCHoleInfo2DVector;
+
 #endif //EOSI_ALIAS_H

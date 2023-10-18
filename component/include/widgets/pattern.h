@@ -49,10 +49,10 @@ private:
     QPoint mLastPos; // 鼠标左键点击的真实物理坐标
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true
-    QBoolColorPair2DVector mSelectPoints; // 被选中的所有点赋值true,color 2个信息
+    QHoleInfo2DVector mHoleInfo; // 每个孔的所有信息用结构体封装
+    //QBoolColorPair2DVector mSelectPoints; // 被选中的所有点赋值true,color 2个信息
 private:
     void select(QCColor color);
-    void unselect();
 signals:
     void mouseClicked(const QPoint& point);
 };

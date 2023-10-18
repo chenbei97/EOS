@@ -27,7 +27,7 @@ void Pattern::drawHighlight(QPainter&painter)
             }
 
             // 启用了鼠标事件mMousePos才会被赋值,否则是(-1,-1),所以这里不用再判断是否启用了鼠标事件
-            if (mMousePos.x() == row && mMousePos.y() == col && !mSelectPoints[row][col].first)
+            if (mMousePos.x() == row && mMousePos.y() == col && !mHoleInfo[row][col].isSelected)
             { // 已绘制的点不要绘制鼠标选中高亮
                 path.clear();
                 path.moveTo(center);
@@ -44,19 +44,19 @@ void Pattern::drawHighlight(QPainter&painter)
                 painter.setPen(pen);
             }
 
-            if (mDrapPoints[row][col] ) { // && !mSelectPoints[row][col] 绘制拖拽临时的点,如果有已被选中的不需要再绘制
+            if (mDrapPoints[row][col] ) { // && !mHoleInfo[row][col].isSelected 绘制拖拽临时的点,如果有已被选中的不需要再绘制
                 path.clear(); // 不过这样取消选中时不能绘制拖拽的点感受不好,还是恢复
                 path.moveTo(center);
                 path.addEllipse(center,radius*0.75,radius*0.75);
                 painter.fillPath(path,mMouseClickColor);
             }
 
-            if (mSelectPoints[row][col].first) //  绘制确定选中的点
+            if (mHoleInfo[row][col].isSelected) //  绘制确定选中的点
             {
                 path.clear();
                 path.moveTo(center);
                 path.addEllipse(center,radius*0.75,radius*0.75);
-                painter.fillPath(path,mSelectPoints[row][col].second);
+                painter.fillPath(path,mHoleInfo[row][col].color);
             }
 
         }
@@ -110,7 +110,7 @@ void Pattern::mouseReleaseEvent(QMouseEvent *event)
 {
     if (mMouseEvent) {
         if (event->button() == Qt::LeftButton) {
-            auto c = mSelectPoints[mMousePos.x()][mMousePos.y()].second;
+            auto c = mHoleInfo[mMousePos.x()][mMousePos.y()].color;
             auto dlg = new GroupInfo;
             dlg->setBtnColor(c); // 鼠标单击时可以让按钮跟随当前的孔颜色
             //dlg->setAttribute(Qt::WA_DeleteOnClose);
@@ -272,8 +272,9 @@ void Pattern::selectPoint(int row,int col, bool isSelected)
 { // 选中某个点
     if (row <0 || row >= mrows) return ;
     if (col <0 || col >= mcols) return ;
-    mSelectPoints[row][col].first = isSelected;
-    mSelectPoints[row][col].second = Qt::red;
+    mHoleInfo[row][col].isSelected = isSelected;
+    mHoleInfo[row][col].color = Qt::red;
+    mHoleInfo[row][col].point = QPoint(row,col);
     update();
 }
 
@@ -349,13 +350,17 @@ void Pattern::initDrapPoints()
 
 void Pattern::initSelectPoints()
 {
-    mSelectPoints.clear();
+    mHoleInfo.clear();
     for(int row = 0 ; row < mrows; ++ row) {
-        QBoolColorPairVector var;
+        QHoleInfoVector var;
         for (int col = 0; col < mcols; ++col){
-            var.append(qMakePair(false,Qt::red));
+            HoleInfo info;
+            info.point = QPoint(row,col);
+            info.color = Qt::red;
+            info.isSelected = false;
+            var.append(info);
         }
-        mSelectPoints.append(var);
+        mHoleInfo.append(var);
     }
     update();
 }
@@ -366,8 +371,8 @@ void Pattern::select(QCColor color)
         for (int col = 0; col < mcols; ++col){
             auto pt = mDrapPoints[row][col];
             if (pt){
-                mSelectPoints[row][col].first = true;
-                mSelectPoints[row][col].second = color;
+                mHoleInfo[row][col].isSelected = true;
+                mHoleInfo[row][col].color = color;
                 mDrapPoints[row][col] = false; // 被选中的点不要再视为拖拽区域
             }
         }
@@ -375,30 +380,9 @@ void Pattern::select(QCColor color)
     auto ret = mMousePos.x()<0 || mMousePos.x()>mrows-1
                || mMousePos.y()<0 || mMousePos.y()>mcols-1;
     if (!ret) {// 防止越界,选择和取消选择需要在未初始化时禁用动作,
-        mSelectPoints[mMousePos.x()][mMousePos.y()].first = true; // 没启用鼠标事件,这是{-1,-1}会越界
-        mSelectPoints[mMousePos.x()][mMousePos.y()].second = color;
+        mHoleInfo[mMousePos.x()][mMousePos.y()].isSelected = true; // 没启用鼠标事件,这是{-1,-1}会越界
+        mHoleInfo[mMousePos.x()][mMousePos.y()].color = color;
         mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
     }
     update();
-}
-
-void Pattern::unselect()
-{
-//    for(int row = 0 ; row < mrows; ++ row) {
-//        for (int col = 0; col < mcols; ++col){
-//            auto pt = mDrapPoints[row][col];
-//            if (pt){
-//                mSelectPoints[row][col] = false;
-//                mDrapPoints[row][col] = false;
-//            }
-//        }
-//    }
-//    auto ret = mMousePos.x()<0 || mMousePos.x()>mrows-1
-//            || mMousePos.y()<0 || mMousePos.y()>mcols-1;
-//    if (!ret) {// 防止越界,选择和取消选择需要在未初始化时禁用动作,
-//        mSelectPoints[mMousePos.x()][mMousePos.y()] = false; // 没启用鼠标事件,这是{-1,-1}会越界
-//        mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
-//    }
-//    mMousePos = {-1,-1}; // 短暂的清除一下
-//    update();
 }
