@@ -12,12 +12,15 @@ AssemblerController::AssemblerController(QObject *parent) : QObject(parent)
 {
     assembler = new Assembler;
     assembler->moveToThread(&assemblethread);
+
     // 组装信号传递给组装类,触发信号和同步信号,这样信号回来后这里message()就可以拿到同步后的结果
     connect(this,&AssemblerController::assemble,assembler,&Assembler::assemble);
-    connect(this,&AssemblerController::assemble,this,[&]{loop.exec();});//组装时同步等待异步的assembleFinished
-    connect(assembler,&Assembler::assembleResult,this,[&](const QByteArray& m){msg=m;emit assembleFinished();});
+    connect(assembler,&Assembler::assembleResult,this,
+            [&](auto m){msg=m;emit assembleResult(m);});
 
-    connect(this,&AssemblerController::assembleFinished,&loop,&EventLoop::quit);
+    // 触发assemble信号后也开始执行事件循环等待同步
+    connect(this,&AssemblerController::assemble,this,[&]{loop.exec();});//组装时同步等待异步的assembleFinished
+    connect(this,&AssemblerController::assembleResult,&loop,&EventLoop::quit);
     assemblethread.start();
 }
 

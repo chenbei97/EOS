@@ -26,6 +26,6 @@ private:
     EventLoop loop;
 signals:
     void assemble(const QString&frame, const QVariantMap& m);
-    void assembleFinished();
+    void assembleResult(const QByteArray& m);
 };
 #endif //EOSI_ASSEMBLECONTROL_H

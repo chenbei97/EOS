@@ -63,7 +63,7 @@ static QByteArray assemble0x0000(QCVariantMap m)
 {
     Q_UNUSED(m);
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x1000;
+    object[FrameField] = TcpFramePool.frame0x0000;
 
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();

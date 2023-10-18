@@ -11,6 +11,10 @@
 
 // (1) 头文件包含
 #include "tcpsocket.h"
+#include "assemble.h"
+#include "assemblecontrol.h"
+#include "parse.h"
+#include "parsecontrol.h"
 
 #include "eventloop.h"
 #include "sqlquerymodel.h"
