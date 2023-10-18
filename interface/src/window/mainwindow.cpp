@@ -11,10 +11,12 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
     navigbar = new NavigBar;
+    appselect = new AppSelect;
+
     auto s = new Splitter(Qt::Vertical);
     s->setHandleWidth(0);
     s->addWidget(navigbar);
-    s->addWidget(new QWidget);
+    s->addWidget(appselect);
 
     setCentralWidget(s);
     resize(MainWindowWidth,MainWindowHeight);

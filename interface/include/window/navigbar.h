@@ -19,14 +19,13 @@ public:
     void paintEvent(QPaintEvent*event) override;
     void mousePressEvent(QMouseEvent *event) override;
 private:
-    const int rectwidth = 200;
-    const int rectheight = 100;
-    const int gap = 2;
-    const int pointsize = 20;
     QStringList texts;
     QVector<int> pixwidths;
-    int pixheight;
-    QFont font;
-
+    QRectVector getRects() const; // 获取所有文字部分的小正方形区域
+signals:
+    void previewClicked();
+    void protocolClicked();
+    void dataClicked();
+    void analysisClicked();
 };
 #endif //EOSI_NAVIGBAR_H

@@ -10,6 +10,7 @@
 #define EOSI_INTERFACE_H
 
 #include "navigbar.h"
+#include "appselect.h"
 #include "mainwindow.h"
 
 

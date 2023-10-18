@@ -11,6 +11,7 @@
 
 #include "window.h"
 #include "navigbar.h"
+#include "appselect.h"
 
 class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 {
@@ -19,5 +20,6 @@ public:
     explicit MainWindow(QWidget*parent= nullptr);
 private:
     NavigBar * navigbar;
+    AppSelect * appselect;
 };
 #endif //EOSI_MAINWINDOW_H

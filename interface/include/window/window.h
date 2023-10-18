@@ -13,6 +13,7 @@
 
 // (2) 常量
 #define NavigBarColor QColor("#767C85")
+#define AppSelectColor QColor("#2F7CAD")
 
 // (3) 导出定义
 #if defined(INTERFACE_LIBRARY)
