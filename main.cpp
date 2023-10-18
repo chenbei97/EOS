@@ -21,9 +21,9 @@ int main(int argc, char *argv[]) {
     //w.selectPoints(QPointVector()<<QPoint(1,1)<<QPoint(2,2));
     //w.clearPoints();
 
-    NavigBar w;
+    MainWindow w;
 //    SocketPanel w;
-    w.resize(2000,1200);
+    //w.resize(2000,1200);
     w.show();
     return QApplication::exec();
 }
