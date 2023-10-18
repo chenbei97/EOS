@@ -11,6 +11,9 @@
 
 #include "public.h"
 
+// (2) 常量
+#define NavigBarColor QColor("#767C85")
+
 // (3) 导出定义
 #if defined(INTERFACE_LIBRARY)
 #  define INTERFACE_IMEXPORT Q_DECL_EXPORT

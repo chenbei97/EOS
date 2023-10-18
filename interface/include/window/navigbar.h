@@ -16,5 +16,17 @@ class INTERFACE_IMEXPORT NavigBar: public QWidget
     Q_OBJECT
 public:
     explicit NavigBar(QWidget*parent= nullptr);
+    void paintEvent(QPaintEvent*event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+private:
+    const int rectwidth = 200;
+    const int rectheight = 100;
+    const int gap = 2;
+    const int pointsize = 20;
+    QStringList texts;
+    QVector<int> pixwidths;
+    int pixheight;
+    QFont font;
+
 };
 #endif //EOSI_NAVIGBAR_H

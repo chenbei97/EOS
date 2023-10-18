@@ -20,6 +20,7 @@ Splitter::Splitter(Qt::Orientation orientation, QWidget *parent) :QSplitter(pare
 
 Splitter::Splitter(QWidget *parent) :QSplitter(parent)
 {
+    setOrientation(Qt::Horizontal);
     setHandleWidth(SplitterHandleWidth);
     setOpaqueResize(false);
     setChildrenCollapsible(true);

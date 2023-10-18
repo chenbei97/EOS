@@ -26,6 +26,7 @@
 #include "qtimeline.h"
 #include "qdialog.h"
 #include "qcolordialog.h"
+#include "qmainwindow.h"
 
 #include "qlayout.h"
 #include "qboxlayout.h"
@@ -47,7 +48,7 @@
 #define DefaultFontSize 12
 #define DefaultFontFamily ("Times New Roman")
 #define PatternColorAlpha 125
-#define SplitterHandleWidth 10
+#define SplitterHandleWidth 2
 #define SplitterStyle ("QSplitter::handle { background-color: #F2A072 }")
 #define ProgressBarStyle ("QProgressBar{border:2px solid grey;border-radius:5px;text-align:center;}"\
                                     "QProgressBar::chunk{background-color: #CD96CD;width: 10px;margin: 0.5px;}")
@@ -58,6 +59,13 @@
 #define UserScreenHeight (QApplication::desktop()->screenGeometry().height())
 #define ProgressBarMinHeight 40
 #define ColorButtonSize 40
+
+#define ScreenWidth 2560
+#ifdef ScreenWidth
+    #define MainWindowWidth 2000
+    #define MainWindowHeight 1200
+#endif
+
 // (3) 导出定义
 #if defined(COMPONENT_LIBRARY)
 #  define COMPONENT_IMEXPORT Q_DECL_EXPORT
