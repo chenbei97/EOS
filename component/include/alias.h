@@ -83,6 +83,8 @@ typedef QList<bool> QBoolList;
 typedef const QList<bool>& QCBoolList;
 typedef QList<QList<bool>> QBool2DList;
 typedef const QList<QList<bool>>& QCBool2DList;
+typedef QStringList QFieldsList;
+typedef const QFieldsList& QCFieldsList;
 
 typedef QVector<QVector<QString>> QValue2DVector;
 typedef  const QVector<QVector<QString>>& QCValue2DVector;

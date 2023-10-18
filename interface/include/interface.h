@@ -11,6 +11,8 @@
 
 #include "navigbar.h"
 #include "appselect.h"
+#include "preview.h"
+#include "previewtool.h"
 #include "mainwindow.h"
 
 

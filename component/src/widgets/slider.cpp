@@ -21,6 +21,28 @@ Slider::Slider(QWidget *parent):QWidget(parent)
     setLayout(hlay);
 
     connect(slider,&QSlider::sliderMoved,this,&Slider::onSliderChanged);
+    setMinimumHeight(50);
+}
+
+Slider::Slider(const QString &p, const QString &s, int min, int max, QWidget *parent) :QWidget(parent)
+{
+    slider = new QSlider(Qt::Horizontal);
+    suffix = new Label;
+    prefix = new Label;
+
+    prefix->setText(p);
+    suffix->setText(s);
+    slider->setRange(min,max);
+    suffixtext = s;
+
+    auto hlay = new QHBoxLayout;
+    hlay->addWidget(prefix);
+    hlay->addWidget(slider);
+    hlay->addWidget(suffix);
+    setLayout(hlay);
+
+    connect(slider,&QSlider::sliderMoved,this,&Slider::onSliderChanged);
+    setMinimumHeight(50);
 }
 
 void Slider::onSliderChanged(int val)

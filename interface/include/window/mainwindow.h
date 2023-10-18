@@ -12,6 +12,7 @@
 #include "window.h"
 #include "navigbar.h"
 #include "appselect.h"
+#include "preview.h"
 
 class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 {
@@ -21,5 +22,6 @@ public:
 private:
     NavigBar * navigbar;
     AppSelect * appselect;
+    Preview * preview;
 };
 #endif //EOSI_MAINWINDOW_H

@@ -17,6 +17,7 @@ class COMPONENT_IMEXPORT Slider: public QWidget
     Q_OBJECT
 public:
     explicit Slider(QWidget *parent = nullptr);
+    explicit Slider(const QString& p,const QString& s,int min,int max,QWidget *parent = nullptr);
     void setRange(int min,int max);
     void setPrefix(const QString& p);
     void setSuffix(const QString& s);
