@@ -18,6 +18,4 @@
 #include "channelbox.h"
 #include "mainwindow.h"
 
-
-
 #endif //EOSI_INTERFACE_H

@@ -20,7 +20,6 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     QSize sizeHint() const override;
 private:
-    QStringList texts;
     QVector<int> pixwidths;
     QRectVector getRects() const; // 获取所有文字部分的小正方形区域
 signals:

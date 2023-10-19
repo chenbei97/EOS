@@ -10,8 +10,7 @@
 
 NavigBar::NavigBar(QWidget*parent): QWidget(parent)
 {
-    texts <<"Logo"<<"Main"<<"Preview"<<"Protocol"<<"Data"<<"Analysis";
-    foreach(auto text, texts)
+    foreach(auto text, NavigBarFields)
         pixwidths << (NavigBarWidth-PainterMetric.width(text))/2;
 
     //setFixedHeight(NavigBarHeight);
@@ -27,16 +26,16 @@ void NavigBar::paintEvent(QPaintEvent*event)
     painter.setPen(pen);
 
     QPainterPath path;
-    for(int i = 0; i < texts.count(); ++i) {
+    for(int i = 0; i < NavigBarFieldsCount; ++i) {
         path.clear(); // 起始坐标(0,0),向右移动的距离是gap+width;text的起始坐标是(pixwidths[i],NavigBarFontHeight),高度不变
         path.addRect(0+NavigBarMoveDistance*i,0,NavigBarWidth,NavigBarHeight);
-        path.addText(pixwidths[i]+NavigBarMoveDistance*i,NavigBarFontHeight,PainterFont,texts[i]);
+        path.addText(pixwidths[i]+NavigBarMoveDistance*i,NavigBarFontHeight,PainterFont,NavigBarFields[i]);
         painter.fillPath(path,NavigBarColor);
     }
 
     // 没有文字的部分,为了好看继续填充矩形,为了调整窗口大小时自动绘制,计算宽度减去已经绘制的宽度得到还要继续填充几个矩形
-    auto count = (width() - texts.count()*NavigBarMoveDistance)/(NavigBarMoveDistance);
-    for(int i = texts.count();i <= count+texts.count(); ++i) {
+    auto count = (width() - NavigBarFieldsCount*NavigBarMoveDistance)/(NavigBarMoveDistance);
+    for(int i = NavigBarFieldsCount;i <= count+NavigBarFieldsCount; ++i) {
         path.clear();
         path.addRect(0+NavigBarMoveDistance*i,0,NavigBarWidth,NavigBarHeight);
         painter.fillPath(path,NavigBarColor);
@@ -69,7 +68,7 @@ void NavigBar::mousePressEvent(QMouseEvent *event)
 QRectVector NavigBar::getRects() const
 { // 获取所有文字部分的小正方形区域
     QRectVector vec;
-    for(int i = 0; i < texts.count(); ++i) {
+    for(int i = 0; i < NavigBarFieldsCount; ++i) {
         auto x = 0 + NavigBarMoveDistance*i;
         vec.append(QRect(x,0,NavigBarWidth,NavigBarHeight));
     }

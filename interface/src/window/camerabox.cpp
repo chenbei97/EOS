@@ -15,10 +15,10 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     cameratool3 = new CameraTool;
     cameratool4 = new CameraTool;
 
-    cameratool1->setTitle("PH");
-    cameratool2->setTitle("GFP");
-    cameratool3->setTitle("RFP");
-    cameratool4->setTitle("DAPI");
+    cameratool1->setTitle(PHField);
+    cameratool2->setTitle(GFPField);
+    cameratool3->setTitle(RFPField);
+    cameratool4->setTitle(DAPIField);
 
     setEnabled(0, false);
     setEnabled(1, false);

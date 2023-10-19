@@ -23,14 +23,112 @@
 #define NavigBarColor QColor("#767C85")
 #define AppSelectColor QColor("#2F7CAD")
 
+static const QFieldList NavigBarFields = {
+    "Logo","Main","Preview","Protocol","Data","Analysis"
+};
+#define NavigBarFieldsCount  (NavigBarFields.count())
+
+static const QFieldList AppFields = {
+    QObject::tr("增殖"),QObject::tr("划痕"),QObject::tr("侵袭"),QObject::tr("转染"),
+    QObject::tr("形态学"),QObject::tr("类器官"),QObject::tr("药效和毒理"),QObject::tr("自定义")
+};
+
+static const QFieldList WellsizeFields = {
+        "6","24","96","384",
+};
+static const char* WellsizeField = "wellsize";
+static const char* WellsizeFieldLabel = "wellsize: ";
+
+static const QFieldList ObjectiveFields = {
+        "4x","10x","20x","40x",
+};
+static const char* ObjectiveField = "objective";
+static const char* ObjectiveFieldLabel = "objective: ";
+
+static const QFieldList ChannelFields = {
+        "PH","GFP","RFP","DAPI"
+};
+static const char* PHField = "PH";
+static const char* GFPField = "GFP";
+static const char* RFPField = "RFP";
+static const char* DAPIField = "DAPI";
+static const char* ChannelField = "channel";
+static const char* ChannelFieldLabel = "channel: ";
+
+static const QFieldList ImageFormatFields = {
+        "jpg","png","ico","bmp"
+};
+
+static const QFieldList VideoFormatFields = {
+        "avi","wmv"
+};
+
+static const QFieldList BrandFields = {
+        "brand1","brand2","brand3"
+};
+static const char* BrandField = "brand";
+static const char* BrandFieldLabel = "brand: ";
+
+
+static const QFieldList DishFields = {
+        "dish1","dish2","dish3"
+};
+static const char* DishField = "dish";
+static const char* DishFieldLabel = "dish: ";
+
+static const QFieldList FlaskFields = {
+        "flask1","flask2","flask3"
+};
+static const char* FlaskField = "flask";
+static const char* FlaskFieldLabel = "flask: ";
+
+
+static const QFieldList SlideFields = {
+        "slide1","slide2","slide3"
+};
+static const char* SlideField = "slide";
+static const char* SlideFieldLabel = "slide: ";
+
+static const char* ExposureField = "exposure";
+static const char* ExposureFieldLabel = "exposure: ";
+static const char* ExposureFieldUnit = "ms";
+#define ExposureLowLimit 0
+#define ExposureUpLimit 15000
+static const char* GainField = "gain";
+static const char* GainFieldLabel = "gain: ";
+#define GainLowLimit 100
+#define GainUpLimit 5000
+static const char* GainFieldUnit = "%";
+static const char* BrightField = "bright";
+static const char* BrightFieldLabel = "bright: ";
+#define BrightLowLimit 0
+#define BrightUpLimit 100
+
+static const QList<QFieldList> SocketNeedMapFields{
+        BrandFields,VideoFormatFields,ImageFormatFields,
+        ChannelFields,ObjectiveFields,WellsizeFields,
+        DishFields,FlaskFields,SlideFields
+};
+
+static QString getIndexFromFields (QCString field)
+{ // 用于把这些字段统一映射为0,1,2,3方便下位机读取
+    // 例如4x,jpg,bright,avi都应该映射为0
+    QString idx = "";
+            foreach(auto fields, SocketNeedMapFields) { // 仅限于从这些字段查找
+            auto index = fields.indexOf(field);
+            if (index>=0){
+                idx = QString::number(index);
+                break; // 找到
+            }
+        }
+    return idx;
+}
+
 #define ScreenWidth 2560
 
 #ifdef ScreenWidth
     #define MainWindowWidth 2400
     #define MainWindowHeight 1200
-
-    #define PatternSizeHintWidth 600
-    #define PatternSizeHintHeight 400
 
     #define PainterFontSize 20
     #define PainterFont (QFont(DefaultFontFamily,PainterFontSize,QFont::Bold))

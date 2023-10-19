@@ -19,8 +19,7 @@ public:
     void paintEvent(QPaintEvent*event) override;
     void mousePressEvent(QMouseEvent *event) override;
 private:
-    QStringList texts;
-    QVector<int> pixwidths;
+    QVector<int> pixelwidths;
     void drawRoundRectV1(QPainter& painter);
     void drawRoundRectV2(QPainter& painter);
     QRectVector getRects() const; // 获取所有按钮的小正方形区域

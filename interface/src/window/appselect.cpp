@@ -10,10 +10,8 @@
 
 AppSelect::AppSelect(QWidget*parent): QWidget(parent)
 {
-    texts <<tr("增殖")<<tr("划痕")<<tr("侵袭")<<tr("转染")
-    <<tr("形态学")<<tr("类器官")<<tr("药效和毒理")<<tr("自定义");
-    foreach(auto text, texts)
-        pixwidths<< (AppSelectButtonWidth-PainterMetric.width(text))/2;
+    foreach(auto text, AppFields)
+       pixelwidths<< (AppSelectButtonWidth-PainterMetric.width(text))/2;
 }
 
 void AppSelect::paintEvent(QPaintEvent*event)
@@ -55,7 +53,7 @@ void AppSelect::mousePressEvent(QMouseEvent *event)
 }
 
 QRectVector AppSelect::getRects() const
-{// 获取所有按钮的小正方形区域
+{// 获取所有按钮的小正方形区域,从左到右从上到下
     QRectVector vec;
 
     for(int r = 0; r < AppSelectButtonCountPerRow; ++ r) {
@@ -80,11 +78,11 @@ void AppSelect::drawRoundRectV2(QPainter &painter)
             path.addRoundedRect(rect_x,rect_y,
                                 AppSelectButtonWidth,AppSelectButtonHeight,
                                 AppSelectButtonRoundRadius,AppSelectButtonRoundRadius);
-            auto idx = r * AppSelectButtonCountPerRow + c; // 例如(1,0)应该1x4+0=4,一维列表的索引位置4 r*4+c=idx
-            auto pixwidth = pixwidths[idx]; // (AppSelectButtonWidth-PainterMetric.width(texts[idx]))/2;
+            auto idx = r * AppSelectButtonCountPerCol + c; // 例如(1,0)应该1x4+0=4,一维列表的索引位置4 r*4+c=idx
+            auto pixwidth = pixelwidths[idx]; // (AppSelectButtonWidth-PainterMetric.width(texts[idx]))/2;
             auto x = AppSelectHorGap+(AppSelectMoveHorDistance)*c+pixwidth; // 到左侧距离+水平移动距离*0+文字相对按钮的水平距离
             auto y = AppSelectVerGap+(AppSelectMoveVerDistance)*r+AppSelectButtonFontHeight; // 到顶端距离+垂直移动+文字相对按钮垂直距离
-            path.addText(x,y,PainterFont,texts[idx]);
+            path.addText(x,y,PainterFont,AppFields[idx]);
             painter.fillPath(path,AppSelectColor);
         }
     }

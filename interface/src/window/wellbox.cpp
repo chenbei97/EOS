@@ -10,26 +10,26 @@
 
 WellBox::WellBox(QWidget*parent): GroupBox(parent)
 {
-    wellbrandCombo = new ComboBox(QStringList()<<"brand1"<<"brand2"<<"brand3");
+    wellbrandCombo = new ComboBox(BrandFields);
     wellsizeCombo = new ComboBox(WellsizeFields);
-    welldishCombo = new ComboBox(QStringList()<<"dish1"<<"dish2"<<"dish3");
-    wellflaskCombo = new ComboBox(QStringList()<<"flash1"<<"flash2"<<"flash3");
-    wellslideCombo = new ComboBox(QStringList()<<"slide1"<<"slide2"<<"slide3");
+    welldishCombo = new ComboBox(DishFields);
+    wellflaskCombo = new ComboBox(FlaskFields);
+    wellslideCombo = new ComboBox(SlideFields);
     objectiveCombo = new ComboBox(ObjectiveFields);
 
     auto gridlay = new QGridLayout;
-    gridlay->addWidget(new Label("brand: "),0,0);
+    gridlay->addWidget(new Label(BrandFieldLabel),0,0);
     gridlay->addWidget(wellbrandCombo,0,1);
-    gridlay->addWidget(new Label("wellsize: "),0,2);
+    gridlay->addWidget(new Label(WellsizeFieldLabel),0,2);
     gridlay->addWidget(wellsizeCombo,0,3);
-    gridlay->addWidget(new Label("objective: "),0,4);
+    gridlay->addWidget(new Label(ObjectiveFieldLabel),0,4);
     gridlay->addWidget(objectiveCombo,0,5);
 
-    gridlay->addWidget(new Label("dish: "),1,0);
+    gridlay->addWidget(new Label(DishFieldLabel),1,0);
     gridlay->addWidget(welldishCombo,1,1);
-    gridlay->addWidget(new Label("flask: "),1,2);
+    gridlay->addWidget(new Label(FlaskFieldLabel),1,2);
     gridlay->addWidget(wellflaskCombo,1,3);
-    gridlay->addWidget(new Label("slide: "),1,4);
+    gridlay->addWidget(new Label(SlideFieldLabel),1,4);
     gridlay->addWidget(wellslideCombo,1,5);
 
     gridlay->setColumnStretch(0,1);

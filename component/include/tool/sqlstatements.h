@@ -124,53 +124,11 @@ static const ExperConfigTableField ExperConfigTableFields;
 #define ExperTableStartTimeColumn  (ExperGeneralConfigFields.indexOf("start_time"))
 #define ExperTableEndTimeColumn  (ExperGeneralConfigFields.indexOf("end_time"))
 
-static const QFieldList WellsizeFields = {
-        "6","24","96","384",
-};
-
-static const QFieldList ObjectiveFields = {
-        "4x","10x","20x","40x",
-};
-
-static const QFieldList ChannelFields = {
-        "bright","phase","red","green","blue"
-};
-
-static const QFieldList ImageFormatFields = {
-        "jpg","png","ico","bmp"
-};
-
-static const QFieldList VideoFormatFields = {
-        "avi","wmv"
-};
-
-static const QFieldList BrandFields = {
-        "brand1","brand2","brand3"
-};
-
 static const QFieldList  GroupPointFields = {
         "id","user","flag",
         "group_name","point_pos","point_name"
 };
 
-static const QList<QFieldList> SocketNeedMapFields{
-        BrandFields,VideoFormatFields,ImageFormatFields,
-        ChannelFields,ObjectiveFields,WellsizeFields
-};
-
-static QString getIndexFromFields (QCString field)
-{ // 用于把这些字段统一映射为0,1,2,3方便下位机读取
-    // 例如4x,jpg,bright,avi都应该映射为0
-    QString idx = "";
-    foreach(auto fields, SocketNeedMapFields) { // 仅限于从这些字段查找
-        auto index = fields.indexOf(field);
-        if (index>=0){
-            idx = QString::number(index);
-            break; // 找到
-        }
-    }
-    return idx;
-}
 
 static const char* QueryGroupPointAndName =
         "select point_pos,point_name from grouppoint "

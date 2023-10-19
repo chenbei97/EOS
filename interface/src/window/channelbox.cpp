@@ -10,14 +10,14 @@
 
 ChannelBox::ChannelBox(QWidget*parent): GroupBox(parent)
 {
-    phbox = new CheckBox("PH");
-    gfpbox = new CheckBox("GFP");
-    rfpbox = new CheckBox("RFP");
-    dapibox = new CheckBox("DAPI");
+    phbox = new CheckBox(PHField);
+    gfpbox = new CheckBox(GFPField);
+    rfpbox = new CheckBox(RFPField);
+    dapibox = new CheckBox(DAPIField);
 
     auto lay = new QHBoxLayout;
 
-    lay->addWidget(new Label("channel: "));
+    lay->addWidget(new Label(ChannelFieldLabel));
     lay->addWidget(phbox);
     lay->addWidget(gfpbox);
     lay->addWidget(rfpbox);

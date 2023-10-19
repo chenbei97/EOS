@@ -61,8 +61,6 @@
 #define UserScreenHeight (QApplication::desktop()->screenGeometry().height())
 #define ProgressBarMinHeight 40
 #define ColorButtonSize 40
-//#define SliderSizeHintWidth 100
-//#define SliderSizeHintHeight 30
 
 // (3) 导出定义
 #if defined(COMPONENT_LIBRARY)
