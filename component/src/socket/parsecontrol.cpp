@@ -8,33 +8,33 @@
  */
 #include "parsecontrol.h"
 
-ParseControl::ParseControl(QObject *parent) : QObject(parent)
+ParserControl::ParserControl(QObject *parent) : QObject(parent)
 {
     parser = new Parse;
     parser->moveToThread(&parsethread);
 
     // 解析信号传递给解析类,触发信号和同步信号,这样信号回来后这里result()就可以拿到同步后的结果
-    connect(this,&ParseControl::parse,parser,&Parse::parse);
+    connect(this,&ParserControl::parse,parser,&Parse::parse);
     connect(parser,&Parse::parseResult,this,
             [&](auto f,auto d){fram=f;res=d;emit parseResult(f,d);});
 
-    connect(this,&ParseControl::parse,this,[&]{loop.exec();}); // 开始解析就进入时间循环等待同步
-    connect(this,&ParseControl::parseResult,&loop,&EventLoop::quit);
+    connect(this,&ParserControl::parse,this,[&]{loop.exec();}); // 开始解析就进入时间循环等待同步
+    connect(this,&ParserControl::parseResult,&loop,&EventLoop::quit);
 
     parsethread.start();
 }
 
-QVariant ParseControl::result() const
+QVariant ParserControl::result() const
 {
     return res;
 }
 
-QString ParseControl::frame() const
+QString ParserControl::frame() const
 {
     return fram;
 }
 
-ParseControl::~ParseControl()
+ParserControl::~ParserControl()
 {
     parsethread.quit();
     parsethread.wait();

@@ -27,8 +27,6 @@ SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
     lay->addWidget(edit);
     lay->addLayout(blay);
     setLayout(lay);
-    resize(800,600);
-
 
     connect(btn,&QPushButton::clicked,this,&SocketPanel::onSend);
     SocketInit;

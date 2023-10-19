@@ -16,14 +16,11 @@ int main(int argc, char *argv[]) {
     LOG << "Screen Width:" << UserScreenWidth << "Screen Height:" << UserScreenHeight;
 
     //test_assemble_parse();
-    //Pattern w(16,24);
-    //w.toggleState(Pattern::TickState);
-    //w.selectPoints(QPointVector()<<QPoint(1,1)<<QPoint(2,2));
-    //w.clearPoints();
+    //test_pattern();
+    test_tcp();
 
-    MainWindow w;
-//    SocketPanel w;
-    //w.resize(2000,1200);
-    w.showMaximized();
+//    MainWindow w;
+//    w.show();
+
     return QApplication::exec();
 }

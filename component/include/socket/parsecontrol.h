@@ -12,12 +12,12 @@
 #include "parse.h"
 #include "eventloop.h"
 
-class COMPONENT_IMEXPORT ParseControl : public QObject
+class COMPONENT_IMEXPORT ParserControl : public QObject
 {
     Q_OBJECT
 public:
-    explicit ParseControl(QObject *parent = nullptr);
-    ~ParseControl();
+    explicit ParserControl(QObject *parent = nullptr);
+    ~ParserControl();
     QVariant result() const;
     QString frame() const;
 private:
