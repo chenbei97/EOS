@@ -12,14 +12,15 @@
 #include "assemble.h"
 #include "eventloop.h"
 
-class COMPONENT_IMEXPORT AssemblerController : public QObject
+class COMPONENT_IMEXPORT AssemblerControl : public QObject
 {
     Q_OBJECT
 public:
-    explicit AssemblerController(QObject *parent = nullptr);
-    ~AssemblerController();
+    static AssemblerControl& instance();
     QByteArray message() const;
 private:
+    explicit AssemblerControl(QObject *parent = nullptr);
+    ~AssemblerControl();
     QThread assemblethread;
     Assembler * assembler;
     QByteArray msg;

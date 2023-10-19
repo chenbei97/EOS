@@ -9,10 +9,7 @@
 #ifndef EOSI_SOCKETPANEL_H
 #define EOSI_SOCKETPANEL_H
 
-#include "widgets.h"
-#include "pushbutton.h"
-#include "textedit.h"
-#include "tcpsocket.h"
+#include "socketpython.h"
 
 #define sendText (tr("<strong><font color = #75FA8D>[%1] 发送:</font></strong> %2") \
             .arg(QDateTime::currentDateTime().toString("yyyy/MMdd hh:mm:ss")))
@@ -21,11 +18,12 @@
 #define errorText (tr("<strong><font color = #75FA8D>[%1] 错误:</font></strong> %2") \
             .arg(QDateTime::currentDateTime().toString("yyyy/MMdd hh:mm:ss")))
 
-class COMPONENT_IMEXPORT SocketPanel: public QWidget
+class SocketPanel: public QWidget
 {
     Q_OBJECT
 public:
     explicit SocketPanel(QWidget *parent = nullptr);
+    QVariantMap getTestData1();
 private:
     PushButton * btn;
     TextEdit * edit;

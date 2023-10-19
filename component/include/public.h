@@ -36,11 +36,11 @@
 #include "checkbox.h"
 #include "progressbar.h"
 #include "spinbox.h"
+#include "textedit.h"
 #include "splitter.h"
 #include "slider.h"
 #include "tableview.h"
 #include "colorbutton.h"
-#include "socketpanel.h"
 
 #include "qtimer.h"
 

@@ -10,14 +10,16 @@
 #define EOSI_TEST_H
 
 #include "interface.h"
+#include "socketpanel.h"
 
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 
 static void test_tcp()
 {
     auto w = new SocketPanel;
-    w->resize(2000,1200);
+    w->resize(800,600);
     w->show();
+
 }
 
 static void test_assemble_parse()
@@ -25,11 +27,10 @@ static void test_assemble_parse()
     LOG << "main thread: "<<QThread::currentThread();
 
     // (1) 组装
-    AssemblerController c;
     QVariantMap m;
     m["0x0000"] = "0x0000";
-    c.assemble("0x0000",m);
-    auto msg = c.message();
+    AssemblerPointer->assemble("0x0000",m);
+    auto msg = AssemblerPointer->message();
     msg.chop(3);
     LOG<<"msg = "<<msg;
 

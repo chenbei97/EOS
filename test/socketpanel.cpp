@@ -11,7 +11,19 @@
 
 void SocketPanel::onSend()
 {
-    SocketPointer->exec("0x0000","hello!");
+    AssemblerPointer->assemble("test0x0",getTestData1());
+    edit->append(sendText.arg(QString::fromUtf8(AssemblerMessage)));
+    SocketPointer->exec("test0x0",AssemblerMessage);
+    //edit->append(recvText.arg(QString::fromUtf8(AssemblerMessage)));
+}
+
+QVariantMap SocketPanel::getTestData1()
+{ // 规定 发送帧头+坐标x,y,返回帧头+坐标x,y+路径
+    QVariantMap m;
+    m["test0x0"] = "test0x0";
+    m["x"] = 10;
+    m["y"] = 5;
+    return m;
 }
 
 SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
@@ -30,4 +42,7 @@ SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
 
     connect(btn,&QPushButton::clicked,this,&SocketPanel::onSend);
     SocketInit;
+
+    SocketPython * pthread = new SocketPython();
+    pthread->start();
 }

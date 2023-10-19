@@ -28,6 +28,7 @@ endif ()
 set(QRC_PATH bin/images.qrc bin/app.rc)
 #set(THEME_PATH ${PROJECT_SOURCE_DIR}/bin/theme/dark/darkstyle.qrc)
 
+set(MYSQL_INSTALL_PATH "C:/Program Files/MySQL/MySQL Server 8.0")
 set(MYSQL_LIB_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.lib") # dll必须复制到bin下,lib可以不用
 set(MYSQL_DLL_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.dll")
 
@@ -35,10 +36,10 @@ set(SQLDRIVERS_PATH "${CMAKE_PREFIX_PATH}/plugins/sqldrivers")
 set(IMAGEFORMATS_PATH "${CMAKE_PREFIX_PATH}/plugins/imageformats")
 set(MEDIA_PATH "${CMAKE_PREFIX_PATH}/plugins/mediaservice")
 
-set(MYSQL_INSTALL_PATH "C:/Program Files/MySQL/MySQL Server 8.0")
 set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
 set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
 set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
+
 
 set(COMPONENT_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/component/include
@@ -52,7 +53,7 @@ set(INTERFACE_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/interface/include/window)
 
 file(GLOB MAIN_FILES  "${PROJECT_SOURCE_DIR}/*.h" "${PROJECT_SOURCE_DIR}/*.cpp")
-
+file(GLOB TESTFILES  "${PROJECT_SOURCE_DIR}/test/*.h" "${PROJECT_SOURCE_DIR}/test/*.cpp")
 # （3）2个子目录
 add_subdirectory(component)
 add_subdirectory(interface)
@@ -63,7 +64,7 @@ link_directories(${PYTHON310_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib)
 find_package(Qt5 COMPONENTS Core Gui Widgets Sql Network
         Concurrent Multimedia MultimediaWidgets OpenGL REQUIRED)
 
-add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH}) # ${THEME_PATH}
+add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES}) # ${THEME_PATH}
 
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}

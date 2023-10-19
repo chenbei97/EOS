@@ -29,9 +29,13 @@ static const char* FrameField = "frame";
 static const char* SeparateField = "@@@";
 #define AppendSeparateField(s) (s+SeparateField)
 
-class TcpSocket;
+class Socket;
 #define SocketInit (TcpSocket::instance())
 #define SocketPointer (&TcpSocket::instance())
+
+class AssemblerControl;
+#define AssemblerPointer (&AssemblerControl::instance())
+#define AssemblerMessage (AssemblerPointer->message())
 
 // (3) 导出定义
 #if defined(COMPONENT_LIBRARY)
@@ -70,6 +74,20 @@ static QByteArray assemble0x0000(QCVariantMap m)
     return AppendSeparateField(json);
 }
 
+/*---------以下都是临时测试函数,以后可以注释掉-----------------*/
+static QByteArray assemble_test0x0(QCVariantMap m)
+{ // test0x0会传来x,y,frame字段
+    QJsonObject object;
+    object[FrameField] = "test0x0";
+    object["x"] = m["x"].toString();
+    object["y"] = m["y"].toString();
+
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+/*---------以上都是临时测试函数,以后可以注释掉-----------------*/
+
 // 根据帧头选择对应的解析函数
 static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.frame0x0000,parse0x0000},
@@ -87,6 +105,8 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
 //        {TcpFramePool.frame0x0003,assemble0x0003},
 //        {TcpFramePool.frame0x0004,assemble0x0004},
 //        {TcpFramePool.frame0x1000,assemble0x1000},
+
+        {"test0x0",assemble_test0x0},
 };
 
 

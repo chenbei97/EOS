@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     LOG << "Screen Width:" << UserScreenWidth << "Screen Height:" << UserScreenHeight;
 
-    //test_assemble_parse();
+//    test_assemble_parse();
     //test_pattern();
     test_tcp();
 
