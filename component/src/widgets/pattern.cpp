@@ -109,14 +109,15 @@ void Pattern::mouseMoveEvent(QMouseEvent *event)
 void Pattern::mouseReleaseEvent(QMouseEvent *event)
 {
     if (mMouseEvent) {
+        //LOG<<"mouse point = "<<mMousePos;
+        if (mMousePos == QPoint(-1,-1)) return; // 可能会点到边缘位置导致下方获取颜色越界
         if (event->button() == Qt::LeftButton) {
             auto c = mHoleInfo[mMousePos.x()][mMousePos.y()].color;
             auto dlg = new GroupInfo;
             dlg->setBtnColor(c); // 鼠标单击时可以让按钮跟随当前的孔颜色
             //dlg->setAttribute(Qt::WA_DeleteOnClose);
             int ret = dlg->exec();
-            if (ret == QDialog::Accepted)
-            {
+            if (ret == QDialog::Accepted) {
                 select(dlg->groupColor());
             }
             delete dlg;
@@ -283,11 +284,6 @@ void Pattern::selectPoints(QCPointVector points, bool isSelected)
     foreach (auto p ,points) {
         selectPoint(p.x(),p.y(),isSelected);
     }
-}
-
-void Pattern::clearPoints()
-{
-    initSelectPoints();
 }
 
 void Pattern::setPatternSize(int rows,int cols)

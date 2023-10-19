@@ -24,6 +24,7 @@ private:
     QVector<int> pixwidths;
     QRectVector getRects() const; // 获取所有文字部分的小正方形区域
 signals:
+    void mainClicked();
     void previewClicked();
     void protocolClicked();
     void dataClicked();

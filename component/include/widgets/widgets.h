@@ -33,6 +33,7 @@
 #include "qboxlayout.h"
 #include "qformlayout.h"
 #include "qgridlayout.h"
+#include "qstackedlayout.h"
 
 #include "qvalidator.h"
 #include "qpainter.h"

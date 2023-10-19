@@ -32,7 +32,7 @@ Preview::Preview(QWidget*parent): QWidget(parent)
 
 void Preview::onWellsizeChanged(int option)
 {
-    LOG<<"wellsize option = "<<option;
+    //LOG<<"wellsize option = "<<option;
     switch (option) {
         case 0: pattern->setPatternSize(2,3);
             break;

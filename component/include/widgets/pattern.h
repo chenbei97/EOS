@@ -16,8 +16,11 @@ public:
 
     void selectPoint(int row,int col, bool isSelected = true); // 选中某个点
     void selectPoints(QCPointVector points, bool isSelected = true); // 选中点列表的所有点
-    void clearPoints();
 
+    void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 //    QSize sizeHint() const override;
 private:
     QSize getChildSize() const; // 每个圆都在划分的小正方形区域内,计算正方形的长度
@@ -29,10 +32,6 @@ private:
     void drawLine(QPainter&painter); // 绘制线
     void drawText(QPainter&painter); // 行列表头的文字
     void drawHighlight(QPainter&painter); // 绘制鼠标选中的高亮和已选择区域的高亮
-    void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
 
     void initDrapPoints();
     void initSelectPoints();

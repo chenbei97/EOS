@@ -10,7 +10,7 @@
 
 NavigBar::NavigBar(QWidget*parent): QWidget(parent)
 {
-    texts <<"Logo"<<"Preview"<<"Protocol"<<"Data"<<"Analysis";
+    texts <<"Logo"<<"Main"<<"Preview"<<"Protocol"<<"Data"<<"Analysis";
     foreach(auto text, texts)
         pixwidths << (NavigBarWidth-PainterMetric.width(text))/2;
 
@@ -52,12 +52,13 @@ void NavigBar::mousePressEvent(QMouseEvent *event)
     
     for(int c = 0; c < rects.count(); ++c) {
         if (rects[c].contains(pos)) {
-            LOG<<"click toolbar index = "<<c;
+            //LOG<<"click toolbar index = "<<c;
             switch (c) {
-                case 1: emit previewClicked();break;
-                case 2: emit protocolClicked();break;
-                case 3: emit dataClicked();break;
-                case 4: emit analysisClicked();break;
+                case 1: emit mainClicked();break;
+                case 2: emit previewClicked();break;
+                case 3: emit protocolClicked();break;
+                case 4: emit dataClicked();break;
+                case 5: emit analysisClicked();break;
                 default:break;
             }
         }
