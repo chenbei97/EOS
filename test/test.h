@@ -35,9 +35,8 @@ static void test_assemble_parse()
     LOG<<"msg = "<<msg;
 
     // (2) 解析
-    ParserControl p;
-    p.parse("0x0000",msg);
-    LOG<<"frame = "<<p.frame()<<" res = "<<p.result();
+    ParserPointer->parse("0x0000",msg);
+    LOG<<"frame = "<<ParserFrame<<" res = "<<ParserResult;
 }
 
 void test_pattern()

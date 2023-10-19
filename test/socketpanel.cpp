@@ -14,7 +14,8 @@ void SocketPanel::onSend()
     AssemblerPointer->assemble("test0x0",getTestData1());
     edit->append(sendText.arg(QString::fromUtf8(AssemblerMessage)));
     SocketPointer->exec("test0x0",AssemblerMessage);
-    //edit->append(recvText.arg(QString::fromUtf8(AssemblerMessage)));
+//    LOG<<ParserResult;
+    edit->append(recvText.arg(SocketPointer->result()["test0x0"].toString()));//ParserResult.toString()
 }
 
 QVariantMap SocketPanel::getTestData1()
@@ -45,4 +46,7 @@ SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
 
     SocketPython * pthread = new SocketPython();
     pthread->start();
+
+    btn->click();
+    QThread::sleep(1);
 }

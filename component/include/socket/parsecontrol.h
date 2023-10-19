@@ -16,11 +16,12 @@ class COMPONENT_IMEXPORT ParserControl : public QObject
 {
     Q_OBJECT
 public:
-    explicit ParserControl(QObject *parent = nullptr);
-    ~ParserControl();
+    static ParserControl& instance();
     QVariant result() const;
     QString frame() const;
 private:
+    explicit ParserControl(QObject *parent = nullptr);
+    ~ParserControl();
     QThread parsethread;
     Parse * parser;
     EventLoop loop;

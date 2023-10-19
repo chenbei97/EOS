@@ -10,6 +10,7 @@
 #define EOSI_TCPSOCKET_H
 
 #include "socket.h"
+#include "parsecontrol.h"
 
 class COMPONENT_IMEXPORT TcpSocket: public QObject
 {
@@ -18,6 +19,7 @@ public:
     static TcpSocket& instance();
     void connectToHost(const QString &hostName = LocalHost, quint16 port = SocketPort);
     void exec(const QString& f,const QByteArray& c);
+    QVariantMap result() const;
 private:
     explicit TcpSocket(QObject *parent = nullptr);
     ~TcpSocket();
@@ -26,6 +28,7 @@ private:
     QTcpSocket * socket = nullptr;
     QByteQueue msgQueue;
     QString frame;
+    EventLoop loop;
 signals:
 };
 #endif //EOSI_TCPSOCKET_H

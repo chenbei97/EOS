@@ -36,7 +36,7 @@ void TcpSocket::processMsgQueue()
 {
     while (!msgQueue.isEmpty()) {
         auto message = msgQueue.head();
-        //controller->parse(frame,message);
+        ParserPointer->parse(frame,message);
         msgQueue.dequeue(); // 从队列中取出消息
     }
 }
@@ -46,6 +46,14 @@ void TcpSocket::exec(const QString& f,const QByteArray& c)
     LOG<<"request msg = "<<c;
     frame = f;
     socket->write(c);
+    loop.exec(); // 阻塞直到解析完,此时TcpSocket或者ParsePointer拿到结果
+}
+
+QVariantMap TcpSocket::result() const
+{
+    QVariantMap m;
+    m[ParserFrame] = ParserResult;
+    return m;
 }
 
 TcpSocket& TcpSocket::instance()
@@ -66,6 +74,8 @@ TcpSocket::TcpSocket(QObject *parent):QObject(parent)
     socket->setSocketOption(QAbstractSocket::LowDelayOption, true); // 尽可能低延迟,但是不能避免,还是会粘包
     connect(socket,&QTcpSocket::readyRead,this,&TcpSocket::onReadyReadSlot);
     connect(socket,&QTcpSocket::readyRead,this,&TcpSocket::processMsgQueue);
+    //connect(socket,&QTcpSocket::readyRead,&loop,&EventLoop::exec);
+    connect(ParserPointer,&ParserControl::parseResult,&loop,&EventLoop::quit);
     connectToHost();
 }
 

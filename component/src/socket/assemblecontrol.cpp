@@ -26,7 +26,7 @@ AssemblerControl::AssemblerControl(QObject *parent) : QObject(parent)
 
     // 触发assemble信号后也开始执行事件循环等待同步
     connect(this,&AssemblerControl::assemble,this,[&]{loop.exec();});//组装时同步等待异步的assembleFinished
-    connect(this,&AssemblerControl::assembleResult,&loop,&EventLoop::quit);
+    connect(this,&AssemblerControl::assembleResult,&loop,&EventLoop::quit);// 必须同步,否则总是延迟
     assemblethread.start();
 }
 
