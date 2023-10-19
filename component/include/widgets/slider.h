@@ -21,6 +21,7 @@ public:
     void setRange(int min,int max);
     void setPrefix(const QString& p);
     void setSuffix(const QString& s);
+//    QSize sizeHint() const override;
 private:
     QSlider * slider;
     Label * prefix;
@@ -28,6 +29,8 @@ private:
     QString suffixtext;
 private slots:
      void onSliderChanged(int val);
+signals:
+    void valueChanged(int val);
 };
 
 #endif //EOSI_SLIDER_H

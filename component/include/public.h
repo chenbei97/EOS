@@ -33,6 +33,7 @@
 #include "groupbox.h"
 #include "pattern.h"
 #include "label.h"
+#include "checkbox.h"
 #include "progressbar.h"
 #include "spinbox.h"
 #include "splitter.h"

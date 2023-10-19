@@ -20,5 +20,7 @@ public:
 private:
     PreviewTool * toolbar;
     Pattern * pattern;
+
+    void onWellsizeChanged(int option);
 };
 #endif //EOSI_PREVIEW_H

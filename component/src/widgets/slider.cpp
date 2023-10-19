@@ -18,10 +18,15 @@ Slider::Slider(QWidget *parent):QWidget(parent)
     hlay->addWidget(prefix);
     hlay->addWidget(slider);
     hlay->addWidget(suffix);
+    hlay->setMargin(0);
+    hlay->setSpacing(0);
     setLayout(hlay);
 
     connect(slider,&QSlider::sliderMoved,this,&Slider::onSliderChanged);
-    setMinimumHeight(50);
+    connect(slider,&QSlider::sliderMoved,this,&Slider::valueChanged);
+
+
+    //setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
 }
 
 Slider::Slider(const QString &p, const QString &s, int min, int max, QWidget *parent) :QWidget(parent)
@@ -39,10 +44,14 @@ Slider::Slider(const QString &p, const QString &s, int min, int max, QWidget *pa
     hlay->addWidget(prefix);
     hlay->addWidget(slider);
     hlay->addWidget(suffix);
+    hlay->setMargin(0);
+    hlay->setSpacing(0);
     setLayout(hlay);
 
     connect(slider,&QSlider::sliderMoved,this,&Slider::onSliderChanged);
-    setMinimumHeight(50);
+    connect(slider,&QSlider::sliderMoved,this,&Slider::valueChanged);
+
+    //setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
 }
 
 void Slider::onSliderChanged(int val)
@@ -66,3 +75,8 @@ void Slider::setSuffix(const QString& s)
     suffixtext = s;
     suffix->setText(s);
 }
+
+//QSize Slider::sizeHint() const
+//{
+//    return QSize(SliderSizeHintWidth,SliderSizeHintHeight);
+//}

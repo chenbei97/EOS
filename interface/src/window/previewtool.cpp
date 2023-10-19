@@ -10,58 +10,18 @@
 
 PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
 {
+    wellbox = new WellBox;
+    camerabox = new CameraBox;
+
     lay = new QVBoxLayout;
-    auto box1 = initWellBox();
-    auto box2 = initCameraBox();
-
-    auto lay1 = new QVBoxLayout;
-    lay1->addWidget(box1);
-    lay1->addWidget(box2);
-
-    lay->addLayout(lay1);
+    lay->addWidget(wellbox);
+    lay->addWidget(camerabox);
     setLayout(lay);
-}
 
-GroupBox* PreviewTool::initWellBox()
-{
-    wellbrandCombo = new ComboBox(QStringList()<<"brand1"<<"brand2"<<"brand3");
-    wellsizeCombo = new ComboBox(WellsizeFields);
-    welldishCombo = new ComboBox(QStringList()<<"dish1"<<"dish2"<<"dish3");
-    wellflaskCombo = new ComboBox(QStringList()<<"flash1"<<"flash2"<<"flash3");
-    wellslideCombo = new ComboBox(QStringList()<<"slide1"<<"slide2"<<"slide3");
-    objectiveCombo = new ComboBox(ObjectiveFields);
+    connect(wellbox,&WellBox::wellbrandChanged,this,&PreviewTool::wellbrandChanged);
+    connect(wellbox,&WellBox::wellsizeChanged,this,&PreviewTool::wellsizeChanged);
+    connect(wellbox,&WellBox::welldishChanged,this,&PreviewTool::welldishChanged);
+    connect(wellbox,&WellBox::wellflaskChanged,this,&PreviewTool::wellflaskChanged);
+    connect(wellbox,&WellBox::wellslideChanged,this,&PreviewTool::wellslideChanged);
 
-    auto box = new GroupBox;
-    auto formlay = new QFormLayout;
-    formlay->addRow("brand: ",wellbrandCombo);
-    formlay->addRow("size: ",wellsizeCombo);
-    formlay->addRow("dish: ",welldishCombo);
-    formlay->addRow("flask: ",wellflaskCombo);
-    formlay->addRow("slide: ",wellslideCombo);
-    formlay->addRow("objective: ",objectiveCombo);
-    formlay->setVerticalSpacing(20);
-    box->setLayout(formlay);
-
-//    auto vlay = new QVBoxLayout;
-//    vlay->addWidget(cameraExposureSlider);
-//    vlay->addWidget(cameraGainSlider);
-//    vlay->addWidget(cameraBrightSlider);
-//    box->setLayout(vlay);
-    return box;
-}
-
-GroupBox* PreviewTool::initCameraBox()
-{
-    cameraExposureSlider = new Slider("exposure: ","ms",0,15000);
-    cameraGainSlider = new Slider("gain: ","%",100,5000);
-    cameraBrightSlider = new Slider("bright: ","",0,100);
-
-    auto box = new GroupBox;
-    auto vlay = new QVBoxLayout;
-    vlay->addWidget(cameraExposureSlider);
-    vlay->addWidget(cameraGainSlider);
-    vlay->addWidget(cameraBrightSlider);
-
-    box->setLayout(vlay);
-    return box;
 }

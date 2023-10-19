@@ -17,8 +17,9 @@ public:
     void selectPoint(int row,int col, bool isSelected = true); // 选中某个点
     void selectPoints(QCPointVector points, bool isSelected = true); // 选中点列表的所有点
     void clearPoints();
+
+//    QSize sizeHint() const override;
 private:
-    void init();
     QSize getChildSize() const; // 每个圆都在划分的小正方形区域内,计算正方形的长度
     QRectF2DVector getChildRects() const; // 拿到所有小正方形的区域
     QPointF2DVector getBorderPoints() const;// 按行从左到右拿到所有分隔线上的点,可用于画线

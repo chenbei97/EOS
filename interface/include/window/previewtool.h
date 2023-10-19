@@ -10,6 +10,9 @@
 #define EOSI_PREVIEWTOOL_H
 
 #include "window.h"
+#include "camerabox.h"
+#include "channelbox.h"
+#include "wellbox.h"
 
 class INTERFACE_IMEXPORT PreviewTool : public QWidget
 {
@@ -17,19 +20,8 @@ class INTERFACE_IMEXPORT PreviewTool : public QWidget
 public:
     explicit PreviewTool(QWidget*parent= nullptr);
 private:
-    ComboBox * wellbrandCombo;
-    ComboBox * wellsizeCombo;
-    ComboBox * welldishCombo;
-    ComboBox * wellflaskCombo;
-    ComboBox * wellslideCombo;
-    ComboBox * objectiveCombo;
-    GroupBox* initWellBox();
-
-    Slider * cameraExposureSlider;
-    Slider * cameraGainSlider;
-    Slider * cameraBrightSlider;
-    GroupBox* initCameraBox();
-
+    WellBox * wellbox;
+    CameraBox * camerabox;
     QVBoxLayout * lay;
 signals:
     void wellbrandChanged(int option);
@@ -38,11 +30,6 @@ signals:
     void wellslideChanged(int option);
     void wellsizeChanged(int option);
     void objectiveChanged(int option);
-    void channelChanged(const QList<int>& options);
-    void exposureChanged(int ms); // 1ms-15s
-    void gainChanged(int percent); // 100%-5000%
-    void brightChanged(int bright); // 0-100
-
 };
 
 #endif //EOSI_PREVIEWTOOL_H

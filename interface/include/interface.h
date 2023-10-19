@@ -13,6 +13,9 @@
 #include "appselect.h"
 #include "preview.h"
 #include "previewtool.h"
+#include "cameratool.h"
+#include "camerabox.h"
+#include "channelbox.h"
 #include "mainwindow.h"
 
 

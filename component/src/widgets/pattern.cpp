@@ -290,23 +290,6 @@ void Pattern::clearPoints()
     initSelectPoints();
 }
 
-void Pattern::init()
-{
-    mState = UnInitialState;
-    mMouseEvent = false;
-    mMousePos = {-1,-1};
-    mInnerCircleColor.setAlpha(PatternColorAlpha);
-    mMouseClickColor.setAlpha(PatternColorAlpha);
-
-    initSelectPoints();
-    initDrapPoints();
-}
-
-Pattern::Pattern(int rows, int cols,QWidget*parent):mrows(rows),mcols(cols),QWidget(parent)
-{
-    init();
-}
-
 void Pattern::setPatternSize(int rows,int cols)
 {
     mrows = rows;
@@ -386,3 +369,21 @@ void Pattern::select(QCColor color)
     }
     update();
 }
+
+Pattern::Pattern(int rows, int cols,QWidget*parent):mrows(rows),mcols(cols),QWidget(parent)
+{
+    mState = UnInitialState;
+    mMouseEvent = false;
+    mMousePos = {-1,-1};
+    mInnerCircleColor.setAlpha(PatternColorAlpha);
+    mMouseClickColor.setAlpha(PatternColorAlpha);
+
+    initSelectPoints();
+    initDrapPoints();
+    //setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+}
+
+//QSize Pattern::sizeHint() const
+//{
+//    return QSize(PatternSizeHintWidth,PatternSizeHintHeight);
+//}

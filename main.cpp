@@ -24,6 +24,6 @@ int main(int argc, char *argv[]) {
     MainWindow w;
 //    SocketPanel w;
     //w.resize(2000,1200);
-    w.show();
+    w.showMaximized();
     return QApplication::exec();
 }

@@ -18,6 +18,7 @@ public:
     explicit NavigBar(QWidget*parent= nullptr);
     void paintEvent(QPaintEvent*event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    QSize sizeHint() const override;
 private:
     QStringList texts;
     QVector<int> pixwidths;

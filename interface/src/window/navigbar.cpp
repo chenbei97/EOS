@@ -14,7 +14,8 @@ NavigBar::NavigBar(QWidget*parent): QWidget(parent)
     foreach(auto text, texts)
         pixwidths << (NavigBarWidth-PainterMetric.width(text))/2;
 
-    setFixedHeight(NavigBarHeight);
+    //setFixedHeight(NavigBarHeight);
+    setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum); // 代替setFixedSize
 }
 
 void NavigBar::paintEvent(QPaintEvent*event)
@@ -33,8 +34,9 @@ void NavigBar::paintEvent(QPaintEvent*event)
         painter.fillPath(path,NavigBarColor);
     }
 
-    // 没有文字的部分,为了好看继续填充矩形
-    for(int i = texts.count();i <= NavigBarButtonCount; ++i) {
+    // 没有文字的部分,为了好看继续填充矩形,为了调整窗口大小时自动绘制,计算宽度减去已经绘制的宽度得到还要继续填充几个矩形
+    auto count = (width() - texts.count()*NavigBarMoveDistance)/(NavigBarMoveDistance);
+    for(int i = texts.count();i <= count+texts.count(); ++i) {
         path.clear();
         path.addRect(0+NavigBarMoveDistance*i,0,NavigBarWidth,NavigBarHeight);
         painter.fillPath(path,NavigBarColor);
@@ -71,4 +73,9 @@ QRectVector NavigBar::getRects() const
         vec.append(QRect(x,0,NavigBarWidth,NavigBarHeight));
     }
     return vec;
+}
+
+QSize NavigBar::sizeHint() const
+{
+    return QSize(NavigBarWidth,NavigBarHeight);
 }
