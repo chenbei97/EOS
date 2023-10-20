@@ -72,11 +72,19 @@ TcpSocket::TcpSocket(QObject *parent):QObject(parent)
     socket = new QTcpSocket;
     socket->setReadBufferSize(0);// 默认就是0,也就是缓冲不受限制,有多少就接受多少
     socket->setSocketOption(QAbstractSocket::LowDelayOption, true); // 尽可能低延迟,但是不能避免,还是会粘包
+
+    timer.setSingleShot(true);
+    timer.setInterval(SocketWaitTime);
+    // loop只要执行就启动定时器,如果一直没有回复也不能卡着,定时器超时就退出loop
+    connect(&timer,&QTimer::timeout,&loop,&EventLoop::quit);
+    connect(&loop,&EventLoop::started,this,[=]{timer.start(SocketWaitTime);});
+
     connect(socket,&QTcpSocket::readyRead,this,&TcpSocket::onReadyReadSlot);
     connect(socket,&QTcpSocket::readyRead,this,&TcpSocket::processMsgQueue);
     //connect(socket,&QTcpSocket::readyRead,&loop,&EventLoop::exec);
     connect(ParserPointer,&ParserControl::parseResult,&loop,&EventLoop::quit);
     connectToHost();
+
 }
 
 TcpSocket::~TcpSocket()

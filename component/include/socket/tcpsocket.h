@@ -29,6 +29,7 @@ private:
     QByteQueue msgQueue;
     QString frame;
     EventLoop loop;
+    QTimer timer;
 signals:
 };
 #endif //EOSI_TCPSOCKET_H
