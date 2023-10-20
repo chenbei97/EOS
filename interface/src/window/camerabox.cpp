@@ -39,26 +39,32 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
 
     setLayout(lay);
 
-    connect(cameratool1,&CameraTool::exposureChanged,this,&CameraBox::exposureChanged1);
-    connect(cameratool1,&CameraTool::gainChanged,this,&CameraBox::gainChanged1);
-    connect(cameratool1,&CameraTool::brightChanged,this,&CameraBox::brightChanged1);
+    connect(cameratool1,&CameraTool::exposureChanged,this,&CameraBox::phExposureChanged);
+    connect(cameratool1,&CameraTool::gainChanged,this,&CameraBox::phGainChanged);
+    connect(cameratool1,&CameraTool::brightChanged,this,&CameraBox::phBrightChanged);
 
-    connect(cameratool2,&CameraTool::exposureChanged,this,&CameraBox::exposureChanged2);
-    connect(cameratool2,&CameraTool::gainChanged,this,&CameraBox::gainChanged2);
-    connect(cameratool2,&CameraTool::brightChanged,this,&CameraBox::brightChanged2);
+    connect(cameratool2,&CameraTool::exposureChanged,this,&CameraBox::gfpExposureChanged);
+    connect(cameratool2,&CameraTool::gainChanged,this,&CameraBox::gfpGainChanged);
+    connect(cameratool2,&CameraTool::brightChanged,this,&CameraBox::gfpBrightChanged);
 
-    connect(cameratool3,&CameraTool::exposureChanged,this,&CameraBox::exposureChanged3);
-    connect(cameratool3,&CameraTool::gainChanged,this,&CameraBox::gainChanged3);
-    connect(cameratool3,&CameraTool::brightChanged,this,&CameraBox::brightChanged3);
+    connect(cameratool3,&CameraTool::exposureChanged,this,&CameraBox::rfpExposureChanged);
+    connect(cameratool3,&CameraTool::gainChanged,this,&CameraBox::rfpGainChanged);
+    connect(cameratool3,&CameraTool::brightChanged,this,&CameraBox::rfpBrightChanged);
 
-    connect(cameratool4,&CameraTool::exposureChanged,this,&CameraBox::exposureChanged4);
-    connect(cameratool4,&CameraTool::gainChanged,this,&CameraBox::gainChanged4);
-    connect(cameratool4,&CameraTool::brightChanged,this,&CameraBox::brightChanged4);
+    connect(cameratool4,&CameraTool::exposureChanged,this,&CameraBox::dapiExposureChanged);
+    connect(cameratool4,&CameraTool::gainChanged,this,&CameraBox::dapiGainChanged);
+    connect(cameratool4,&CameraTool::brightChanged,this,&CameraBox::dapiBrightChanged);
 
-    connect(channelbox,&ChannelBox::phSelected,this,[=](auto isSelect){ setEnabled(0,isSelect);});
-    connect(channelbox,&ChannelBox::gfpSelected,this,[=](auto isSelect){ setEnabled(1,isSelect);});
-    connect(channelbox,&ChannelBox::rfpSelected,this,[=](auto isSelect){ setEnabled(2,isSelect);});
-    connect(channelbox,&ChannelBox::dapiSelected,this,[=](auto isSelect){ setEnabled(3,isSelect);});
+    connect(channelbox,&ChannelBox::phSelected,this,[=](auto isSelect)
+        { setEnabled(0,isSelect);emit channelChanged(channelbox->selectStates());});
+    connect(channelbox,&ChannelBox::gfpSelected,this,[=](auto isSelect)
+        { setEnabled(1,isSelect);emit channelChanged(channelbox->selectStates());});
+    connect(channelbox,&ChannelBox::rfpSelected,this,[=](auto isSelect)
+        { setEnabled(2,isSelect);emit channelChanged(channelbox->selectStates());});
+    connect(channelbox,&ChannelBox::dapiSelected,this,[=](auto isSelect)
+        { setEnabled(3,isSelect);emit channelChanged(channelbox->selectStates());});
+
+
 }
 
 void CameraBox::setVisible(int index,bool visible)
@@ -91,4 +97,38 @@ void CameraBox::setEnabled(int index, bool enabled)
         default:
             break;
     }
+}
+
+CameraInfo CameraBox::cameraInfo() const
+{ // 只有勾选的通道才会打包信息
+    auto states = channelbox->selectStates();
+    //LOG<<"checked states = "<<states;
+    CameraInfo info;
+    ChannelInfo m;
+
+    if (states[0]) {
+        m = {PHField,states[0],cameratool1->exposure(),
+                        cameratool1->gain(),cameratool1->bright()};
+        info[PHField] = m;
+    }
+
+    if (states[1]) {
+        m = {GFPField,states[1],cameratool2->exposure(),
+             cameratool2->gain(),cameratool2->bright()};
+        info[GFPField] = m;
+    }
+
+    if (states[2]) {
+        m = {RFPField,states[2],cameratool3->exposure(),
+             cameratool3->gain(),cameratool3->bright()};
+        info[RFPField] = m;
+    }
+
+    if (states[3]) {
+        m = {DAPIField,states[3],cameratool4->exposure(),
+             cameratool4->gain(),cameratool4->bright()};
+        info[DAPIField] = m;
+    }
+
+    return info;
 }

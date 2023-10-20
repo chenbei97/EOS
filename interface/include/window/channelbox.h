@@ -16,6 +16,7 @@ class INTERFACE_IMEXPORT ChannelBox: public GroupBox
     Q_OBJECT
 public:
     explicit ChannelBox(QWidget*parent= nullptr);
+    QBoolVector selectStates() const;
 private:
     CheckBox * phbox;
     CheckBox * gfpbox;

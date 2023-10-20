@@ -49,3 +49,18 @@ WellBox::WellBox(QWidget*parent): GroupBox(parent)
     connect(welldishCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::welldishChanged);
     connect(objectiveCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::objectiveChanged);
 }
+
+WellInfo WellBox::wellInfo() const
+{
+    WellInfo m;
+
+    m[BrandField] = wellbrandCombo->currentText();
+    m[WellsizeField] = wellslideCombo->currentText();
+    m[FlaskField] = wellflaskCombo->currentText();
+    m[SlideField] = wellslideCombo->currentText();
+    m[DishField] = welldishCombo->currentText();
+    m[ObjectiveField] = objectiveCombo->currentText();
+
+    return m;
+}
+

@@ -20,6 +20,7 @@ public:
     explicit CameraBox(QWidget*parent= nullptr);
     void setVisible(int index,bool visible);
     void setEnabled(int index,bool enabled);
+    CameraInfo cameraInfo() const;
 private:
     CameraTool * cameratool1;
     CameraTool * cameratool2;
@@ -27,17 +28,18 @@ private:
     CameraTool * cameratool4;
     ChannelBox * channelbox;
 signals:
-    void exposureChanged1(int ms); // 1ms-15s
-    void gainChanged1(int percent); // 100%-5000%
-    void brightChanged1(int bright); // 0-100
-    void exposureChanged2(int ms);
-    void gainChanged2(int percent);
-    void brightChanged2(int bright);
-    void exposureChanged3(int ms);
-    void gainChanged3(int percent);
-    void brightChanged3(int bright);
-    void exposureChanged4(int ms);
-    void gainChanged4(int percent);
-    void brightChanged4(int bright);
+    void phExposureChanged(int ms); // 1ms-15s
+    void phGainChanged(int percent); // 100%-5000%
+    void phBrightChanged(int bright); // 0-100
+    void gfpExposureChanged(int ms);
+    void gfpGainChanged(int percent);
+    void gfpBrightChanged(int bright);
+    void rfpExposureChanged(int ms);
+    void rfpGainChanged(int percent);
+    void rfpBrightChanged(int bright);
+    void dapiExposureChanged(int ms);
+    void dapiGainChanged(int percent);
+    void dapiBrightChanged(int bright);
+    void channelChanged(QVector<bool> states);
 };
 #endif //EOSI_CAMERABOX_H

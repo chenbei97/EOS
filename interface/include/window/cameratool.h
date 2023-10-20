@@ -17,6 +17,9 @@ class INTERFACE_IMEXPORT CameraTool : public QWidget
 public:
     explicit CameraTool(QWidget*parent= nullptr);
     void setTitle(const QString& title);
+    QString exposure() const;
+    QString gain() const;
+    QString bright() const;
 //    QSize sizeHint() const override;
 //    QSize minimumSizeHint() const;
 private:

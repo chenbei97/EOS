@@ -22,5 +22,6 @@ private:
     Pattern * pattern;
 
     void onWellsizeChanged(int option);
+    void onInfoChanged();
 };
 #endif //EOSI_PREVIEW_H

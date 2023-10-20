@@ -21,6 +21,7 @@ public:
     void setRange(int min,int max);
     void setPrefix(const QString& p);
     void setSuffix(const QString& s);
+    QString value() const;
 //    QSize sizeHint() const override;
 private:
     QSlider * slider;

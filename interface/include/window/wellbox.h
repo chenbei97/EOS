@@ -16,6 +16,7 @@ class INTERFACE_IMEXPORT WellBox: public GroupBox
     Q_OBJECT
 public:
     explicit WellBox(QWidget*parent= nullptr);
+    WellInfo wellInfo() const;
 private:
     ComboBox * wellbrandCombo;
     ComboBox * wellsizeCombo;

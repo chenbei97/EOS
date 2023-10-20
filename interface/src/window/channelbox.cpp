@@ -30,3 +30,8 @@ ChannelBox::ChannelBox(QWidget*parent): GroupBox(parent)
     connect(rfpbox,&CheckBox::checkedChanged,this,&ChannelBox::rfpSelected);
     connect(dapibox,&CheckBox::checkedChanged,this,&ChannelBox::dapiSelected);
 }
+
+QBoolVector ChannelBox::selectStates() const
+{
+    return {phbox->isChecked(),gfpbox->isChecked(),rfpbox->isChecked(),dapibox->isChecked()};
+}

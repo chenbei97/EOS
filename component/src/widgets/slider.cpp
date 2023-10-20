@@ -76,6 +76,11 @@ void Slider::setSuffix(const QString& s)
     suffix->setText(s);
 }
 
+QString Slider::value() const
+{
+    return QString::number(slider->value());
+}
+
 //QSize Slider::sizeHint() const
 //{
 //    return QSize(SliderSizeHintWidth,SliderSizeHintHeight);

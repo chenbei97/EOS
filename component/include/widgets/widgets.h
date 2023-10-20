@@ -47,6 +47,8 @@
 #include "qapplication.h"
 
 // (2) 常量定义
+#define CURRENT_PATH (QDir::currentPath())
+#define CURRENT_THREAD (QThread::currentThread())
 #define DefaultFontSize 10
 #define DefaultFontFamily ("Times New Roman")
 #define PatternColorAlpha 125

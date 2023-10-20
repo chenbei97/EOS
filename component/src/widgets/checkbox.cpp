@@ -50,6 +50,11 @@ void CheckBox::setChecked(bool checked)
     checkbox->setCheckState(Qt::Unchecked);
 }
 
+bool CheckBox::isChecked() const
+{
+    return checkbox->isChecked();
+}
+
 //QSize CheckBox::sizeHint() const
 //{
 //    return QSize(30,30);

@@ -11,6 +11,7 @@ public:
     explicit CheckBox(const QString& text,QWidget*parent= nullptr);
     void setChecked(bool checked);
     void setText(const QString& text);
+    bool isChecked() const;
 //    QSize sizeHint() const override;
 private:
     QCheckBox * checkbox;

@@ -28,6 +28,7 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     setLayout(lay);
 
     connect(toolbar,&PreviewTool::wellsizeChanged,this,&Preview::onWellsizeChanged);
+    connect(toolbar,&PreviewTool::infoChanged,this,&Preview::onInfoChanged);
 }
 
 void Preview::onWellsizeChanged(int option)
@@ -43,4 +44,11 @@ void Preview::onWellsizeChanged(int option)
         case 3: pattern->setPatternSize(16,24);
             break;
     }
+}
+
+void Preview::onInfoChanged()
+{   // 任意改变都会更新信息,这个信息结合pattern的信息来组装数据,无需保存数据库,只需要下发指令
+    auto toolinfo = toolbar->toolInfo();
+
+    //LOG<<"tool info = "<<toolinfo;
 }

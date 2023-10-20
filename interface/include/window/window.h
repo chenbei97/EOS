@@ -11,6 +11,7 @@
 
 // (1)头文件
 #include "public.h"
+#include "alias.h"
 
 // (2) 导出定义
 #if defined(INTERFACE_LIBRARY)
@@ -53,6 +54,7 @@ static const char* GFPField = "GFP";
 static const char* RFPField = "RFP";
 static const char* DAPIField = "DAPI";
 static const char* ChannelField = "channel";
+static const char* IsCheckedField = "isChecked";
 static const char* ChannelFieldLabel = "channel: ";
 
 static const QFieldList ImageFormatFields = {

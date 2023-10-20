@@ -33,7 +33,7 @@
 #include "sqlstatements.h"
 
 // (2) 定义常量
-#define CURRENT_PATH (QDir::currentPath)
+#define CURRENT_PATH (QDir::currentPath())
 #define CURRENT_THREAD (QThread::currentThread())
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 #define SqlExecFailedLOG (qDebug()<<"[" \
