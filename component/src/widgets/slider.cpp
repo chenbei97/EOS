@@ -10,7 +10,7 @@
 
 Slider::Slider(QWidget *parent):QWidget(parent)
 {
-    slider = new QSlider(Qt::Horizontal);
+    slider = new Sliderx(Qt::Horizontal);
     suffix = new Label;
     prefix = new Label;
 
@@ -31,7 +31,7 @@ Slider::Slider(QWidget *parent):QWidget(parent)
 
 Slider::Slider(const QString &p, const QString &s, int min, int max, QWidget *parent) :QWidget(parent)
 {
-    slider = new QSlider(Qt::Horizontal);
+    slider = new Sliderx(Qt::Horizontal);
     suffix = new Label;
     prefix = new Label;
 
@@ -56,8 +56,15 @@ Slider::Slider(const QString &p, const QString &s, int min, int max, QWidget *pa
 
 void Slider::onSliderChanged(int val)
 {
+    //LOG<<"slider->value() = "<<slider->value()<<" val = "<<val; // 会发现2个值不相同,value()直接获取总是慢一拍
     auto text = QString("%1 %2").arg(val).arg(suffixtext);
     suffix->setText(text);
+    currentValue = val;
+}
+
+void Slider::setSingleStep(int step)
+{
+    slider->setSingleStep(step);
 }
 
 void Slider::setRange(int min,int max)
@@ -78,7 +85,8 @@ void Slider::setSuffix(const QString& s)
 
 QString Slider::value() const
 {
-    return QString::number(slider->value());
+    return QString::number(currentValue);
+    //return QString::number(slider->value()); // 总是慢一拍
 }
 
 //QSize Slider::sizeHint() const

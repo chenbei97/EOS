@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
     //test_tcp();
 
     MainWindow w;
+    setWindowAlignCenter(&w);
     w.show();
 
     return QApplication::exec();

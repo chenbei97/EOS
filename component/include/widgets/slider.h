@@ -11,6 +11,7 @@
 
 #include "widgets.h"
 #include "label.h"
+#include "sliderx.h"
 
 class COMPONENT_IMEXPORT Slider: public QWidget
 {
@@ -21,13 +22,15 @@ public:
     void setRange(int min,int max);
     void setPrefix(const QString& p);
     void setSuffix(const QString& s);
+    void setSingleStep(int step);
     QString value() const;
 //    QSize sizeHint() const override;
 private:
-    QSlider * slider;
+    Sliderx * slider;
     Label * prefix;
     Label * suffix;
     QString suffixtext;
+    int currentValue = 0;
 private slots:
      void onSliderChanged(int val);
 signals:

@@ -50,5 +50,7 @@ void Preview::onInfoChanged()
 {   // 任意改变都会更新信息,这个信息结合pattern的信息来组装数据,无需保存数据库,只需要下发指令
     auto toolinfo = toolbar->toolInfo();
 
-    //LOG<<"tool info = "<<toolinfo;
+    AssemblerPointer->assemble(TcpFramePool.frame0x0001,toolinfo);
+
+    LOG<<"request = "<<AssemblerMessage;
 }

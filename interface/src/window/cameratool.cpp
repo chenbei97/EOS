@@ -15,6 +15,7 @@ CameraTool::CameraTool(QWidget*parent): QWidget(parent)
     cameraExposureSlider = new Slider(ExposureFieldLabel,ExposureFieldUnit,ExposureLowLimit,ExposureUpLimit);
     cameraGainSlider = new Slider(GainFieldLabel,GainFieldUnit,GainLowLimit,GainUpLimit);
     cameraBrightSlider = new Slider(BrightFieldLabel,"",BrightLowLimit,BrightUpLimit);
+    cameraExposureSlider->setSingleStep(1);
 
     auto vlay = new QVBoxLayout;
     vlay->addWidget(label);

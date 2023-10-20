@@ -15,6 +15,21 @@
 #include "qpixmap.h"
 #include "qimagereader.h"
 #include "qmessagebox.h"
+#include "qscreen.h"
+#include "qapplication.h"
+#include "qdesktopwidget.h"
+#include "qmainwindow.h"
+
+/*居中对齐窗口*/
+#define UserScreenWidth (QApplication::desktop()->screenGeometry().width())
+#define UserScreenHeight (QApplication::desktop()->screenGeometry().height())
+
+static void setWindowAlignCenter(QWidget*w)
+{
+    auto x = (UserScreenWidth-w->width())/2;
+    auto y = (UserScreenHeight-w->height())/2;
+    w->move(x,y);
+}
 
 #define WaitDialogMsg QObject::tr("请稍等,正在处理...")
 

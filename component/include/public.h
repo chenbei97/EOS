@@ -15,6 +15,7 @@
 #include "assemblecontrol.h"
 #include "parse.h"
 #include "parsecontrol.h"
+#include "socket.h"
 
 #include "eventloop.h"
 #include "sqlquerymodel.h"
@@ -39,6 +40,7 @@
 #include "textedit.h"
 #include "splitter.h"
 #include "slider.h"
+#include "sliderx.h"
 #include "tableview.h"
 #include "colorbutton.h"
 

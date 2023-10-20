@@ -76,6 +76,8 @@ PreviewToolInfo PreviewTool::toolInfo() const
     }
 
     auto camerainfo = camerabox->cameraInfo(); // 可能4个都没选
+
+    QStringList channel;
     if (!camerainfo.isEmpty()) { // 有勾选的通道
         foreach(auto key, camerainfo.keys()) {
             ChannelInfo val = camerainfo[key];// 每个通道的信息
@@ -87,8 +89,10 @@ PreviewToolInfo PreviewTool::toolInfo() const
             m[BrightField] = val.bright;
 
             info[key] = m; // 转成QVarintMap,wellinfo的值是QString,camerainfo的值是QVarintMap
+            channel << val.channel;
         }
     }
 
+    info[ChannelField] = channel;//增加一个key=channel,和ph,gfp,wellsize等是平级的,方便组装时判断
     return info;
 }

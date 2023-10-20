@@ -55,7 +55,7 @@ WellInfo WellBox::wellInfo() const
     WellInfo m;
 
     m[BrandField] = wellbrandCombo->currentText();
-    m[WellsizeField] = wellslideCombo->currentText();
+    m[WellsizeField] = wellsizeCombo->currentText();
     m[FlaskField] = wellflaskCombo->currentText();
     m[SlideField] = wellslideCombo->currentText();
     m[DishField] = welldishCombo->currentText();
