@@ -11,6 +11,7 @@
 
 void SocketPanel::onSend()
 {
+    testStateActivateCode();
     testData1_2();
     testData3();
 }
@@ -71,6 +72,25 @@ void SocketPanel::testData3()
     edit->append(sendText.arg(QString::fromUtf8(getTestData3())));
     SocketPointer->exec(TcpFramePool.frame0x0001,getTestData3());
     edit->append(recvText.arg(ParserResult.toString()));
+}
+
+void SocketPanel::testStateActivateCode()
+{// 测试激活码状态连接
+//    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
+//    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
+//    else LOG<<"socket is connect failed!";
+//    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
+//    LOG<<"activate code is "<<ParserResult.toString();
+
+    edit->append(sendText.arg(QString::fromUtf8(assemble0x0002(QVariantMap()))));
+    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
+    if (ParserResult.toBool())
+        edit->append(recvText.arg("socket is connect successful!"));
+    else edit->append(recvText.arg("socket is connect failed!"));
+
+    edit->append(sendText.arg(QString::fromUtf8(assemble0x0003(QVariantMap()))));
+    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
+    edit->append(recvText.arg("activate code is "+ParserResult.toString()));
 }
 
 SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)

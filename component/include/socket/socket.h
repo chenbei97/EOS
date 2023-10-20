@@ -183,10 +183,15 @@ struct Field0x0002 {
     const QString state = "state"; // 程序启动时发送命令询问是否连接上了
 };
 
+struct Field0x0003 {
+    const QString activate_code = "activate_code"; // 询问激活码
+};
+
 typedef struct {
     //Field0x0000 field0x0000;
     Field0x0001 field0x0001;
     Field0x0002 field0x0002;
+    Field0x0003 field0x0003;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
@@ -196,7 +201,7 @@ static const TcpFieldList TcpFieldPool;
 //#define Field0x0000 TcpFieldPool.field0x0000
 #define Field0x0001 TcpFieldPool.field0x0001
 #define Field0x0002 TcpFieldPool.field0x0002
-
+#define Field0x0003 TcpFieldPool.field0x0003
 
 static QVariant parse0x0000(QCVariantMap m)
 {
@@ -274,7 +279,7 @@ static QByteArray assemble0x0001(QCVariantMap m)
 }
 
 static QVariant parse0x0002(QCVariantMap m)
-{ // preview界面调整各种参数时发送的toolInfo+patternInfo 回复要显示的图片路径
+{ // 用于询问是否连接的命令,只要有回复不为空就ok,随便发
     if (!m.keys().contains(Field0x0002.state)) return QVariant();
     if (!m.keys().contains(FrameField)) return QVariant();
     auto text = m[Field0x0002.state].toString(); // 只要有回复就可
@@ -287,6 +292,25 @@ static QByteArray assemble0x0002(QCVariantMap m)
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0002;
     object[Field0x0002.state] = "socket is connected?";
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parse0x0003(QCVariantMap m)
+{ // 询问设备激活码,回复激活码
+    if (!m.keys().contains(Field0x0003.activate_code)) return QVariant();
+    if (!m.keys().contains(FrameField)) return QVariant();
+    auto code = m[Field0x0003.activate_code].toString();
+    return code;
+}
+
+static QByteArray assemble0x0003(QCVariantMap m)
+{ // 询问设备激活码,回复激活码
+    Q_UNUSED(m);
+    QJsonObject object;
+    object[FrameField] = TcpFramePool.frame0x0003;
+    object[Field0x0003.activate_code] = "ask activate_code";
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -339,7 +363,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.frame0x0000,parse0x0000},
         {TcpFramePool.frame0x0001,parse0x0001},
         {TcpFramePool.frame0x0002,parse0x0002},
-//        {TcpFramePool.frame0x0003,parse0x0003},
+        {TcpFramePool.frame0x0003,parse0x0003},
 //        {TcpFramePool.frame0x0004,parse0x0004},
 //        {TcpFramePool.frame0x1000,parse0x1000},
         {"test0x0",parse_test0x0},
@@ -350,7 +374,7 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
         {TcpFramePool.frame0x0000,assemble0x0000},
         {TcpFramePool.frame0x0001,assemble0x0001},
         {TcpFramePool.frame0x0002,assemble0x0002},
-//        {TcpFramePool.frame0x0003,assemble0x0003},
+        {TcpFramePool.frame0x0003,assemble0x0003},
 //        {TcpFramePool.frame0x0004,assemble0x0004},
 //        {TcpFramePool.frame0x1000,assemble0x1000},
 

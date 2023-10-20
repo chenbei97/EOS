@@ -21,14 +21,18 @@ class ParseManager:
         self.separate = "@@@"
         self.x = "x"
         self.y = "y"
-        self.path = "path"
         self.equip = "equip"
+        self.path = "path"
+        self.state = "state"
+        self.activate_code = "activate_code"
         self.__socket = None
         self.parseFunctions = {
             "test0x0": self.__parsetest0x0,
             "test0x1": self.__parsetest0x1,
             "test0x2": self.__parsetest0x2,
             "0x0001": self.__parse0x0001,
+            "0x0002": self.__parse0x0002,
+            "0x0003": self.__parse0x0003,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -62,9 +66,8 @@ class ParseManager:
     def __parsetest0x2(self,msg: dict):
         pass
 
-    def __parse0x0001(self,msg:dict):
+    def __parse0x0001(self,msg:dict): # 回复图片路径
         frame = msg[self.frame]
-
         reponse = defaultdict()
         reponse[self.frame] = frame
         path = r"c/user/appdata/" + str(randint(1, 100))+".jpg"
@@ -72,6 +75,26 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0001回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
+
+    def __parse0x0002(self,msg:dict): # 回复任意消息告知上位机连接上了
+        frame = msg[self.frame]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.state] = "yes,has connected"
+        response = json.dumps(reponse)
+        response+=self.separate
+        print("0x0002回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
+
+    def __parse0x0003(self,msg:dict): # 回复激活码
+        frame = msg[self.frame]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.activate_code] = "89732kjdcjkwa"
+        response = json.dumps(reponse)
+        response+=self.separate
+        print("0x0003回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
 class SocketServerManger:
