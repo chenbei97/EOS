@@ -20,6 +20,8 @@
 #include "alias.h"
 
 // (2) 定义常量
+#define CURRENT_PATH (QDir::currentPath)
+#define CURRENT_THREAD (QThread::currentThread())
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 #define SqlExecFailedLOG (qDebug()<<"[" \
     <<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] sql exec failed! error is ")
@@ -101,6 +103,24 @@ static QVariant parse_test0x0(QCVariantMap m)
     auto path = m["path"].toString();
     return path;
 }
+static QByteArray assemble_test0x1(QCVariantMap m)
+{ // test0x1会传来equip,frame字段
+    QJsonObject object;
+    object[FrameField] = "test0x1";
+    object["equip"] = m["equip"].toString();
+
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+static QVariant parse_test0x1(QCVariantMap m)
+{// test0x1会返回equip,frame字段
+    if (!m.keys().contains("equip")) return QVariant();
+    if (!m.keys().contains(FrameField)) return QVariant();
+
+    auto equip = m["equip"].toString();
+    return equip;
+}
 /*---------以上都是临时测试函数,以后可以注释掉-----------------*/
 
 // 根据帧头选择对应的解析函数
@@ -112,6 +132,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
 //        {TcpFramePool.frame0x0004,parse0x0004},
 //        {TcpFramePool.frame0x1000,parse0x1000},
         {"test0x0",parse_test0x0},
+        {"test0x1",parse_test0x1},
 };
 
 static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
@@ -123,6 +144,7 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
 //        {TcpFramePool.frame0x1000,assemble0x1000},
 
         {"test0x0",assemble_test0x0},
+        {"test0x1",assemble_test0x1},
 };
 
 

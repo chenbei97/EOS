@@ -16,7 +16,7 @@ Assembler::Assembler(QObject *parent) : QObject(parent)
 void Assembler::assemble(const QString&frame,const QVariantMap &m)
 { // 调用组装函数,把组装结果通过信号发出去
     QMutexLocker locker(&mutex);
-    LOG<<"current assemble thread is "<<QThread::currentThread();
+    LOG<<"current assemble thread is "<<CURRENT_THREAD;
     auto json = TcpAssembleFunctions[frame](m);
     emit assembleResult(json);
 }

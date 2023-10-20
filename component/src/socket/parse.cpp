@@ -11,7 +11,7 @@
 void Parse::parse(const QString&f,const QByteArray &msg)
 {
     QMutexLocker locker(&mutex);
-    LOG<<"current parse thread is "<<QThread::currentThread();
+    LOG<<"current parse thread is "<<CURRENT_THREAD;
     LOG<<"parse msg = "<<msg;
     JsonReadWrite m;
     m.parseJson(msg);

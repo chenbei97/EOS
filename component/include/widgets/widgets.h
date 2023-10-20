@@ -47,7 +47,7 @@
 #include "qapplication.h"
 
 // (2) 常量定义
-#define DefaultFontSize 12
+#define DefaultFontSize 10
 #define DefaultFontFamily ("Times New Roman")
 #define PatternColorAlpha 125
 #define SplitterHandleWidth 2

@@ -24,6 +24,8 @@ ParserControl::ParserControl(QObject *parent) : QObject(parent)
     connect(parser,&Parse::parseResult,this,[&](auto f,auto d){
         fram=f;res=d;
         //LOG<<"frame = "<<fram<<" d = "<<res;
+        parseresult.clear();
+        parseresult[fram]=d;
         emit parseResult(f,d);
     });
 
@@ -41,6 +43,11 @@ QVariant ParserControl::result() const
 QString ParserControl::frame() const
 {
     return fram;
+}
+
+QVariantMap ParserControl::response() const
+{
+    return parseresult;
 }
 
 ParserControl::~ParserControl()

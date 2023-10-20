@@ -10,17 +10,34 @@
 
 SQLType CurrentSqlType; // 必须定义
 
+void initApp(QApplication& a);
+
 int main(int argc, char *argv[]) {
     LogInit;
     QApplication a(argc, argv);
-    LOG << "Screen Width:" << UserScreenWidth << "Screen Height:" << UserScreenHeight;
+    initApp(a);
 
-//    test_assemble_parse();
+
+    //test_assemble_parse();
     //test_pattern();
-    test_tcp();
+    //test_tcp();
 
-//    MainWindow w;
-//    w.show();
+    MainWindow w;
+    w.show();
 
     return QApplication::exec();
+}
+
+void initApp(QApplication& a)
+{
+    LOG << "UserScreen Width:" << UserScreenWidth << "UserScreen Height:" << UserScreenHeight;
+    LOG<<"main thread is "<<CURRENT_THREAD;
+    LOG<<"current path = "<<CURRENT_PATH;
+
+//    QTextCodec *codec = QTextCodec::codecForName("utf-8");
+//    QTextCodec::setCodecForLocale(codec);
+    a.setFont(QFont(DefaultFontFamily,DefaultFontSize));
+    //qRegisterMetaType<QList<int>>("QList<int>");
+    a.setWindowIcon(QApplication::style()->standardIcon(QStyle::SP_DesktopIcon));
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 }

@@ -19,6 +19,7 @@ public:
     static ParserControl& instance();
     QVariant result() const;
     QString frame() const;
+    QVariantMap response() const;
 private:
     explicit ParserControl(QObject *parent = nullptr);
     ~ParserControl();
@@ -27,6 +28,7 @@ private:
     EventLoop loop;
     QVariant res;
     QString fram;
+    QVariantMap parseresult;
 signals:
     void parse(const QString& f, const QByteArray& msg);
     void parseResult(const QString& f, const QVariant& d);

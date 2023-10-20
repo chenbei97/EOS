@@ -22,6 +22,7 @@ class ParseManager:
         self.x = "x"
         self.y = "y"
         self.path = "path"
+        self.equip = "equip"
         self.__socket = None
         self.parseFunctions = {
             "test0x0": self.__parsetest0x0,
@@ -47,7 +48,16 @@ class ParseManager:
         print("test0x0回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
     def __parsetest0x1(self,msg: dict):
-        pass
+        frame = msg[self.frame]
+        equip = msg[self.equip]
+
+        reponse = defaultdict()
+        reponse[self.frame] = frame  # 只有这部分保留,逐坐标拍照需要发送的参数
+        reponse[self.equip] = equip
+        response = json.dumps(reponse)
+        response+=self.separate
+        print("test0x1回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
     def __parsetest0x2(self,msg: dict):
         pass
 

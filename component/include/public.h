@@ -43,8 +43,10 @@
 #include "colorbutton.h"
 
 #include "qtimer.h"
+#include "qtextcodec.h"
 
 // (2) 常量定义
-
+#define CURRENT_PATH (QDir::currentPath)
+#define CURRENT_THREAD (QThread::currentThread())
 
 #endif //EOSI_PUBLIC_H

@@ -17,7 +17,7 @@
 static void test_tcp()
 {
     auto w = new SocketPanel;
-    w->resize(800,600);
+    w->resize(1000,600);
     w->show();
 
 }

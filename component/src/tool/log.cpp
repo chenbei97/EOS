@@ -38,7 +38,7 @@ void Log::messageToFile(QtMsgType type, const QMessageLogContext &context, const
     QFile logfile(name);
     logfile.open(QIODevice::ReadWrite | QIODevice::Append);
     QTextStream stream(&logfile);
-    //stream.setCodec("utf-8");
+    stream.setCodec("utf-8");
     stream << localMsg << "\r\n";
     logfile.flush();
     logfile.close();
