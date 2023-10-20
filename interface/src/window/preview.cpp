@@ -52,5 +52,13 @@ void Preview::onInfoChanged()
 
     AssemblerPointer->assemble(TcpFramePool.frame0x0001,toolinfo);
 
-    LOG<<"request = "<<AssemblerMessage;
+    //LOG<<"request = "<<AssemblerMessage;
+
+    SocketPointer->exec(TcpFramePool.frame0x0001,AssemblerMessage);
+
+//    QFile file(CURRENT_PATH+"/../test/test0x0001.json");
+//    file.open(QIODevice::WriteOnly|QIODevice::Truncate);
+//    QTextStream s(&file);
+//    s<<AssemblerMessage;
+//    file.close();
 }

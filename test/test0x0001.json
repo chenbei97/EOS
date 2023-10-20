@@ -1,24 +1,35 @@
 {
-    "brand": "1",
+    "brand": "2",
     "channel": [
         {
-            "bright": "0",
-            "channel": "1",
-            "exposure": "0",
-            "gain": "0"
+            "bright": "85",
+            "channel": "3",
+            "exposure": "8199",
+            "gain": "2742"
         },
         {
-            "bright": "0",
+            "bright": "43",
+            "channel": "1",
+            "exposure": "6801",
+            "gain": "2022"
+        },
+        {
+            "bright": "47",
             "channel": "0",
-            "exposure": "0",
-            "gain": "0"
+            "exposure": "10757",
+            "gain": "1988"
+        },
+        {
+            "bright": "38",
+            "channel": "2",
+            "exposure": "6574",
+            "gain": "1749"
         }
     ],
-    "dish": "0",
+    "dish": "2",
     "flask": "1",
     "frame": "0x0001",
-    "objective": "0",
-    "slide": "0",
-    "wellsize": "2"
+    "objective": "3",
+    "slide": "1",
+    "wellsize": "3"
 }
-@@@

@@ -25,6 +25,9 @@ public:
     explicit SocketPanel(QWidget *parent = nullptr);
     QVariantMap getTestData1();
     QVariantMap getTestData2();
+    QByteArray getTestData3();
+    void testData1_2();
+    void testData3();
 private:
     PushButton * btn;
     TextEdit * edit;

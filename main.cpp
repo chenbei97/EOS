@@ -34,7 +34,9 @@ void initApp(QApplication& a)
     LOG << "UserScreen Width:" << UserScreenWidth << "UserScreen Height:" << UserScreenHeight;
     LOG<<"main thread is "<<CURRENT_THREAD;
     LOG<<"current path = "<<CURRENT_PATH;
-
+    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
+    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
+    else LOG<<"socket is connect failed!";
 //    QTextCodec *codec = QTextCodec::codecForName("utf-8");
 //    QTextCodec::setCodecForLocale(codec);
     a.setFont(QFont(DefaultFontFamily,DefaultFontSize));

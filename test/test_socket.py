@@ -27,7 +27,8 @@ class ParseManager:
         self.parseFunctions = {
             "test0x0": self.__parsetest0x0,
             "test0x1": self.__parsetest0x1,
-            "test0x2": self.__parsetest0x2
+            "test0x2": self.__parsetest0x2,
+            "0x0001": self.__parse0x0001,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -60,6 +61,18 @@ class ParseManager:
         self.__socket.sendall(response.encode("utf-8"))
     def __parsetest0x2(self,msg: dict):
         pass
+
+    def __parse0x0001(self,msg:dict):
+        frame = msg[self.frame]
+
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        path = r"c/user/appdata/" + str(randint(1, 100))+".jpg"
+        reponse[self.path] = path
+        response = json.dumps(reponse)
+        response+=self.separate
+        print("0x0001回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
 
 class SocketServerManger:
     def __init__(self, port=3000):  # 测试本地链接,只需要提供端口

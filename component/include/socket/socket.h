@@ -19,6 +19,7 @@
 #include "qmutex.h"
 #include "qthread.h"
 #include "alias.h"
+#include "qtimer.h"
 
 // (2) 定义常量
 #define CURRENT_PATH (QDir::currentPath())
@@ -28,6 +29,7 @@
     <<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] sql exec failed! error is ")
 #define SocketPort 3000
 #define LocalHost "localhost"
+#define SocketWaitTime 3000
 static const char* FrameField = "frame";
 static const char* SeparateField = "@@@";
 #define AppendSeparateField(s) (s+SeparateField)
@@ -154,6 +156,7 @@ typedef struct { // 注册过的帧头命令
 
 struct Field0x0001{
     // 不需要传递给下位机(但是Tcp用过的字段)
+    const QString path = "path"; // 本命令需要回复路径
     // 传给下位机json涉及的字段
     const QString objective = ObjectiveField;
     const QString wellbrand = BrandField;
@@ -176,10 +179,14 @@ struct Field0x0001{
     //const QString order = "order";
 };
 
+struct Field0x0002 {
+    const QString state = "state"; // 程序启动时发送命令询问是否连接上了
+};
+
 typedef struct {
     //Field0x0000 field0x0000;
     Field0x0001 field0x0001;
-    //Field0x0002 field0x0002;
+    Field0x0002 field0x0002;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
@@ -188,7 +195,7 @@ static const TcpFieldList TcpFieldPool;
 
 //#define Field0x0000 TcpFieldPool.field0x0000
 #define Field0x0001 TcpFieldPool.field0x0001
-//#define Field0x0002 TcpFieldPool.field0x0002
+#define Field0x0002 TcpFieldPool.field0x0002
 
 
 static QVariant parse0x0000(QCVariantMap m)
@@ -210,15 +217,15 @@ static QByteArray assemble0x0000(QCVariantMap m)
 }
 
 static QVariant parse0x0001(QCVariantMap m)
-{ // preview界面调整各种参数时发送的toolInfo+patternInfo
-    Q_UNUSED(m);
-    QVariant d;
-    return d;
+{ // preview界面调整各种参数时发送的toolInfo+patternInfo 回复要显示的图片路径
+    if (!m.keys().contains(Field0x0001.path)) return QVariant();
+    if (!m.keys().contains(FrameField)) return QVariant();
+    auto path = m[Field0x0001.path].toString();
+    return path;
 }
 
 static QByteArray assemble0x0001(QCVariantMap m)
 {// preview界面调整各种参数时发送的toolInfo+patternInfo
-    Q_UNUSED(m);
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0001;
 
@@ -261,6 +268,25 @@ static QByteArray assemble0x0001(QCVariantMap m)
 
     //LOG<<object;
 
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parse0x0002(QCVariantMap m)
+{ // preview界面调整各种参数时发送的toolInfo+patternInfo 回复要显示的图片路径
+    if (!m.keys().contains(Field0x0002.state)) return QVariant();
+    if (!m.keys().contains(FrameField)) return QVariant();
+    auto text = m[Field0x0002.state].toString(); // 只要有回复就可
+    return !text.isEmpty();
+}
+
+static QByteArray assemble0x0002(QCVariantMap m)
+{ // 用于询问是否连接的命令,只要有回复不为空就ok,随便发
+    Q_UNUSED(m);
+    QJsonObject object;
+    object[FrameField] = TcpFramePool.frame0x0002;
+    object[Field0x0002.state] = "socket is connected?";
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -312,7 +338,7 @@ static QVariant parse_test0x1(QCVariantMap m)
 static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.frame0x0000,parse0x0000},
         {TcpFramePool.frame0x0001,parse0x0001},
-//        {TcpFramePool.frame0x0002,parse0x0002},
+        {TcpFramePool.frame0x0002,parse0x0002},
 //        {TcpFramePool.frame0x0003,parse0x0003},
 //        {TcpFramePool.frame0x0004,parse0x0004},
 //        {TcpFramePool.frame0x1000,parse0x1000},
@@ -323,7 +349,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
 static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
         {TcpFramePool.frame0x0000,assemble0x0000},
         {TcpFramePool.frame0x0001,assemble0x0001},
-//        {TcpFramePool.frame0x0002,assemble0x0002},
+        {TcpFramePool.frame0x0002,assemble0x0002},
 //        {TcpFramePool.frame0x0003,assemble0x0003},
 //        {TcpFramePool.frame0x0004,assemble0x0004},
 //        {TcpFramePool.frame0x1000,assemble0x1000},

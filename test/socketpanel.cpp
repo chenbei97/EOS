@@ -11,6 +11,12 @@
 
 void SocketPanel::onSend()
 {
+    testData1_2();
+    testData3();
+}
+
+void SocketPanel::testData1_2()
+{
     for(int i = 0; i < 10;++i) {
         if (i%2) {
             AssemblerPointer->assemble("test0x0",getTestData1());
@@ -30,7 +36,6 @@ void SocketPanel::onSend()
             edit->append(recvText.arg(ParserResult.toString())); // 这2个代码都是相同的
         }
     }
-
 }
 
 QVariantMap SocketPanel::getTestData1()
@@ -48,6 +53,24 @@ QVariantMap SocketPanel::getTestData2()
     m["test0x1"] = "test0x1";
     m["equip"] = QString("xxx%1%2%3xxx").arg(rand()).arg(rand()).arg(rand());
     return m;
+}
+
+QByteArray SocketPanel::getTestData3()
+{
+    QByteArray c;
+    QFile file(CURRENT_PATH+"/../test/test0x0001.json");
+    file.open(QIODevice::ReadOnly);
+    c = file.readAll();
+    file.close();
+    c.append(SeparateField);
+    return c;
+}
+
+void SocketPanel::testData3()
+{
+    edit->append(sendText.arg(QString::fromUtf8(getTestData3())));
+    SocketPointer->exec(TcpFramePool.frame0x0001,getTestData3());
+    edit->append(recvText.arg(ParserResult.toString()));
 }
 
 SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)

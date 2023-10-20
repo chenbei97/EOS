@@ -18,6 +18,7 @@ static void test_tcp()
 {
     auto w = new SocketPanel;
     w->resize(1000,600);
+    setWindowAlignCenter(w);
     w->show();
 
 }
