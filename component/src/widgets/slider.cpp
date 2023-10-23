@@ -89,6 +89,13 @@ QString Slider::value() const
     //return QString::number(slider->value()); // 总是慢一拍
 }
 
+void Slider::setValue(int value)
+{
+    currentValue = value;
+    slider->setValue(value);
+    slider->sliderMoved(value);
+}
+
 //QSize Slider::sizeHint() const
 //{
 //    return QSize(SliderSizeHintWidth,SliderSizeHintHeight);

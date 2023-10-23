@@ -11,35 +11,27 @@
 
 #include "window.h"
 #include "cameratool.h"
-#include "channelbox.h"
 
 class INTERFACE_IMEXPORT CameraBox : public GroupBox
 {
     Q_OBJECT
 public:
     explicit CameraBox(QWidget*parent= nullptr);
-    void setVisible(int index,bool visible);
-    void setEnabled(int index,bool enabled);
-    CameraInfo cameraInfo() const;
+    void setEnabled(bool enabled);
+    void setChannel(int option);
+    MultiCameraInfo cameraInfo() const;
 private:
-    CameraTool * cameratool1;
-    CameraTool * cameratool2;
-    CameraTool * cameratool3;
-    CameraTool * cameratool4;
-    ChannelBox * channelbox;
+    CameraTool * cameratool;
+    Label * currentchannel;
+    PushButton * savebtn;
+
+    MultiCameraInfo camerainfo;
+    void onSaveBtn();
+    CameraInfo saveInfo() const;
 signals:
-    void phExposureChanged(int ms); // 1ms-15s
-    void phGainChanged(int percent); // 100%-5000%
-    void phBrightChanged(int bright); // 0-100
-    void gfpExposureChanged(int ms);
-    void gfpGainChanged(int percent);
-    void gfpBrightChanged(int bright);
-    void rfpExposureChanged(int ms);
-    void rfpGainChanged(int percent);
-    void rfpBrightChanged(int bright);
-    void dapiExposureChanged(int ms);
-    void dapiGainChanged(int percent);
-    void dapiBrightChanged(int bright);
-    void channelChanged(QVector<bool> states);
+    void exposureChanged(int ms); // 1ms-15s
+    void gainChanged(int percent); // 100%-5000%
+    void brightChanged(int bright); // 0-100
+    void infoChanged(const MultiCameraInfo &);
 };
 #endif //EOSI_CAMERABOX_H

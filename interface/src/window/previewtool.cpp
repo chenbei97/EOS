@@ -11,10 +11,14 @@
 PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
 {
     wellbox = new WellBox;
+    objectivebox = new ObjectiveBox;
+    channelbox = new ChannelBox;
     camerabox = new CameraBox;
 
     lay = new QVBoxLayout;
     lay->addWidget(wellbox);
+    lay->addWidget(objectivebox);
+    lay->addWidget(channelbox);
     lay->addWidget(camerabox);
     setLayout(lay);
 
@@ -23,44 +27,28 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(wellbox,&WellBox::welldishChanged,this,&PreviewTool::welldishChanged);
     connect(wellbox,&WellBox::wellflaskChanged,this,&PreviewTool::wellflaskChanged);
     connect(wellbox,&WellBox::wellslideChanged,this,&PreviewTool::wellslideChanged);
-    connect(wellbox,&WellBox::objectiveChanged,this,&PreviewTool::objectiveChanged);
+    connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::objectiveChanged);
     connect(wellbox,&WellBox::wellbrandChanged,this,&PreviewTool::infoChanged);
     connect(wellbox,&WellBox::wellsizeChanged,this,&PreviewTool::infoChanged);
     connect(wellbox,&WellBox::welldishChanged,this,&PreviewTool::infoChanged);
     connect(wellbox,&WellBox::wellflaskChanged,this,&PreviewTool::infoChanged);
     connect(wellbox,&WellBox::wellslideChanged,this,&PreviewTool::infoChanged);
-    connect(wellbox,&WellBox::objectiveChanged,this,&PreviewTool::infoChanged);
+    connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::infoChanged);
 
-    connect(camerabox,&CameraBox::phExposureChanged,this,&PreviewTool::phExposureChanged);
-    connect(camerabox,&CameraBox::phGainChanged,this,&PreviewTool::phGainChanged);
-    connect(camerabox,&CameraBox::phBrightChanged,this,&PreviewTool::phBrightChanged);
-    connect(camerabox,&CameraBox::phExposureChanged,this,&PreviewTool::infoChanged);
-    connect(camerabox,&CameraBox::phGainChanged,this,&PreviewTool::infoChanged);
-    connect(camerabox,&CameraBox::phBrightChanged,this,&PreviewTool::infoChanged);
 
-    connect(camerabox,&CameraBox::gfpExposureChanged,this,&PreviewTool::gfpExposureChanged);
-    connect(camerabox,&CameraBox::gfpGainChanged,this,&PreviewTool::gfpGainChanged);
-    connect(camerabox,&CameraBox::gfpBrightChanged,this,&PreviewTool::gfpBrightChanged);
-    connect(camerabox,&CameraBox::gfpExposureChanged,this,&PreviewTool::infoChanged);
-    connect(camerabox,&CameraBox::gfpGainChanged,this,&PreviewTool::infoChanged);
-    connect(camerabox,&CameraBox::gfpBrightChanged,this,&PreviewTool::infoChanged);
+    connect(camerabox,&CameraBox::exposureChanged,this,&PreviewTool::exposureChanged);
+    connect(camerabox,&CameraBox::gainChanged,this,&PreviewTool::gainChanged);
+    connect(camerabox,&CameraBox::brightChanged,this,&PreviewTool::brightChanged);
+    // 不需要滑动条移动就会触发信息改变,只能是保存相机信息那个动作才可以触发
+    connect(camerabox,&CameraBox::infoChanged,this,&PreviewTool::infoChanged);
+    //connect(camerabox,&CameraBox::exposureChanged,this,&PreviewTool::infoChanged);
+    //connect(camerabox,&CameraBox::gainChanged,this,&PreviewTool::infoChanged);
+    //connect(camerabox,&CameraBox::brightChanged,this,&PreviewTool::infoChanged);
 
-    connect(camerabox,&CameraBox::rfpExposureChanged,this,&PreviewTool::rfpExposureChanged);
-    connect(camerabox,&CameraBox::rfpGainChanged,this,&PreviewTool::rfpGainChanged);
-    connect(camerabox,&CameraBox::rfpBrightChanged,this,&PreviewTool::rfpBrightChanged);
-    connect(camerabox,&CameraBox::rfpExposureChanged,this,&PreviewTool::infoChanged);
-    connect(camerabox,&CameraBox::rfpGainChanged,this,&PreviewTool::infoChanged);
-    connect(camerabox,&CameraBox::rfpBrightChanged,this,&PreviewTool::infoChanged);
 
-    connect(camerabox,&CameraBox::dapiExposureChanged,this,&PreviewTool::dapiExposureChanged);
-    connect(camerabox,&CameraBox::dapiGainChanged,this,&PreviewTool::dapiGainChanged);
-    connect(camerabox,&CameraBox::dapiBrightChanged,this,&PreviewTool::dapiBrightChanged);
-    connect(camerabox,&CameraBox::dapiExposureChanged,this,&PreviewTool::infoChanged);
-    connect(camerabox,&CameraBox::dapiGainChanged,this,&PreviewTool::infoChanged);
-    connect(camerabox,&CameraBox::dapiBrightChanged,this,&PreviewTool::infoChanged);
-
-    connect(camerabox,&CameraBox::channelChanged,this,&PreviewTool::channelChanged);
-    connect(camerabox,&CameraBox::channelChanged,this,&PreviewTool::infoChanged);
+    connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::channelChanged);
+    connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
+    connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::infoChanged);
 
     //LOG<<"wellinfo = "<<wellbox->wellInfo();
     //LOG<<"camerainfo = "<<camerabox->cameraInfo();
@@ -71,28 +59,33 @@ PreviewToolInfo PreviewTool::toolInfo() const
     PreviewToolInfo info;
 
     auto wellinfo = wellbox->wellInfo();
-    foreach(auto key,wellinfo.keys()) {
+    foreach(auto key,wellinfo.keys())
         info[key] = wellinfo[key];
-    }
 
-    auto camerainfo = camerabox->cameraInfo(); // 可能4个都没选
+    auto objectiveinfo = objectivebox->objectiveInfo();
+    info[ObjectiveField] = objectiveinfo[ObjectiveField];
 
-    QStringList channel;
+    auto channelinfo = channelbox->channelInfo();
+    info[ChannelField] = channelinfo[ChannelField];
+
+    auto camerainfo = camerabox->cameraInfo();
+
+    QStringList channels;
     if (!camerainfo.isEmpty()) { // 有勾选的通道
-        foreach(auto key, camerainfo.keys()) {
-            ChannelInfo val = camerainfo[key];// 每个通道的信息
-            QVariantMap m;//把结构体信息转成QVarintMap
-            m[ChannelField] = val.channel;
-            //m[IsCheckedField] = val.isChecked; // 能传过来的消息一定都是勾选过的,不需要这个额外字段了
-            m[ExposureField] = val.expousre;
-            m[GainField] = val.gain;
-            m[BrightField] = val.bright;
+        foreach(auto channel, camerainfo.keys()) {
+            CameraInfo val = camerainfo[channel];// 每个通道的信息
 
-            info[key] = m; // 转成QVarintMap,wellinfo的值是QString,camerainfo的值是QVarintMap
-            channel << val.channel;
+            QVariantMap m;//把每个通道的信息转成QVarintMap
+            m[ChannelField] = channel;
+            m[ExposureField] = val[ExposureField];
+            m[GainField] = val[GainField];
+            m[BrightField] = val[BrightField];
+            info[channel] = m; // 这个channel字段存储这个CameraInfo
+            channels << channel;
         }
     }
 
-    info[ChannelField] = channel;//增加一个key=channel,和ph,gfp,wellsize等是平级的,方便组装时判断
+    info[ChannelField] = channels;//增加一个key=channel,和objective,well等是平级的,方便组装时判断
+    LOG<<"tool info = "<<info;
     return info;
 }

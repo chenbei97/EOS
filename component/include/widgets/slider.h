@@ -24,6 +24,7 @@ public:
     void setSuffix(const QString& s);
     void setSingleStep(int step);
     QString value() const;
+    void setValue(int value);
 //    QSize sizeHint() const override;
 private:
     Sliderx * slider;

@@ -16,17 +16,15 @@ class INTERFACE_IMEXPORT ChannelBox: public GroupBox
     Q_OBJECT
 public:
     explicit ChannelBox(QWidget*parent= nullptr);
-    QBoolVector selectStates() const;
+    ChannelInfo channelInfo() const;
 private:
-    CheckBox * phbox;
-    CheckBox * gfpbox;
-    CheckBox * rfpbox;
-    CheckBox * dapibox;
+    QRadioButton * brbox;
+    QRadioButton * phbox;
+    QRadioButton * gfpbox;
+    QRadioButton * rfpbox;
+    QRadioButton * dapibox;
 signals:
-    void phSelected(bool isSelect);
-    void gfpSelected(bool isSelect);
-    void rfpSelected(bool isSelect);
-    void dapiSelected(bool isSelect);
+    void channelChanged(int option);
 
 };
 #endif //EOSI_CHANNELBOX_H

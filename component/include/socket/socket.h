@@ -43,12 +43,17 @@ static const char* WellsizeFieldLabel = "wellsize: ";
 static const QFieldList ObjectiveFields = {
         "4x","10x","20x","40x",
 };
+#define Objective4x  "4x"
+#define Objective10x  "10x"
+#define Objective20x  "20x"
+#define Objective40x  "40x"
 static const char* ObjectiveField = "objective";
 static const char* ObjectiveFieldLabel = "objective: ";
 
 static const QFieldList ChannelFields = {
-        "PH","GFP","RFP","DAPI"
+        "BR","PH","GFP","RFP","DAPI"
 };
+static const char* BRField = "BR";
 static const char* PHField = "PH";
 static const char* GFPField = "GFP";
 static const char* RFPField = "RFP";

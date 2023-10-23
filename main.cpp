@@ -17,9 +17,10 @@ int main(int argc, char *argv[]) {
     LogInit;
     QApplication a(argc, argv);
     initApp(a);
-    
+
     //test_assemble_parse();
     //test_pattern();
+    //test_async();
 #ifdef usetesttcp
     test_tcp();
 #else
@@ -35,13 +36,13 @@ void initApp(QApplication& a)
     LOG << "UserScreen Width:" << UserScreenWidth << "UserScreen Height:" << UserScreenHeight;
     LOG<<"main thread is "<<CURRENT_THREAD;
     LOG<<"current path = "<<CURRENT_PATH;
-#ifdef usetesttcp
-    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
-    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
-    else LOG<<"socket is connect failed!";
-    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
-    LOG<<"activate code is "<<ParserResult.toString();
-#endif
+//#ifndef usetesttcp
+//    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
+//    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
+//    else LOG<<"socket is connect failed!";
+//    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
+//    LOG<<"activate code is "<<ParserResult.toString();
+//#endif
 //    QTextCodec *codec = QTextCodec::codecForName("utf-8");
 //    QTextCodec::setCodecForLocale(codec);
     a.setFont(QFont(DefaultFontFamily,DefaultFontSize));

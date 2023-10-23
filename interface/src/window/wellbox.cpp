@@ -15,15 +15,12 @@ WellBox::WellBox(QWidget*parent): GroupBox(parent)
     welldishCombo = new ComboBox(DishFields);
     wellflaskCombo = new ComboBox(FlaskFields);
     wellslideCombo = new ComboBox(SlideFields);
-    objectiveCombo = new ComboBox(ObjectiveFields);
 
     auto gridlay = new QGridLayout;
     gridlay->addWidget(new Label(BrandFieldLabel),0,0);
     gridlay->addWidget(wellbrandCombo,0,1);
     gridlay->addWidget(new Label(WellsizeFieldLabel),0,2);
     gridlay->addWidget(wellsizeCombo,0,3);
-    gridlay->addWidget(new Label(ObjectiveFieldLabel),0,4);
-    gridlay->addWidget(objectiveCombo,0,5);
 
     gridlay->addWidget(new Label(DishFieldLabel),1,0);
     gridlay->addWidget(welldishCombo,1,1);
@@ -41,13 +38,13 @@ WellBox::WellBox(QWidget*parent): GroupBox(parent)
 
     gridlay->setHorizontalSpacing(WellBoxGridLayHorSpacing);
     setLayout(gridlay);
+    setTitle(tr("孔板"));
 
     connect(wellbrandCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellbrandChanged);
     connect(wellsizeCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellsizeChanged);
     connect(wellflaskCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellflaskChanged);
     connect(wellslideCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellslideChanged);
     connect(welldishCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::welldishChanged);
-    connect(objectiveCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::objectiveChanged);
 }
 
 WellInfo WellBox::wellInfo() const
@@ -59,7 +56,6 @@ WellInfo WellBox::wellInfo() const
     m[FlaskField] = wellflaskCombo->currentText();
     m[SlideField] = wellslideCombo->currentText();
     m[DishField] = welldishCombo->currentText();
-    m[ObjectiveField] = objectiveCombo->currentText();
 
     return m;
 }

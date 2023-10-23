@@ -23,14 +23,12 @@ private:
     ComboBox * welldishCombo;
     ComboBox * wellflaskCombo;
     ComboBox * wellslideCombo;
-    ComboBox * objectiveCombo;
 signals:
     void wellbrandChanged(int option);
     void welldishChanged(int option);
     void wellflaskChanged(int option);
     void wellslideChanged(int option);
     void wellsizeChanged(int option);
-    void objectiveChanged(int option);
 };
 
 #endif //EOSI_WELLBOX_H

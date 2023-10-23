@@ -115,20 +115,25 @@ typedef const QVector<QVector<HoleInfo>>& QCHoleInfo2DVector;
 
 
 typedef QMap<QString,QString> WellInfo;
-struct ChannelInfo {
-    QString channel;
-    bool isChecked;
-    QString expousre;
-    QString gain;
-    QString bright;
-
-    friend QDebug operator<<(QDebug debug, const ChannelInfo& s) {
-        debug << "channel: "<<s.channel<<" isChecked: "<<s.isChecked
-        <<" exposure: "<<s.expousre<<" gain: "<<s.gain<<" bright: "<<s.bright;
-        return debug;
-    }
-};
-typedef QMap<QString,ChannelInfo> CameraInfo;
+typedef QMap<QString,QString> ObjectiveInfo;
+typedef QMap<QString,QString> ChannelInfo;
+typedef QMap<QString,QString> CameraInfo;
+typedef QMap<QString,CameraInfo> MultiCameraInfo;
 typedef QVariantMap PreviewToolInfo;
+
+//struct ChannelInfo {
+//    QString channel;
+//    bool isChecked;
+//    QString expousre;
+//    QString gain;
+//    QString bright;
+//
+//    friend QDebug operator<<(QDebug debug, const ChannelInfo& s) {
+//        debug << "channel: "<<s.channel<<" isChecked: "<<s.isChecked
+//        <<" exposure: "<<s.expousre<<" gain: "<<s.gain<<" bright: "<<s.bright;
+//        return debug;
+//    }
+//};
+
 
 #endif //EOSI_ALIAS_H

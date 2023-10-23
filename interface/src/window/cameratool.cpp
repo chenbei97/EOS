@@ -40,6 +40,11 @@ void CameraTool::setTitle(const QString &title)
     label->setText(title);
 }
 
+void CameraTool::setExposure(int exposure)
+{
+    cameraExposureSlider->setValue(exposure);
+}
+
 QString CameraTool::exposure() const
 {
     return cameraExposureSlider->value();
@@ -50,9 +55,19 @@ QString CameraTool::gain() const
     return cameraGainSlider->value();
 }
 
+void CameraTool::setGain(int gain)
+{
+    cameraGainSlider->setValue(gain);
+}
+
 QString CameraTool::bright() const
 {
     return cameraBrightSlider->value();
+}
+
+void CameraTool::setBright(int bright)
+{
+    cameraBrightSlider->setValue(bright);
 }
 
 //QSize CameraTool::sizeHint() const

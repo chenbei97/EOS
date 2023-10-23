@@ -10,28 +10,48 @@
 
 ChannelBox::ChannelBox(QWidget*parent): GroupBox(parent)
 {
-    phbox = new CheckBox(PHField);
-    gfpbox = new CheckBox(GFPField);
-    rfpbox = new CheckBox(RFPField);
-    dapibox = new CheckBox(DAPIField);
+    brbox = new QRadioButton(BRField);
+    phbox = new QRadioButton(PHField);
+    gfpbox = new QRadioButton(GFPField);
+    rfpbox = new QRadioButton(RFPField);
+    dapibox = new QRadioButton(DAPIField);
 
     auto lay = new QHBoxLayout;
 
-    lay->addWidget(new Label(ChannelFieldLabel));
+    lay->addWidget(brbox);
     lay->addWidget(phbox);
     lay->addWidget(gfpbox);
     lay->addWidget(rfpbox);
     lay->addWidget(dapibox);
 
     setLayout(lay);
+    setTitle(tr("通道"));
 
-    connect(phbox,&CheckBox::checkedChanged,this,&ChannelBox::phSelected);
-    connect(gfpbox,&CheckBox::checkedChanged,this,&ChannelBox::gfpSelected);
-    connect(rfpbox,&CheckBox::checkedChanged,this,&ChannelBox::rfpSelected);
-    connect(dapibox,&CheckBox::checkedChanged,this,&ChannelBox::dapiSelected);
+    QButtonGroup * group = new QButtonGroup;
+    group->addButton(brbox,0);
+    group->addButton(phbox,1);
+    group->addButton(gfpbox,2);
+    group->addButton(rfpbox,3);
+    group->addButton(dapibox,4);
+    brbox->setChecked(true);
+
+    connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&ChannelBox::channelChanged);
 }
 
-QBoolVector ChannelBox::selectStates() const
+ChannelInfo ChannelBox::channelInfo() const
 {
-    return {phbox->isChecked(),gfpbox->isChecked(),rfpbox->isChecked(),dapibox->isChecked()};
+    ChannelInfo m;
+
+    if (brbox->isChecked())
+        m[ChannelField] = BRField; // 转换为idx无需在这里,这里需要实际字符串
+    else if (phbox->isChecked())
+        m[ChannelField] = PHField;
+    else if (gfpbox->isChecked())
+        m[ChannelField] = GFPField;
+    else if (rfpbox->isChecked())
+        m[ChannelField] = RFPField;
+    else if (dapibox->isChecked())
+        m[ChannelField] = DAPIField;
+
+    return m;
 }

@@ -12,6 +12,8 @@
 // (1)头文件
 #include "public.h"
 #include "alias.h"
+#include "qradiobutton.h"
+#include "qbuttongroup.h"
 
 // (2) 导出定义
 #if defined(INTERFACE_LIBRARY)
@@ -38,7 +40,7 @@ static const QFieldList AppFields = {
 
 #ifdef ScreenWidth
     #define MainWindowWidth 2400
-    #define MainWindowHeight 1200
+    #define MainWindowHeight 1300
 
     #define PainterFontSize 20
     #define PainterFont (QFont(DefaultFontFamily,PainterFontSize,QFont::Bold))

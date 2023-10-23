@@ -13,6 +13,7 @@
 #include "camerabox.h"
 #include "channelbox.h"
 #include "wellbox.h"
+#include "objectivebox.h"
 
 class INTERFACE_IMEXPORT PreviewTool : public QWidget
 {
@@ -22,6 +23,8 @@ public:
     PreviewToolInfo toolInfo() const;
 private:
     WellBox * wellbox;
+    ObjectiveBox * objectivebox;
+    ChannelBox * channelbox;
     CameraBox * camerabox;
     QVBoxLayout * lay;
 signals:
@@ -32,20 +35,12 @@ signals:
     void wellslideChanged(int option);
     void wellsizeChanged(int option);
     void objectiveChanged(int option);
+    // 通道选择
+    void channelChanged(int option);
     // 相机不同通道的信息
-    void phExposureChanged(int ms); // 1ms-15s
-    void phGainChanged(int percent); // 100%-5000%
-    void phBrightChanged(int bright); // 0-100
-    void gfpExposureChanged(int ms);
-    void gfpGainChanged(int percent);
-    void gfpBrightChanged(int bright);
-    void rfpExposureChanged(int ms);
-    void rfpGainChanged(int percent);
-    void rfpBrightChanged(int bright);
-    void dapiExposureChanged(int ms);
-    void dapiGainChanged(int percent);
-    void dapiBrightChanged(int bright);
-    void channelChanged(QVector<bool> states);
+    void exposureChanged(int ms); // 1ms-15s
+    void gainChanged(int percent); // 100%-5000%
+    void brightChanged(int bright); // 0-100
     // 上述所有信号都会触发此信号
     void infoChanged();
 

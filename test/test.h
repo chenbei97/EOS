@@ -11,8 +11,52 @@
 
 #include "interface.h"
 #include "socketpanel.h"
+#include <thread>
+using std::async;
+using std::promise;
+using std::future;
 
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
+
+static void test_async()
+{
+// promise<int> pval;
+// pval.set_value(-1);
+// auto func1 = [](promise<int> & p){
+//     //p.set_value_at_thread_exit(9);
+//     p.set_value(9);
+//
+// };
+// std::thread thread1(func1,std::ref(pval));
+// LOG<<"is joinable? "<<thread1.joinable();
+// //thread1.join();
+// thread1.detach();
+// auto future1 = pval.get_future();
+// LOG<< "promise val = "<<future1.get();
+
+
+ auto func2 = []()->int{
+     int val = -1;
+     LOG<<"before sleep_for val = "<<val;
+     std::this_thread::sleep_for(std::chrono::seconds(3));
+     val = 9;
+     LOG<<"after sleep_for val = "<<val;
+     return val;
+ };
+    std::future<int> future2 = std::async(std::launch::async, func2);
+    std::future_status status;
+    do {
+        status = future2.wait_for(std::chrono::seconds(1));
+        if (status == std::future_status::deferred) {
+            LOG << "deferred\n";
+        } else if (status == std::future_status::timeout) {
+            LOG << "timeout\n";
+        } else if (status == std::future_status::ready) {
+            LOG << "ready!\n";
+        }
+    } while (status != std::future_status::ready);
+    LOG << "result is " << future2.get() << '\n';
+}
 
 static void test_tcp()
 {

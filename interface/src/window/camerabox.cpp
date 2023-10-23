@@ -10,125 +10,74 @@
 
 CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
 {
-    cameratool1 = new CameraTool;
-    cameratool2 = new CameraTool;
-    cameratool3 = new CameraTool;
-    cameratool4 = new CameraTool;
+    cameratool = new CameraTool;
+    currentchannel = new Label(QString("%1%2").arg(ChannelFieldLabel).arg(BRField));
+    savebtn = new PushButton(tr("保存相机设置"));
 
-    cameratool1->setTitle(PHField);
-    cameratool2->setTitle(GFPField);
-    cameratool3->setTitle(RFPField);
-    cameratool4->setTitle(DAPIField);
+    auto rlay = new QVBoxLayout;
+    rlay->addWidget(cameratool);
+    auto rblay = new QHBoxLayout;
+    rblay->addStretch();
+    rblay->addWidget(currentchannel);
+    rblay->addWidget(savebtn);
+    rlay->addLayout(rblay);
 
-    setEnabled(0, false);
-    setEnabled(1, false);
-    setEnabled(2, false);
-    setEnabled(3, false);
+    setLayout(rlay);
+    setTitle(tr("相机"));
 
-    auto gridlay = new QGridLayout;
-    gridlay->addWidget(cameratool1,0,0);
-    gridlay->addWidget(cameratool2,0,1);
-    gridlay->addWidget(cameratool3,1,0);
-    gridlay->addWidget(cameratool4,1,1);
-
-    channelbox = new ChannelBox;
-
-    auto lay = new QVBoxLayout;
-    lay->addWidget(channelbox);
-    lay->addLayout(gridlay);
-
-    setLayout(lay);
-
-    connect(cameratool1,&CameraTool::exposureChanged,this,&CameraBox::phExposureChanged);
-    connect(cameratool1,&CameraTool::gainChanged,this,&CameraBox::phGainChanged);
-    connect(cameratool1,&CameraTool::brightChanged,this,&CameraBox::phBrightChanged);
-
-    connect(cameratool2,&CameraTool::exposureChanged,this,&CameraBox::gfpExposureChanged);
-    connect(cameratool2,&CameraTool::gainChanged,this,&CameraBox::gfpGainChanged);
-    connect(cameratool2,&CameraTool::brightChanged,this,&CameraBox::gfpBrightChanged);
-
-    connect(cameratool3,&CameraTool::exposureChanged,this,&CameraBox::rfpExposureChanged);
-    connect(cameratool3,&CameraTool::gainChanged,this,&CameraBox::rfpGainChanged);
-    connect(cameratool3,&CameraTool::brightChanged,this,&CameraBox::rfpBrightChanged);
-
-    connect(cameratool4,&CameraTool::exposureChanged,this,&CameraBox::dapiExposureChanged);
-    connect(cameratool4,&CameraTool::gainChanged,this,&CameraBox::dapiGainChanged);
-    connect(cameratool4,&CameraTool::brightChanged,this,&CameraBox::dapiBrightChanged);
-
-    connect(channelbox,&ChannelBox::phSelected,this,[=](auto isSelect)
-        { setEnabled(0,isSelect);emit channelChanged(channelbox->selectStates());});
-    connect(channelbox,&ChannelBox::gfpSelected,this,[=](auto isSelect)
-        { setEnabled(1,isSelect);emit channelChanged(channelbox->selectStates());});
-    connect(channelbox,&ChannelBox::rfpSelected,this,[=](auto isSelect)
-        { setEnabled(2,isSelect);emit channelChanged(channelbox->selectStates());});
-    connect(channelbox,&ChannelBox::dapiSelected,this,[=](auto isSelect)
-        { setEnabled(3,isSelect);emit channelChanged(channelbox->selectStates());});
-
-
+    connect(cameratool,&CameraTool::exposureChanged,this,&CameraBox::exposureChanged);
+    connect(cameratool,&CameraTool::gainChanged,this,&CameraBox::gainChanged);
+    connect(cameratool,&CameraTool::brightChanged,this,&CameraBox::brightChanged);
+    connect(savebtn,&PushButton::clicked,this,&CameraBox::onSaveBtn);
 }
 
-void CameraBox::setVisible(int index,bool visible)
+void CameraBox::onSaveBtn()
 {
-    switch (index) {
-        case 0: cameratool1->setVisible(visible);
-            break;
-        case 1: cameratool2->setVisible(visible);
-            break;
-        case 2: cameratool3->setVisible(visible);
-            break;
-        case 3: cameratool4->setVisible(visible);
-            break;
-        default:
-            break;
+    auto channel = currentchannel->text().remove(ChannelFieldLabel);
+    camerainfo[channel] = saveInfo();
+
+    emit infoChanged(camerainfo);
+    //LOG<<"camera info = "<<camerainfo;
+}
+
+void CameraBox::setEnabled(bool enabled)
+{ // 除了br,phase,其它通道不需要调整相机参数
+    cameratool->setEnabled(enabled);
+    savebtn->setEnabled(enabled);
+    currentchannel->setEnabled(enabled);
+}
+
+void CameraBox::setChannel(int option)
+{ // channelbox设置通道后来响应这里的因为
+    //LOG<<"option = "<<option;
+    if (option != 0 && option != 1) { // br, phase
+        setEnabled(false);
+    } else setEnabled(true);
+
+    auto channel = ChannelFields[option];
+    currentchannel->setText(QString("%1%2").arg(ChannelFieldLabel).arg(channel));
+
+    if (camerainfo.keys().contains(channel)) { // 切换通道,如果通道有保存过的值,同步UI
+        cameratool->setBright(camerainfo[channel][BrightField].toUInt());
+        cameratool->setExposure(camerainfo[channel][ExposureField].toUInt());
+        cameratool->setGain(camerainfo[channel][GainField].toUInt());
+    } else {
+        cameratool->setBright(0);
+        cameratool->setExposure(0);
+        cameratool->setGain(0);
     }
 }
 
-void CameraBox::setEnabled(int index, bool enabled)
+MultiCameraInfo CameraBox::cameraInfo() const
 {
-    switch (index) {
-        case 0: cameratool1->setEnabled(enabled);
-            break;
-        case 1: cameratool2->setEnabled(enabled);
-            break;
-        case 2: cameratool3->setEnabled(enabled);
-            break;
-        case 3: cameratool4->setEnabled(enabled);
-            break;
-        default:
-            break;
-    }
+    return camerainfo;
 }
 
-CameraInfo CameraBox::cameraInfo() const
-{ // 只有勾选的通道才会打包信息
-    auto states = channelbox->selectStates();
-    //LOG<<"checked states = "<<states;
+CameraInfo CameraBox::saveInfo() const
+{
     CameraInfo info;
-    ChannelInfo m;
-
-    if (states[0]) {
-        m = {PHField,states[0],cameratool1->exposure(),
-                        cameratool1->gain(),cameratool1->bright()};
-        info[PHField] = m;
-    }
-
-    if (states[1]) {
-        m = {GFPField,states[1],cameratool2->exposure(),
-             cameratool2->gain(),cameratool2->bright()};
-        info[GFPField] = m;
-    }
-
-    if (states[2]) {
-        m = {RFPField,states[2],cameratool3->exposure(),
-             cameratool3->gain(),cameratool3->bright()};
-        info[RFPField] = m;
-    }
-
-    if (states[3]) {
-        m = {DAPIField,states[3],cameratool4->exposure(),
-             cameratool4->gain(),cameratool4->bright()};
-        info[DAPIField] = m;
-    }
-
+    info[BrightField] = cameratool->bright();
+    info[GainField] = cameratool->gain();
+    info[ExposureField] = cameratool->exposure();
     return info;
 }
