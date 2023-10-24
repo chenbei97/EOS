@@ -11,6 +11,7 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
     navigbar = new NavigBar;
+    navigbar->setMinimumHeight(NavigBarHeight);
 
     appselect = new AppSelect;
     preview = new Preview;

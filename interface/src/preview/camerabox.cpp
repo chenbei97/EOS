@@ -10,22 +10,21 @@
 
 CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
 {
-    focustool = new FocusTool;
     cameratool = new CameraTool;
     currentchannel = new Label(QString("%1%2").arg(ChannelFieldLabel).arg(BRField));
-    savebtn = new PushButton(tr("保存相机设置"));
+    savebtn = new PushButton(tr("保存相机通道设置"));
+    combinebtn = new PushButton(tr("组合通道"));
+    capturebtn = new PushButton(tr("拍照"));
 
     auto blay = new QHBoxLayout;
     blay->addStretch();
     blay->addWidget(currentchannel);
+    blay->addWidget(capturebtn);
+    blay->addWidget(combinebtn);
     blay->addWidget(savebtn);
 
-    QHBoxLayout * hlay = new QHBoxLayout;
-    hlay->addWidget(focustool);
-    hlay->addWidget(cameratool);
-
     auto lay = new QVBoxLayout;
-    lay->addLayout(hlay);
+    lay->addWidget(cameratool);
     lay->addLayout(blay);
 
     setLayout(lay);
@@ -55,11 +54,6 @@ void CameraBox::setEnabled(bool enabled)
 
 void CameraBox::setChannel(int option)
 { // channelbox设置通道后来响应这里的因为
-    //LOG<<"option = "<<option;
-    if (option != 0 && option != 1) { // br, phase
-        setEnabled(false);
-    } else setEnabled(true);
-
     auto channel = ChannelFields[option];
     currentchannel->setText(QString("%1%2").arg(ChannelFieldLabel).arg(channel));
 

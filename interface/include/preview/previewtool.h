@@ -26,14 +26,15 @@ private:
     ObjectiveBox * objectivebox;
     ChannelBox * channelbox;
     CameraBox * camerabox;
+    FocusBox * focusbox;
+    PushButton * saveallbtn;
+    CheckBox * exportToFile;
+    LineEdit * filenameedit;
     QVBoxLayout * lay;
 signals:
     // wellbox的信息
     void wellbrandChanged(int option);
-    void welldishChanged(int option);
-    void wellflaskChanged(int option);
-    void wellslideChanged(int option);
-    void wellsizeChanged(int option);
+    void manufacturerChanged(int option);
     void objectiveChanged(int option);
     // 通道选择
     void channelChanged(int option);

@@ -19,16 +19,10 @@ public:
     WellInfo wellInfo() const;
 private:
     ComboBox * wellbrandCombo;
-    ComboBox * wellsizeCombo;
-    ComboBox * welldishCombo;
-    ComboBox * wellflaskCombo;
-    ComboBox * wellslideCombo;
+    ComboBox * manufacturerCombo;
 signals:
     void wellbrandChanged(int option);
-    void welldishChanged(int option);
-    void wellflaskChanged(int option);
-    void wellslideChanged(int option);
-    void wellsizeChanged(int option);
+    void manufacturerChanged(int option);
 };
 
 #endif //EOSI_WELLBOX_H

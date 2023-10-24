@@ -6,23 +6,27 @@
  * @FilePath: \EOS\interface\include\preview\focustool.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#ifndef EOSI_FOCUSTOOL_H
-#define EOSI_FOCUSTOOL_H
+#ifndef EOSI_FOCUSBOX_H
+#define EOSI_FOCUSBOX_H
 
 #include "window.h"
 
-class INTERFACE_IMEXPORT FocusTool: public QWidget
+class INTERFACE_IMEXPORT FocusBox: public GroupBox
 {
     Q_OBJECT
 public:
-    explicit FocusTool(QWidget*parent= nullptr);
+    explicit FocusBox(QWidget*parent= nullptr);
+    void setEnabled(bool enabled);
+    int focus() const;
 private:
-    Slider * slider;
+    DoubleSlider * slider;
     RoundButton * leftbtn;
     RoundButton * rightbtn;
     SpinBox * step;
+    PushButton * autofocusbtn;
     void addFocus();
     void subtractFocus();
+    void onAutoFocus();
 };
 
-#endif //EOSI_FOCUSTOOL_H
+#endif //EOSI_FOCUSBOX_H

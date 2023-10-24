@@ -10,11 +10,13 @@
 
 Preview::Preview(QWidget*parent): QWidget(parent)
 {
+    auto mode = new CameraMode;
     auto canvas = new QWidget;
     toolbar = new PreviewTool;
 
     pattern = new Pattern(2,3);
-    pattern->toggleState(Pattern::TickState);
+    pattern->toggleState(Pattern::PreviewState);
+    pattern->setMinimumHeight(PreviewPatternMinHeight);
     auto pbox = new GroupBox(tr("选孔"));
     auto play = new QVBoxLayout;
     play->addWidget(pattern);
@@ -28,15 +30,18 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     box->setMaximumWidth(PreviewToolBarMaxWidth);
 
     auto lay = new QHBoxLayout;
-    lay->addWidget(canvas);
+    auto clay = new QVBoxLayout;
+    clay->addWidget(mode);
+    clay->addWidget(canvas);
+    lay->addLayout(clay);
     lay->addWidget(box);
     setLayout(lay);
 
-    connect(toolbar,&PreviewTool::wellsizeChanged,this,&Preview::onWellsizeChanged);
+    connect(toolbar,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);
     connect(toolbar,&PreviewTool::infoChanged,this,&Preview::onInfoChanged);
 }
 
-void Preview::onWellsizeChanged(int option)
+void Preview::onManufacturerChanged(int option)
 {
     //LOG<<"wellsize option = "<<option;
     switch (option) {

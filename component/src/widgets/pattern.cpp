@@ -35,22 +35,26 @@ void Pattern::drawHighlight(QPainter&painter)
                 painter.fillPath(path,mMouseClickColor);
             }
 
-            if (!mDrapRect.isNull()) {
-                auto pen = painter.pen();
-                pen.setColor(Qt::blue);
-                painter.setPen(pen);
-                painter.drawRect(mDrapRect);
-                pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
-                painter.setPen(pen);
+            if (supportBoxSelect) {
+                if (!mDrapRect.isNull()) { // 绘制框选框
+                    auto pen = painter.pen();
+                    pen.setColor(Qt::blue);
+                    painter.setPen(pen);
+                    painter.drawRect(mDrapRect);
+                    pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
+                    painter.setPen(pen);
+                }
+
+                // 绘制框选的所有点
+                if (mDrapPoints[row][col]) { // && !mHoleInfo[row][col].isSelected 绘制拖拽临时的点,如果有已被选中的不需要再绘制
+                    path.clear(); // 不过这样取消选中时不能绘制拖拽的点感受不好,还是恢复
+                    path.moveTo(center);
+                    path.addEllipse(center, radius * 0.75, radius * 0.75);
+                    painter.fillPath(path, mMouseClickColor);
+                }
             }
 
-            if (mDrapPoints[row][col] ) { // && !mHoleInfo[row][col].isSelected 绘制拖拽临时的点,如果有已被选中的不需要再绘制
-                path.clear(); // 不过这样取消选中时不能绘制拖拽的点感受不好,还是恢复
-                path.moveTo(center);
-                path.addEllipse(center,radius*0.75,radius*0.75);
-                painter.fillPath(path,mMouseClickColor);
-            }
-
+            // 绘制确实选中的点
             if (mHoleInfo[row][col].isSelected) //  绘制确定选中的点
             {
                 path.clear();
@@ -66,9 +70,9 @@ void Pattern::drawHighlight(QPainter&painter)
 void Pattern::mousePressEvent(QMouseEvent *event)
 {
     if (mMouseEvent) {
-        if (event->button() == Qt::LeftButton) // 框选完不会自动清除颜色,但是右键还需要菜单,不能清除掉
-            initDrapPoints();
-
+//        if (event->button() == Qt::LeftButton) // 框选完不会自动清除颜色
+//            initDrapPoints();
+        mMousePos = QPoint(-1,-1);
         mLastPos = event->pos();
         auto rects = getChildRects(); // 所有小正方形区域匹配这个坐标
         for(int row = 0; row < mrows; ++row)
@@ -110,22 +114,28 @@ void Pattern::mouseReleaseEvent(QMouseEvent *event)
 {
     if (mMouseEvent) {
         //LOG<<"mouse point = "<<mMousePos;
-        if (mMousePos == QPoint(-1,-1)) return; // 可能会点到边缘位置导致下方获取颜色越界
+        if (mMousePos == QPoint(-1,-1))
+            return; // 可能会点到边缘位置导致下方获取颜色越界
+
         if (event->button() == Qt::LeftButton) {
-            auto c = mHoleInfo[mMousePos.x()][mMousePos.y()].color;
-            auto dlg = new GroupInfo;
-            dlg->setBtnColor(c); // 鼠标单击时可以让按钮跟随当前的孔颜色
-            //dlg->setAttribute(Qt::WA_DeleteOnClose);
-            int ret = dlg->exec();
-            if (ret == QDialog::Accepted) {
-                select(dlg->groupColor());
+            if (supportBoxSelect) { // 支持框选的时候,也就是需要分组和选多个孔的时候
+                auto c = mHoleInfo[mMousePos.x()][mMousePos.y()].color; // 选中点的颜色
+
+                auto dlg = new GroupInfo;
+                dlg->setBtnColor(c); // 鼠标单击时可以让按钮跟随当前的孔颜色
+
+                int ret = dlg->exec();
+                if (ret == QDialog::Accepted) {
+                    select(dlg->groupColor());
+                }
+                delete dlg;
+                mDrapRect.setWidth(0); // 清除矩形
+                mDrapRect.setHeight(0);
+            } else { // 预览状态不需要分组和框选,选单个孔就可以
+                auto dlg = new Circle;
+                dlg->show();
+                //delete dlg;
             }
-            delete dlg;
-            mDrapRect.setWidth(0); // 清除矩形
-            mDrapRect.setHeight(0);
-
-        } else if (event->button() == Qt::RightButton) {
-
         }
     }
     event->accept();
@@ -134,6 +144,7 @@ void Pattern::mouseReleaseEvent(QMouseEvent *event)
 void Pattern::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
     auto pen = painter.pen();
     pen.setWidth(2);
     painter.setPen(pen);
@@ -301,9 +312,15 @@ void Pattern::toggleState(PatternState state)
     switch (mState) {
         case UnInitialState:
             mMouseEvent = false;
+            supportBoxSelect = false;
+            break;
+        case PreviewState:
+            mMouseEvent = true;
+            supportBoxSelect = false;
             break;
         case TickState:
             mMouseEvent = true;
+            supportBoxSelect = true;
             break;
     }
 }
@@ -350,9 +367,9 @@ void Pattern::select(QCColor color)
         for (int col = 0; col < mcols; ++col){
             auto pt = mDrapPoints[row][col];
             if (pt){
-                mHoleInfo[row][col].isSelected = true;
-                mHoleInfo[row][col].color = color;
-                mDrapPoints[row][col] = false; // 被选中的点不要再视为拖拽区域
+                mHoleInfo[row][col].isSelected = true;//框选内对应的点都设为选中
+                mHoleInfo[row][col].color = color; // 颜色跟随窗口设置的颜色
+                mDrapPoints[row][col] = false; // 拖拽区域内的点也要更新为false,不然还会绘制这个区域
             }
         }
     }

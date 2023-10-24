@@ -44,6 +44,8 @@
 #include "tableview.h"
 #include "roundbutton.h"
 #include "colorbutton.h"
+#include "doubleslider.h"
+#include "circle.h"
 
 #include "qtimer.h"
 #include "qtextcodec.h"

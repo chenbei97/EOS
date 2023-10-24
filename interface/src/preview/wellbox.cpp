@@ -11,40 +11,17 @@
 WellBox::WellBox(QWidget*parent): GroupBox(parent)
 {
     wellbrandCombo = new ComboBox(BrandFields);
-    wellsizeCombo = new ComboBox(WellsizeFields);
-    welldishCombo = new ComboBox(DishFields);
-    wellflaskCombo = new ComboBox(FlaskFields);
-    wellslideCombo = new ComboBox(SlideFields);
+    manufacturerCombo = new ComboBox(ManufacturerFields);
 
-    auto gridlay = new QGridLayout;
-    gridlay->addWidget(new Label(BrandFieldLabel),0,0);
-    gridlay->addWidget(wellbrandCombo,0,1);
-    gridlay->addWidget(new Label(WellsizeFieldLabel),0,2);
-    gridlay->addWidget(wellsizeCombo,0,3);
+    auto lay = new QHBoxLayout;
+    lay->addWidget(manufacturerCombo);
+    lay->addWidget(wellbrandCombo);
 
-    gridlay->addWidget(new Label(DishFieldLabel),1,0);
-    gridlay->addWidget(welldishCombo,1,1);
-    gridlay->addWidget(new Label(FlaskFieldLabel),1,2);
-    gridlay->addWidget(wellflaskCombo,1,3);
-    gridlay->addWidget(new Label(SlideFieldLabel),1,4);
-    gridlay->addWidget(wellslideCombo,1,5);
-
-    gridlay->setColumnStretch(0,1);
-    gridlay->setColumnStretch(1,2);
-    gridlay->setColumnStretch(3,1);
-    gridlay->setColumnStretch(4,2);
-    gridlay->setColumnStretch(5,1);
-    gridlay->setColumnStretch(6,2);
-
-    gridlay->setHorizontalSpacing(WellBoxGridLayHorSpacing);
-    setLayout(gridlay);
+    setLayout(lay);
     setTitle(tr("孔板"));
 
     connect(wellbrandCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellbrandChanged);
-    connect(wellsizeCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellsizeChanged);
-    connect(wellflaskCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellflaskChanged);
-    connect(wellslideCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellslideChanged);
-    connect(welldishCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::welldishChanged);
+    connect(manufacturerCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::manufacturerChanged);
 }
 
 WellInfo WellBox::wellInfo() const
@@ -52,10 +29,7 @@ WellInfo WellBox::wellInfo() const
     WellInfo m;
 
     m[BrandField] = wellbrandCombo->currentText();
-    m[WellsizeField] = wellsizeCombo->currentText();
-    m[FlaskField] = wellflaskCombo->currentText();
-    m[SlideField] = wellslideCombo->currentText();
-    m[DishField] = welldishCombo->currentText();
+    m[ManufacturerField] = manufacturerCombo->currentText();
 
     return m;
 }

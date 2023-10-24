@@ -4,12 +4,13 @@
 #include "widgets.h"
 #include "alias.h"
 #include "groupinfo.h"
+#include "circle.h"
 
 class COMPONENT_IMEXPORT Pattern : public QWidget
 {
     Q_OBJECT
 public:
-    enum PatternState{UnInitialState,TickState};
+    enum PatternState{UnInitialState,TickState,PreviewState};
     explicit Pattern(int rows, int cols,QWidget*parent= nullptr);
     void setPatternSize(int rows,int cols);
     void toggleState(PatternState state);
@@ -50,7 +51,7 @@ private:
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true
     QHoleInfo2DVector mHoleInfo; // 每个孔的所有信息用结构体封装
-    //QBoolColorPair2DVector mSelectPoints; // 被选中的所有点赋值true,color 2个信息
+    bool supportBoxSelect = true;
 private:
     void select(QCColor color);
 signals:

@@ -14,6 +14,8 @@
 #include "alias.h"
 #include "qradiobutton.h"
 #include "qbuttongroup.h"
+#include <cmath>
+using std::modf;
 
 // (2) 导出定义
 #if defined(INTERFACE_LIBRARY)
@@ -23,8 +25,22 @@
 #endif
 
 // (3) 常量
+#define DefaultPainterFont QFont(DefaultFontFamily,DefaultFontSize,QFont::Bold)
+#define DefaultPainterMetric (QFontMetrics(DefaultPainterFont))
+#define DefaultPainterPixelHeight (DefaultPainterMetric.height()) //指定font下文字像素的高度
+#define FocusToolFocusMaxVal 50000
+#define FocusToolStepMaxVal 25000
+#define FocusToolFocusLabel "focus: "
+#define FocusToolStepLabel "step: "
+static const char* FocusField = "focus";
+static const char* LiveField = "live";
+static const char* PhotoField = "photo";
+#define LiveFieldMetricWidth DefaultPainterMetric.width(LiveField)
+#define PhotoFieldMetricWidth DefaultPainterMetric.width(PhotoField)
 #define NavigBarColor QColor("#767C85")
 #define AppSelectColor QColor("#2F7CAD")
+
+
 
 static const QFieldList NavigBarFields = {
     "Logo","Main","Preview","Protocol","Data","Analysis"
@@ -54,6 +70,8 @@ static const QFieldList AppFields = {
     #define NavigBarFontHeight (NavigBarHeight-PainterPixelHeight)  // 文字在按钮内部,按钮高度和文字高度的差值
     #define NavigBarMoveDistance (NavigBarGap+NavigBarWidth) // 下一个按钮相对于移动距离=gap+width
 
+    #define PreviewPatternMinHeight 450
+
     #define AppSelectButtonCountPerCol 4 // 每行4个按钮
     #define AppSelectButtonCountPerRow 2 // 共2行
     #define AppSelectButtonWidth 250 // 按钮的宽度
@@ -69,8 +87,11 @@ static const QFieldList AppFields = {
     #define AppSelectMoveVerDistance (AppSelectButtonVerGap+AppSelectButtonHeight) // 垂直方向下一个按钮相对移动距离=verbtngap+btnheight
     #define AppSelectButtonRoundRadius 25 // 圆角半径
 
-    #define WellBoxGridLayHorSpacing 30
-    #define PreviewToolBarMaxWidth 800
+    #define FocusBoxButtonMargin 100 // 2个按钮到边界的距离
+    #define PreviewToolBarMaxWidth 800 // 预览界面工具栏的宽度
+    #define FocusToolStepSpinMaxWidth 100 // 设置焦距中间的step步进设置的宽度不能太宽
+
+    #define CameraModeHeight 40 // 切换相机模式部件的高度
 #endif
 
 

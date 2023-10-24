@@ -34,6 +34,12 @@ static const char* FrameField = "frame";
 static const char* SeparateField = "@@@";
 #define AppendSeparateField(s) (s+SeparateField)
 
+static const char* ManufacturerField = "manufacturer";
+
+static const QFieldList ManufacturerFields = {
+        "manufacturer1","manufacturer2","manufacturer3","manufacturer4",
+};
+
 static const QFieldList WellsizeFields = {
         "6","24","96","384",
 };

@@ -11,6 +11,7 @@
 
 #include "window.h"
 #include "previewtool.h"
+#include "cameramode.h"
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -21,7 +22,7 @@ private:
     PreviewTool * toolbar;
     Pattern * pattern;
 
-    void onWellsizeChanged(int option);
+    void onManufacturerChanged(int option);
     void onInfoChanged();
 };
 #endif //EOSI_PREVIEW_H

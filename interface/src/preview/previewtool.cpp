@@ -14,25 +14,39 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     objectivebox = new ObjectiveBox;
     channelbox = new ChannelBox;
     camerabox = new CameraBox;
+    focusbox = new FocusBox;
+
+    filenameedit = new LineEdit("please input filename");
+    exportToFile = new CheckBox(tr("导出到文件?"));
+    saveallbtn = new PushButton(tr("保存所有设置"));
+    filenameedit->hide();
+
+    auto blay = new QHBoxLayout;
+    blay->addStretch();
+    blay->addWidget(filenameedit);
+    blay->addWidget(exportToFile);
+    blay->addWidget(saveallbtn);
+    auto box = new GroupBox(tr("其它"));
+    box->setLayout(blay);
 
     lay = new QVBoxLayout;
     lay->addWidget(wellbox);
     lay->addWidget(objectivebox);
     lay->addWidget(channelbox);
+    lay->addWidget(focusbox);
     lay->addWidget(camerabox);
+    lay->addWidget(box);
+
+
     setLayout(lay);
 
+    connect(exportToFile,&CheckBox::checkedChanged,this,[=](bool enable){filenameedit->setVisible(enable);});
+
     connect(wellbox,&WellBox::wellbrandChanged,this,&PreviewTool::wellbrandChanged);
-    connect(wellbox,&WellBox::wellsizeChanged,this,&PreviewTool::wellsizeChanged);
-    connect(wellbox,&WellBox::welldishChanged,this,&PreviewTool::welldishChanged);
-    connect(wellbox,&WellBox::wellflaskChanged,this,&PreviewTool::wellflaskChanged);
-    connect(wellbox,&WellBox::wellslideChanged,this,&PreviewTool::wellslideChanged);
+    connect(wellbox,&WellBox::manufacturerChanged,this,&PreviewTool::manufacturerChanged);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::objectiveChanged);
     connect(wellbox,&WellBox::wellbrandChanged,this,&PreviewTool::infoChanged);
-    connect(wellbox,&WellBox::wellsizeChanged,this,&PreviewTool::infoChanged);
-    connect(wellbox,&WellBox::welldishChanged,this,&PreviewTool::infoChanged);
-    connect(wellbox,&WellBox::wellflaskChanged,this,&PreviewTool::infoChanged);
-    connect(wellbox,&WellBox::wellslideChanged,this,&PreviewTool::infoChanged);
+    connect(wellbox,&WellBox::manufacturerChanged,this,&PreviewTool::infoChanged);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::infoChanged);
 
 
