@@ -86,6 +86,6 @@ PreviewToolInfo PreviewTool::toolInfo() const
     }
 
     info[ChannelField] = channels;//增加一个key=channel,和objective,well等是平级的,方便组装时判断
-    LOG<<"tool info = "<<info;
+    //LOG<<"tool info = "<<info;
     return info;
 }

@@ -27,6 +27,7 @@ private:
 
     MultiCameraInfo camerainfo;
     void onSaveBtn();
+    void onFocusStepChanged(double val);
     CameraInfo saveInfo() const;
 signals:
     void exposureChanged(int ms); // 1ms-15s

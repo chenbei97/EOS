@@ -14,15 +14,20 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     currentchannel = new Label(QString("%1%2").arg(ChannelFieldLabel).arg(BRField));
     savebtn = new PushButton(tr("保存相机设置"));
 
-    auto rlay = new QVBoxLayout;
-    rlay->addWidget(cameratool);
-    auto rblay = new QHBoxLayout;
-    rblay->addStretch();
-    rblay->addWidget(currentchannel);
-    rblay->addWidget(savebtn);
-    rlay->addLayout(rblay);
+    auto blay = new QHBoxLayout;
+    blay->addStretch();
+    blay->addWidget(currentchannel);
+    blay->addWidget(savebtn);
 
-    setLayout(rlay);
+    QHBoxLayout * hlay = new QHBoxLayout;
+    hlay->addWidget(new GroupBox);
+    hlay->addWidget(cameratool);
+
+    auto lay = new QVBoxLayout;
+    lay->addLayout(hlay);
+    lay->addLayout(blay);
+
+    setLayout(lay);
     setTitle(tr("相机"));
 
     connect(cameratool,&CameraTool::exposureChanged,this,&CameraBox::exposureChanged);
