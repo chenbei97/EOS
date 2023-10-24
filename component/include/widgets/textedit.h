@@ -11,7 +11,7 @@
 
 #include "widgets.h"
 
-class TextEdit: public QTextEdit
+class COMPONENT_IMEXPORT TextEdit: public QTextEdit
 {
     Q_OBJECT
 public:

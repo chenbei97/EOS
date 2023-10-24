@@ -42,6 +42,7 @@
 #include "slider.h"
 #include "sliderx.h"
 #include "tableview.h"
+#include "roundbutton.h"
 #include "colorbutton.h"
 
 #include "qtimer.h"

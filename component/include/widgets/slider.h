@@ -23,8 +23,10 @@ public:
     void setPrefix(const QString& p);
     void setSuffix(const QString& s);
     void setSingleStep(int step);
+    void setMouseEvent(bool enabled);
     QString value() const;
     void setValue(int value);
+    int sliderPosition() const;
 //    QSize sizeHint() const override;
 private:
     Sliderx * slider;

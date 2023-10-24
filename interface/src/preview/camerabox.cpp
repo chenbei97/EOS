@@ -10,6 +10,7 @@
 
 CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
 {
+    focustool = new FocusTool;
     cameratool = new CameraTool;
     currentchannel = new Label(QString("%1%2").arg(ChannelFieldLabel).arg(BRField));
     savebtn = new PushButton(tr("保存相机设置"));
@@ -20,7 +21,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     blay->addWidget(savebtn);
 
     QHBoxLayout * hlay = new QHBoxLayout;
-    hlay->addWidget(new GroupBox);
+    hlay->addWidget(focustool);
     hlay->addWidget(cameratool);
 
     auto lay = new QVBoxLayout;

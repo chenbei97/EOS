@@ -18,6 +18,8 @@ public:
     explicit Sliderx(QWidget*parent= nullptr);
     explicit Sliderx(Qt::Orientation orientation,QWidget*parent= nullptr);
     void mousePressEvent(QMouseEvent*event) override;
-
+    void setMouseEvent(bool enabled);
+private:
+    bool enableMouse = true;
 };
 #endif //EOSI_SLIDERX_H

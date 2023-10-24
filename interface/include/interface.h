@@ -16,6 +16,7 @@
 #include "cameratool.h"
 #include "camerabox.h"
 #include "channelbox.h"
+#include "focustool.h"
 #include "mainwindow.h"
 
 #endif //EOSI_INTERFACE_H

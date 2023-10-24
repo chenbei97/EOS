@@ -11,7 +11,25 @@
 SpinBox::SpinBox(QWidget*parent):QDoubleSpinBox(parent)
 {
     setDecimals(0);
-    setValue(1);
+    setValue(0);
+}
+
+SpinBox::SpinBox(bool isDouble,QWidget*parent):QDoubleSpinBox(parent)
+{
+    setDecimals(0);
+    setValue(0);
+
+    if (isDouble) {
+        setDecimals(1);
+        setValue(0.1);
+        setSingleStep(0.1);
+    }
+}
+
+void SpinBox::setSingleStep(double val)
+{
+    QDoubleSpinBox::setSingleStep(val);
+    emit singleStepChanged(val);
 }
 
 void SpinBox::wheelEvent(QWheelEvent *e)
@@ -27,5 +45,6 @@ void SpinBox::wheelEvent(QWheelEvent *e)
             setValue(value()-singleStep()); // 0还可以设置
         else setValue(maximum());//倒退为最大值
     }
+    //QDoubleSpinBox::wheelEvent(e);
     e->accept();
 }

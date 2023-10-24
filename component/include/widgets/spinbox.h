@@ -13,10 +13,14 @@
 
 class COMPONENT_IMEXPORT SpinBox : public QDoubleSpinBox
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     explicit SpinBox(QWidget*parent = nullptr);
+    explicit SpinBox(bool isDouble,QWidget*parent = nullptr);
+    void setSingleStep(double val);
     void wheelEvent(QWheelEvent*e) ;
+signals:
+    void singleStepChanged(double step);
 };
 
 

@@ -54,6 +54,11 @@ Slider::Slider(const QString &p, const QString &s, int min, int max, QWidget *pa
     //setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
 }
 
+void Slider::setMouseEvent(bool enabled)
+{
+    slider->setMouseEvent(enabled);
+}
+
 void Slider::onSliderChanged(int val)
 {
     //LOG<<"slider->value() = "<<slider->value()<<" val = "<<val; // 会发现2个值不相同,value()直接获取总是慢一拍
@@ -93,7 +98,16 @@ void Slider::setValue(int value)
 {
     currentValue = value;
     slider->setValue(value);
+    if (value<=slider->minimum())
+        slider->setValue(slider->minimum());
+    if (value>=slider->maximum())
+        slider->setValue(slider->maximum());
     slider->sliderMoved(value);
+}
+
+int Slider::sliderPosition() const
+{
+    return slider->sliderPosition();
 }
 
 //QSize Slider::sizeHint() const

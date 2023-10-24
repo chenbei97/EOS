@@ -11,6 +11,7 @@
 
 #include "window.h"
 #include "cameratool.h"
+#include "focustool.h"
 
 class INTERFACE_IMEXPORT CameraBox : public GroupBox
 {
@@ -24,6 +25,7 @@ private:
     CameraTool * cameratool;
     Label * currentchannel;
     PushButton * savebtn;
+    FocusTool * focustool;
 
     MultiCameraInfo camerainfo;
     void onSaveBtn();

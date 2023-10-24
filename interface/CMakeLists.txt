@@ -36,7 +36,7 @@ set_target_properties(${DLLNAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(${DLLNAME}
         PUBLIC
         ${PROJECT_SOURCE_DIR}/component/include
-        ${PROJECT_SOURCE_DIR}/interface/include/window
+        ${PROJECT_SOURCE_DIR}/interface/include/preview
 #        ${PROJECT_SOURCE_DIR}/interface/inc/login
 #        ${PROJECT_SOURCE_DIR}/interface/inc/main
 #        ${PROJECT_SOURCE_DIR}/interface/inc/sql
