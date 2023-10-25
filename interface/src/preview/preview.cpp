@@ -13,6 +13,7 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     cameramode = new CameraMode;
     livecanvas = new QWidget;
     photocanvas = new PreviewPhotoCanvas;
+    sliderbar = new PreviewPhotoCanvas;
     stack = new QStackedWidget;
     pattern = new PreviewPattern(2,3);
     toolbar = new PreviewTool;
@@ -60,10 +61,10 @@ void Preview::onClickPattern(const QPoint &point)
     auto brand = toolbar->toolInfo()[BrandField].toString();
     auto manufacturer = toolbar->toolInfo()[ManufacturerField].toString();
 
-    cameramode->changeMode(CameraMode::PhotoMode);
+    //cameramode->changeMode(CameraMode::PhotoMode);
 
     // 关闭相机,切换stack
-    stack->setCurrentWidget(photocanvas);
+    //stack->setCurrentWidget(photocanvas);
 
 
     // 依据objective,brand等设置不同的策略
@@ -72,10 +73,15 @@ void Preview::onClickPattern(const QPoint &point)
     auto objective_idx = getIndexFromFields(objective).toUInt();
 
     auto size = ViewCircleMapFields[manufacturer_idx][brand_idx][objective_idx];
-    LOG<<" manufacturer = "<<manufacturer_idx<<" brand = "<<brand_idx<<"objective = "<<objective_idx<<" size = "<<size;
+    //LOG<<" manufacturer = "<<manufacturer_idx<<" brand = "<<brand_idx<<"objective = "<<objective_idx<<" size = "<<size;
     if (point != QPoint(-1,-1))
-        photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
-    else photocanvas->setStrategy(PreviewPhotoCanvas::NoStrategy);
+        sliderbar->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
+    else sliderbar->setStrategy(PreviewPhotoCanvas::NoStrategy);
+
+    sliderbar->move(pos().x()+width(),0);
+    sliderbar->setSlideAnimation(true,this);
+
+    //sliderbar->show();
 }
 
 void Preview::onManufacturerChanged(int option)
@@ -89,7 +95,7 @@ void Preview::onWellbrandChanged(int option)
     auto brand = getIndexFromFields(toolbar->toolInfo()[BrandField].toString()).toUInt();
     auto manufacturer = getIndexFromFields(toolbar->toolInfo()[ManufacturerField].toString()).toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
-    photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
+    sliderbar->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
     Q_ASSERT(option == brand);
     switch (option) {
         case 0: pattern->setPatternSize(2,3);
@@ -109,7 +115,7 @@ void Preview::onObjectiveChanged(int option)
     auto brand = getIndexFromFields(toolbar->toolInfo()[BrandField].toString()).toUInt();
     auto manufacturer = getIndexFromFields(toolbar->toolInfo()[ManufacturerField].toString()).toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
-    photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
+    sliderbar->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
     Q_ASSERT(option == objective);
 }
 

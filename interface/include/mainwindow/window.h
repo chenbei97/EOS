@@ -14,6 +14,7 @@
 #include "alias.h"
 #include "qradiobutton.h"
 #include "qbuttongroup.h"
+#include "qpropertyanimation.h"
 #include <cmath>
 using std::modf;
 

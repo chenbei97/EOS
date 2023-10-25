@@ -24,6 +24,7 @@ private:
     CameraMode * cameramode;
     QWidget * livecanvas;
     PreviewPhotoCanvas * photocanvas;
+    PreviewPhotoCanvas * sliderbar;
     QStackedWidget * stack;
     PreviewTool * toolbar;
     PreviewPattern * pattern;

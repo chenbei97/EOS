@@ -11,12 +11,32 @@
 
 #include "interface.h"
 #include "socketpanel.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/xfeatures2d.hpp>
 #include <thread>
 using std::async;
 using std::promise;
 using std::future;
-
+using namespace cv;
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
+
+static void test_opencv()
+{
+    auto path = CURRENT_PATH+"/images/cell.png";
+    cv::Mat src = cv::imread(path.toStdString().c_str(),IMREAD_GRAYSCALE);
+    if (!src.empty())
+    {
+        LOG << "src.depth()=" << src.depth();
+        cv::namedWindow("input", WINDOW_FREERATIO);//可调的自由比例
+        cv::imshow("input", src);
+        cv::waitKey(0);
+        cv::destroyAllWindows();
+    }
+    else
+        LOG <<"could not load image...";
+
+}
 
 static void test_async()
 {

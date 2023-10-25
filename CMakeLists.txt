@@ -32,6 +32,14 @@ set(MYSQL_INSTALL_PATH "C:/Program Files/MySQL/MySQL Server 8.0")
 set(MYSQL_LIB_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.lib") # dll必须复制到bin下,lib可以不用
 set(MYSQL_DLL_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.dll")
 
+#set(OpenCV_DIR "C:/opencv-4.6.0")
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+file(GLOB OPENCV_DLLs_PATH  "C:/opencv-4.6.0/x64/vc17/bin/*.dll")
+file(GLOB OPENCV_LIBs_PATH  "C:/opencv-4.6.0/x64/vc17/lib/*.lib")
+set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
+set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
+set(OPENCV_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/opencv2)
+
 set(SQLDRIVERS_PATH "${CMAKE_PREFIX_PATH}/plugins/sqldrivers")
 set(IMAGEFORMATS_PATH "${CMAKE_PREFIX_PATH}/plugins/imageformats")
 set(MEDIA_PATH "${CMAKE_PREFIX_PATH}/plugins/mediaservice")
@@ -39,7 +47,6 @@ set(MEDIA_PATH "${CMAKE_PREFIX_PATH}/plugins/mediaservice")
 set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
 set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
 set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
-
 
 set(COMPONENT_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/component/include
@@ -70,7 +77,7 @@ add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES}) # ${THEME
 
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
-        ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
+        ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH} ${OPENCV_INCLUDE_PATH})
 # （7）清理4个文件夹并重新复制
 # 1. remove_directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -114,6 +121,24 @@ if (EXISTS "${MYSQL_DLL_PATH}")
             "${MYSQL_DLL_PATH}"
             "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
 endif ()
+# 4. 同理opencv的进行复制 OPENCV_DLL_PATH
+foreach(opencv_lib ${OPENCV_LIBs_PATH})
+    if (EXISTS "${opencv_lib}")
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy
+                "${opencv_lib}"
+                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+    endif ()
+endforeach(opencv_lib)
+
+foreach(opencv_dll ${OPENCV_DLLs_PATH}) # 必须复制dll不然无法单独运行
+    if (EXISTS "${opencv_dll}")
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy
+                "${opencv_dll}"
+                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+    endif ()
+endforeach(opencv_dll)
 
 # （8）清理lib、bin不必要的上次编译生成的文件
 file(GLOB lastFiles
@@ -134,7 +159,9 @@ endforeach(file)
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Sql Qt5::Network Qt5::Concurrent
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
-        component interface python310) # mingw必须显示指定python310,msvc指定与否都可
+        component interface python310  # mingw必须显示指定python310,msvc指定与否都可
+        ${OPENCV_LIBs_PATH} # ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH}不行,还没复制这
+        ) # opencv连接libs就可以,不需要dll
 
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)

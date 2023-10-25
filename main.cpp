@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
 
     //test_assemble_parse();
     //test_async();
+    //test_opencv();
 #ifdef usetesttcp
     test_tcp();
 #else
