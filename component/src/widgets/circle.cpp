@@ -28,22 +28,7 @@ void Circle::paintEvent(QPaintEvent *event)
 
 void Circle::mousePressEvent(QMouseEvent *event)
 {
-    mMousePos = QPoint(-1,-1);
-    auto pos = event->pos();
-    QPainterPath path;
-    path.addEllipse(getCenter(),getRadius(),getRadius());
-    if (path.contains(pos)){
-
-        auto pos_x = pos.x();
-        auto pos_y = pos.y();
-
-        if (pos_x>=width()/2 && pos_y<=height()/2) {
-            // (400,0)应该映射为(200,200) 其中radius=200
-            mMousePos.setX(pos_x-getRadius());
-            mMousePos.setY(-(pos_y-getRadius()));
-        }
-        LOG<<"pos = "<<mMousePos;
-    }
+    mMousePos = event->pos();
     emit mouseClicked(mMousePos);
     event->accept();
 }

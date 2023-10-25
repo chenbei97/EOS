@@ -83,13 +83,4 @@ static void test_assemble_parse()
     ParserPointer->parse("0x0000",msg);
     LOG<<"frame = "<<ParserFrame<<" res = "<<ParserResult;
 }
-
-void test_pattern()
-{
-    auto w = new Pattern(16,24);
-    w->toggleState(Pattern::TickState);
-    w->selectPoints(QPointVector()<<QPoint(1,1)<<QPoint(2,2));
-    w->resize(MainWindowWidth,MainWindowHeight);
-    w->show();
-}
 #endif //EOSI_TEST_H

@@ -37,7 +37,7 @@ target_include_directories(${DLLNAME}
         PUBLIC
         ${PROJECT_SOURCE_DIR}/component/include
         ${PROJECT_SOURCE_DIR}/interface/include/preview
-#        ${PROJECT_SOURCE_DIR}/interface/inc/login
+        ${PROJECT_SOURCE_DIR}/interface/include/protocol
 #        ${PROJECT_SOURCE_DIR}/interface/inc/main
 #        ${PROJECT_SOURCE_DIR}/interface/inc/sql
         ${PROJECT_SOURCE_DIR}/interface/include

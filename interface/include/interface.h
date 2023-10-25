@@ -18,6 +18,8 @@
 #include "channelbox.h"
 #include "focusbox.h"
 #include "cameramode.h"
+#include "previewpattern.h"
+#include "protocolpattern.h"
 #include "mainwindow.h"
 
 #endif //EOSI_INTERFACE_H

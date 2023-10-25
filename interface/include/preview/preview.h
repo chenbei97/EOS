@@ -12,6 +12,7 @@
 #include "window.h"
 #include "previewtool.h"
 #include "cameramode.h"
+#include "previewpattern.h"
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -20,7 +21,7 @@ public:
     explicit Preview(QWidget*parent= nullptr);
 private:
     PreviewTool * toolbar;
-    Pattern * pattern;
+    PreviewPattern * pattern;
 
     void onManufacturerChanged(int option);
     void onInfoChanged();

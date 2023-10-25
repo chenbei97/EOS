@@ -50,7 +50,8 @@ set(COMPONENT_INCLUDE_PATH
 
 set(INTERFACE_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/interface/include
-        ${PROJECT_SOURCE_DIR}/interface/include/preview)
+        ${PROJECT_SOURCE_DIR}/interface/include/preview
+        ${PROJECT_SOURCE_DIR}/interface/include/protocol)
 
 file(GLOB MAIN_FILES  "${PROJECT_SOURCE_DIR}/*.h" "${PROJECT_SOURCE_DIR}/*.cpp")
 file(GLOB TESTFILES  "${PROJECT_SOURCE_DIR}/test/*.h" "${PROJECT_SOURCE_DIR}/test/*.cpp")

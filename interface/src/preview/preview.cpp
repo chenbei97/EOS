@@ -14,8 +14,7 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     auto canvas = new QWidget;
     toolbar = new PreviewTool;
 
-    pattern = new Pattern(2,3);
-    pattern->toggleState(Pattern::PreviewState);
+    pattern = new PreviewPattern(2,3);
     pattern->setMinimumHeight(PreviewPatternMinHeight);
     auto pbox = new GroupBox(tr("选孔"));
     auto play = new QVBoxLayout;

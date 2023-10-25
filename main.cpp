@@ -19,7 +19,6 @@ int main(int argc, char *argv[]) {
     initApp(a);
 
     //test_assemble_parse();
-    //test_pattern();
     //test_async();
 #ifdef usetesttcp
     test_tcp();
