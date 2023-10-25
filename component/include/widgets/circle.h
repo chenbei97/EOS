@@ -18,6 +18,7 @@ public:
     explicit Circle(QWidget*parent= nullptr);
     void paintEvent(QPaintEvent*event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    QPainterPath strategy() const;
 protected:
     QPoint mMousePos = QPoint(-1,-1);
     QPoint getCenter() const;

@@ -6,12 +6,12 @@
  * @FilePath: \EOS\interface\src\window\appselect.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#include "include/mainwindow/appselect.h"
+#include "appselect.h"
 
 AppSelect::AppSelect(QWidget*parent): QWidget(parent)
 {
     foreach(auto text, AppFields)
-       pixelwidths<< (AppSelectButtonWidth-PainterMetric.width(text))/2;
+       pixelwidths<< (AppSelectButtonWidth-NavigPainterMetric.width(text))/2;
 }
 
 void AppSelect::paintEvent(QPaintEvent*event)
@@ -82,7 +82,7 @@ void AppSelect::drawRoundRectV2(QPainter &painter)
             auto pixwidth = pixelwidths[idx]; // (AppSelectButtonWidth-PainterMetric.width(texts[idx]))/2;
             auto x = AppSelectHorGap+(AppSelectMoveHorDistance)*c+pixwidth; // 到左侧距离+水平移动距离*0+文字相对按钮的水平距离
             auto y = AppSelectVerGap+(AppSelectMoveVerDistance)*r+AppSelectButtonFontHeight; // 到顶端距离+垂直移动+文字相对按钮垂直距离
-            path.addText(x,y,PainterFont,AppFields[idx]);
+            path.addText(x,y,NavigPainterFont,AppFields[idx]);
             painter.fillPath(path,AppSelectColor);
         }
     }
@@ -97,10 +97,10 @@ void AppSelect::drawRoundRectV1(QPainter &painter)
                         AppSelectVerGap+AppSelectMoveVerDistance*0,
                         AppSelectButtonWidth,AppSelectButtonHeight,
                         AppSelectButtonRoundRadius,AppSelectButtonRoundRadius);
-    auto pixwidth = (AppSelectButtonWidth-PainterMetric.width("增值"))/2;
+    auto pixwidth = (AppSelectButtonWidth-NavigPainterMetric.width("增值"))/2;
     auto x = AppSelectHorGap+(AppSelectMoveHorDistance)*0+pixwidth; // 到左侧距离+水平移动距离*0+文字相对按钮的水平距离
     auto y = AppSelectVerGap+(AppSelectMoveVerDistance)*0+AppSelectButtonFontHeight; // 到顶端距离+垂直移动+文字相对按钮垂直距离
-    path.addText(x,y,PainterFont,"增殖");
+    path.addText(x,y,NavigPainterFont,"增殖");
     painter.fillPath(path,AppSelectColor);
 
     //(1,2)
@@ -109,10 +109,10 @@ void AppSelect::drawRoundRectV1(QPainter &painter)
                         AppSelectVerGap+AppSelectMoveVerDistance*0,// y不需要动
                         AppSelectButtonWidth,AppSelectButtonHeight,
                         AppSelectButtonRoundRadius,AppSelectButtonRoundRadius);
-    pixwidth = (AppSelectButtonWidth-PainterMetric.width("划痕"))/2;
+    pixwidth = (AppSelectButtonWidth-NavigPainterMetric.width("划痕"))/2;
     x = AppSelectHorGap+(AppSelectMoveHorDistance)*1+pixwidth;
     y = AppSelectVerGap+(AppSelectMoveVerDistance)*0+AppSelectButtonFontHeight;// y不需要动
-    path.addText(x,y,PainterFont,"划痕");
+    path.addText(x,y,NavigPainterFont,"划痕");
     painter.fillPath(path,AppSelectColor);
 
     //(1,3)
@@ -121,10 +121,10 @@ void AppSelect::drawRoundRectV1(QPainter &painter)
                         AppSelectVerGap+AppSelectMoveVerDistance*0,// y不需要动
                         AppSelectButtonWidth,AppSelectButtonHeight,
                         AppSelectButtonRoundRadius,AppSelectButtonRoundRadius);
-    pixwidth = (AppSelectButtonWidth-PainterMetric.width("侵袭"))/2;
+    pixwidth = (AppSelectButtonWidth-NavigPainterMetric.width("侵袭"))/2;
     x = AppSelectHorGap+(AppSelectMoveHorDistance)*2+pixwidth;
     y = AppSelectVerGap+(AppSelectMoveVerDistance)*0+AppSelectButtonFontHeight;// y不需要动
-    path.addText(x,y,PainterFont,"侵袭");
+    path.addText(x,y,NavigPainterFont,"侵袭");
     painter.fillPath(path,AppSelectColor);
 
     //(1,4)
@@ -133,10 +133,10 @@ void AppSelect::drawRoundRectV1(QPainter &painter)
                         AppSelectVerGap+AppSelectMoveVerDistance*0,// y不需要动
                         AppSelectButtonWidth,AppSelectButtonHeight,
                         AppSelectButtonRoundRadius,AppSelectButtonRoundRadius);
-    pixwidth = (AppSelectButtonWidth-PainterMetric.width("转染"))/2;
+    pixwidth = (AppSelectButtonWidth-NavigPainterMetric.width("转染"))/2;
     x = AppSelectHorGap+(AppSelectMoveHorDistance)*3+pixwidth;
     y = AppSelectVerGap+(AppSelectMoveVerDistance)*0+AppSelectButtonFontHeight;// y不需要动
-    path.addText(x,y,PainterFont,"转染");
+    path.addText(x,y,NavigPainterFont,"转染");
     painter.fillPath(path,AppSelectColor);
 
     //(2,1)
@@ -145,10 +145,10 @@ void AppSelect::drawRoundRectV1(QPainter &painter)
                         AppSelectVerGap+AppSelectMoveVerDistance*1,// y+1个距离
                         AppSelectButtonWidth,AppSelectButtonHeight,
                         AppSelectButtonRoundRadius,AppSelectButtonRoundRadius);
-    pixwidth = (AppSelectButtonWidth-PainterMetric.width("形态学"))/2;
+    pixwidth = (AppSelectButtonWidth-NavigPainterMetric.width("形态学"))/2;
     x = AppSelectHorGap+(AppSelectMoveHorDistance)*0+pixwidth; // 回到0
     y = AppSelectVerGap+(AppSelectMoveVerDistance)*1+AppSelectButtonFontHeight;// y+1个距离
-    path.addText(x,y,PainterFont,"形态学");
+    path.addText(x,y,NavigPainterFont,"形态学");
     painter.fillPath(path,AppSelectColor);
 
     //(2,2)
@@ -157,10 +157,10 @@ void AppSelect::drawRoundRectV1(QPainter &painter)
                         AppSelectVerGap+AppSelectMoveVerDistance*1,// y+1个距离
                         AppSelectButtonWidth,AppSelectButtonHeight,
                         AppSelectButtonRoundRadius,AppSelectButtonRoundRadius);
-    pixwidth = (AppSelectButtonWidth-PainterMetric.width("类器官"))/2;
+    pixwidth = (AppSelectButtonWidth-NavigPainterMetric.width("类器官"))/2;
     x = AppSelectHorGap+(AppSelectMoveHorDistance)*1+pixwidth; // 回到1
     y = AppSelectVerGap+(AppSelectMoveVerDistance)*1+AppSelectButtonFontHeight;// y+1个距离
-    path.addText(x,y,PainterFont,"类器官");
+    path.addText(x,y,NavigPainterFont,"类器官");
     painter.fillPath(path,AppSelectColor);
 
     //(2,3)
@@ -169,10 +169,10 @@ void AppSelect::drawRoundRectV1(QPainter &painter)
                         AppSelectVerGap+AppSelectMoveVerDistance*1,// y+1个距离
                         AppSelectButtonWidth,AppSelectButtonHeight,
                         AppSelectButtonRoundRadius,AppSelectButtonRoundRadius);
-    pixwidth = (AppSelectButtonWidth-PainterMetric.width("药效和毒理"))/2;
+    pixwidth = (AppSelectButtonWidth-NavigPainterMetric.width("药效和毒理"))/2;
     x = AppSelectHorGap+(AppSelectMoveHorDistance)*2+pixwidth; // 回到2
     y = AppSelectVerGap+(AppSelectMoveVerDistance)*1+AppSelectButtonFontHeight;// y+1个距离
-    path.addText(x,y,PainterFont,"药效和毒理");
+    path.addText(x,y,NavigPainterFont,"药效和毒理");
     painter.fillPath(path,AppSelectColor);
 
     //(2,4)
@@ -181,9 +181,9 @@ void AppSelect::drawRoundRectV1(QPainter &painter)
                         AppSelectVerGap+AppSelectMoveVerDistance*1,// y+1个距离
                         AppSelectButtonWidth,AppSelectButtonHeight,
                         AppSelectButtonRoundRadius,AppSelectButtonRoundRadius);
-    pixwidth = (AppSelectButtonWidth-PainterMetric.width("自定义"))/2;
+    pixwidth = (AppSelectButtonWidth-NavigPainterMetric.width("自定义"))/2;
     x = AppSelectHorGap+(AppSelectMoveHorDistance)*3+pixwidth; // 回到3
     y = AppSelectVerGap+(AppSelectMoveVerDistance)*1+AppSelectButtonFontHeight;// y+1个距离
-    path.addText(x,y,PainterFont,"自定义");
+    path.addText(x,y,NavigPainterFont,"自定义");
     painter.fillPath(path,AppSelectColor);
 }

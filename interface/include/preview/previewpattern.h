@@ -20,7 +20,6 @@ public:
     void paintEvent(QPaintEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
 private:
-
 };
 
 #endif //EOSI_PREVIEWPATTERN_H

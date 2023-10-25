@@ -26,6 +26,13 @@ void Circle::paintEvent(QPaintEvent *event)
     event->accept();
 }
 
+QPainterPath Circle::strategy() const
+{
+    QPainterPath  path;
+    path.addEllipse(getCenter(),getRadius(),getRadius());
+    return path;
+}
+
 void Circle::mousePressEvent(QMouseEvent *event)
 {
     mMousePos = {-1,-1};

@@ -23,5 +23,6 @@ private:
     NavigBar * navigbar;
     AppSelect * appselect;
     Preview * preview;
+    QStackedWidget * stack;
 };
 #endif //EOSI_MAINWINDOW_H

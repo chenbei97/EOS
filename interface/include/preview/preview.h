@@ -13,6 +13,7 @@
 #include "previewtool.h"
 #include "cameramode.h"
 #include "previewpattern.h"
+#include "previewphotocanvas.h"
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -22,11 +23,12 @@ public:
 private:
     CameraMode * cameramode;
     QWidget * livecanvas;
-    QWidget * photocanvas;
+    PreviewPhotoCanvas * photocanvas;
     QStackedWidget * stack;
     PreviewTool * toolbar;
     PreviewPattern * pattern;
 
+    void onClickPattern(const QPoint& point);
     void onManufacturerChanged(int option);
     void onInfoChanged();
 };

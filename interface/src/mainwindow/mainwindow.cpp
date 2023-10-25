@@ -11,29 +11,29 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
     navigbar = new NavigBar;
-    navigbar->setMinimumHeight(NavigBarHeight);
-
     appselect = new AppSelect;
     preview = new Preview;
+    stack = new QStackedWidget;
 
-    auto stacklay = new QStackedLayout;
-    stacklay->addWidget(appselect);
-    stacklay->addWidget(preview);
+    navigbar->setMinimumHeight(NavigBarHeight);
+
+    stack->addWidget(appselect);
+    stack->addWidget(preview);
 
     auto w = new QWidget;
     auto s = new QVBoxLayout;
     s->addWidget(navigbar);
-    s->addLayout(stacklay);
+    s->addWidget(stack);
     s->setMargin(0);
     s->setSpacing(0);
     w->setLayout(s);
-
     setCentralWidget(w);
+
     resize(MainWindowWidth,MainWindowHeight);
 
-    connect(navigbar,&NavigBar::mainClicked,this,[=]{stacklay->setCurrentIndex(0);});
-    connect(navigbar,&NavigBar::previewClicked,this,[=]{stacklay->setCurrentIndex(1);});
+    connect(navigbar,&NavigBar::mainClicked,this,[=]{stack->setCurrentIndex(0);});
+    connect(navigbar,&NavigBar::previewClicked,this,[=]{stack->setCurrentIndex(1);});
 
-    connect(appselect,&AppSelect::proliferationClicked,this,[=]{stacklay->setCurrentIndex(1);});
-    connect(appselect,&AppSelect::scratchClicked,this,[=]{stacklay->setCurrentIndex(1);});
+    connect(appselect,&AppSelect::proliferationClicked,this,[=]{stack->setCurrentIndex(1);});
+    connect(appselect,&AppSelect::scratchClicked,this,[=]{stack->setCurrentIndex(1);});
 }

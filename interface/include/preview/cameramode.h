@@ -22,6 +22,6 @@ public:
     QSize sizeHint() const override;
     void mousePressEvent(QMouseEvent *event) override;
 private:
-    bool isLive = false;
+    bool isLive = true;
 };
 #endif //EOSI_CAMERAMODE_H

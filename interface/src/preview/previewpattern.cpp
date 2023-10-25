@@ -47,12 +47,6 @@ void PreviewPattern::mouseReleaseEvent(QMouseEvent *event)
         //LOG<<"mouse point = "<<mMousePos;
         if (mMousePos == QPoint(-1,-1))
             return; // 可能会点到边缘位置导致下方获取颜色越界
-
-        if (event->button() == Qt::LeftButton) {
-                auto dlg = new Circle;
-                dlg->show();
-                //delete dlg;
-        }
     }
     event->accept();
 }

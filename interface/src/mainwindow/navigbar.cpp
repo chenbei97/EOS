@@ -11,7 +11,7 @@
 NavigBar::NavigBar(QWidget*parent): QWidget(parent)
 {
     foreach(auto text, NavigBarFields)
-        pixwidths << (NavigBarWidth-PainterMetric.width(text))/2;
+        pixwidths << (NavigBarWidth-NavigPainterMetric.width(text))/2;
 
     //setFixedHeight(NavigBarHeight);
     setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum); // 代替setFixedSize
@@ -29,7 +29,7 @@ void NavigBar::paintEvent(QPaintEvent*event)
     for(int i = 0; i < NavigBarFieldsCount; ++i) {
         path.clear(); // 起始坐标(0,0),向右移动的距离是gap+width;text的起始坐标是(pixwidths[i],NavigBarFontHeight),高度不变
         path.addRect(0+NavigBarMoveDistance*i,0,NavigBarWidth,NavigBarHeight);
-        path.addText(pixwidths[i]+NavigBarMoveDistance*i,NavigBarFontHeight,PainterFont,NavigBarFields[i]);
+        path.addText(pixwidths[i]+NavigBarMoveDistance*i,NavigBarFontHeight,NavigPainterFont,NavigBarFields[i]);
         painter.fillPath(path,NavigBarColor);
     }
 

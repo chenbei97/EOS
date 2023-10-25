@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-24 09:01:34
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-24 14:03:47
+ * @LastEditTime: 2023-10-25 09:57:04
  * @FilePath: \EOS\component\src\widgets\roundbutton.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */

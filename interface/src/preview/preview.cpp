@@ -12,7 +12,7 @@ Preview::Preview(QWidget*parent): QWidget(parent)
 {
     cameramode = new CameraMode;
     livecanvas = new QWidget;
-    photocanvas = new QWidget;
+    photocanvas = new PreviewPhotoCanvas;
     stack = new QStackedWidget;
     pattern = new PreviewPattern(2,3);
     toolbar = new PreviewTool;
@@ -48,6 +48,35 @@ Preview::Preview(QWidget*parent): QWidget(parent)
 
     connect(toolbar,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);
     connect(toolbar,&PreviewTool::infoChanged,this,&Preview::onInfoChanged);
+    connect(pattern,&PreviewPattern::mouseClicked,this,&Preview::onClickPattern);
+}
+
+void Preview::onClickPattern(const QPoint &point)
+{ // 点击图案的某个点,就要切换到photo模式,并依据当前的objective,brand设置photocanvas的绘制策略
+    auto objective = toolbar->toolInfo()[ObjectiveField].toString();
+    auto brand = toolbar->toolInfo()[BrandField].toString();
+    auto manufacturer = toolbar->toolInfo()[ManufacturerField].toString();
+    LOG<<"objective = "<<objective<<" brand = "<<brand<<" manufacturer = "<<manufacturer<<" point = "<<point;
+    cameramode->changeMode(CameraMode::PhotoMode);
+    // 关闭相机,切换stack
+    stack->setCurrentWidget(photocanvas);
+    // 依据objective,brand等设置不同的策略
+    auto objective_idx = getIndexFromFields(objective).toUInt();
+    switch (objective_idx)
+    {
+        case 0: // 4x
+            photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect);
+            break;
+        case 1: // 10x
+            photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect);
+            break;
+        case 2: // 20x
+            photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect);
+            break;
+        case 3: // 40x
+            photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect);
+            break;
+    }
 }
 
 void Preview::onManufacturerChanged(int option)
