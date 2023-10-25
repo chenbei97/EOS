@@ -27,6 +27,7 @@
 #include "qdialog.h"
 #include "qcolordialog.h"
 #include "qmainwindow.h"
+#include "qstackedwidget.h"
 
 #include "qlayout.h"
 #include "qboxlayout.h"

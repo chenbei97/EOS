@@ -6,7 +6,7 @@
  * @FilePath: \EOS\interface\src\navigbar.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#include "navigbar.h"
+#include "include/mainwindow/navigbar.h"
 
 NavigBar::NavigBar(QWidget*parent): QWidget(parent)
 {

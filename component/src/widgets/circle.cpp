@@ -28,7 +28,12 @@ void Circle::paintEvent(QPaintEvent *event)
 
 void Circle::mousePressEvent(QMouseEvent *event)
 {
-    mMousePos = event->pos();
+    mMousePos = {-1,-1};
+    QPainterPath path;
+    path.addEllipse(getCenter(),getRadius(),getRadius());
+    if (path.contains(event->pos())) {
+        mMousePos = event->pos();
+    }
     emit mouseClicked(mMousePos);
     event->accept();
 }

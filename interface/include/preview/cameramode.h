@@ -15,11 +15,13 @@ class INTERFACE_IMEXPORT CameraMode: public QWidget
 {
     Q_OBJECT
 public:
+    enum cameraMode {LiveMode,PhotoMode};
     explicit CameraMode(QWidget*parent= nullptr);
+    void changeMode(cameraMode mode);
     void paintEvent(QPaintEvent*event) override;
     QSize sizeHint() const override;
     void mousePressEvent(QMouseEvent *event) override;
 private:
-    bool isLive = true;
+    bool isLive = false;
 };
 #endif //EOSI_CAMERAMODE_H

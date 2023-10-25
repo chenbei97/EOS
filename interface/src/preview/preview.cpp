@@ -10,30 +10,40 @@
 
 Preview::Preview(QWidget*parent): QWidget(parent)
 {
-    auto mode = new CameraMode;
-    auto canvas = new QWidget;
+    cameramode = new CameraMode;
+    livecanvas = new QWidget;
+    photocanvas = new QWidget;
+    stack = new QStackedWidget;
+    pattern = new PreviewPattern(2,3);
     toolbar = new PreviewTool;
 
-    pattern = new PreviewPattern(2,3);
+    // 右侧布局
     pattern->setMinimumHeight(PreviewPatternMinHeight);
     auto pbox = new GroupBox(tr("选孔"));
     auto play = new QVBoxLayout;
     play->addWidget(pattern);
     pbox->setLayout(play);
 
-    auto vlay = new QVBoxLayout;
-    vlay->addWidget(pbox);
-    vlay->addWidget(toolbar);
-    auto box = new GroupBox;
-    box->setLayout(vlay);
-    box->setMaximumWidth(PreviewToolBarMaxWidth);
+    auto rlay = new QVBoxLayout;
+    rlay->addWidget(pbox);
+    rlay->addWidget(toolbar);
+    auto rbox = new GroupBox;
+    rbox->setLayout(rlay);
+    rbox->setMaximumWidth(PreviewToolBarMaxWidth);
 
+    // 左侧布局
+    stack->addWidget(photocanvas);
+    stack->addWidget(livecanvas);
+    auto llay = new QVBoxLayout;
+    llay->addWidget(cameramode);
+    llay->addWidget(stack);
+    auto lbox = new GroupBox;
+    lbox->setLayout(llay);
+
+    // 总布局
     auto lay = new QHBoxLayout;
-    auto clay = new QVBoxLayout;
-    clay->addWidget(mode);
-    clay->addWidget(canvas);
-    lay->addLayout(clay);
-    lay->addWidget(box);
+    lay->addWidget(lbox);
+    lay->addWidget(rbox);
     setLayout(lay);
 
     connect(toolbar,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);

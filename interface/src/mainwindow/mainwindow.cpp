@@ -6,7 +6,7 @@
  * @FilePath: \EOS\interface\src\window\mainwindow.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#include "mainwindow.h"
+#include "include/mainwindow/mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {

@@ -13,6 +13,12 @@ CameraMode::CameraMode(QWidget *parent) : QWidget(parent)
     setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum); // 代替setFixedSize
 }
 
+void CameraMode::changeMode(CameraMode::cameraMode mode)
+{
+    mode == LiveMode? isLive=true: isLive= false;
+    update();
+}
+
 void CameraMode::paintEvent(QPaintEvent*event)
 {
     QPainter painter(this);

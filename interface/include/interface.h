@@ -9,8 +9,8 @@
 #ifndef EOSI_INTERFACE_H
 #define EOSI_INTERFACE_H
 
-#include "navigbar.h"
-#include "appselect.h"
+#include "interface/include/mainwindow/navigbar.h"
+#include "interface/include/mainwindow/appselect.h"
 #include "preview.h"
 #include "previewtool.h"
 #include "cameratool.h"
@@ -20,6 +20,6 @@
 #include "cameramode.h"
 #include "previewpattern.h"
 #include "protocolpattern.h"
-#include "mainwindow.h"
+#include "interface/include/mainwindow/mainwindow.h"
 
 #endif //EOSI_INTERFACE_H

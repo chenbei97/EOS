@@ -6,7 +6,7 @@
  * @FilePath: \EOS\interface\src\window\appselect.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#include "appselect.h"
+#include "include/mainwindow/appselect.h"
 
 AppSelect::AppSelect(QWidget*parent): QWidget(parent)
 {

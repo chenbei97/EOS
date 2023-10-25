@@ -50,6 +50,7 @@ set(COMPONENT_INCLUDE_PATH
 
 set(INTERFACE_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/interface/include
+        ${PROJECT_SOURCE_DIR}/interface/include/mainwindow
         ${PROJECT_SOURCE_DIR}/interface/include/preview
         ${PROJECT_SOURCE_DIR}/interface/include/protocol)
 

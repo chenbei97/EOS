@@ -20,6 +20,10 @@ class INTERFACE_IMEXPORT Preview : public QWidget
 public:
     explicit Preview(QWidget*parent= nullptr);
 private:
+    CameraMode * cameramode;
+    QWidget * livecanvas;
+    QWidget * photocanvas;
+    QStackedWidget * stack;
     PreviewTool * toolbar;
     PreviewPattern * pattern;
 
