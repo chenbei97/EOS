@@ -32,8 +32,8 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     rbox->setMaximumWidth(PreviewToolBarMaxWidth);
 
     // 左侧布局
-    stack->addWidget(photocanvas);
     stack->addWidget(livecanvas);
+    stack->addWidget(photocanvas);
     auto llay = new QVBoxLayout;
     llay->addWidget(cameramode);
     llay->addWidget(stack);
@@ -47,8 +47,11 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     setLayout(lay);
 
     connect(toolbar,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);
+    connect(toolbar,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
+    connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(toolbar,&PreviewTool::infoChanged,this,&Preview::onInfoChanged);
     connect(pattern,&PreviewPattern::mouseClicked,this,&Preview::onClickPattern);
+    connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
 }
 
 void Preview::onClickPattern(const QPoint &point)
@@ -56,32 +59,38 @@ void Preview::onClickPattern(const QPoint &point)
     auto objective = toolbar->toolInfo()[ObjectiveField].toString();
     auto brand = toolbar->toolInfo()[BrandField].toString();
     auto manufacturer = toolbar->toolInfo()[ManufacturerField].toString();
-    LOG<<"objective = "<<objective<<" brand = "<<brand<<" manufacturer = "<<manufacturer<<" point = "<<point;
+
     cameramode->changeMode(CameraMode::PhotoMode);
+
     // 关闭相机,切换stack
     stack->setCurrentWidget(photocanvas);
+
+
     // 依据objective,brand等设置不同的策略
+    auto manufacturer_idx = getIndexFromFields(manufacturer).toUInt();
+    auto brand_idx = getIndexFromFields(brand).toUInt();
     auto objective_idx = getIndexFromFields(objective).toUInt();
-    switch (objective_idx)
-    {
-        case 0: // 4x
-            photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect);
-            break;
-        case 1: // 10x
-            photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect);
-            break;
-        case 2: // 20x
-            photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect);
-            break;
-        case 3: // 40x
-            photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect);
-            break;
-    }
+
+    auto size = ViewCircleMapFields[manufacturer_idx][brand_idx][objective_idx];
+    LOG<<" manufacturer = "<<manufacturer_idx<<" brand = "<<brand_idx<<"objective = "<<objective_idx<<" size = "<<size;
+    if (point != QPoint(-1,-1))
+        photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
+    else photocanvas->setStrategy(PreviewPhotoCanvas::NoStrategy);
 }
 
 void Preview::onManufacturerChanged(int option)
 {
-    //LOG<<"wellsize option = "<<option;
+
+}
+
+void Preview::onWellbrandChanged(int option)
+{
+    auto objective = getIndexFromFields(toolbar->toolInfo()[ObjectiveField].toString()).toUInt();
+    auto brand = getIndexFromFields(toolbar->toolInfo()[BrandField].toString()).toUInt();
+    auto manufacturer = getIndexFromFields(toolbar->toolInfo()[ManufacturerField].toString()).toUInt();
+    auto size = ViewCircleMapFields[manufacturer][brand][objective];
+    photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
+    Q_ASSERT(option == brand);
     switch (option) {
         case 0: pattern->setPatternSize(2,3);
             break;
@@ -92,6 +101,16 @@ void Preview::onManufacturerChanged(int option)
         case 3: pattern->setPatternSize(16,24);
             break;
     }
+}
+
+void Preview::onObjectiveChanged(int option)
+{
+    auto objective = getIndexFromFields(toolbar->toolInfo()[ObjectiveField].toString()).toUInt();
+    auto brand = getIndexFromFields(toolbar->toolInfo()[BrandField].toString()).toUInt();
+    auto manufacturer = getIndexFromFields(toolbar->toolInfo()[ManufacturerField].toString()).toUInt();
+    auto size = ViewCircleMapFields[manufacturer][brand][objective];
+    photocanvas->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
+    Q_ASSERT(option == objective);
 }
 
 void Preview::onInfoChanged()

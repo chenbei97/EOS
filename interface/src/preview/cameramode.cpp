@@ -60,6 +60,7 @@ void CameraMode::mousePressEvent(QMouseEvent *event)
     if (r1.contains(event->pos())) isLive = true;
     else if (r2.contains(event->pos())) isLive = false;
 
+    emit cameraModeChanged(!isLive); // live是0,photo是1
     event->accept();
     update();
 }

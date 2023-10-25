@@ -13,7 +13,9 @@ PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)
     strategy = NoStrategy;
     mrows = 0;
     mcols = 0;
-    mrectsize = DefaultPreviewPhotoCanvasViewRectSize;
+    mMousePoint = QPoint(-1,-1);
+    mExternalCircleRectSize = DefaultPreviewPhotoCanvasViewRectSize;
+    mMouseClickColor.setAlpha(PatternColorAlpha);
 }
 
 void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
@@ -36,41 +38,165 @@ void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
         default:
             break;
     }
-
     event->accept();
 }
 
 void PreviewPhotoCanvas::mousePressEvent(QMouseEvent *event)
 {
+    auto pos = event->pos();
+    mMousePoint = {-1,-1};
+    auto rects = getInnerRects();
+    for(int r = 0; r < mrows; ++r) {
+        for(int c = 0; c < mcols; ++c) {
+            if (rects[r][c].contains(pos)) {
+                mMousePoint = {r,c};
+            }
+        }
+    }
+    update();
+    emit mouseClicked(mMousePoint);
     event->accept();
+}
+
+QRectF2DVector PreviewPhotoCanvas::getInnerRects() const
+{
+    QRectF2DVector m;
+    auto hoffset = getInnerRectWidth();
+    auto voffset = getInnerRectHeight();
+
+    auto start = getInnerRectTopLeftPoint();
+    for(int i = 0 ; i < mrows; ++i) {
+        QRectFVector vec;
+        for(int j = 0; j < mcols; ++j) { // j*offset加在x坐标也就是水平方向
+            auto topleft = start + QPointF(j*hoffset,i*voffset); // x, x+d，j依次取0,1; y先不变在后
+            auto bottomright = topleft + QPointF(hoffset,voffset);
+            vec.append(QRectF(topleft,bottomright));
+        }
+        m.append(vec);
+    }
+
+    return m;
 }
 
 void PreviewPhotoCanvas::drawInnerLine(QPainter &painter)
 {
-    auto radius = getExternalCircleRadius();
-    auto p11 = QPoint(width()/2 - radius,0);
-    auto p12 = QPoint(width()/2 + radius,0);
-    auto p21 = QPoint(width()/2 - radius,height());
-    auto p22 = QPoint(width()/2 + radius,height());
+    // 绘制外边框
+    auto p11 = getInnerRectTopLeftPoint();
+    auto p12 = getInnerRectTopRightPoint();
+    auto p21 = getInnerRectBottomLeftPoint();
+    auto p22 = getInnerRectBottomRightPoint();
 
     painter.drawLine(p11,p21);
     painter.drawLine(p11,p12);
     painter.drawLine(p12,p22);
     painter.drawLine(p21,p22);
+
+    // 绘制内部线
+    auto tops = getInnerVerticalLineTopPoints();
+    auto bottoms = getInnerVerticalLineBottomPoints();
+    auto lefts = getInnerHorizonalLineLeftPoints();
+    auto rights = getInnerHorizonalLineRightPoints();
+
+    Q_ASSERT(tops.count() == bottoms.count());
+    Q_ASSERT(lefts.count() == rights.count());
+    for(int i = 0; i < tops.count(); i++) {
+        painter.drawLine(tops.at(i),bottoms.at(i));
+    }
+    for(int i = 0; i < lefts.count(); i++) {
+        painter.drawLine(lefts.at(i),rights.at(i));
+    }
+
+    // 高亮鼠标区域
+    auto rects = getInnerRects();
+    LOG<<"rects.size = "<<rects.size()<<" mouse = "<<mMousePoint;
+    if (mMousePoint != QPoint(-1,-1)) // 尚未点击
+        painter.fillRect(rects[mMousePoint.x()][mMousePoint.y()],mMouseClickColor);
+}
+
+double PreviewPhotoCanvas::getInnerRectWidth() const
+{
+    return 2 * getExternalCircleRadius() / mrows *1.0;
+}
+
+double PreviewPhotoCanvas::getInnerRectHeight() const
+{
+    return 2 * getExternalCircleRadius() / mcols *1.0;
+}
+
+QPointFVector PreviewPhotoCanvas::getInnerHorizonalLineLeftPoints() const
+{// 正方形左侧的等分点
+    QPointFVector vec;
+    auto offset = getInnerRectHeight(); // 点之间y坐标相差的是小矩形高度
+    auto topleft = getInnerRectTopLeftPoint();
+    for (int i = 1; i <= mcols-1; ++i) // i = 1开始是不包含topleft
+        vec.append(topleft+ QPoint(0,i*offset)); // x不变,y增加
+    return vec;
+}
+
+QPointFVector PreviewPhotoCanvas::getInnerHorizonalLineRightPoints() const
+{// 正方形右侧的等分点
+    QPointFVector vec;
+    auto offset = getInnerRectHeight(); // 点之间y坐标相差的是小矩形高度
+    auto topright = getInnerRectTopRightPoint();
+    for (int i = 1; i <= mcols-1; ++i) // i = 1开始是不包含topright
+        vec.append(topright+ QPoint(0,i*offset)); // x不变,y增加
+    return vec;
+}
+
+QPointFVector PreviewPhotoCanvas::getInnerVerticalLineTopPoints() const
+{// 正方形顶侧的等分点
+    QPointFVector vec;
+    auto offset = getInnerRectWidth();
+    auto topleft= getInnerRectTopLeftPoint();
+    for (int i = 1; i <= mrows-1; ++i)
+        vec.append(topleft+ QPoint(i*offset,0));
+//    LOG<<"topleft = "<<topleft<<" offset = "<<offset<<" mrows = "<<mrows
+//    <<" radius = "<<getExternalCircleRadius();
+    return vec;
+}
+
+QPointFVector PreviewPhotoCanvas::getInnerVerticalLineBottomPoints() const
+{// 正方形底侧的等分点
+    QPointFVector vec;
+    auto offset = getInnerRectWidth();
+    auto bottomleft= getInnerRectBottomLeftPoint();
+    for (int i = 1; i <= mrows-1; ++i)
+        vec.append(bottomleft+ QPoint(i*offset,0));
+    return vec;
+}
+
+QPointF PreviewPhotoCanvas::getInnerRectTopLeftPoint() const
+{
+    return QPointF(width()/2.0-getExternalCircleRadius(),0);
+}
+
+QPointF PreviewPhotoCanvas::getInnerRectTopRightPoint() const
+{
+    return QPointF(width()/2.0+getExternalCircleRadius(),0);
+}
+
+QPointF PreviewPhotoCanvas::getInnerRectBottomLeftPoint() const
+{
+    return QPointF(width()/2.0-getExternalCircleRadius(),height());
+}
+
+QPointF PreviewPhotoCanvas::getInnerRectBottomRightPoint() const
+{
+    return QPointF(width()/2.0+getExternalCircleRadius(),height());
 }
 
 void PreviewPhotoCanvas::drawExternalCircle(QPainter &painter)
 {
     auto radius = getExternalCircleRadius();
-    painter.drawEllipse(QPoint(width()/2,height()/2),radius,radius);
+    painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
 }
 
-int PreviewPhotoCanvas::getExternalCircleRadius() const
+double PreviewPhotoCanvas::getExternalCircleRadius() const
 { // 圆半径
-    return width()>=height()?height()/2:width()/2;
+    return width()>=height()?height()/2.0:width()/2.0;
 }
 
-int PreviewPhotoCanvas::getExternalCircleRectSize() const
+double PreviewPhotoCanvas::getExternalCircleRectSize() const
 { // 圆内接正方形尺寸
     return getExternalCircleRadius()* sqrt(2);
 }
@@ -78,8 +204,8 @@ int PreviewPhotoCanvas::getExternalCircleRectSize() const
 QPoint PreviewPhotoCanvas::getExternalCircleRectTopLeftPoint() const
 { // 窗口内有个圆,圆的内部有个内接正方形,正方形的左上角顶点 (w/2-r*sqrt(2)/2,r-r*sqrt(2)/2)
     auto radius = getExternalCircleRadius();
-    auto x = width()/2 - radius * sqrt(2)/2; // x坐标为窗口的一半减去半径的45°对边
-    auto y = radius - radius * sqrt(2)/2; // y坐标为半径减去半径的45°对边
+    auto x = width()/2.0 - radius * sqrt(2)/2.0; // x坐标为窗口的一半减去半径的45°对边
+    auto y = radius - radius * sqrt(2)/2.0; // y坐标为半径减去半径的45°对边
 
     return QPoint(x,y);
 }
@@ -87,8 +213,8 @@ QPoint PreviewPhotoCanvas::getExternalCircleRectTopLeftPoint() const
 QPoint PreviewPhotoCanvas::getExternalCircleRectTopRightPoint() const
 { // 窗口内有个圆,圆的内部有个内接正方形,正方形的右上角顶点 (w/2+r*sqrt(2)/2,r-r*sqrt(2)/2)
     auto radius = getExternalCircleRadius();
-    auto x = width()/2 + radius * sqrt(2)/2; // x坐标为窗口的一半加上半径的45°对边
-    auto y = radius - radius * sqrt(2)/2; // y坐标和左上角相同
+    auto x = width()/2.0 + radius * sqrt(2)/2.0; // x坐标为窗口的一半加上半径的45°对边
+    auto y = radius - radius * sqrt(2)/2.0; // y坐标和左上角相同
 
     return QPoint(x,y);
 }
@@ -96,8 +222,8 @@ QPoint PreviewPhotoCanvas::getExternalCircleRectTopRightPoint() const
 QPoint PreviewPhotoCanvas::getExternalCircleRectBottomLeftPoint() const
 {// 窗口内有个圆,圆的内部有个内接正方形,正方形的左下角顶点 (w/2-r*sqrt(2)/2,r+r*sqrt(2)/2)
     auto radius = getExternalCircleRadius();
-    auto x = width()/2 - radius * sqrt(2)/2; // x坐标和左上角相同
-    auto y = radius + radius * sqrt(2)/2; // y坐标为半径加上半径的45°对边
+    auto x = width()/2.0 - radius * sqrt(2)/2.0; // x坐标和左上角相同
+    auto y = radius + radius * sqrt(2)/2.0; // y坐标为半径加上半径的45°对边
 
     return QPoint(x,y);
 }
@@ -105,8 +231,8 @@ QPoint PreviewPhotoCanvas::getExternalCircleRectBottomLeftPoint() const
 QPoint PreviewPhotoCanvas::getExternalCircleRectBottomRightPoint() const
 {// 窗口内有个圆,圆的内部有个内接正方形,正方形的右下角顶点 (w/2+r*sqrt(2)/2,r+r*sqrt(2)/2)
     auto radius = getExternalCircleRadius();
-    auto x = width()/2 - radius * sqrt(2)/2; // x坐标和右上角相同
-    auto y = radius + radius * sqrt(2)/2; // y坐标和左下角相同
+    auto x = width()/2.0 - radius * sqrt(2)/2.0; // x坐标和右上角相同
+    auto y = radius + radius * sqrt(2)/2.0; // y坐标和左下角相同
 
     return QPoint(x,y);
 }
@@ -129,8 +255,8 @@ QRectVector PreviewPhotoCanvas::getExternalCircleRects() const
     QRectVector vec;
     auto rect_size = getExternalCircleRectSize(); // 内接正方形的尺寸,在这个尺寸内计算水平和垂直间距
 
-    auto hor_gap = (rect_size-mrows * mrectsize) / (mrows+1);
-    auto ver_gap = (rect_size-mcols * mrectsize) / (mcols+1);
+    auto hor_gap = (rect_size-mrows * mExternalCircleRectSize) / (mrows+1.0);
+    auto ver_gap = (rect_size-mcols * mExternalCircleRectSize) / (mcols+1.0);
 
     // 水平垂直偏移从正方形左上角顶点开始
     auto hor_offset = getExternalCircleRectTopLeftPoint().x();
@@ -138,9 +264,9 @@ QRectVector PreviewPhotoCanvas::getExternalCircleRects() const
 
     for(int r = 0; r < mrows; ++r) {
         for(int c = 0; c < mcols; ++c) {
-            auto x = hor_gap + r * (mrectsize+hor_gap) + hor_offset;
-            auto y = ver_gap + c * (mrectsize+ver_gap) + ver_offset;
-            auto rect = QRect(x,y,mrectsize,mrectsize);
+            auto x = hor_gap + r * (mExternalCircleRectSize+hor_gap) + hor_offset;
+            auto y = ver_gap + c * (mExternalCircleRectSize+ver_gap) + ver_offset;
+            auto rect = QRect(x,y,mExternalCircleRectSize,mExternalCircleRectSize);
             vec.append(rect);
         }
     }
@@ -150,6 +276,7 @@ QRectVector PreviewPhotoCanvas::getExternalCircleRects() const
 void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s)
 {
     strategy = s;
+    mMousePoint = {-1,-1};
     update();
 }
 
@@ -158,10 +285,11 @@ void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, int row
     strategy = s;
     mrows = rows;
     mcols = cols;
+    mMousePoint = {-1,-1}; // 必须更新,否则上次的鼠标点还在会导致切换物镜或者brand出现越界
     update();
 }
 
 void PreviewPhotoCanvas::setExternalCircleRectSize(int size)
 {
-    mrectsize = size;
+    mExternalCircleRectSize = size;
 }

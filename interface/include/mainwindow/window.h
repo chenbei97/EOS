@@ -62,8 +62,6 @@ static const QFieldList AppFields = {
     #define MainWindowWidth 2400
     #define MainWindowHeight 1300
 
-
-
     #define NavigBarWidth 200 // 导航条的宽度
     #define NavigBarHeight 100 // 导航条的高度
     #define NavigBarGap 2 // 导航按钮之间的间隔

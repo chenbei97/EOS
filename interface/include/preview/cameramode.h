@@ -23,5 +23,7 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
 private:
     bool isLive = true;
+signals:
+    void cameraModeChanged(int option);
 };
 #endif //EOSI_CAMERAMODE_H

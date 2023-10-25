@@ -10,7 +10,7 @@
 
 WellBox::WellBox(QWidget*parent): GroupBox(parent)
 {
-    wellbrandCombo = new ComboBox(BrandFields);
+    wellbrandCombo = new ComboBox(Brand1Fields);
     manufacturerCombo = new ComboBox(ManufacturerFields);
 
     auto lay = new QHBoxLayout;
@@ -22,6 +22,28 @@ WellBox::WellBox(QWidget*parent): GroupBox(parent)
 
     connect(wellbrandCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellbrandChanged);
     connect(manufacturerCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::manufacturerChanged);
+    connect(manufacturerCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::onManufacturerChange);
+}
+
+void WellBox::onManufacturerChange(int option)
+{
+    wellbrandCombo->blockSignals(true);
+    wellbrandCombo->clear();
+    switch (option) {
+        case 0:
+            wellbrandCombo->addItems(Brand1Fields);
+            break;
+        case 1:
+            wellbrandCombo->addItems(Brand2Fields);
+            break;
+        case 2:
+            wellbrandCombo->addItems(Brand3Fields);
+            break;
+        case 3:
+            wellbrandCombo->addItems(Brand4Fields);
+            break;
+    }
+    wellbrandCombo->blockSignals(false);
 }
 
 WellInfo WellBox::wellInfo() const

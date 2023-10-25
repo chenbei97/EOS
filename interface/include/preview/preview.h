@@ -29,6 +29,8 @@ private:
     PreviewPattern * pattern;
 
     void onClickPattern(const QPoint& point);
+    void onWellbrandChanged(int option);
+    void onObjectiveChanged(int option);
     void onManufacturerChanged(int option);
     void onInfoChanged();
 };

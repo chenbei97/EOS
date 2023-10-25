@@ -20,6 +20,7 @@ public:
 private:
     ComboBox * wellbrandCombo;
     ComboBox * manufacturerCombo;
+    void onManufacturerChange(int option);
 signals:
     void wellbrandChanged(int option);
     void manufacturerChanged(int option);
