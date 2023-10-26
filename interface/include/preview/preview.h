@@ -14,6 +14,7 @@
 #include "cameramode.h"
 #include "previewpattern.h"
 #include "previewphotocanvas.h"
+#include "protocolpattern.h"
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -28,11 +29,14 @@ private:
     QStackedWidget * stack;
     PreviewTool * toolbar;
     PreviewPattern * pattern;
+    DockWidget * dock;
+    QMainWindow * dockcanvas;
 
     void onClickPattern(const QPoint& point);
     void onWellbrandChanged(int option);
     void onObjectiveChanged(int option);
     void onManufacturerChanged(int option);
     void onInfoChanged();
+    void updatePattern();
 };
 #endif //EOSI_PREVIEW_H

@@ -27,7 +27,8 @@
 static void setWindowAlignCenter(QWidget*w)
 {
     auto x = (UserScreenWidth-w->width())/2;
-    auto y = (UserScreenHeight-w->height())/2;
+    auto y = (UserScreenHeight-w->height())/6;
+    //LOG<<UserScreenWidth<<UserScreenHeight<<w->width()<<w->height()<<x<<y;
     w->move(x,y);
 }
 

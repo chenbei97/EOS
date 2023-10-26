@@ -197,6 +197,11 @@ void Pattern::clearMousePoint()
     update();
 }
 
+QPoint Pattern::currentMousePoint() const
+{
+    return mMousePos;
+}
+
 Pattern::Pattern(int rows, int cols,QWidget*parent):mrows(rows),mcols(cols),QWidget(parent)
 {
     mMouseEvent = false;

@@ -14,11 +14,8 @@ PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)
     mrows = 0;
     mcols = 0;
     mMousePoint = QPoint(-1,-1);
-    enableSlideAnimation = false;
     mExternalCircleRectSize = DefaultPreviewPhotoCanvasViewRectSize;
     mMouseClickColor.setAlpha(PatternColorAlpha);
-
-    slideAnimation = nullptr;
 }
 
 void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
@@ -111,7 +108,7 @@ void PreviewPhotoCanvas::drawInnerLine(QPainter &painter)
 
     // 高亮鼠标区域
     auto rects = getInnerRects();
-    LOG<<"rects.size = "<<rects.size()<<" mouse = "<<mMousePoint;
+    //LOG<<"rects.size = "<<rects.size()<<" mouse = "<<mMousePoint;
     if (mMousePoint != QPoint(-1,-1)) // 尚未点击
         painter.fillRect(rects[mMousePoint.x()][mMousePoint.y()],mMouseClickColor);
 }
@@ -295,29 +292,4 @@ void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, int row
 void PreviewPhotoCanvas::setExternalCircleRectSize(int size)
 {// 圆内接正方形 小方格的尺寸
     mExternalCircleRectSize = size;
-}
-
-void PreviewPhotoCanvas::setSlideAnimation(bool enable,QWidget*parent)
-{
-    enableSlideAnimation = enable;
-    if (!slideAnimation) {
-        slideAnimation = new QPropertyAnimation(this,"geometry");
-        slideAnimation->setEasingCurve(QEasingCurve::InOutSine);
-        slideAnimation->setDuration(800);
-
-        auto parent_x = parent->geometry().x();
-        auto parent_y = parent->geometry().y();
-        auto parent_w = parent->width();
-        auto parent_h = parent->height();
-
-
-        // 起始位置在父窗口右侧(x+w,0)
-        slideAnimation->setStartValue(QRect(parent_x+parent_w,0,width(),height()));
-//        // 结束位置应该在父窗口的(x+(w-this.w),0)处
-        slideAnimation->setEndValue(QRect(parent_x+(parent_w-width()),0,width(),height()));
-        LOG<<"21312";
-    }
-    LOG<<"2786876868612";
-    if (enableSlideAnimation)
-        slideAnimation->start();
 }

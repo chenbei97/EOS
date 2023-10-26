@@ -61,7 +61,7 @@ static const QFieldList AppFields = {
 
 #ifdef ScreenWidth
     #define MainWindowWidth 2400
-    #define MainWindowHeight 1300
+    #define MainWindowHeight 1200
 
     #define NavigBarWidth 200 // 导航条的宽度
     #define NavigBarHeight 100 // 导航条的高度
@@ -90,9 +90,12 @@ static const QFieldList AppFields = {
     #define FocusBoxButtonMargin 100 // 2个按钮到边界的距离
     #define PreviewToolBarMaxWidth 800 // 预览界面工具栏的宽度
     #define FocusToolStepSpinMaxWidth 100 // 设置焦距中间的step步进spibox设置的宽度不能太宽
-    #define DefaultPreviewPhotoCanvasViewRectSize 50 // 预览图像模式画布绘制视野圆内小方格的默认尺寸
+
+    #define DefaultPreviewPhotoCanvasViewRectSize 50 // 预览图像模式画布绘制视野圆内小方格的默认尺寸(内接正方形策略)
+    #define PreviewPhotoCanvasViewDefaultSize 400 // 视野圆窗口的默认尺寸
 
     #define CameraModeHeight 40 // 切换相机模式部件的高度
+
 #endif
 
 

@@ -9,10 +9,18 @@
 #ifndef EOSI_WIDGETS_H
 #define EOSI_WIDGETS_H
 
-// (1) 头文件
+// (1) 导出定义
+#if defined(COMPONENT_LIBRARY)
+#  define COMPONENT_IMEXPORT Q_DECL_EXPORT
+#else
+#  define COMPONENT_IMEXPORT Q_DECL_IMPORT
+#endif
+
+// (2) 头文件
 #include "qcombobox.h"
 #include "qlineedit.h"
 #include "qtextedit.h"
+#include "qdockwidget.h"
 #include "qlabel.h"
 #include "qgroupbox.h"
 #include "qpushbutton.h"
@@ -46,7 +54,7 @@
 #include "qdesktopwidget.h"
 #include "qapplication.h"
 
-// (2) 常量定义
+// (3) 常量定义
 #define CURRENT_PATH (QDir::currentPath())
 #define CURRENT_THREAD (QThread::currentThread())
 #define DefaultFontSize 10
@@ -65,12 +73,7 @@
 #define ColorButtonSize 40
 #define RoundButtonSize 20
 
-// (3) 导出定义
-#if defined(COMPONENT_LIBRARY)
-#  define COMPONENT_IMEXPORT Q_DECL_EXPORT
-#else
-#  define COMPONENT_IMEXPORT Q_DECL_IMPORT
-#endif
+
 
 
 #endif //EOSI_WIDGETS_H

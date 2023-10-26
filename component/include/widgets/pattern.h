@@ -22,6 +22,8 @@ public:
     virtual void setPatternSize(int rows,int cols);
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    QPoint currentMousePoint() const;
+    void clearMousePoint();//清除鼠标选中的圆
 //    QSize sizeHint() const override;
 protected:
     QSize getChildSize() const; // 每个圆都在划分的小正方形区域内,计算正方形的长度
@@ -33,7 +35,7 @@ protected:
     void drawLine(QPainter&painter); // 绘制线
     void drawText(QPainter&painter); // 行列表头的文字
     void drawHighlight(QPainter&painter); // 绘制鼠标选中的高亮和已选择区域的高亮
-    void clearMousePoint();//清除鼠标选中的圆
+
 protected:
     int mrows = 0;
     int mcols = 0;

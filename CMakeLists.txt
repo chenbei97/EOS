@@ -141,26 +141,26 @@ foreach(opencv_dll ${OPENCV_DLLs_PATH}) # 必须复制dll不然无法单独运�
 endforeach(opencv_dll)
 
 # （8）清理lib、bin不必要的上次编译生成的文件
-file(GLOB lastFiles
-        "bin/*.dll"
-        "bin/*.exe"
-        "bin/*.exp"
-        "bin/*.pdb"
-        "bin/*.ilk"
-        "bin/*.lib"
-        "lib/*.lib"
-        "lib/*.exp"
-        "lib/*.dll.a"
-        )
-foreach(file ${lastFiles})
-    file(REMOVE ${file})
-endforeach(file)
+#file(GLOB lastFiles
+#        "bin/*.dll"
+#        "bin/*.exe"
+#        "bin/*.exp"
+#        "bin/*.pdb"
+#        "bin/*.ilk"
+#        "bin/*.lib"
+#        "lib/*.lib"
+#        "lib/*.exp"
+#        "lib/*.dll.a"
+#        )
+#foreach(file ${lastFiles})
+#    file(REMOVE ${file})
+#endforeach(file)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Sql Qt5::Network Qt5::Concurrent
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
         component interface python310  # mingw必须显示指定python310,msvc指定与否都可
-        ${OPENCV_LIBs_PATH} # ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH}不行,还没复制这
+         ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH} #不行,还没复制这 ${OPENCV_LIBs_PATH}
         ) # opencv连接libs就可以,不需要dll
 
 

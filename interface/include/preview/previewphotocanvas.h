@@ -27,7 +27,6 @@ public:
 
     void setExternalCircleRectSize(int size);// 圆内接正方形 小方格的尺寸
 
-    void setSlideAnimation(bool enable,QWidget*parent);
 private:
     DrawStrategy strategy = NoStrategy;
     QPoint mMousePoint = QPoint(-1,-1);
@@ -35,8 +34,6 @@ private:
 private:
     int mrows = 0;
     int mcols = 0;
-    QPropertyAnimation * slideAnimation = nullptr;
-    bool enableSlideAnimation = false;
     // 绘制内接圆用到的变量
     void drawInnerLine(QPainter&painter);
     double getInnerRectWidth() const; // 小矩形区域的宽度
