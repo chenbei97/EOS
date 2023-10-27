@@ -106,6 +106,7 @@ struct HoleInfo {
     QPoint point;
     QColor color;
     QString group;
+    QPointVector viewpoints;
 };
 
 typedef QVector<HoleInfo> QHoleInfoVector;

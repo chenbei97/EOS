@@ -14,8 +14,8 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     livecanvas = new QWidget;
     photocanvas = new PreviewPhotoCanvas;
     stack = new QStackedWidget;
-    pattern = new PreviewPattern(2,3);
-    auto p = new ProtocolPattern(2,3);
+    pattern = new WellPattern(2,3);
+    groupinfo = new GroupInfo;
     toolbar = new PreviewTool;
     sliderbar = new PreviewPhotoCanvas;//侧边栏选择视野的窗口
     dock = new DockWidget(tr("选择孔内视野"));
@@ -31,7 +31,7 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     pattern->setMinimumHeight(PreviewPatternMinHeight);
     auto pbox = new GroupBox(tr("选孔"));
     auto play = new QVBoxLayout;
-    play->addWidget(p);
+    play->addWidget(pattern);
     //play->addWidget(dockcanvas); // 不加了通过点击孔来触发
     pbox->setLayout(play);
 
@@ -61,7 +61,8 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     connect(toolbar,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
     connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(toolbar,&PreviewTool::infoChanged,this,&Preview::onInfoChanged);
-    connect(pattern,&PreviewPattern::mouseClicked,this,&Preview::onClickPattern);
+    //connect(pattern,&WellPattern::mouseClicked,this,&Preview::onClickPattern);
+    connect(pattern,&WellPattern::drapEvent,this,&Preview::onDrapEvent);
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
     //connect(dock,&QDockWidget::topLevelChanged,this,&Preview::updatePattern);
 }
@@ -97,6 +98,15 @@ void Preview::onClickPattern(const QPoint &point)
     if (point == QPoint(-1,-1))
         sliderbar->setStrategy(PreviewPhotoCanvas::NoStrategy);
     else updatePattern();
+}
+
+void Preview::onDrapEvent(const QColor &color)
+{
+    groupinfo->setBtnColor(color);// color是传过来之前的颜色
+    int ret = groupinfo->exec();
+    if (ret == QDialog::Accepted) {
+        pattern->setGroup(groupinfo->groupColor()); // 用选择的颜色去分组
+    }
 }
 
 void Preview::onManufacturerChanged(int option)

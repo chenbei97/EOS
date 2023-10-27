@@ -13,7 +13,7 @@ void SocketPanel::onSend()
 {
     edit->clear();
     testStateActivateCode();
-    //testData1_2();
+    testData1_2();
     testData3();
     //QThread::sleep(1);
 
@@ -79,15 +79,16 @@ void SocketPanel::testData3()
 
 void SocketPanel::testStateActivateCode()
 {// 测试激活码状态连接
-    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
-    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
-    else LOG<<"socket is connect failed!";
-    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
-    LOG<<"activate code is "<<ParserResult.toString();
+//    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
+//    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
+//    else LOG<<"socket is connect failed!";
+//    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
+//    LOG<<"activate code is "<<ParserResult.toString();
 
     edit->append(sendText.arg(QString::fromUtf8(assemble0x0002(QVariantMap()))));
     SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
-    if (ParserResult.toBool())
+    //if (ParserResult.toBool())
+   if (SocketPointer->result()[TcpFramePool.frame0x0002].toBool())
         edit->append(recvText.arg("socket is connect successful!"));
     else edit->append(recvText.arg("socket is connect failed!"));
 

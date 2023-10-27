@@ -12,9 +12,8 @@
 #include "window.h"
 #include "previewtool.h"
 #include "cameramode.h"
-#include "previewpattern.h"
 #include "previewphotocanvas.h"
-#include "protocolpattern.h"
+#include "wellpattern.h"
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -28,11 +27,13 @@ private:
     PreviewPhotoCanvas * sliderbar;
     QStackedWidget * stack;
     PreviewTool * toolbar;
-    PreviewPattern * pattern;
+    WellPattern * pattern;
     DockWidget * dock;
     QMainWindow * dockcanvas;
+    GroupInfo * groupinfo;
 
     void onClickPattern(const QPoint& point);
+    void onDrapEvent(const QColor& color);
     void onWellbrandChanged(int option);
     void onObjectiveChanged(int option);
     void onManufacturerChanged(int option);
