@@ -72,8 +72,7 @@
 #define ProgressBarMinHeight 40
 #define ColorButtonSize 40
 #define RoundButtonSize 20
-
-
-
+static const char* GroupNameField = "groupname";
+static const char* GroupColorField = "groupcolor";
 
 #endif //EOSI_WIDGETS_H

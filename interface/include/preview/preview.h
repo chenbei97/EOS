@@ -24,7 +24,7 @@ private:
     CameraMode * cameramode;
     QWidget * livecanvas;
     PreviewPhotoCanvas * photocanvas;
-    PreviewPhotoCanvas * sliderbar;
+    PreviewPhotoCanvas * viewpattern;
     QStackedWidget * stack;
     PreviewTool * toolbar;
     WellPattern * pattern;
@@ -32,12 +32,12 @@ private:
     QMainWindow * dockcanvas;
     GroupInfo * groupinfo;
 
-    void onClickPattern(const QPoint& point);
-    void onDrapEvent(const QColor& color);
+    void onViewEvent(const QPoint& point);
+    void onDrapEvent(const QVariantMap& m);
     void onWellbrandChanged(int option);
     void onObjectiveChanged(int option);
     void onManufacturerChanged(int option);
     void onInfoChanged();
-    void updatePattern();
+    void updateViewPattern();
 };
 #endif //EOSI_PREVIEW_H

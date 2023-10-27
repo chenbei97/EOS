@@ -18,12 +18,17 @@ class COMPONENT_IMEXPORT GroupInfo: public QDialog
     Q_OBJECT
 public:
     explicit GroupInfo(QWidget*parent= nullptr);
+
     QColor groupColor() const;
-    void setBtnColor(const QColor& color);
+    QString groupName() const;
+    QVariantMap groupInfo() const;
+
+    void setGroupColor(const QColor& color);
+    void setGroupName(const QString& name);
 private:
     void initObjects();
     void onClick();
-    LineEdit * groupName;
+    LineEdit * groupname;
     LineEdit * tmp1;
     LineEdit * tmp2;
     LineEdit * tmp3;

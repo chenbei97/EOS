@@ -17,11 +17,11 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     pattern = new WellPattern(2,3);
     groupinfo = new GroupInfo;
     toolbar = new PreviewTool;
-    sliderbar = new PreviewPhotoCanvas;//侧边栏选择视野的窗口
+    viewpattern = new PreviewPhotoCanvas;//侧边栏选择视野的窗口
     dock = new DockWidget(tr("选择孔内视野"));
     dockcanvas = new QMainWindow;
 
-    dock->setWidget(sliderbar);
+    dock->setWidget(viewpattern);
     dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
     dockcanvas->setCentralWidget(dock);
@@ -61,19 +61,20 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     connect(toolbar,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
     connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(toolbar,&PreviewTool::infoChanged,this,&Preview::onInfoChanged);
-    //connect(pattern,&WellPattern::mouseClicked,this,&Preview::onClickPattern);
+    connect(pattern,&WellPattern::viewEvent,this,&Preview::onViewEvent);
+    connect(pattern,&WellPattern::doubleClicked,this,&Preview::onViewEvent);
     connect(pattern,&WellPattern::drapEvent,this,&Preview::onDrapEvent);
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
     //connect(dock,&QDockWidget::topLevelChanged,this,&Preview::updatePattern);
 }
 
-void Preview::updatePattern()
+void Preview::updateViewPattern()
 {
     auto objective = getIndexFromFields(toolbar->toolInfo()[ObjectiveField].toString()).toUInt();
     auto brand = getIndexFromFields(toolbar->toolInfo()[BrandField].toString()).toUInt();
     auto manufacturer = getIndexFromFields(toolbar->toolInfo()[ManufacturerField].toString()).toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
-    sliderbar->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
+    viewpattern->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
 
     LOG<<" manufacturer = "<<manufacturer<<" brand = "<<brand<<"objective = "<<objective<<" size = "<<size
        <<" current hole = "<<pattern->currentMousePoint(); // 有可能是没选孔(不过已经避免了brand,objective的触发了不会发生)
@@ -82,30 +83,34 @@ void Preview::updatePattern()
         dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
     else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
-
-
 }
 
-void Preview::onClickPattern(const QPoint &point)
+void Preview::onViewEvent(const QPoint &point)
 { // 点击图案的某个点,就要切换到photo模式,并依据当前的objective,brand设置photocanvas的绘制策略
     //cameramode->changeMode(CameraMode::PhotoMode);
 
     // 关闭相机,切换stack
     //stack->setCurrentWidget(photocanvas);
-
-    dock->setFloating(!dock->isFloating());
-
+    dock->setWindowTitle(tr("选择孔内视野(%1,%2)")
+        .arg(QChar(point.x()+65)).arg(point.y()+1));
+    dock->setFloating(true);
     if (point == QPoint(-1,-1))
-        sliderbar->setStrategy(PreviewPhotoCanvas::NoStrategy);
-    else updatePattern();
+        viewpattern->setStrategy(PreviewPhotoCanvas::NoStrategy);
+    else updateViewPattern();
 }
 
-void Preview::onDrapEvent(const QColor &color)
+void Preview::onDrapEvent(const QVariantMap& m)
 {
-    groupinfo->setBtnColor(color);// color是传过来之前的颜色
+    auto color = m[GroupColorField].toString();
+    auto group = m[GroupNameField].toString();
+
+    groupinfo->setGroupColor(color);// color是传过来之前的颜色
+    groupinfo->setGroupName(group);
+
+
     int ret = groupinfo->exec();
     if (ret == QDialog::Accepted) {
-        pattern->setGroup(groupinfo->groupColor()); // 用选择的颜色去分组
+        pattern->setGroup(groupinfo->groupInfo()); // 用选择的颜色去分组
     }
 }
 
@@ -116,7 +121,7 @@ void Preview::onManufacturerChanged(int option)
 
 void Preview::onWellbrandChanged(int option)
 {
-    updatePattern(); // 会造成没选孔就选了点会出问题
+    updateViewPattern(); // 会造成没选孔就选了点会出问题
     //dock->setFloating(true);
     switch (option) {
         case 0: pattern->setPatternSize(2,3);
@@ -133,7 +138,7 @@ void Preview::onWellbrandChanged(int option)
 
 void Preview::onObjectiveChanged(int option)
 {
-    updatePattern();
+    updateViewPattern();
     //dock->setFloating(true);
 }
 

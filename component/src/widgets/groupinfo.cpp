@@ -20,9 +20,28 @@ QColor GroupInfo::groupColor() const
     return cbtn->color();
 }
 
-void GroupInfo::setBtnColor(const QColor& color)
+QString GroupInfo::groupName() const
+{
+    return groupname->text().simplified();
+}
+
+QVariantMap GroupInfo::groupInfo() const
+{
+    QVariantMap m;
+    m[GroupNameField] = groupName();
+    m[GroupColorField] = groupColor();
+
+    return m;
+}
+
+void GroupInfo::setGroupColor(const QColor &color)
 {
     cbtn->setColor(color);
+}
+
+void GroupInfo::setGroupName(const QString &name)
+{
+    groupname->setText(name);
 }
 
 void GroupInfo::onClick()
@@ -35,13 +54,13 @@ void GroupInfo::initObjects()
     tmp1 = new LineEdit;
     tmp2 = new LineEdit;
     tmp3 = new LineEdit;
-    groupName = new LineEdit;
+    groupname = new LineEdit;
     btn = new PushButton(tr("确定"));
     cbtn = new ColorButton;
 
     auto lay = new QVBoxLayout;
     auto formlay = new QFormLayout;
-    formlay->addRow(tr("组别: "),groupName);
+    formlay->addRow(tr("组别: "),groupname);
     formlay->addRow(tr("xxx: "),tmp1);
     formlay->addRow(tr("xxx: "),tmp2);
     formlay->addRow(tr("xxx: "),tmp3);

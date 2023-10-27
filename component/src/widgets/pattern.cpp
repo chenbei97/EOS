@@ -45,6 +45,22 @@ void Pattern::mousePressEvent(QMouseEvent *event)
     event->accept();
 }
 
+void Pattern::mouseDoubleClickEvent(QMouseEvent*event)
+{
+    if (mMouseEvent) {
+        mMousePos = QPoint(-1,-1);
+        mLastPos = event->pos();
+        auto rects = getChildRects(); // 所有小正方形区域匹配这个坐标
+        for(int row = 0; row < mrows; ++row)
+            for(int col = 0; col < mcols; ++col)
+                if (rects[row][col].contains(mLastPos))
+                    mMousePos = {row,col};
+        update();
+        emit doubleClicked(mMousePos);
+    }
+    event->accept();
+}
+
 void Pattern::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
@@ -191,6 +207,8 @@ void Pattern::setPatternSize(int rows,int cols)
 {
     mrows = rows;
     mcols = cols;
+    mMousePos = {-1,-1};
+    mLastPos = {-1,-1};
     update();
 }
 

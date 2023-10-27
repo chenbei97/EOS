@@ -22,6 +22,7 @@ public:
     virtual void setPatternSize(int rows,int cols);
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent*event) override;
     QPoint currentMousePoint() const;
     void clearMousePoint();//清除鼠标选中的圆
 //    QSize sizeHint() const override;
@@ -48,6 +49,7 @@ protected:
     QPoint mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
 signals:
     void mouseClicked(const QPoint& point);
+    void doubleClicked(const QPoint& point);
 };
 
 #endif //EOSI_PATTERN_H

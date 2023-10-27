@@ -21,8 +21,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
-
-    void setGroup(QCColor color);
+    void setGroup(QCVariantMap m);
 private:
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true
@@ -33,7 +32,10 @@ private:
     void initDrapPoints(); // 拖拽结束后清除这些点
     void initHoleInfo(); // 初始化所有孔内的包含信息
     int drapPointCount() const; // 计算拖拽区域包含的点个数
+    void onSetGroupAct();
+    void onSetViewAct();
 signals:
-    void drapEvent(const QColor& color);
+    void drapEvent(const QVariantMap& m);
+    void viewEvent(const QPoint& point);
 };
 #endif //EOSI_WELLPATTERN_H

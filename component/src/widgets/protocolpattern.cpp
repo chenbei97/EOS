@@ -40,7 +40,7 @@ void ProtocolPattern::paintEvent(QPaintEvent *event)
             auto center = centerPts[row][col];
 
             // 启用了鼠标事件mMousePos才会被赋值,否则是(-1,-1),所以这里不用再判断是否启用了鼠标事件
-            if (mMousePos.x() == row && mMousePos.y() == col && !mHoleInfo[row][col].isSelected)
+            if (mMousePos.x() == row && mMousePos.y() == col && !mHoleInfo[row][col].isselected)
             { // 已绘制的点不要绘制鼠标选中高亮
                 path.clear();
                 path.moveTo(center);
@@ -66,7 +66,7 @@ void ProtocolPattern::paintEvent(QPaintEvent *event)
             }
 
             // 绘制确实选中的点
-            if (mHoleInfo[row][col].isSelected) //  绘制确定选中的点
+            if (mHoleInfo[row][col].isselected) //  绘制确定选中的点
             {
                 path.clear();
                 path.moveTo(center);
@@ -152,9 +152,9 @@ void ProtocolPattern::initHoleInfo()
         QHoleInfoVector var;
         for (int col = 0; col < mcols; ++col){
             HoleInfo info;
-            info.point = QPoint(row,col);
+            info.coordinate = QPoint(row,col);
             info.color = Qt::red;
-            info.isSelected = false;
+            info.isselected = false;
             var.append(info);
         }
         mHoleInfo.append(var);
@@ -193,7 +193,7 @@ void ProtocolPattern::select(QCColor color)
         for (int col = 0; col < mcols; ++col){
             auto pt = mDrapPoints[row][col];
             if (pt){
-                mHoleInfo[row][col].isSelected = true;//框选内对应的点都设为选中
+                mHoleInfo[row][col].isselected = true;//框选内对应的点都设为选中
                 mHoleInfo[row][col].color = color; // 颜色跟随窗口设置的颜色
                 mDrapPoints[row][col] = false; // 拖拽区域内的点也要更新为false,不然还会绘制这个区域
             }
@@ -202,7 +202,7 @@ void ProtocolPattern::select(QCColor color)
     auto ret = mMousePos.x()<0 || mMousePos.x()>mrows-1
                || mMousePos.y()<0 || mMousePos.y()>mcols-1;
     if (!ret) {// 防止越界,选择和取消选择需要在未初始化时禁用动作,
-        mHoleInfo[mMousePos.x()][mMousePos.y()].isSelected = true; // 没启用鼠标事件,这是{-1,-1}会越界
+        mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = true; // 没启用鼠标事件,这是{-1,-1}会越界
         mHoleInfo[mMousePos.x()][mMousePos.y()].color = color;
         mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
     }

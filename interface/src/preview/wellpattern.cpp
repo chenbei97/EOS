@@ -27,7 +27,7 @@ void WellPattern::paintEvent(QPaintEvent *event)
 
             // (1) 绘制鼠标点击的高亮
             //启用了鼠标事件mMousePos才会被赋值,否则是(-1,-1),所以这里不用再判断是否启用了鼠标事件
-            if (mMousePos.x() == row && mMousePos.y() == col && !mHoleInfo[row][col].isSelected) {
+            if (mMousePos.x() == row && mMousePos.y() == col && !mHoleInfo[row][col].isselected) {
                 path.clear(); // 已绘制的点不要绘制鼠标选中高亮
                 path.moveTo(center);
                 path.addEllipse(center, radius * 0.75, radius * 0.75);
@@ -43,26 +43,24 @@ void WellPattern::paintEvent(QPaintEvent *event)
             }
 
             // (3) 绘制确实选中的孔
-            if (mHoleInfo[row][col].isSelected) //  绘制确定选中的点
+            if (mHoleInfo[row][col].isselected) //  绘制确定选中的点
             {
                 path.clear();
                 path.moveTo(center);
                 path.addEllipse(center,radius*0.75,radius*0.75);
                 painter.fillPath(path,mHoleInfo[row][col].color);
             }
-
-            // (4) 绘制框选框(放最后画,防止被填充颜色覆盖)
-            if (!mDrapRect.isNull()) {
-                auto pen = painter.pen();
-                pen.setColor(Qt::blue);
-                painter.setPen(pen);
-                painter.drawRect(mDrapRect);
-                pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
-                painter.setPen(pen);
-            }
         }
     }
-
+    // (4) 绘制框选框(放最后画,防止被填充颜色覆盖)
+    if (!mDrapRect.isNull()) {
+        auto pen = painter.pen();
+        pen.setColor(Qt::blue);
+        painter.setPen(pen);
+        painter.drawRect(mDrapRect);
+        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
+        painter.setPen(pen);
+    }
     event->accept();
 }
 
@@ -70,12 +68,18 @@ void WellPattern::mouseReleaseEvent(QMouseEvent *event)
 {
     if (mMouseEvent) {
         //LOG<<"mouse point = "<<mMousePos;
-        if (mMousePos == QPoint(-1,-1))
+        if (mMousePos == QPoint(-1,-1)){
+            viewact->setEnabled(false);
+            groupact->setEnabled(false);
             return; // 可能会点到边缘位置
+        }
 
-//        int count = drapPointCount();
-//        if (count <= 1) // 只框选了1个不会弹
-//            return;
+        groupact->setEnabled(true);
+
+        int count = drapPointCount();
+        if (count > 1) // 只框选了1个不会弹
+            viewact->setEnabled(false);
+        else viewact->setEnabled(true);
         //emit drapEvent(mHoleInfo[mMousePos.x()][mMousePos.y()].color);
 
 //        if (event->button() == Qt::LeftButton) {
@@ -123,14 +127,17 @@ void WellPattern::mousePressEvent(QMouseEvent *event)
     event->accept();
 }
 
-void WellPattern::setGroup(QCColor color)
+void WellPattern::setGroup(QCVariantMap m)
 {
+    auto gcolor = m[GroupColorField].toString();
+    auto gname = m[GroupNameField].toString();
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){
             auto pt = mDrapPoints[row][col]; // 所有拖拽的点都分为一组
             if (pt){
-                mHoleInfo[row][col].isSelected = true;//框选内对应的点都设为选中
-                mHoleInfo[row][col].color = color; // 颜色跟随窗口设置的颜色
+                mHoleInfo[row][col].isselected = true;//框选内对应的点都设为选中
+                mHoleInfo[row][col].color = gcolor; // 颜色跟随窗口设置的颜色
+                mHoleInfo[row][col].group = gname;
                 mDrapPoints[row][col] = false; // 拖拽区域内的点也要更新为false,不然还会绘制这个区域
             }
         }
@@ -138,10 +145,13 @@ void WellPattern::setGroup(QCColor color)
 
     // 框选的时候会遗漏鼠标当前选中的点
     if (mMousePos != QPoint(-1,-1)) {// 没启用鼠标事件或者点击外围,这是{-1,-1}会越界
-        mHoleInfo[mMousePos.x()][mMousePos.y()].isSelected = true; // 鼠标点击的这个
-        mHoleInfo[mMousePos.x()][mMousePos.y()].color = color;
+        mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = true; // 鼠标点击的这个
+        mHoleInfo[mMousePos.x()][mMousePos.y()].color = gcolor;
+        mHoleInfo[mMousePos.x()][mMousePos.y()].group = gname;
         mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
     }
+
+    LOG<<"mHoleInfo = "<<mHoleInfo[mMousePos.x()][mMousePos.y()];
     update();
 }
 
@@ -177,14 +187,31 @@ void WellPattern::initHoleInfo()
         QHoleInfoVector var;
         for (int col = 0; col < mcols; ++col){
             HoleInfo info;
-            info.point = QPoint(row,col);
+            info.coordinate = QPoint(row,col);
             info.color = Qt::red;
-            info.isSelected = false;
+            info.isselected = false;
             var.append(info);
         }
         mHoleInfo.append(var);
     }
     update();
+}
+
+void WellPattern::onSetViewAct()
+{
+    // dosomething
+    if (mMousePos != QPoint(-1,-1))
+        emit viewEvent(mMousePos);
+}
+
+void WellPattern::onSetGroupAct()
+{
+    auto color = mHoleInfo[mMousePos.x()][mMousePos.y()].color;
+    auto name = mHoleInfo[mMousePos.x()][mMousePos.y()].group;
+    QVariantMap m;
+    m[GroupColorField] = color;
+    m[GroupNameField] = name;
+    emit drapEvent(m);
 }
 
 WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,cols,parent)
@@ -198,10 +225,8 @@ WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,col
     initDrapPoints();
     initHoleInfo();
 
-    connect(groupact,&QAction::triggered,this,[=]{
-        auto c = mHoleInfo[mMousePos.x()][mMousePos.y()].color;
-        emit drapEvent(c);
-    });
+    connect(groupact,&QAction::triggered,this,&WellPattern::onSetGroupAct);
+    connect(viewact,&QAction::triggered,this,&WellPattern::onSetViewAct);
 }
 
 void WellPattern::setPatternSize(int rows, int cols)

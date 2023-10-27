@@ -8,16 +8,6 @@
  */
 #include "previewphotocanvas.h"
 
-PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)
-{
-    strategy = NoStrategy;
-    mrows = 0;
-    mcols = 0;
-    mMousePoint = QPoint(-1,-1);
-    mExternalCircleRectSize = DefaultPreviewPhotoCanvasViewRectSize;
-    mMouseClickColor.setAlpha(PatternColorAlpha);
-}
-
 void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
@@ -27,13 +17,15 @@ void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
     painter.setPen(pen);
 
     switch (strategy) {
-        case ExternalCircleRect: // 内接圆
-            drawExternalCircle(painter);
-            drawExternalCircleRect(painter);
-            break;
         case InnerCircleRect:
-            drawExternalCircle(painter);
+            drawSelectRect(painter);
+            drawCircle(painter);
             drawInnerLine(painter);
+            drawDrapRect(painter);
+            break;
+        case ExternalCircleRect:
+            drawCircle(painter);
+            drawExternalCircleRect(painter);
             break;
         default:
             break;
@@ -41,14 +33,61 @@ void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
     event->accept();
 }
 
+void PreviewPhotoCanvas::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (mMousePoint == QPoint(-1,-1)){
+        viewact->setEnabled(false);
+        return; // 可能会点到边缘位置
+    }
+    viewact->setEnabled(true);
+    if (drapPointCount()==1) // 选中1个才是预览事件
+        emit previewEvent(mMousePoint);
+
+    event->accept();
+}
+
+//void PreviewPhotoCanvas::showEvent(QShowEvent *event)
+//{
+//    auto x = (UserScreenWidth-width())/2;
+//    auto y = (UserScreenHeight-height())/2;
+//    move(x,y);
+//    event->accept();
+//}
+
+void PreviewPhotoCanvas::mouseMoveEvent(QMouseEvent *event)
+{
+    if (event->buttons() & Qt::LeftButton){
+        initDrapPoints(); // 清除拖拽区域
+        auto end = event->pos(); // 鼠标停下的点
+        mDrapRect = QRectF(mLastPos,end); // 鼠标形成的矩形框
+        auto rects = getInnerRects();
+        for(int row = 0; row < mrows; ++row)
+            for(int col = 0; col < mcols; ++col) {
+                if(mDrapRect.intersects(rects[row][col])){ // 小矩形区域在这个推拽区域内有交集
+                    mDrapPoints[row][col] = true;
+                }
+            }
+
+    }
+    update();
+    event->accept();
+}
+
 void PreviewPhotoCanvas::mousePressEvent(QMouseEvent *event)
 {
-    auto pos = event->pos();
+    if (event->button() == Qt::LeftButton) {
+        initDrapPoints(); // 框选后，如果左键点一下应该取消框选
+        mDrapRect.setWidth(0);
+        mDrapRect.setHeight(0);
+        mDrapRect = QRectF();
+        update();
+    } // 右键是菜单
+    mLastPos = event->pos();
     mMousePoint = {-1,-1};
     auto rects = getInnerRects();
     for(int r = 0; r < mrows; ++r) {
         for(int c = 0; c < mcols; ++c) {
-            if (rects[r][c].contains(pos)) {
+            if (rects[r][c].contains(mLastPos)) {
                 mMousePoint = {r,c};
             }
         }
@@ -115,12 +154,12 @@ void PreviewPhotoCanvas::drawInnerLine(QPainter &painter)
 
 double PreviewPhotoCanvas::getInnerRectWidth() const
 {
-    return 2 * getExternalCircleRadius() / mrows *1.0;
+    return 2 * getCircleRadius() / mrows *1.0;
 }
 
 double PreviewPhotoCanvas::getInnerRectHeight() const
 {
-    return 2 * getExternalCircleRadius() / mcols *1.0;
+    return 2 * getCircleRadius() / mcols *1.0;
 }
 
 QPointFVector PreviewPhotoCanvas::getInnerHorizonalLineLeftPoints() const
@@ -167,43 +206,43 @@ QPointFVector PreviewPhotoCanvas::getInnerVerticalLineBottomPoints() const
 
 QPointF PreviewPhotoCanvas::getInnerRectTopLeftPoint() const
 {
-    return QPointF(width()/2.0-getExternalCircleRadius(),0);
+    return QPointF(width()/2.0-getCircleRadius(),0);
 }
 
 QPointF PreviewPhotoCanvas::getInnerRectTopRightPoint() const
 {
-    return QPointF(width()/2.0+getExternalCircleRadius(),0);
+    return QPointF(width()/2.0+getCircleRadius(),0);
 }
 
 QPointF PreviewPhotoCanvas::getInnerRectBottomLeftPoint() const
 {
-    return QPointF(width()/2.0-getExternalCircleRadius(),height());
+    return QPointF(width()/2.0-getCircleRadius(),height());
 }
 
 QPointF PreviewPhotoCanvas::getInnerRectBottomRightPoint() const
 {
-    return QPointF(width()/2.0+getExternalCircleRadius(),height());
+    return QPointF(width()/2.0+getCircleRadius(),height());
 }
 
-void PreviewPhotoCanvas::drawExternalCircle(QPainter &painter)
+void PreviewPhotoCanvas::drawCircle(QPainter &painter)
 {
-    auto radius = getExternalCircleRadius();
+    auto radius = getCircleRadius();
     painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
 }
 
-double PreviewPhotoCanvas::getExternalCircleRadius() const
+double PreviewPhotoCanvas::getCircleRadius() const
 { // 圆半径
     return width()>=height()?height()/2.0:width()/2.0;
 }
 
 double PreviewPhotoCanvas::getExternalCircleRectSize() const
 { // 圆内接正方形尺寸
-    return getExternalCircleRadius()* sqrt(2);
+    return getCircleRadius()* sqrt(2);
 }
 
 QPoint PreviewPhotoCanvas::getExternalCircleRectTopLeftPoint() const
 { // 窗口内有个圆,圆的内部有个内接正方形,正方形的左上角顶点 (w/2-r*sqrt(2)/2,r-r*sqrt(2)/2)
-    auto radius = getExternalCircleRadius();
+    auto radius = getCircleRadius();
     auto x = width()/2.0 - radius * sqrt(2)/2.0; // x坐标为窗口的一半减去半径的45°对边
     auto y = radius - radius * sqrt(2)/2.0; // y坐标为半径减去半径的45°对边
 
@@ -212,7 +251,7 @@ QPoint PreviewPhotoCanvas::getExternalCircleRectTopLeftPoint() const
 
 QPoint PreviewPhotoCanvas::getExternalCircleRectTopRightPoint() const
 { // 窗口内有个圆,圆的内部有个内接正方形,正方形的右上角顶点 (w/2+r*sqrt(2)/2,r-r*sqrt(2)/2)
-    auto radius = getExternalCircleRadius();
+    auto radius = getCircleRadius();
     auto x = width()/2.0 + radius * sqrt(2)/2.0; // x坐标为窗口的一半加上半径的45°对边
     auto y = radius - radius * sqrt(2)/2.0; // y坐标和左上角相同
 
@@ -221,7 +260,7 @@ QPoint PreviewPhotoCanvas::getExternalCircleRectTopRightPoint() const
 
 QPoint PreviewPhotoCanvas::getExternalCircleRectBottomLeftPoint() const
 {// 窗口内有个圆,圆的内部有个内接正方形,正方形的左下角顶点 (w/2-r*sqrt(2)/2,r+r*sqrt(2)/2)
-    auto radius = getExternalCircleRadius();
+    auto radius = getCircleRadius();
     auto x = width()/2.0 - radius * sqrt(2)/2.0; // x坐标和左上角相同
     auto y = radius + radius * sqrt(2)/2.0; // y坐标为半径加上半径的45°对边
 
@@ -230,7 +269,7 @@ QPoint PreviewPhotoCanvas::getExternalCircleRectBottomLeftPoint() const
 
 QPoint PreviewPhotoCanvas::getExternalCircleRectBottomRightPoint() const
 {// 窗口内有个圆,圆的内部有个内接正方形,正方形的右下角顶点 (w/2+r*sqrt(2)/2,r+r*sqrt(2)/2)
-    auto radius = getExternalCircleRadius();
+    auto radius = getCircleRadius();
     auto x = width()/2.0 - radius * sqrt(2)/2.0; // x坐标和右上角相同
     auto y = radius + radius * sqrt(2)/2.0; // y坐标和左下角相同
 
@@ -273,10 +312,28 @@ QRectVector PreviewPhotoCanvas::getExternalCircleRects() const
     return vec;
 }
 
+PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)
+{
+    strategy = NoStrategy;
+    mrows = 0;
+    mcols = 0;
+    mMousePoint = QPoint(-1,-1);
+    mLastPos = {-1,-1};
+    mExternalCircleRectSize = DefaultPreviewPhotoCanvasViewRectSize;
+    mMouseClickColor.setAlpha(PatternColorAlpha);
+    viewact = new QAction(tr("选点"));
+    addAction(viewact);
+    setContextMenuPolicy(Qt::ActionsContextMenu);
+    initDrapPoints();
+    initSelectPoints();
+    connect(viewact,&QAction::triggered,this,&PreviewPhotoCanvas::onSetViewAct);
+}
+
 void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s)
 {
     strategy = s;
     mMousePoint = {-1,-1};
+    mLastPos = {-1,-1};
     update();
 }
 
@@ -285,11 +342,116 @@ void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, int row
     strategy = s;
     mrows = rows;
     mcols = cols;
+    initDrapPoints();
+    initSelectPoints();
     mMousePoint = {-1,-1}; // 必须更新,否则上次的鼠标点还在会导致切换物镜或者brand出现越界
+    mLastPos = {-1,-1};
+    mDrapRect = QRectF(); // 上次的框选痕迹还在要清除
     update();
 }
 
 void PreviewPhotoCanvas::setExternalCircleRectSize(int size)
 {// 圆内接正方形 小方格的尺寸
     mExternalCircleRectSize = size;
+}
+
+void PreviewPhotoCanvas::initDrapPoints()
+{ // 拖拽结束后清除这些点
+    mDrapPoints.clear();
+    for(int row = 0 ; row < mrows; ++ row) {
+        QBoolVector var;
+        for (int col = 0; col < mcols; ++col){
+            var.append(false);
+        }
+        mDrapPoints.append(var);
+    }
+    update();
+}
+
+void PreviewPhotoCanvas::initSelectPoints()
+{ // 首次需要初始化这些点
+    mSelectPoints.clear();
+    for(int row = 0 ; row < mrows; ++ row) {
+        QBoolVector var;
+        for (int col = 0; col < mcols; ++col){
+            var.append(false);
+        }
+        mSelectPoints.append(var);
+    }
+
+    if (!mTmpSelectPoints.isEmpty() && mTmpSelectPoints.count() == mrows) {
+        if (!mTmpSelectPoints[0].isEmpty() &&mTmpSelectPoints[0].count() == mcols) {
+            // 行列数相当,那么上次临时保存的值赋给mSelectPoints
+            mSelectPoints = mTmpSelectPoints;
+        }
+    } else mTmpSelectPoints.clear(); // 说明view形状变了无需重现上次的设置
+    update();
+}
+
+void PreviewPhotoCanvas::onSetViewAct()
+{
+    if (mMousePoint != QPoint(-1,-1)) {
+        mSelectPoints[mMousePoint.x()][mMousePoint.y()] = true;
+        mDrapPoints[mMousePoint.x()][mMousePoint.y()] = false;
+    }
+    for(int r = 0; r < mrows; ++r) {
+        for(int c = 0; c < mcols; ++c) {
+            if (mDrapPoints[r][c]) {
+                mDrapPoints[r][c] = false;
+                mSelectPoints[r][c] = true;
+            }
+        }
+    }
+    mTmpSelectPoints = mSelectPoints; // 临时保存这次设置
+    update();
+}
+
+void PreviewPhotoCanvas::drawDrapRect(QPainter &painter)
+{
+    auto  rects = getInnerRects();
+
+    // 绘制框选的所有孔
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            if (mDrapPoints[row][col]) {
+                auto rect = rects[row][col];
+                painter.fillRect(rect,mMouseClickColor);
+            }
+        }
+    }
+    // 绘制框
+    if (!mDrapRect.isNull()) {
+        auto pen = painter.pen();
+        pen.setColor(Qt::blue);
+        painter.setPen(pen);
+        painter.drawRect(mDrapRect);
+        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
+        painter.setPen(pen);
+    }
+}
+
+void PreviewPhotoCanvas::drawSelectRect(QPainter &painter)
+{
+    auto  rects = getInnerRects();
+    // 绘制框选的所有孔
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            if (mSelectPoints[row][col]) {
+                auto rect = rects[row][col];
+                painter.fillRect(rect,Qt::red);
+            }
+        }
+    }
+}
+
+int PreviewPhotoCanvas::drapPointCount() const
+{ // 计算拖拽区域包含的点个数
+    int count = 0;
+    for(int r = 0; r < mrows; ++ r) {
+        for(int c = 0; c < mcols; ++c) {
+            if (mDrapPoints[r][c])
+                count++;
+        }
+    }
+    return count;
 }

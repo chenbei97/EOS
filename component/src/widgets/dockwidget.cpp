@@ -36,7 +36,7 @@ bool DockWidget::event(QEvent* event)
 }
 
 void DockWidget::closeEvent(QCloseEvent* event)
-{
+{ // 如果显示浮动小窗口,恢复原位才需要设置mRetracement=true
     if (mRetracement) { // 这个要写在外头,否则关闭时会出现问题
         if (isFloating()) {
             setFloating(false);    //设置浮动标志为false
