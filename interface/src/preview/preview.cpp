@@ -62,7 +62,6 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(toolbar,&PreviewTool::infoChanged,this,&Preview::onInfoChanged);
     connect(pattern,&WellPattern::viewEvent,this,&Preview::onViewEvent);
-    connect(pattern,&WellPattern::doubleClicked,this,&Preview::onViewEvent);
     connect(pattern,&WellPattern::drapEvent,this,&Preview::onDrapEvent);
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
     //connect(dock,&QDockWidget::topLevelChanged,this,&Preview::updatePattern);
@@ -74,6 +73,7 @@ void Preview::updateViewPattern()
     auto brand = getIndexFromFields(toolbar->toolInfo()[BrandField].toString()).toUInt();
     auto manufacturer = getIndexFromFields(toolbar->toolInfo()[ManufacturerField].toString()).toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
+
     viewpattern->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
 
     LOG<<" manufacturer = "<<manufacturer<<" brand = "<<brand<<"objective = "<<objective<<" size = "<<size
@@ -85,15 +85,20 @@ void Preview::updateViewPattern()
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 }
 
-void Preview::onViewEvent(const QPoint &point)
+void Preview::onViewEvent(const QVariantMap& m)
 { // 点击图案的某个点,就要切换到photo模式,并依据当前的objective,brand设置photocanvas的绘制策略
     //cameramode->changeMode(CameraMode::PhotoMode);
 
     // 关闭相机,切换stack
     //stack->setCurrentWidget(photocanvas);
-    dock->setWindowTitle(tr("选择孔内视野(%1,%2)")
-        .arg(QChar(point.x()+65)).arg(point.y()+1));
+    auto point = m[HolePointField].toPoint(); //双击或者右键打开视野窗口带来的孔信息
+    auto groupname = m[GroupNameField].toString();
+    if (groupname.isEmpty()) groupname = tr("未设置组");
+    dock->setWindowTitle(tr("选择孔内视野(%1,%2)-组别(%3)")
+        .arg(QChar(point.x()+65)).arg(point.y()+1).arg(groupname));
     dock->setFloating(true);
+
+    viewpattern->setCurrentHoleInfo(m);
     if (point == QPoint(-1,-1))
         viewpattern->setStrategy(PreviewPhotoCanvas::NoStrategy);
     else updateViewPattern();
@@ -106,7 +111,6 @@ void Preview::onDrapEvent(const QVariantMap& m)
 
     groupinfo->setGroupColor(color);// color是传过来之前的颜色
     groupinfo->setGroupName(group);
-
 
     int ret = groupinfo->exec();
     if (ret == QDialog::Accepted) {

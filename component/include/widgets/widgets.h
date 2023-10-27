@@ -74,5 +74,6 @@
 #define RoundButtonSize 20
 static const char* GroupNameField = "groupname";
 static const char* GroupColorField = "groupcolor";
+static const char* HolePointField = "holepoint";
 
 #endif //EOSI_WIDGETS_H

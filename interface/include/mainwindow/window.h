@@ -45,6 +45,7 @@ static const char* PhotoField = "photo";
 #define NavigBarColor QColor("#767C85")
 #define AppSelectColor QColor("#2F7CAD")
 #define PreviewPhotoCanvasViewRectColor QColor("#00A2E8")
+#define PointToIDCoefficient 100
 
 
 static const QFieldList NavigBarFields = {

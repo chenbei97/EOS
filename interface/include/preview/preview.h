@@ -32,7 +32,7 @@ private:
     QMainWindow * dockcanvas;
     GroupInfo * groupinfo;
 
-    void onViewEvent(const QPoint& point);
+    void onViewEvent(const QVariantMap& m);
     void onDrapEvent(const QVariantMap& m);
     void onWellbrandChanged(int option);
     void onObjectiveChanged(int option);

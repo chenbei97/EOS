@@ -198,14 +198,26 @@ void WellPattern::initHoleInfo()
 }
 
 void WellPattern::onSetViewAct()
+{ // 打开选择视野窗口的事件,需要传递当前孔的坐标,孔的分组
+    if (mMousePos != QPoint(-1,-1)){
+        // 把孔的信息也带出去更新视野窗口的框选颜色,坐标,所在组
+        QVariantMap m;
+        Q_ASSERT(mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate == mMousePos);
+        m[HolePointField] = mMousePos;
+        m[GroupNameField] = mHoleInfo[mMousePos.x()][mMousePos.y()].group;
+        m[GroupColorField] = mHoleInfo[mMousePos.x()][mMousePos.y()].color;
+        emit viewEvent(m);
+    }
+}
+
+void WellPattern::mouseDoubleClickEvent(QMouseEvent*event)
 {
-    // dosomething
-    if (mMousePos != QPoint(-1,-1))
-        emit viewEvent(mMousePos);
+    Pattern::mouseDoubleClickEvent(event);
+    viewact->trigger(); // 触发一下
 }
 
 void WellPattern::onSetGroupAct()
-{
+{ // 颜色和名称信息去更新拖动事件窗口的信息
     auto color = mHoleInfo[mMousePos.x()][mMousePos.y()].color;
     auto name = mHoleInfo[mMousePos.x()][mMousePos.y()].group;
     QVariantMap m;

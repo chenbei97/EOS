@@ -40,8 +40,11 @@ void PreviewPhotoCanvas::mouseReleaseEvent(QMouseEvent *event)
         return; // 可能会点到边缘位置
     }
     viewact->setEnabled(true);
-    if (drapPointCount()==1) // 选中1个才是预览事件
+    if (drapPointCount()<1) // 选中1个或者没选中才是预览事件
+    {
+        LOG<<"preview event is emit";
         emit previewEvent(mMousePoint);
+    }
 
     event->accept();
 }
@@ -322,10 +325,14 @@ PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)
     mExternalCircleRectSize = DefaultPreviewPhotoCanvasViewRectSize;
     mMouseClickColor.setAlpha(PatternColorAlpha);
     viewact = new QAction(tr("选点"));
+    applygroupact = new QAction(tr("应用到本组"));
+    applyallact = new QAction(tr("应用到所有"));
     addAction(viewact);
+    addAction(applygroupact);
+    addAction(applyallact);
     setContextMenuPolicy(Qt::ActionsContextMenu);
     initDrapPoints();
-    initSelectPoints();
+    //initSelectPoints();
     connect(viewact,&QAction::triggered,this,&PreviewPhotoCanvas::onSetViewAct);
 }
 
@@ -350,6 +357,17 @@ void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, int row
     update();
 }
 
+void PreviewPhotoCanvas::setCurrentHoleInfo(const QVariantMap &m)
+{
+    currentHoleInfo = m;
+    auto groupname = m[GroupNameField].toString();
+    //auto groupcolor = m[GroupColorField].toString();
+    //auto coordinate = m[HolePointField].toPoint();
+    if (groupname.isEmpty()) { // 这个孔不属于任何组
+        applygroupact->setEnabled(false);
+    } else applygroupact->setEnabled(true);
+}
+
 void PreviewPhotoCanvas::setExternalCircleRectSize(int size)
 {// 圆内接正方形 小方格的尺寸
     mExternalCircleRectSize = size;
@@ -370,39 +388,46 @@ void PreviewPhotoCanvas::initDrapPoints()
 
 void PreviewPhotoCanvas::initSelectPoints()
 { // 首次需要初始化这些点
-    mSelectPoints.clear();
+    auto coordinate = currentHoleInfo[HolePointField].toPoint();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2x+y,每个孔对应唯一的idx
+
+    QBool2DVector vec;
     for(int row = 0 ; row < mrows; ++ row) {
         QBoolVector var;
         for (int col = 0; col < mcols; ++col){
             var.append(false);
         }
-        mSelectPoints.append(var);
+        vec.append(var);
     }
+    mHoleSelectPoints[idx] = vec;
 
-    if (!mTmpSelectPoints.isEmpty() && mTmpSelectPoints.count() == mrows) {
-        if (!mTmpSelectPoints[0].isEmpty() &&mTmpSelectPoints[0].count() == mcols) {
-            // 行列数相当,那么上次临时保存的值赋给mSelectPoints
-            mSelectPoints = mTmpSelectPoints;
+    if (!mTmpHoleSelectPoints[idx].isEmpty() && mTmpHoleSelectPoints[idx].count() == mrows) {
+        if (!mTmpHoleSelectPoints[idx][0].isEmpty() &&mTmpHoleSelectPoints[idx][0].count() == mcols) {
+            // 行列数相当,那么上次临时保存的值来更新
+            mHoleSelectPoints[idx] = mTmpHoleSelectPoints[idx];
         }
-    } else mTmpSelectPoints.clear(); // 说明view形状变了无需重现上次的设置
+    } else mTmpHoleSelectPoints[idx].clear(); // 说明view形状变了无需重现上次的设置
     update();
 }
 
 void PreviewPhotoCanvas::onSetViewAct()
 {
+    auto coordinate = currentHoleInfo[HolePointField].toPoint();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2x+y,每个孔对应唯一的idx
+
     if (mMousePoint != QPoint(-1,-1)) {
-        mSelectPoints[mMousePoint.x()][mMousePoint.y()] = true;
+        mHoleSelectPoints[idx][mMousePoint.x()][mMousePoint.y()] = true;
         mDrapPoints[mMousePoint.x()][mMousePoint.y()] = false;
     }
     for(int r = 0; r < mrows; ++r) {
         for(int c = 0; c < mcols; ++c) {
             if (mDrapPoints[r][c]) {
                 mDrapPoints[r][c] = false;
-                mSelectPoints[r][c] = true;
+                mHoleSelectPoints[idx][r][c] = true;
             }
         }
     }
-    mTmpSelectPoints = mSelectPoints; // 临时保存这次设置
+    mTmpHoleSelectPoints[idx] = mHoleSelectPoints[idx]; // 临时保存这次设置
     update();
 }
 
@@ -432,13 +457,17 @@ void PreviewPhotoCanvas::drawDrapRect(QPainter &painter)
 
 void PreviewPhotoCanvas::drawSelectRect(QPainter &painter)
 {
+    auto coordinate = currentHoleInfo[HolePointField].toPoint();
+    auto groupcolor = currentHoleInfo[GroupColorField].toString();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2x+y,每个孔对应唯一的idx
+
     auto  rects = getInnerRects();
     // 绘制框选的所有孔
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            if (mSelectPoints[row][col]) {
+            if (mHoleSelectPoints[idx][row][col]) {
                 auto rect = rects[row][col];
-                painter.fillRect(rect,Qt::red);
+                painter.fillRect(rect,groupcolor);
             }
         }
     }

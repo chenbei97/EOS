@@ -21,6 +21,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent*event) override;
     void setGroup(QCVariantMap m);
 private:
     QRectF mDrapRect; // 鼠标拖动生成的矩形
@@ -36,6 +37,6 @@ private:
     void onSetViewAct();
 signals:
     void drapEvent(const QVariantMap& m);
-    void viewEvent(const QPoint& point);
+    void viewEvent(const QVariantMap& m);
 };
 #endif //EOSI_WELLPATTERN_H

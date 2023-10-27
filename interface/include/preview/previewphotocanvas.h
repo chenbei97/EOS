@@ -27,6 +27,7 @@ public:
 
     void setStrategy(DrawStrategy s);
     void setStrategy(DrawStrategy s,int rows,int cols);
+    void setCurrentHoleInfo(const QVariantMap & m); //设置当前孔的一些信息
 
     void setExternalCircleRectSize(int size);// 圆内接正方形 小方格的尺寸
 private:
@@ -36,11 +37,16 @@ private:
     QColor mMouseClickColor = Qt::green;
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true
-    QBool2DVector mSelectPoints; // 确实选中的点标记其他颜色
-    QBool2DVector mTmpSelectPoints; // 临时变量
+    //QBool2DVector mSelectPoints; // 确实选中的点标记其他颜色
+    QMap<int,QBool2DVector> mHoleSelectPoints;
+    QMap<int,QBool2DVector> mTmpHoleSelectPoints; // 临时变量
     QAction * viewact;
+    QAction * applygroupact;
+    QAction * applyallact;
     int mrows = 0;
     int mcols = 0;
+private:
+    QVariantMap currentHoleInfo;
 private:
     void initDrapPoints(); // 拖拽结束后清除这些点
     void initSelectPoints(); // 被选中的点
