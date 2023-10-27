@@ -53,6 +53,8 @@ void Pattern::paintEvent(QPaintEvent *event)
     pen.setWidth(2);
     painter.setPen(pen);
 
+    painter.drawRect(0,0,width(),height());
+
     drawLine(painter);
     drawText(painter);
     drawHighlight(painter);
@@ -68,6 +70,7 @@ void Pattern::drawLine(QPainter&painter)
                          points[row][mcols]);
     for(int col = 1; col < mcols; ++col)
         painter.drawLine(points[0][col],points[mrows][col]);
+
 }
 
 void Pattern::drawText(QPainter &painter)

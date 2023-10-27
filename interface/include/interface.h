@@ -18,8 +18,6 @@
 #include "channelbox.h"
 #include "focusbox.h"
 #include "cameramode.h"
-#include "previewpattern.h"
-#include "protocolpattern.h"
 #include "previewphotocanvas.h"
 #include "mainwindow.h"
 

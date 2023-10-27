@@ -34,6 +34,8 @@
 #include "groupbox.h"
 #include "dockwidget.h"
 #include "pattern.h"
+#include "previewpattern.h"
+#include "protocolpattern.h"
 #include "label.h"
 #include "checkbox.h"
 #include "progressbar.h"

@@ -9,10 +9,10 @@
 #ifndef EOSI_PREVIEWPATTERN_H
 #define EOSI_PREVIEWPATTERN_H
 
-#include "window.h"
+#include "widgets.h"
 #include "pattern.h"
 
-class INTERFACE_IMEXPORT PreviewPattern: public Pattern
+class COMPONENT_IMEXPORT PreviewPattern: public Pattern
 {
     Q_OBJECT
 public:

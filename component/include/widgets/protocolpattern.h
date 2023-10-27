@@ -9,10 +9,10 @@
 #ifndef EOSI_PROTOCOLPATTERN_H
 #define EOSI_PROTOCOLPATTERN_H
 
-#include "window.h"
+#include "widgets.h"
 #include "pattern.h"
 
-class INTERFACE_IMEXPORT ProtocolPattern: public Pattern
+class COMPONENT_IMEXPORT ProtocolPattern: public Pattern
 {
     Q_OBJECT
 public:
@@ -20,6 +20,7 @@ public:
     void setPatternSize(int rows,int cols) override;
     void paintEvent(QPaintEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
 private:
     QRectF mDrapRect; // 鼠标拖动生成的矩形
@@ -28,6 +29,9 @@ private:
 private:
     void initDrapPoints();
     void initHoleInfo();
+    int drapPointCount() const;
     void select(QCColor color);
+signals:
+    void drapEvent(const QColor& color);
 };
 #endif //EOSI_PROTOCOLPATTERN_H

@@ -94,6 +94,7 @@ void ProtocolPattern::mouseMoveEvent(QMouseEvent *event)
                         mDrapPoints[row][col] = true;
                     }
                 }
+            //LOG<<"mDrapPoints is init";
         }
     }
     update();
@@ -107,23 +108,42 @@ void ProtocolPattern::mouseReleaseEvent(QMouseEvent *event)
         if (mMousePos == QPoint(-1,-1))
             return; // 可能会点到边缘位置导致下方获取颜色越界
 
+        int count = drapPointCount();
+        //LOG<<"drap point count = "<<count;
+        if (count <= 1) // 只框选了1个不会弹
+            return;
+
         if (event->button() == Qt::LeftButton) {
+
+            //这些代码转移到外部去写,发射信号即可,把select改为公共函数即可,对于GroupInfo目前只需要传递颜色而已
             auto c = mHoleInfo[mMousePos.x()][mMousePos.y()].color; // 选中点的颜色
-
-            auto dlg = new GroupInfo;
-            dlg->setBtnColor(c); // 鼠标单击时可以让按钮跟随当前的孔颜色
-
-            int ret = dlg->exec();
-            if (ret == QDialog::Accepted) {
-                select(dlg->groupColor());
-            }
-            delete dlg;
+            emit drapEvent(c);
+//
+//            auto dlg = new GroupInfo;
+//            dlg->setBtnColor(c); // 鼠标单击时可以让按钮跟随当前的孔颜色
+//
+//            int ret = dlg->exec();
+//            if (ret == QDialog::Accepted) {
+//                select(dlg->groupColor());
+//            }
+//            delete dlg;
             mDrapRect.setWidth(0); // 清除矩形
             mDrapRect.setHeight(0);
         }
     }
     event->accept();
 }
+
+void ProtocolPattern::mousePressEvent(QMouseEvent *event)
+{
+    Pattern::mousePressEvent(event);
+    initDrapPoints(); // 框选后，如果点一下应该取消框选
+    mDrapRect.setWidth(0);
+    mDrapRect.setHeight(0);
+    update();
+    event->accept();
+}
+
 
 void ProtocolPattern::initHoleInfo()
 {
@@ -153,6 +173,18 @@ void ProtocolPattern::initDrapPoints()
         mDrapPoints.append(var);
     }
     update();
+}
+
+int ProtocolPattern::drapPointCount() const
+{
+    int count = 0;
+    for(int r = 0; r < mrows; ++ r) {
+        for(int c = 0; c < mcols; ++c) {
+            if (mDrapPoints[r][c])
+                count++;
+        }
+    }
+    return count;
 }
 
 void ProtocolPattern::select(QCColor color)
