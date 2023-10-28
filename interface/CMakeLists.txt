@@ -30,7 +30,7 @@ find_package(Qt5 COMPONENTS
 add_library(${DLLNAME} SHARED
         ${INTERFACE_SOURCES}
         ${INTERFACE_HEADERS}
-        )
+        src/preview/previewphotocanvas_other.cpp src/preview/previewphotocanvas_geometry.cpp src/preview/previewphotocanvas_paint.cpp src/preview/previewphotocanvas_mouse.cpp)
 set_target_properties(${DLLNAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${DLLNAME}
