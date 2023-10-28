@@ -15,7 +15,8 @@ void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, const Q
     mMousePoint = {-1,-1}; // 必须更新,否则上次的鼠标点还在会导致切换物镜或者brand出现越界
     mLastPos = {-1,-1};
     mDrapRect = QRectF(); // 上次的框选痕迹还在要清除
-    initDrapPoints();
+    mDrapPoints.clear();
+    //initDrapPoints();//不能在这里调用,尺寸没更新
 
     if (strategy != InnerCircleRect) { // 如果不是InnerCircleRect策略,其他变量不用更新
         update();
@@ -27,11 +28,13 @@ void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, const Q
     //auto groupcolor = m[GroupColorField].toString();
     //auto coordinate = m[HolePointField].toPoint();
     //auto grouppoints = m[GroupPointsField].value<QPointVector>();
+    //auto allgroup = m[AllGroupsField].toStringList();
 
     // 3. 初始化视野尺寸,重新更新
     auto size = m[ViewSizeField].toSize();
     mrows = size.width();
     mcols = size.height();
+    initDrapPoints();//不能在这里调用
     initSelectPoints();// 先更新尺寸,才能基于尺寸更新视野已被选择的信息(上次设置的临时信息)
 
     // 4.更新应用到本组的使能,未分过组或者分过组但是没选过视野
@@ -92,21 +95,22 @@ void PreviewPhotoCanvas::onApplyGroupAct()
     m[GroupColorField] = mCurrentHoleInfo[GroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
     m[ViewSizeField] = mCurrentHoleInfo[ViewSizeField]; // 这是为了pattern画点使用
     m[CoordinateField] = mCurrentHoleInfo[CoordinateField]; // 坐标信息顺带组装
+    m[AllGroupsField] = mCurrentHoleInfo[AllGroupsField]; // 所有组名信息顺带组装
 
     // 3. 组装当前孔选择的所有视野坐标信息
     auto coordinate = mCurrentHoleInfo[CoordinateField].toPoint();
     auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
-    QPointVector points;
+    QPointVector viewpoints;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
             if (mHoleSelectPoints[idx][row][col]) {
-                points.append(QPoint(row,col)); // 当前孔选择的全部视野坐标
+                viewpoints.append(QPoint(row,col)); // 当前孔选择的全部视野坐标
             }
         }
     }
     QVariant v;
-    v.setValue(points);
-    m[PointsField] = v;
+    v.setValue(viewpoints);
+    m[ViewPointsField] = v;
     emit applyGroupEvent(m);
 
     // 4.更新同组其它孔的视野信息和临时信息
@@ -131,6 +135,51 @@ void PreviewPhotoCanvas::onApplyGroupAct()
         mTmpHoleSelectPoints[pt_idx] = vec;
         mHoleSelectPoints[pt_idx] = vec;
     }
+}
+
+void PreviewPhotoCanvas::updateApplyGroup()
+{ // objective更新后视野窗口更新了,但是孔图案的ui绘制点还在,要刷新一下
+
+    // 1. 拿到当前孔的id
+    auto coordinate = mCurrentHoleInfo[CoordinateField].toPoint();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
+
+    // 2. 清除选择的视野信息
+    for(int r = 0; r < mrows; ++r) {
+        for(int c = 0; c < mcols; ++c) {//调用updateApplyGroup之前已经setStrategy更新了mrows,mcols并分配空间不会越界
+            mHoleSelectPoints[idx][r][c] = false;
+        }
+    }
+    mTmpHoleSelectPoints[idx].clear(); // 以前保存的临时信息清空,其实被setStrategy清空过了,视野尺寸不配的时候,加层保护
+
+    // 3. 重新组装数据,除了viewpoint是空的其它不变(pattern的组颜色+名称+坐标这些是不用动的)
+//    QVariantMap m;
+//    m[GroupNameField] = mCurrentHoleInfo[GroupNameField];// 组装组名称,方便pattern依据组名查找所有孔
+//    m[GroupColorField] = mCurrentHoleInfo[GroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
+//    m[ViewSizeField] = mCurrentHoleInfo[ViewSizeField]; // 这是为了pattern画点使用
+//    m[CoordinateField] = mCurrentHoleInfo[CoordinateField]; // 坐标信息顺带组装
+//    m[AllGroupsField] = mCurrentHoleInfo[AllGroupsField]; // 所有组名信息顺带组装
+//    QVariant v;
+//    v.setValue(QPointVector());//去更新mHoleInfo[row][col].viewpoints就是空的
+//    m[ViewPointsField] = v;
+//    emit applyGroupEvent(m);
+//
+//    // 4. 还应该把其它组的所有孔信息也清除,不仅仅是本组的孔(触发应用到所有组的孔)
+//    foreach(auto groupname, m[AllGroupsField].toStringList()) {
+//        m[GroupNameField] = groupname;
+//        emit applyGroupEvent(m);
+//    }
+// 这些工作已经在clearHoleInfo做了
+
+    // 5.同时更新同组其它孔的视野信息和临时信息也都重新分配空间并清空
+    auto groupPoints = mCurrentHoleInfo[GroupPointsField].value<QPointVector>();//拿到本组其它孔的所有坐标
+            foreach(auto pt, groupPoints) {
+            auto pt_idx = pt.x()*PointToIDCoefficient+pt.y(); // 本组其他孔的临时数据区更新为当前孔的视野信息
+            mTmpHoleSelectPoints[pt_idx] = mHoleSelectPoints[idx]; //mHoleSelectPoints[idx]已经分配过空间全是false
+            mHoleSelectPoints[pt_idx] = mHoleSelectPoints[idx];
+    }
+
+    //applygroupact->trigger();// 如果没选择过视野不能触发,所以只能多写上述代码
 }
 
 void PreviewPhotoCanvas::onApplyAllAct()

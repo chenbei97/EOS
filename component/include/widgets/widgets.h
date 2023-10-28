@@ -75,8 +75,9 @@
 static const char* GroupNameField = "groupname";
 static const char* GroupColorField = "groupcolor";
 static const char* GroupPointsField = "grouppoints";
+static const char* AllGroupsField = "allgroups";
 static const char* CoordinateField = "coordinate";
 static const char* ViewSizeField = "viewsize";
-static const char* PointsField = "points";
+static const char* ViewPointsField = "viewpoints";
 
 #endif //EOSI_WIDGETS_H

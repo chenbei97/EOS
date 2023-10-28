@@ -32,12 +32,14 @@ private:
     QMainWindow * dockcanvas;
     GroupInfo * groupinfo;
 
-    void onViewEvent(const QVariantMap& m);
-    void onDrapEvent(const QVariantMap& m);
+    void updateViewWindow(const QVariantMap& m);
+    void openSetGroupWindow(const QVariantMap& m);
+
+    void onManufacturerChanged(int option);
     void onWellbrandChanged(int option);
     void onObjectiveChanged(int option);
-    void onManufacturerChanged(int option);
+    void updateViewSize();
+
     void onInfoChanged();
-    void updateViewPattern();
 };
 #endif //EOSI_PREVIEW_H

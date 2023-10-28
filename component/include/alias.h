@@ -102,18 +102,20 @@ typedef QVariant(*TcpParseFuncPointer)(QCVariantMap m);
 typedef QByteArray(*TcpAssembleFuncPointer)(QCVariantMap m);
 
 struct HoleInfo {
-    bool isselected;
-    QPoint coordinate;
-    QColor color;
     QString group;
-    QPointVector points;
+    QStringList allgroup;
+    QColor color;
+    QPoint coordinate;
+    QPointVector viewpoints;
     QSize viewsize;
+    bool isselected;
     friend QDebug operator<<(QDebug debug, const HoleInfo& s) {
-        debug << "(group,color,coordinate,points,viewsize,isselect)=[";
+        debug << "(group,allgroup,color,coordinate,viewpoints,viewsize,isselect)=[";
         debug <<s.group<<",";
+        debug <<s.allgroup<<",";
         debug <<s.color<<",";
         debug <<s.coordinate<<",";
-        debug <<s.points<<",";
+        debug <<s.viewpoints<<",";
         debug <<s.viewsize<<",";
         debug <<s.isselected<<"]";
         return debug;

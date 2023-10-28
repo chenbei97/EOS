@@ -25,7 +25,8 @@ private: // 动作菜单
     void onSaveViewAct();// 保存选择的视野到当前孔id对应的视野数据区并保存到临时信息用于initSelectPoints重新初始化
     void onApplyGroupAct();//传递视野窗口的组名+组颜色+视野尺寸+当前孔坐标+所有视野坐标信息+更新同组其它孔的视野信息和临时信息
     void onApplyAllAct();
-
+public:
+    void updateApplyGroup();// objective更新后视野窗口更新了,但是孔图案的ui绘制点还在,要刷新一下
 
 public: // 策略和孔信息的传递和取出
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());// 设置策略+传递孔的信息+视野尺寸信息+应用到组使能
