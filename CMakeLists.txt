@@ -17,7 +17,7 @@ message(STATUS "FAMILYPC = $ENV{MY_ENV_VAR}")
 if (MSVC)
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-    set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.14.2/5.14.2/msvc2017_64")
+    set(CMAKE_PREFIX_PATH "E:/Qt5.14.2/5.14.2/msvc2017_64")
 else(GNU)
     set(CMAKE_PREFIX_PATH "E:/Qt5.14.2/5.14.2/mingw73_64")
 endif ()
@@ -160,7 +160,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Sql Qt5::Network Qt5::Concurrent
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
         component interface python310  # mingw必须显示指定python310,msvc指定与否都可
-         ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH} #不行,还没复制这 ${OPENCV_LIBs_PATH}
+        ${OPENCV_LIBs_PATH} # ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH} #不行,还没复制这 ${OPENCV_LIBs_PATH}
         ) # opencv连接libs就可以,不需要dll
 
 

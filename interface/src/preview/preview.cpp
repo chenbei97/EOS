@@ -61,28 +61,34 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     connect(toolbar,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
     connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(toolbar,&PreviewTool::infoChanged,this,&Preview::onInfoChanged);
-    connect(pattern,&WellPattern::viewEvent,this,&Preview::onViewEvent);
-    connect(pattern,&WellPattern::drapEvent,this,&Preview::onDrapEvent);
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
+
+    connect(pattern,&WellPattern::viewEvent,this,&Preview::onViewEvent); // 分组窗口去更新视野窗口
+    connect(pattern,&WellPattern::drapEvent,this,&Preview::onDrapEvent);// 弹出分组窗口
+    connect(viewpattern,&PreviewPhotoCanvas::applyGroupEvent,pattern,&WellPattern::setHoleInfoByViewInfo); // 视野窗口去更新图案
+
     //connect(dock,&QDockWidget::topLevelChanged,this,&Preview::updatePattern);
 }
 
 void Preview::updateViewPattern()
 {
+    // 更新视野的尺寸
     auto objective = getIndexFromFields(toolbar->toolInfo()[ObjectiveField].toString()).toUInt();
     auto brand = getIndexFromFields(toolbar->toolInfo()[BrandField].toString()).toUInt();
     auto manufacturer = getIndexFromFields(toolbar->toolInfo()[ManufacturerField].toString()).toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
 
-    viewpattern->setStrategy(PreviewPhotoCanvas::InnerCircleRect,size,size);
-
-    LOG<<" manufacturer = "<<manufacturer<<" brand = "<<brand<<"objective = "<<objective<<" size = "<<size
-       <<" current hole = "<<pattern->currentMousePoint(); // 有可能是没选孔(不过已经避免了brand,objective的触发了不会发生)
+    //    LOG<<" manufacturer = "<<manufacturer<<" brand = "<<brand<<"objective = "<<objective<<" size = "<<size
+//       <<" current hole = "<<pattern->currentMousePoint(); // 有可能是没选孔(不过已经避免了brand,objective的触发了不会发生)
 
     if (size > view_well_6_4x*10)
         dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
     else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
+
+    auto currentHoleInfo = viewpattern->currentHoleInfo();
+    currentHoleInfo[ViewSizeField] = QSize(size,size);
+    viewpattern->setStrategy(PreviewPhotoCanvas::InnerCircleRect,currentHoleInfo); // 重新更新下尺寸信息,其他的不用改
 }
 
 void Preview::onViewEvent(const QVariantMap& m)
@@ -91,17 +97,36 @@ void Preview::onViewEvent(const QVariantMap& m)
 
     // 关闭相机,切换stack
     //stack->setCurrentWidget(photocanvas);
-    auto point = m[HolePointField].toPoint(); //双击或者右键打开视野窗口带来的孔信息
+
+    // 更新视野窗口的标题
+    auto point = m[CoordinateField].toPoint(); //双击或者右键打开视野窗口带来的孔信息
     auto groupname = m[GroupNameField].toString();
     if (groupname.isEmpty()) groupname = tr("未设置组");
     dock->setWindowTitle(tr("选择孔内视野(%1,%2)-组别(%3)")
         .arg(QChar(point.x()+65)).arg(point.y()+1).arg(groupname));
     dock->setFloating(true);
 
-    viewpattern->setCurrentHoleInfo(m);
+    // 更新视野的尺寸
+    auto objective = getIndexFromFields(toolbar->toolInfo()[ObjectiveField].toString()).toUInt();
+    auto brand = getIndexFromFields(toolbar->toolInfo()[BrandField].toString()).toUInt();
+    auto manufacturer = getIndexFromFields(toolbar->toolInfo()[ManufacturerField].toString()).toUInt();
+    auto size = ViewCircleMapFields[manufacturer][brand][objective];
+
+    //    LOG<<" manufacturer = "<<manufacturer<<" brand = "<<brand<<"objective = "<<objective<<" size = "<<size
+//       <<" current hole = "<<pattern->currentMousePoint(); // 有可能是没选孔(不过已经避免了brand,objective的触发了不会发生)
+
+    if (size > view_well_6_4x*10)
+        dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
+    else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
+    else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
+
+    // 补充传递尺寸数据给视野窗口
+    auto nm = m;
+    nm[ViewSizeField] = QSize(size,size);
+
     if (point == QPoint(-1,-1))
         viewpattern->setStrategy(PreviewPhotoCanvas::NoStrategy);
-    else updateViewPattern();
+    else viewpattern->setStrategy(PreviewPhotoCanvas::InnerCircleRect,nm);//⭐⭐⭐⭐ 把图案的信息传给视野窗口
 }
 
 void Preview::onDrapEvent(const QVariantMap& m)
@@ -114,7 +139,7 @@ void Preview::onDrapEvent(const QVariantMap& m)
 
     int ret = groupinfo->exec();
     if (ret == QDialog::Accepted) {
-        pattern->setGroup(groupinfo->groupInfo()); // 用选择的颜色去分组
+        pattern->setHoleInfoByGroupInfo(groupinfo->groupInfo()); // 用选择的颜色去分组
     }
 }
 

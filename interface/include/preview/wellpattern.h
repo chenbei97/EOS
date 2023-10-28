@@ -22,7 +22,8 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent*event) override;
-    void setGroup(QCVariantMap m);
+    void setHoleInfoByGroupInfo(QCVariantMap m);// 分组窗口的信息拿去更新数据
+    void setHoleInfoByViewInfo(QCVariantMap m); // 视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
 private:
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true
@@ -32,7 +33,9 @@ private:
 private:
     void initDrapPoints(); // 拖拽结束后清除这些点
     void initHoleInfo(); // 初始化所有孔内的包含信息
+    QRectF2DVector getHoleRects(const QPoint& coordinate) const; // 拿到某个孔的小矩形区域
     int drapPointCount() const; // 计算拖拽区域包含的点个数
+    QPointVector holeGroupPoints(const QString& groupName) const;
     void onSetGroupAct();
     void onSetViewAct();
 signals:

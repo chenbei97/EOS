@@ -327,6 +327,7 @@ PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)
     viewact = new QAction(tr("选点"));
     applygroupact = new QAction(tr("应用到本组"));
     applyallact = new QAction(tr("应用到所有"));
+    applygroupact->setEnabled(false);
     addAction(viewact);
     addAction(applygroupact);
     addAction(applyallact);
@@ -334,6 +335,8 @@ PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)
     initDrapPoints();
     //initSelectPoints();
     connect(viewact,&QAction::triggered,this,&PreviewPhotoCanvas::onSetViewAct);
+    connect(applygroupact,&QAction::triggered,this,&PreviewPhotoCanvas::onApplyGroupAct);
+    connect(applyallact,&QAction::triggered,this,&PreviewPhotoCanvas::onApplyAllAct);
 }
 
 void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s)
@@ -344,28 +347,33 @@ void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s)
     update();
 }
 
-void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, int rows, int cols)
+void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, const QVariantMap& m)
 { // 使用绘制视野圆策略使用的方法
     strategy = s;
-    mrows = rows;
-    mcols = cols;
-    initDrapPoints();
-    initSelectPoints();
     mMousePoint = {-1,-1}; // 必须更新,否则上次的鼠标点还在会导致切换物镜或者brand出现越界
     mLastPos = {-1,-1};
     mDrapRect = QRectF(); // 上次的框选痕迹还在要清除
-    update();
-}
+    mCurrentHoleInfo = m;
 
-void PreviewPhotoCanvas::setCurrentHoleInfo(const QVariantMap &m)
-{
-    currentHoleInfo = m;
+    auto size = m[ViewSizeField].toSize();
+    mrows = size.width();
+    mcols = size.height();
+    initDrapPoints();
+    initSelectPoints();
+
     auto groupname = m[GroupNameField].toString();
     //auto groupcolor = m[GroupColorField].toString();
     //auto coordinate = m[HolePointField].toPoint();
-    if (groupname.isEmpty()) { // 这个孔不属于任何组
-        applygroupact->setEnabled(false);
-    } else applygroupact->setEnabled(true);
+    if (!groupname.isEmpty() && holeSelectPointCount()) // 这个孔不属于任何组
+        applygroupact->setEnabled(true);
+    else applygroupact->setEnabled(false);
+
+    update();
+}
+
+QVariantMap PreviewPhotoCanvas::currentHoleInfo() const
+{ // 目的是为了切换brand,objective时外部拿到当前的视野孔信息,然后更新其中尺寸字段即可
+    return mCurrentHoleInfo;
 }
 
 void PreviewPhotoCanvas::setExternalCircleRectSize(int size)
@@ -388,8 +396,8 @@ void PreviewPhotoCanvas::initDrapPoints()
 
 void PreviewPhotoCanvas::initSelectPoints()
 { // 首次需要初始化这些点
-    auto coordinate = currentHoleInfo[HolePointField].toPoint();
-    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2x+y,每个孔对应唯一的idx
+    auto coordinate = mCurrentHoleInfo[CoordinateField].toPoint();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
 
     QBool2DVector vec;
     for(int row = 0 ; row < mrows; ++ row) {
@@ -399,7 +407,7 @@ void PreviewPhotoCanvas::initSelectPoints()
         }
         vec.append(var);
     }
-    mHoleSelectPoints[idx] = vec;
+    mHoleSelectPoints[idx] = vec; // 这里去分配空间
 
     if (!mTmpHoleSelectPoints[idx].isEmpty() && mTmpHoleSelectPoints[idx].count() == mrows) {
         if (!mTmpHoleSelectPoints[idx][0].isEmpty() &&mTmpHoleSelectPoints[idx][0].count() == mcols) {
@@ -411,12 +419,14 @@ void PreviewPhotoCanvas::initSelectPoints()
 }
 
 void PreviewPhotoCanvas::onSetViewAct()
-{
-    auto coordinate = currentHoleInfo[HolePointField].toPoint();
-    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2x+y,每个孔对应唯一的idx
+{ // 保存选择的视野到当前孔id对应的地方
+    auto coordinate = mCurrentHoleInfo[CoordinateField].toPoint();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
 
+    bool haveSelect = false; // 是否至少选了1个点
     if (mMousePoint != QPoint(-1,-1)) {
         mHoleSelectPoints[idx][mMousePoint.x()][mMousePoint.y()] = true;
+        haveSelect = true;
         mDrapPoints[mMousePoint.x()][mMousePoint.y()] = false;
     }
     for(int r = 0; r < mrows; ++r) {
@@ -424,11 +434,77 @@ void PreviewPhotoCanvas::onSetViewAct()
             if (mDrapPoints[r][c]) {
                 mDrapPoints[r][c] = false;
                 mHoleSelectPoints[idx][r][c] = true;
+                haveSelect = true;
             }
         }
     }
+
+    //haveSelect? applygroupact->setEnabled(true):applygroupact->setEnabled(false);
+    if (!mCurrentHoleInfo[GroupNameField].toString().isEmpty() && haveSelect)
+        applygroupact->setEnabled(true);// 如果没分组还是不允许应用到本组
+    else applygroupact->setEnabled(false);
+
     mTmpHoleSelectPoints[idx] = mHoleSelectPoints[idx]; // 临时保存这次设置
     update();
+}
+
+void PreviewPhotoCanvas::onApplyGroupAct()
+{ // 把当前组，当前选的所有点传递出去去更新分组的窗口 应用到那个组(如果当前没有所租也不能应用到本组)
+    if (mCurrentHoleInfo[GroupNameField].toString().isEmpty())
+        return; // 没分组的不允许触发,代码的保护,虽然action的使能控制了,多加一层保护总没坏处
+
+    QVariantMap m;
+    m[GroupNameField] = mCurrentHoleInfo[GroupNameField];
+    m[GroupColorField] = mCurrentHoleInfo[GroupColorField];
+    m[ViewSizeField] = mCurrentHoleInfo[ViewSizeField];
+
+    auto coordinate = mCurrentHoleInfo[CoordinateField].toPoint();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
+    m[CoordinateField] = coordinate;
+
+    // 拿到视野的所有坐标发出去
+    QPointVector points;
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            if (mHoleSelectPoints[idx][row][col]) {
+                points.append(QPoint(row,col)); // 当前孔选择的全部视野坐标
+            }
+        }
+    }
+
+    // 视野窗口除了当前孔对应的数据区,因为应用到其他组,其他组的数据区也要更新
+    // 创建数据区
+    QBool2DVector vec;
+    for(int row = 0 ; row < mrows; ++ row) { // 分配空间
+        QBoolVector var;
+        for (int col = 0; col < mcols; ++col){
+            var.append(false);
+        }
+        vec.append(var);
+    }
+    for(int r = 0; r < mrows; ++r) {
+        for(int c = 0; c < mcols; ++c) {
+            if (mHoleSelectPoints[idx][r][c]) {// 使用当前孔idx的配置更新
+                vec[r][c] = true;
+            }
+        }
+    }
+    auto groupPoints = mCurrentHoleInfo[GroupPointsField].value<QPointVector>();
+    foreach(auto pt, groupPoints) {
+        auto pt_idx = pt.x()*PointToIDCoefficient+pt.y(); // 其他本组孔的临时数据区更新
+        mTmpHoleSelectPoints[pt_idx] = vec;
+        mHoleSelectPoints[pt_idx] = vec;
+    }
+
+    QVariant v;
+    v.setValue(points);
+    m[PointsField] = v;
+    emit applyGroupEvent(m);
+}
+
+void PreviewPhotoCanvas::onApplyAllAct()
+{ // 应用到所有组
+
 }
 
 void PreviewPhotoCanvas::drawDrapRect(QPainter &painter)
@@ -457,9 +533,9 @@ void PreviewPhotoCanvas::drawDrapRect(QPainter &painter)
 
 void PreviewPhotoCanvas::drawSelectRect(QPainter &painter)
 {
-    auto coordinate = currentHoleInfo[HolePointField].toPoint();
-    auto groupcolor = currentHoleInfo[GroupColorField].toString();
-    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2x+y,每个孔对应唯一的idx
+    auto coordinate = mCurrentHoleInfo[CoordinateField].toPoint();
+    auto groupcolor = mCurrentHoleInfo[GroupColorField].toString();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
 
     auto  rects = getInnerRects();
     // 绘制框选的所有孔
@@ -480,6 +556,27 @@ int PreviewPhotoCanvas::drapPointCount() const
         for(int c = 0; c < mcols; ++c) {
             if (mDrapPoints[r][c])
                 count++;
+        }
+    }
+    return count;
+}
+
+int PreviewPhotoCanvas::holeSelectPointCount() const
+{ // 计算当前孔已经选择的视野数
+    // initSelectPoints()分配了空间,setStrategy才去分配,如果在setStrategy之前去调用本函数会导致越界
+    auto coordinate = mCurrentHoleInfo[CoordinateField].toPoint();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
+    auto holeinfo = mHoleSelectPoints[idx];
+
+    if (holeinfo.isEmpty()) return 0; // 没分配过空间
+    //if (holeinfo[0].isEmpty()) return 0; // 分配过但是holeinfo是上次
+
+    int count = 0;
+    for(int row = 0 ; row < mrows; ++ row) { // mrows,mcols没更新,mHoleSelectPoints没分配会越界
+        for (int col = 0; col < mcols; ++col) {
+            if (holeinfo[row][col]) {
+                count++;
+            }
         }
     }
     return count;

@@ -107,13 +107,15 @@ struct HoleInfo {
     QColor color;
     QString group;
     QPointVector points;
+    QSize viewsize;
     friend QDebug operator<<(QDebug debug, const HoleInfo& s) {
-        debug << "(group,color,coordinate,points,isselect)=[";
+        debug << "(group,color,coordinate,points,viewsize,isselect)=[";
         debug <<s.group<<",";
         debug <<s.color<<",";
         debug <<s.coordinate<<",";
-        debug <<s.isselected<<",";
-        debug <<s.points<<"]";
+        debug <<s.points<<",";
+        debug <<s.viewsize<<",";
+        debug <<s.isselected<<"]";
         return debug;
     }
 };

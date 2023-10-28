@@ -26,10 +26,9 @@ public:
     //void showEvent(QShowEvent*event) override;
 
     void setStrategy(DrawStrategy s);
-    void setStrategy(DrawStrategy s,int rows,int cols);
-    void setCurrentHoleInfo(const QVariantMap & m); //设置当前孔的一些信息
-
+    void setStrategy(DrawStrategy s,const QVariantMap& m);
     void setExternalCircleRectSize(int size);// 圆内接正方形 小方格的尺寸
+    QVariantMap currentHoleInfo() const;
 private:
     DrawStrategy strategy = NoStrategy;
     QPoint mMousePoint = QPoint(-1,-1);
@@ -46,12 +45,15 @@ private:
     int mrows = 0;
     int mcols = 0;
 private:
-    QVariantMap currentHoleInfo;
+    QVariantMap mCurrentHoleInfo;
 private:
     void initDrapPoints(); // 拖拽结束后清除这些点
     void initSelectPoints(); // 被选中的点
     void onSetViewAct();
-    int drapPointCount() const;
+    void onApplyGroupAct();
+    void onApplyAllAct();
+    int drapPointCount() const;// 计算拖拽区域包含的点个数
+    int holeSelectPointCount() const;// 计算当前孔已经选择的视野数
 private:
     void drawDrapRect(QPainter&painter);// 绘制矩形框
     void drawSelectRect(QPainter&painter); // 绘制被选中的区域
@@ -86,7 +88,8 @@ private:
 signals:
     void mouseClicked(const QPoint& point);
     void previewEvent(const QPoint& point); // 单击非框选时是预览
-    void drapEvent();// 框选才会
+    void applyGroupEvent(const QVariantMap&m);
+    void applyAllEvent(const QVariantMap&m);
 };
 
 #endif //EOSI_PREVIEWPHOTOCANVAS_H
