@@ -29,7 +29,7 @@ find_package(Qt5 COMPONENTS
 
 add_library(${DLLNAME} SHARED
         ${COMPONENT_SOURCES}
-        ${COMPONENT_HEADERS} include/widgets/inscribedrect.h src/widgets/inscribedrect.cpp)
+        ${COMPONENT_HEADERS})
 
 target_link_libraries(${DLLNAME}
         Qt5::Core

@@ -29,8 +29,7 @@ find_package(Qt5 COMPONENTS
 
 add_library(${DLLNAME} SHARED
         ${INTERFACE_SOURCES}
-        ${INTERFACE_HEADERS}
-        src/preview/wellpattern_mouse.cpp src/preview/wellpattern_paint.cpp include/preview/viewpattern.h src/preview/viewpattern_mouse.cpp src/preview/viewpattern_paint.cpp src/preview/viewpattern_geometry.cpp src/preview/viewpattern.cpp)
+        ${INTERFACE_HEADERS})
 set_target_properties(${DLLNAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${DLLNAME}
