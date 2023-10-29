@@ -19,6 +19,8 @@
 #include "focusbox.h"
 #include "cameramode.h"
 #include "previewphotocanvas.h"
+#include "viewpattern.h"
+#include "wellpattern.h"
 #include "mainwindow.h"
 
 #endif //EOSI_INTERFACE_H

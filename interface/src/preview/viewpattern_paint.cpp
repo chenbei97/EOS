@@ -1,14 +1,15 @@
-/*** 
+/***
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-18 15:40:45
  * @LastEditors: chenbei97 chenbei_electric@163.com
  * @LastEditTime: 2023-10-18 15:42:19
- * @FilePath: \EOS\interface\src\window\previewphotocanvas_paint.cpp
- * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
+ * @FilePath: \EOS\interface\src\window\viewpattern_paint.cpp
+ * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved.
  */
-#include "previewphotocanvas.h"
 
-void PreviewPhotoCanvas::drawSelectRect(QPainter &painter)
+#include "viewpattern.h"
+
+void ViewPattern::drawSelectRect(QPainter &painter)
 { // 根据当前孔的组颜色去绘制视野已经被选择的小矩形区域
 
     // 计算当前孔的唯一id
@@ -28,7 +29,7 @@ void PreviewPhotoCanvas::drawSelectRect(QPainter &painter)
     }
 }
 
-void PreviewPhotoCanvas::drawDrapRect(QPainter &painter)
+void ViewPattern::drawDrapRect(QPainter &painter)
 {// 绘制推拽矩形框包含的小矩形区域
     auto  rects = getInnerRects();
 
@@ -52,7 +53,7 @@ void PreviewPhotoCanvas::drawDrapRect(QPainter &painter)
     }
 }
 
-void PreviewPhotoCanvas::drawInnerLine(QPainter &painter)
+void ViewPattern::drawInnerLine(QPainter &painter)
 {// 画窗口的线区分出小矩形区域
     // 绘制外边框
     auto p11 = getInnerRectTopLeftPoint();
@@ -87,14 +88,14 @@ void PreviewPhotoCanvas::drawInnerLine(QPainter &painter)
         painter.fillRect(rects[mMousePoint.x()][mMousePoint.y()],mMouseClickColor);
 }
 
-void PreviewPhotoCanvas::drawCircle(QPainter &painter)
+void ViewPattern::drawCircle(QPainter &painter)
 {// 画窗口的内接圆
     auto radius = getCircleRadius();
     painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
 }
 
 
-void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
+void ViewPattern::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -118,4 +119,3 @@ void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
     }
     event->accept();
 }
-

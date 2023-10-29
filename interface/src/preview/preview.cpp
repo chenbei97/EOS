@@ -17,7 +17,7 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     pattern = new WellPattern(2,3);
     groupinfo = new GroupInfo;
     toolbar = new PreviewTool;
-    viewpattern = new PreviewPhotoCanvas;//侧边栏选择视野的窗口
+    viewpattern = new ViewPattern;// 视野窗口
     dock = new DockWidget(tr("选择孔内视野"));
     dockcanvas = new QMainWindow;
 
@@ -65,7 +65,7 @@ Preview::Preview(QWidget*parent): QWidget(parent)
 
     connect(pattern,&WellPattern::openViewWindow,this,&Preview::updateViewWindow); // 打开和更新视野窗口
     connect(pattern,&WellPattern::openSetGroupWindow,this,&Preview::openSetGroupWindow);// 打开分组窗口
-    connect(viewpattern,&PreviewPhotoCanvas::applyGroupEvent,pattern,&WellPattern::updateGroupByViewInfo); // 更新孔窗口的分组信息
+    connect(viewpattern,&ViewPattern::applyGroupEvent,pattern,&WellPattern::updateGroupByViewInfo); // 更新孔窗口的分组信息
 
     //connect(dock,&QDockWidget::topLevelChanged,this,&Preview::updatePattern);
 }
@@ -103,8 +103,8 @@ void Preview::updateViewWindow(const QVariantMap& m)
 
     // 5. 鼠标点击边缘设置无策略或者有效时更新视野窗口策略
     if (point == QPoint(-1,-1))
-        viewpattern->setStrategy(PreviewPhotoCanvas::NoStrategy);
-    else viewpattern->setStrategy(PreviewPhotoCanvas::InnerCircleRect,nm);//⭐⭐⭐⭐ 把图案的信息传给视野窗口
+        viewpattern->setStrategy(ViewPattern::NoStrategy);
+    else viewpattern->setStrategy(ViewPattern::InnerCircleRect,nm);//⭐⭐⭐⭐ 把图案的信息传给视野窗口
 }
 
 void Preview::openSetGroupWindow(const QVariantMap& m)
@@ -142,10 +142,11 @@ void Preview::updateViewSize()
     // 2. 孔的信息不需要改变,仅仅需要更新视野窗口去更新视野窗口绘制和临时保存信息
     auto currentHoleInfo = viewpattern->currentHoleInfo();//拿到之前的设置,其它不用改
     currentHoleInfo[ViewSizeField] = QSize(size,size);
-    viewpattern->setStrategy(PreviewPhotoCanvas::InnerCircleRect,currentHoleInfo); // 重新更新下尺寸信息,其他的不用改
+    viewpattern->setStrategy(ViewPattern::InnerCircleRect,currentHoleInfo); // 重新更新下尺寸信息,其他的不用改
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
     //viewpattern->updateApplyGroup(); // 重新刷新下分组信息更新孔图案,如果内部注释掉了pattern的更新代码,其余部分setStrategy-initSelectPoints其实操作过了
+    dock->setWindowTitle(tr("选择孔内视野"));
 
     // 4. 孔被选中的信息也需要更新,点的信息要更新
     //pattern->clearHolePattern();

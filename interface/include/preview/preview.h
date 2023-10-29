@@ -14,6 +14,7 @@
 #include "cameramode.h"
 #include "previewphotocanvas.h"
 #include "wellpattern.h"
+#include "viewpattern.h"
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -24,7 +25,7 @@ private:
     CameraMode * cameramode;
     QWidget * livecanvas;
     PreviewPhotoCanvas * photocanvas;
-    PreviewPhotoCanvas * viewpattern;
+    ViewPattern * viewpattern;
     QStackedWidget * stack;
     PreviewTool * toolbar;
     WellPattern * pattern;

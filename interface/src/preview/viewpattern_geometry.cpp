@@ -1,49 +1,50 @@
-/*** 
+/***
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-18 15:40:45
  * @LastEditors: chenbei97 chenbei_electric@163.com
  * @LastEditTime: 2023-10-18 15:42:19
- * @FilePath: \EOS\interface\src\window\previewphotocanvas_geometry.cpp
- * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
+ * @FilePath: \EOS\interface\src\window\viewpattern_geometry.cpp
+ * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved.
  */
-#include "previewphotocanvas.h"
 
-double PreviewPhotoCanvas::getCircleRadius() const
+#include "viewpattern.h"
+
+double ViewPattern::getCircleRadius() const
 { // 视野圆半径
     return width()>=height()?height()/2.0:width()/2.0;
 }
 
-double PreviewPhotoCanvas::getInnerRectWidth() const
+double ViewPattern::getInnerRectWidth() const
 {// 小矩形区域的宽度
     return 2 * getCircleRadius() / mrows *1.0;
 }
 
-double PreviewPhotoCanvas::getInnerRectHeight() const
+double ViewPattern::getInnerRectHeight() const
 {// 小矩形区域的高度
     return 2 * getCircleRadius() / mcols *1.0;
 }
 
-QPointF PreviewPhotoCanvas::getInnerRectTopLeftPoint() const
+QPointF ViewPattern::getInnerRectTopLeftPoint() const
 {// 外接正方形左上角顶点
     return QPointF(width()/2.0-getCircleRadius(),0);
 }
 
-QPointF PreviewPhotoCanvas::getInnerRectTopRightPoint() const
+QPointF ViewPattern::getInnerRectTopRightPoint() const
 {// 外接正方形右上角顶点
     return QPointF(width()/2.0+getCircleRadius(),0);
 }
 
-QPointF PreviewPhotoCanvas::getInnerRectBottomLeftPoint() const
+QPointF ViewPattern::getInnerRectBottomLeftPoint() const
 {// 外接正方形左下角顶点
     return QPointF(width()/2.0-getCircleRadius(),height());
 }
 
-QPointF PreviewPhotoCanvas::getInnerRectBottomRightPoint() const
+QPointF ViewPattern::getInnerRectBottomRightPoint() const
 {// 外接正方形右下角顶点
     return QPointF(width()/2.0+getCircleRadius(),height());
 }
 
-QPointFVector PreviewPhotoCanvas::getInnerVerticalLineTopPoints() const
+QPointFVector ViewPattern::getInnerVerticalLineTopPoints() const
 {// 正方形顶侧的等分点
     QPointFVector vec;
     auto offset = getInnerRectWidth();
@@ -55,7 +56,7 @@ QPointFVector PreviewPhotoCanvas::getInnerVerticalLineTopPoints() const
     return vec;
 }
 
-QPointFVector PreviewPhotoCanvas::getInnerVerticalLineBottomPoints() const
+QPointFVector ViewPattern::getInnerVerticalLineBottomPoints() const
 {// 正方形底侧的等分点
     QPointFVector vec;
     auto offset = getInnerRectWidth();
@@ -65,7 +66,7 @@ QPointFVector PreviewPhotoCanvas::getInnerVerticalLineBottomPoints() const
     return vec;
 }
 
-QPointFVector PreviewPhotoCanvas::getInnerHorizonalLineLeftPoints() const
+QPointFVector ViewPattern::getInnerHorizonalLineLeftPoints() const
 {// 正方形左侧的等分点
     QPointFVector vec;
     auto offset = getInnerRectHeight(); // 点之间y坐标相差的是小矩形高度
@@ -75,7 +76,7 @@ QPointFVector PreviewPhotoCanvas::getInnerHorizonalLineLeftPoints() const
     return vec;
 }
 
-QPointFVector PreviewPhotoCanvas::getInnerHorizonalLineRightPoints() const
+QPointFVector ViewPattern::getInnerHorizonalLineRightPoints() const
 {// 正方形右侧的等分点
     QPointFVector vec;
     auto offset = getInnerRectHeight(); // 点之间y坐标相差的是小矩形高度
@@ -85,7 +86,7 @@ QPointFVector PreviewPhotoCanvas::getInnerHorizonalLineRightPoints() const
     return vec;
 }
 
-QRectF2DVector PreviewPhotoCanvas::getInnerRects() const
+QRectF2DVector ViewPattern::getInnerRects() const
 {
     QRectF2DVector m;
     auto hoffset = getInnerRectWidth();
@@ -104,3 +105,4 @@ QRectF2DVector PreviewPhotoCanvas::getInnerRects() const
 
     return m;
 }
+
