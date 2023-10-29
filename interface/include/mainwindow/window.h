@@ -15,6 +15,7 @@
 #include "qradiobutton.h"
 #include "qbuttongroup.h"
 #include "qpropertyanimation.h"
+#include "qscrollarea.h"
 #include <cmath>
 using std::modf;
 
@@ -45,7 +46,7 @@ static const char* PhotoField = "photo";
 #define NavigBarColor QColor("#767C85")
 #define AppSelectColor QColor("#2F7CAD")
 #define PreviewPhotoCanvasViewRectColor QColor("#00A2E8")
-#define PointToIDCoefficient 100
+#define PointToIDCoefficient 1000 // kx1+y1=kx2+y2=> k=(y2-y1)/(x1-x2),k取什么值?找不到这样的2个坐标能等于k,由于wellsize最大384,实际上k>384就能保证id唯一了
 
 
 static const QFieldList NavigBarFields = {
@@ -62,7 +63,7 @@ static const QFieldList AppFields = {
 
 #ifdef ScreenWidth
     #define MainWindowWidth 2400
-    #define MainWindowHeight 1200
+    #define MainWindowHeight 1300
 
     #define NavigBarWidth 200 // 导航条的宽度
     #define NavigBarHeight 100 // 导航条的高度

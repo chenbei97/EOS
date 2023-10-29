@@ -53,7 +53,7 @@ void WellPattern::updateGroupByViewInfo(QCVariantMap m)
     auto viewsize = m[ViewSizeField].toSize();
     auto viewpoints = m[ViewPointsField].value<QPointVector>();
     auto allgroup = m[AllGroupsField].toStringList();
-    LOG<<groupColor<<groupName<<coordinate<<viewpoints<<viewsize<<allgroup;
+    //LOG<<groupColor<<groupName<<coordinate<<viewpoints<<viewsize<<allgroup;
 
     // 2. 根据视野窗口传来的组名 把coordinate对应的组(color+viewpoints,viewsize)都更新 (不需要更新isselected,group,allgroup)
     for(int row = 0 ; row < mrows; ++ row) {

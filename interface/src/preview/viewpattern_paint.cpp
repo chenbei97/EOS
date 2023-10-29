@@ -13,18 +13,21 @@ void ViewPattern::drawSelectRect(QPainter &painter)
 { // 根据当前孔的组颜色去绘制视野已经被选择的小矩形区域
 
     // 计算当前孔的唯一id
-    auto coordinate = mCurrentHoleInfo[CoordinateField].toPoint();
-    auto groupcolor = mCurrentHoleInfo[GroupColorField].toString();
+    auto coordinate = mCurrentViewInfo[CoordinateField].toPoint();
+    auto groupcolor = mCurrentViewInfo[GroupColorField].toString();
     auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
 
     auto  rects = getInnerRects();
     // 绘制框选的所有孔
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            if (mHoleSelectPoints[idx][row][col]) {
-                auto rect = rects[row][col];
+            auto rect = rects[row][col];
+            if (mViewSelectPoints[idx][row][col]) {
                 painter.fillRect(rect,groupcolor);
             }
+//            else { // 不加也行,就是删除点时候要恢复成白色,默认也是白色
+//                painter.fillRect(rect,Qt::white);
+//            }
         }
     }
 }

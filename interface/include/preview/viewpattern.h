@@ -10,22 +10,24 @@ public:
     enum DrawStrategy {NoStrategy,InnerCircleRect};
     explicit ViewPattern(QWidget*parent= nullptr);
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());// 设置策略+传递孔的信息+视野尺寸信息+应用到组使能
-    QVariantMap currentHoleInfo() const;// 切换brand,objective时外部拿到当前的视野孔信息,然后更新其中尺寸字段重新调用setStrategy
+    QVariantMap currentViewInfo() const;// 切换brand,objective时外部拿到当前的视野孔信息,然后更新其中尺寸字段重新调用setStrategy
     void updateApplyGroup();// objective更新后视野窗口更新了,但是孔图案的ui绘制点还在,要刷新一下
 private: // 动作菜单
     DrawStrategy strategy = NoStrategy;
-    QVariantMap mCurrentHoleInfo;
+    QVariantMap mCurrentViewInfo;
     int mrows = 0; // viewsize字段去更新
     int mcols = 0;
     QAction * saveviewact;
+    QAction * removeviewact;
     QAction * applygroupact;
     QAction * applyallact;
+    void onRemoveViewAct();
     void onSaveViewAct();// 保存选择的视野到当前孔id对应的视野数据区并保存到临时信息用于initSelectPoints重新初始化
     void onApplyGroupAct();//传递视野窗口的组名+组颜色+视野尺寸+当前孔坐标+所有视野坐标信息+更新同组其它孔的视野信息和临时信息
     void onApplyAllAct();
 private:
-    QMap<int,QBool2DVector> mHoleSelectPoints; // 视野已选择的信息
-    QMap<int,QBool2DVector> mTmpHoleSelectPoints; // 临时变量
+    QMap<int,QBool2DVector> mViewSelectPoints; // 视野已选择的信息
+    QMap<int,QBool2DVector> mTmpViewSelectPoints; // 临时变量
     void initSelectPoints(); // setStrategy内调用,构造函数无需调用,更新当前孔的视野数量(分配空间,如果有上次设置过的视野数量信息就更新)
     int viewPointCount() const;// 计算当前孔已经选择的视野数(控制应用到本组的使能,未分过组或者分过组但是没选过视野)
 

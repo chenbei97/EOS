@@ -21,6 +21,9 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     dock = new DockWidget(tr("选择孔内视野"));
     dockcanvas = new QMainWindow;
 
+    auto scrollarea = new QScrollArea;
+    scrollarea->setWidgetResizable(true);
+
     dock->setWidget(viewpattern);
     dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
@@ -37,7 +40,8 @@ Preview::Preview(QWidget*parent): QWidget(parent)
 
     auto rlay = new QVBoxLayout;
     rlay->addWidget(pbox);
-    rlay->addWidget(toolbar);
+    rlay->addWidget(scrollarea); // 添加滚动区域后(不是添加toolbar)再设置
+    scrollarea->setWidget(toolbar);
     auto rbox = new GroupBox;
     rbox->setLayout(rlay);
     rbox->setMaximumWidth(PreviewToolBarMaxWidth);
@@ -140,16 +144,16 @@ void Preview::updateViewSize()
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
     // 2. 孔的信息不需要改变,仅仅需要更新视野窗口去更新视野窗口绘制和临时保存信息
-    auto currentHoleInfo = viewpattern->currentHoleInfo();//拿到之前的设置,其它不用改
-    currentHoleInfo[ViewSizeField] = QSize(size,size);
-    viewpattern->setStrategy(ViewPattern::InnerCircleRect,currentHoleInfo); // 重新更新下尺寸信息,其他的不用改
+    auto currentViewInfo = viewpattern->currentViewInfo();//拿到之前的设置,其它不用改
+    currentViewInfo[ViewSizeField] = QSize(size,size);
+    viewpattern->setStrategy(ViewPattern::InnerCircleRect,currentViewInfo); // 重新更新下尺寸信息,其他的不用改
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
     //viewpattern->updateApplyGroup(); // 重新刷新下分组信息更新孔图案,如果内部注释掉了pattern的更新代码,其余部分setStrategy-initSelectPoints其实操作过了
     dock->setWindowTitle(tr("选择孔内视野"));
 
     // 4. 孔被选中的信息也需要更新,点的信息要更新
-    //pattern->clearHolePattern();
+    //pattern->clearViewPattern();
     pattern->initHoleInfo(); // 区别是组名和组也要去除
 
 }

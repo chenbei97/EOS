@@ -28,6 +28,15 @@ void ViewPattern::mousePressEvent(QMouseEvent *event)
             }
         }
     }
+
+    // 右键时如果这个视野没被选择过不能删除点
+    auto coordinate = mCurrentViewInfo[CoordinateField].toPoint();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
+    auto currentviewinfo = mViewSelectPoints[idx];
+    bool isselect = currentviewinfo[mMousePoint.x()][mMousePoint.y()];
+    isselect?removeviewact->setEnabled(true):removeviewact->setEnabled(false);
+
+
     update();
     emit mouseClicked(mMousePoint);
     event->accept();
