@@ -103,19 +103,16 @@ void ViewPattern::paintEvent(QPaintEvent *event)
     pen.setWidth(2);
     painter.setPen(pen);
 
-    switch (strategy) {
-        case InnerCircleRect:
-            drawSelectRect(painter);
-            drawCircle(painter);
-            drawInnerLine(painter);
-            drawDrapRect(painter);
-            break;
-        case ExternalCircleRect:
-            drawCircle(painter);
-            drawExternalCircleRect(painter);
-            break;
-        default:
-            break;
+    if (strategy == NoStrategy)
+    {
+        event->accept();
+        return;
     }
+
+    drawSelectRect(painter);
+    drawCircle(painter);
+    drawInnerLine(painter);
+    drawDrapRect(painter);
+
     event->accept();
 }

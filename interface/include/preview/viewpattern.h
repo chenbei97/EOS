@@ -7,29 +7,22 @@ class INTERFACE_IMEXPORT ViewPattern: public QWidget
 {
     Q_OBJECT
 public:
-    enum DrawStrategy {NoStrategy,ExternalCircleRect,InnerCircleRect};
+    enum DrawStrategy {NoStrategy,InnerCircleRect};
     explicit ViewPattern(QWidget*parent= nullptr);
-
+    void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());// 设置策略+传递孔的信息+视野尺寸信息+应用到组使能
+    QVariantMap currentHoleInfo() const;// 切换brand,objective时外部拿到当前的视野孔信息,然后更新其中尺寸字段重新调用setStrategy
+    void updateApplyGroup();// objective更新后视野窗口更新了,但是孔图案的ui绘制点还在,要刷新一下
 private: // 动作菜单
+    DrawStrategy strategy = NoStrategy;
+    QVariantMap mCurrentHoleInfo;
+    int mrows = 0; // viewsize字段去更新
+    int mcols = 0;
     QAction * saveviewact;
     QAction * applygroupact;
     QAction * applyallact;
     void onSaveViewAct();// 保存选择的视野到当前孔id对应的视野数据区并保存到临时信息用于initSelectPoints重新初始化
     void onApplyGroupAct();//传递视野窗口的组名+组颜色+视野尺寸+当前孔坐标+所有视野坐标信息+更新同组其它孔的视野信息和临时信息
     void onApplyAllAct();
-public:
-    void updateApplyGroup();// objective更新后视野窗口更新了,但是孔图案的ui绘制点还在,要刷新一下
-
-public: // 策略和孔信息的传递和取出
-    void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());// 设置策略+传递孔的信息+视野尺寸信息+应用到组使能
-    QVariantMap currentHoleInfo() const;// 切换brand,objective时外部拿到当前的视野孔信息,然后更新其中尺寸字段重新调用setStrategy
-private:
-    DrawStrategy strategy = NoStrategy;
-    QVariantMap mCurrentHoleInfo;
-    int mrows = 0; // viewsize字段去更新
-    int mcols = 0;
-
-
 private:
     QMap<int,QBool2DVector> mHoleSelectPoints; // 视野已选择的信息
     QMap<int,QBool2DVector> mTmpHoleSelectPoints; // 临时变量
@@ -48,7 +41,6 @@ public: // 鼠标事件,viewpattern_mouse.cpp
     void mousePressEvent(QMouseEvent *event) override;// 左键点击清除框选,计算鼠标点击的小矩形区域坐标
     void mouseMoveEvent(QMouseEvent *event) override;// 绘制拖拽框
     void mouseReleaseEvent(QMouseEvent *event) override;// 拖拽区域点个数为0才是预览事件
-
 
 public:// 绘图的函数,定义在viewpattern_paint.cpp
     void paintEvent(QPaintEvent *event) override;
@@ -77,19 +69,6 @@ signals:
     void previewEvent(const QPoint& point); // 单击非框选时是预览
     void applyGroupEvent(const QVariantMap&m);
     void applyAllEvent(const QVariantMap&m);
-
-public: // 定义在viewpattern_other.cpp
-    void setExternalCircleRectSize(int size);// 圆内接正方形小方格的尺寸
-private:
-    // 绘制圆+内接正方形用到的变量
-    int mExternalCircleRectSize = 0;
-    QRectVector getExternalCircleRects() const; //获取圆内接正方形内的所有小正方形区域
-    double getExternalCircleRectSize() const; // 圆内接正方形的尺寸
-    QPoint getExternalCircleRectTopLeftPoint() const; // 圆内接正方形左上角顶点
-    QPoint getExternalCircleRectBottomLeftPoint() const;// 圆内接正方形右上角顶点
-    QPoint getExternalCircleRectTopRightPoint() const;// 圆内接正方形左下角顶点
-    QPoint getExternalCircleRectBottomRightPoint() const;// 圆内接正方形右下角顶点
-    void drawExternalCircleRect(QPainter&painter);//高亮圆内接的小矩形
 };
 
 #endif //EOSI_VIEWPATTERN_H

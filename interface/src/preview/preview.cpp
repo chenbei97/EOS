@@ -74,8 +74,8 @@ void Preview::updateViewWindow(const QVariantMap& m)
 { // 打开选视野的窗口,更新视野的信息(groupname,groupcolor,grouppoints,coordinate+allgroup)+viewsize
 
     // 1. 相机模式的切换 live/photo => 切换stack,关闭相机等动作
-    //cameramode->changeMode(CameraMode::PhotoMode);
-    //stack->setCurrentWidget(photocanvas);
+//    cameramode->changeMode(CameraMode::PhotoMode);
+//    stack->setCurrentWidget(photocanvas);
 
     // 2. 更新视野窗口的标题
     auto point = m[CoordinateField].toPoint(); //双击或者右键打开视野窗口带来的孔信息

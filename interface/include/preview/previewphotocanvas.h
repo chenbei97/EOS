@@ -15,7 +15,7 @@ class INTERFACE_IMEXPORT PreviewPhotoCanvas: public QWidget
 {
     Q_OBJECT
 public:
-    enum DrawStrategy {NoStrategy,ExternalCircleRect};
+    enum DrawStrategy {NoStrategy};
     explicit PreviewPhotoCanvas(QWidget*parent= nullptr);
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());
     QVariantMap currentHoleInfo() const;

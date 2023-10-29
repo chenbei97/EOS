@@ -72,6 +72,10 @@
 #define ProgressBarMinHeight 40
 #define ColorButtonSize 40
 #define RoundButtonSize 20
+#define InscribedRectDefaultRows 3
+#define InscribedRectDefaultCols 3
+#define InscribedRectSize 40
+#define InscribedRectColor QColor("#00A2E8")
 static const char* GroupNameField = "groupname";
 static const char* GroupColorField = "groupcolor";
 static const char* GroupPointsField = "grouppoints";

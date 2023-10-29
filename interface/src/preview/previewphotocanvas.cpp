@@ -16,14 +16,6 @@ void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
     pen.setWidth(2);
     painter.setPen(pen);
 
-    switch (strategy) {
-        break;
-        case ExternalCircleRect:
-            break;
-        default:
-            break;
-    }
-
     // 绘制框
     if (!mDrapRect.isNull()) {
         auto pen = painter.pen();
@@ -33,6 +25,13 @@ void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
         pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
         painter.setPen(pen);
     }
+
+    if (strategy == NoStrategy) {
+        event->accept();
+        return;
+    }
+
+    // 其他策略
     event->accept();
 }
 
@@ -45,10 +44,10 @@ void PreviewPhotoCanvas::mousePressEvent(QMouseEvent *event)
         update();
     } // 右键是菜单
     mLastPos = event->pos();
-    mMousePoint = {-1,-1};
-    update();
-    emit mouseClicked(mMousePoint);
+    //mMousePoint = {-1,-1};
+    //emit mouseClicked(mMousePoint);
     event->accept();
+    update();
 }
 
 void PreviewPhotoCanvas::mouseMoveEvent(QMouseEvent *event)

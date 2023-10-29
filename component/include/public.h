@@ -36,6 +36,7 @@
 #include "pattern.h"
 #include "previewpattern.h"
 #include "protocolpattern.h"
+#include "inscribedrect.h"
 #include "label.h"
 #include "checkbox.h"
 #include "progressbar.h"
