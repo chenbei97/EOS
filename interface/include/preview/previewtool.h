@@ -16,6 +16,7 @@
 #include "objectivebox.h"
 #include "zstackbox.h"
 #include "lensbox.h"
+#include "timebox.h"
 
 class INTERFACE_IMEXPORT PreviewTool : public QWidget
 {
@@ -31,6 +32,7 @@ private:
     FocusBox * focusbox;
     ZStackBox * zstackbox;
     LensBox * lensbox;
+    TimeBox * timebox;
     PushButton * saveallbtn;
     CheckBox * exportToFile;
     LineEdit * filenameedit;

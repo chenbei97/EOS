@@ -17,6 +17,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lensbox = new LensBox;
     focusbox = new FocusBox;
     zstackbox = new ZStackBox;
+    timebox = new TimeBox;
 
     filenameedit = new LineEdit("please input filename");
     exportToFile = new CheckBox(tr("导出到文件?"));
@@ -38,14 +39,12 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lay->addWidget(focusbox);
     lay->addWidget(camerabox);
     lay->addWidget(lensbox);
+    lay->addWidget(timebox);
     lay->addWidget(zstackbox);
 
-    auto b2 = new GroupBox("实验配置");//时间+通道复选
     auto b3 = new GroupBox("启动实验"); // 按钮+实验信息预览+预计
-    b2->setMinimumHeight(80);
     b3->setMinimumHeight(80);
 
-    lay->addWidget(b2);
     lay->addWidget(b3);
     lay->addWidget(box);
 

@@ -94,8 +94,8 @@ static const char* ViewPointsField = "viewpoints";
 static const QStringList GroupDoseUnitFields =  {
         "mg/mL","mg/L","g/mL","g/L",
 };
-
 static const QStringList GroupTypeFields = {
         QObject::tr("控制组"),QObject::tr("对照组"),QObject::tr("对照3"),
 };
+
 #endif //EOSI_WIDGETS_H

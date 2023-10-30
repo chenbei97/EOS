@@ -16,6 +16,7 @@
 #include "qbuttongroup.h"
 #include "qpropertyanimation.h"
 #include "qscrollarea.h"
+#include "qdatetimeedit.h"
 #include <cmath>
 using std::modf;
 
@@ -49,7 +50,17 @@ static const char* StitchField = "stitch";
 #define AppSelectColor QColor("#2F7CAD")
 #define PreviewPhotoCanvasViewRectColor QColor("#00A2E8")
 #define PointToIDCoefficient 1000 // kx1+y1=kx2+y2=> k=(y2-y1)/(x1-x2),k取什么值?找不到这样的2个坐标能等于k,由于wellsize最大384,实际上k>384就能保证id唯一了
-
+static const char* HourField = "hour";
+static const char* MinuteField = "minute";
+static const char* HoursFieldSuffix = " hours";
+static const char* MinutesFieldSuffix = " minutes";
+#define TimeBoxPhotoTimeLimit 1800
+#define TimeBoxPhotoTimeWaring (QObject::tr("警告:实验间隔时间不能低于%1分钟!").arg(TimeBoxPhotoTimeLimit/60))
+#define TimeBoxTotalBeyondDurationWaring (QObject::tr("警告:实验时长至少大于等于一个实验间隔!"))
+#define DateTimeDefaultFormat "yyyy/MM/dd hh::mm"
+static const QStringList TimeBoxTimeUnitFields = {
+        HourField,MinuteField,
+};
 
 static const QFieldList NavigBarFields = {
     "Logo","Main","Preview","Protocol","Data","Analysis"
