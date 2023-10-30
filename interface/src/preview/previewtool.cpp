@@ -26,7 +26,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     blay->addWidget(filenameedit);
     blay->addWidget(exportToFile);
     blay->addWidget(saveallbtn);
-    auto box = new GroupBox(tr("其它"));
+    auto box = new GroupBox(tr("保存"));
     box->setLayout(blay);
 
     lay = new QVBoxLayout;
@@ -35,8 +35,22 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lay->addWidget(channelbox);
     lay->addWidget(focusbox);
     lay->addWidget(camerabox);
-    lay->addWidget(box);
 
+
+    auto b0 = new GroupBox("镜头");
+    auto b1 = new GroupBox("Z_Stack");
+    auto b2 = new GroupBox("实验配置");//时间+通道复选
+    auto b3 = new GroupBox("启动实验"); // 按钮+实验信息预览+预计
+    b0->setMinimumHeight(80);
+    b1->setMinimumHeight(80);
+    b2->setMinimumHeight(80);
+    b3->setMinimumHeight(80);
+    lay->addWidget(b1);
+    lay->addWidget(box);
+    lay->addWidget(b0);
+
+    lay->addWidget(b2);
+    lay->addWidget(b3);
 
     setLayout(lay);
 

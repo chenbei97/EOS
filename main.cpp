@@ -21,11 +21,13 @@ int main(int argc, char *argv[]) {
     //test_assemble_parse();
     //test_async();
     //test_opencv();
+
 #ifdef usetesttcp
     test_tcp();
 #else
-    MainWindow w;
-    setWindowAlignCenter(&w);
+//    MainWindow w;
+//    setWindowAlignCenter(&w);
+TriangleMove w;
     w.show();
 #endif
     return QApplication::exec();
