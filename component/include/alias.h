@@ -102,16 +102,34 @@ typedef QVariant(*TcpParseFuncPointer)(QCVariantMap m);
 typedef QByteArray(*TcpAssembleFuncPointer)(QCVariantMap m);
 
 struct HoleInfo {
-    QString group;
-    QSet<QString> allgroup;
-    QColor color;
-    QPoint coordinate;
-    QPointVector viewpoints;
-    QSize viewsize;
-    bool isselected;
+    // 分组窗口去更新的信息
+    QString type; // 本孔分配的实验类型
+    QString group; // 本孔分配的组名
+    QString medicine; // 本孔分配的药物
+    QString dose; // 本孔分配的剂量
+    QString doseunit; // 本孔分配的剂量单位
+    QColor color; // 本孔分配的组颜色
+
+    // 拖拽区域控制的
+    bool isselected; // 本孔是否被分配分组
+
+    // 初始化就赋值
+    QPoint coordinate; // 本孔坐标
+
+    // 视野窗口传递来的信息
+    QPointVector viewpoints; // 本孔分配的视野坐标
+    QSize viewsize; // 本孔分配的视野尺寸
+
+    // 每次打开分组窗口就会重新计算已有的分组数
+    QSet<QString> allgroup; // 当前所有分过的组别信息
+
     friend QDebug operator<<(QDebug debug, const HoleInfo& s) {
-        debug << "(group,allgroup,color,coordinate,viewpoints,viewsize,isselect)=[";
+        debug << "(type,group,medicine,dose,unit,allgroup,color,coordinate,viewpoints,viewsize,isselect)=[";
+        debug <<s.type<<",";
         debug <<s.group<<",";
+        debug <<s.medicine<<",";
+        debug <<s.dose<<",";
+        debug <<s.doseunit<<",";
         debug <<s.allgroup<<",";
         debug <<s.color<<",";
         debug <<s.coordinate<<",";
@@ -126,7 +144,8 @@ typedef const QVector<HoleInfo>& QCHoleInfoVector;
 typedef QVector<QVector<HoleInfo>> QHoleInfo2DVector;
 typedef const QVector<QVector<HoleInfo>>& QCHoleInfo2DVector;
 
-
+typedef QMap<QString,QString> LensInfo;
+typedef QMap<QString,QString> ZStackInfo;
 typedef QMap<QString,QString> WellInfo;
 typedef QMap<QString,QString> ObjectiveInfo;
 typedef QMap<QString,QString> ChannelInfo;

@@ -16,6 +16,8 @@
 #include "cameratool.h"
 #include "camerabox.h"
 #include "channelbox.h"
+#include "zstackbox.h"
+#include "lensbox.h"
 #include "focusbox.h"
 #include "cameramode.h"
 #include "previewphotocanvas.h"

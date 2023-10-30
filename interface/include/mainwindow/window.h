@@ -37,6 +37,8 @@ using std::modf;
 static const char* FocusField = "focus";
 static const char* LiveField = "live";
 static const char* PhotoField = "photo";
+static const char* ZStackField = "zstack";
+static const char* StitchField = "stitch";
 #define LiveFieldMetricWidth DefaultPainterMetric.width(LiveField)
 #define PhotoFieldMetricWidth DefaultPainterMetric.width(PhotoField)
 #define NavigPainterFontSize 20

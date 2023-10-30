@@ -14,8 +14,13 @@ TriangleMove::TriangleMove(QWidget *parent) : QWidget(parent)
     trianglen = TriangleLength;
     trianggap = TriangleGap;
 
-    auto len = width()>=height()?height():width();
-    resize(len,len);
+    setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+    resize(TriangleMinSize,TriangleMinSize);
+}
+
+QSize TriangleMove::sizeHint() const
+{
+    return QSize(TriangleMinSize,TriangleMinSize);
 }
 
 void TriangleMove::setTriangleGap(double gap)
@@ -56,9 +61,6 @@ void TriangleMove::mousePressEvent(QMouseEvent *event)
 
 void TriangleMove::paintEvent(QPaintEvent *event)
 {
-    auto len = width()>=height()?height():width();
-    resize(len,len);
-
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     auto pen = painter.pen();

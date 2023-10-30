@@ -25,9 +25,9 @@ int main(int argc, char *argv[]) {
 #ifdef usetesttcp
     test_tcp();
 #else
-//    MainWindow w;
-//    setWindowAlignCenter(&w);
-TriangleMove w;
+    MainWindow w;
+    setWindowAlignCenter(&w);
+    //TriangleMove w;
     w.show();
 #endif
     return QApplication::exec();

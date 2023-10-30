@@ -71,19 +71,31 @@
 #define UserScreenHeight (QApplication::desktop()->screenGeometry().height())
 #define ProgressBarMinHeight 40
 #define ColorButtonSize 40
+#define GroupInfoSize QSize(400,250)
 #define RoundButtonSize 20
 #define InscribedRectDefaultRows 3
 #define InscribedRectDefaultCols 3
 #define InscribedRectSize 40
 #define InscribedRectColor QColor("#00A2E8")
-#define TriangleLength 100
-#define TriangleGap 50
+#define TriangleLength 40
+#define TriangleGap 10
+#define TriangleMinSize 200
+static const char* GroupTypeField = "grouptype";
 static const char* GroupNameField = "groupname";
 static const char* GroupColorField = "groupcolor";
 static const char* GroupPointsField = "grouppoints";
+static const char* GroupMedicineField = "groupmedicine";
+static const char* GroupDoseField = "groupdose";
+static const char* GroupDoseUnitField = "groupdoseunit";
 static const char* AllGroupsField = "allgroups";
 static const char* CoordinateField = "coordinate";
 static const char* ViewSizeField = "viewsize";
 static const char* ViewPointsField = "viewpoints";
+static const QStringList GroupDoseUnitFields =  {
+        "mg/mL","mg/L","g/mL","g/L",
+};
 
+static const QStringList GroupTypeFields = {
+        QObject::tr("控制组"),QObject::tr("对照组"),QObject::tr("对照3"),
+};
 #endif //EOSI_WIDGETS_H

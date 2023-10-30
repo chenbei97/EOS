@@ -12,12 +12,45 @@
 GroupInfo::GroupInfo(QWidget *parent) : QDialog(parent)
 {
     initObjects();
+    resize(GroupInfoSize);
     connect(btn,&PushButton::clicked,this,&GroupInfo::onClick);
 }
 
-QColor GroupInfo::groupColor() const
+QVariantMap GroupInfo::groupInfo() const
 {
-    return cbtn->color();
+    QVariantMap m;
+
+    m[GroupTypeField] = groupType();
+    m[GroupNameField] = groupName();
+    m[GroupColorField] = groupColor();
+    m[GroupMedicineField] = groupMedicine();
+    m[GroupDoseField] = groupDose();
+    m[GroupDoseUnitField] = groupDoseUnit();
+
+    return m;
+}
+
+void GroupInfo::setGroupInfo(const QVariantMap &m)
+{
+
+    auto type = m[GroupTypeField].toString();
+    auto color = m[GroupColorField].toString();
+    auto group = m[GroupNameField].toString();
+    auto medicine = m[GroupMedicineField].toString();
+    auto dose = m[GroupDoseField].toString();
+    auto unit = m[GroupDoseUnitField].toString();
+
+    setGroupType(type);
+    setGroupColor(color);
+    setGroupName(group);
+    setGroupMedicine(medicine);
+    setGroupDose(dose);
+    setGroupDoseUnit(unit);
+}
+
+QString GroupInfo::groupType() const
+{
+    return grouptype->currentText();
 }
 
 QString GroupInfo::groupName() const
@@ -25,18 +58,29 @@ QString GroupInfo::groupName() const
     return groupname->text().simplified();
 }
 
-QVariantMap GroupInfo::groupInfo() const
+QColor GroupInfo::groupColor() const
 {
-    QVariantMap m;
-    m[GroupNameField] = groupName();
-    m[GroupColorField] = groupColor();
-
-    return m;
+    return cbtn->color();
 }
 
-void GroupInfo::setGroupColor(const QColor &color)
+QString GroupInfo::groupMedicine() const
 {
-    cbtn->setColor(color);
+    return medicine->text().simplified();
+}
+
+QString GroupInfo::groupDose() const
+{
+    return dose->text();
+}
+
+QString GroupInfo::groupDoseUnit() const
+{
+    return doseunit->currentText();
+}
+
+void GroupInfo::setGroupType(const QString &type)
+{
+    grouptype->setCurrentText(type);
 }
 
 void GroupInfo::setGroupName(const QString &name)
@@ -44,26 +88,52 @@ void GroupInfo::setGroupName(const QString &name)
     groupname->setText(name);
 }
 
+void GroupInfo::setGroupColor(const QColor &color)
+{
+    cbtn->setColor(color);
+}
+
+void GroupInfo::setGroupMedicine(const QString &mdc)
+{
+    medicine->setText(mdc);
+}
+
+void GroupInfo::setGroupDose(const QString &d)
+{
+    dose->setText(d);
+}
+
+void GroupInfo::setGroupDoseUnit(const QString &unit)
+{
+    doseunit->setCurrentText(unit);
+}
+
 void GroupInfo::onClick()
 {
-  emit accept();
+   emit accept();
 }
 
 void GroupInfo::initObjects()
 {
-    tmp1 = new LineEdit;
-    tmp2 = new LineEdit;
-    tmp3 = new LineEdit;
+    grouptype = new ComboBox;
     groupname = new LineEdit;
+    medicine = new LineEdit;
+    dose = new LineEdit;
+    doseunit = new ComboBox;
     btn = new PushButton(tr("确定"));
     cbtn = new ColorButton;
 
+    grouptype->addItems(GroupTypeFields);
+    doseunit->addItems(GroupDoseUnitFields);
+    dose->setValidator(new QDoubleValidator);
+
     auto lay = new QVBoxLayout;
     auto formlay = new QFormLayout;
-    formlay->addRow(tr("组别: "),groupname);
-    formlay->addRow(tr("xxx: "),tmp1);
-    formlay->addRow(tr("xxx: "),tmp2);
-    formlay->addRow(tr("xxx: "),tmp3);
+    formlay->addRow(tr("实验类型: "),grouptype);
+    formlay->addRow(tr("实验组名: "),groupname);
+    formlay->addRow(tr("实验药品: "),medicine);
+    formlay->addRow(tr("剂量数值: "),dose);
+    formlay->addRow(tr("剂量单位: "),doseunit);
 
     auto blay = new QHBoxLayout;
     blay->addStretch();
@@ -73,6 +143,4 @@ void GroupInfo::initObjects()
     lay->addLayout(formlay);
     lay->addLayout(blay);
     setLayout(lay);
-
-
 }

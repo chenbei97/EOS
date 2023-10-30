@@ -17,6 +17,7 @@ class COMPONENT_IMEXPORT TriangleMove: public QWidget
     Q_OBJECT
 public:
     explicit TriangleMove(QWidget*parent= nullptr);
+    QSize sizeHint() const override;
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void setTriangleGap(double gap);

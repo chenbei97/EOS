@@ -28,7 +28,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     lay->addLayout(blay);
 
     setLayout(lay);
-    setTitle(tr("相机"));
+    setTitle(tr("亮度"));
 
     connect(cameratool,&CameraTool::exposureChanged,this,&CameraBox::exposureChanged);
     connect(cameratool,&CameraTool::gainChanged,this,&CameraBox::gainChanged);

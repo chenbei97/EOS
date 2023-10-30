@@ -14,7 +14,9 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     objectivebox = new ObjectiveBox;
     channelbox = new ChannelBox;
     camerabox = new CameraBox;
+    lensbox = new LensBox;
     focusbox = new FocusBox;
+    zstackbox = new ZStackBox;
 
     filenameedit = new LineEdit("please input filename");
     exportToFile = new CheckBox(tr("导出到文件?"));
@@ -35,22 +37,17 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lay->addWidget(channelbox);
     lay->addWidget(focusbox);
     lay->addWidget(camerabox);
+    lay->addWidget(lensbox);
+    lay->addWidget(zstackbox);
 
-
-    auto b0 = new GroupBox("镜头");
-    auto b1 = new GroupBox("Z_Stack");
     auto b2 = new GroupBox("实验配置");//时间+通道复选
     auto b3 = new GroupBox("启动实验"); // 按钮+实验信息预览+预计
-    b0->setMinimumHeight(80);
-    b1->setMinimumHeight(80);
     b2->setMinimumHeight(80);
     b3->setMinimumHeight(80);
-    lay->addWidget(b1);
-    lay->addWidget(box);
-    lay->addWidget(b0);
 
     lay->addWidget(b2);
     lay->addWidget(b3);
+    lay->addWidget(box);
 
     setLayout(lay);
 
@@ -63,7 +60,6 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(wellbox,&WellBox::manufacturerChanged,this,&PreviewTool::infoChanged);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::infoChanged);
 
-
     connect(camerabox,&CameraBox::exposureChanged,this,&PreviewTool::exposureChanged);
     connect(camerabox,&CameraBox::gainChanged,this,&PreviewTool::gainChanged);
     connect(camerabox,&CameraBox::brightChanged,this,&PreviewTool::brightChanged);
@@ -73,11 +69,12 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     //connect(camerabox,&CameraBox::gainChanged,this,&PreviewTool::infoChanged);
     //connect(camerabox,&CameraBox::brightChanged,this,&PreviewTool::infoChanged);
 
-
     connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::channelChanged);
     connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
     connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::infoChanged);
 
+    connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
+    connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
     //LOG<<"wellinfo = "<<wellbox->wellInfo();
     //LOG<<"camerainfo = "<<camerabox->cameraInfo();
 }
@@ -86,20 +83,24 @@ PreviewToolInfo PreviewTool::toolInfo() const
 {
     PreviewToolInfo info;
 
+    // 1. wellbox的brand+manufacturer
     auto wellinfo = wellbox->wellInfo();
     foreach(auto key,wellinfo.keys())
         info[key] = wellinfo[key];
 
+    // 2. objective
     auto objectiveinfo = objectivebox->objectiveInfo();
     info[ObjectiveField] = objectiveinfo[ObjectiveField];
 
+    // 3. channel
     auto channelinfo = channelbox->channelInfo();
     info[ChannelField] = channelinfo[ChannelField];
 
+    // 4. camerainfo,分不同通道,保存了gain,exposure,bright
     auto camerainfo = camerabox->cameraInfo();
 
     QStringList channels;
-    if (!camerainfo.isEmpty()) { // 有勾选的通道
+    if (!camerainfo.isEmpty()) { // 有保存过的通道参数
         foreach(auto channel, camerainfo.keys()) {
             CameraInfo val = camerainfo[channel];// 每个通道的信息
 
@@ -112,8 +113,13 @@ PreviewToolInfo PreviewTool::toolInfo() const
             channels << channel;
         }
     }
-
     info[ChannelField] = channels;//增加一个key=channel,和objective,well等是平级的,方便组装时判断
-    //LOG<<"tool info = "<<info;
+
+    // 5. zstack,stitch
+    auto zstackinfo = zstackbox->zstackInfo();
+    info[ZStackField] = zstackinfo[ZStackField];
+    info[StitchField] = zstackinfo[StitchField];
+
+    LOG<<"tool info = "<<info;
     return info;
 }

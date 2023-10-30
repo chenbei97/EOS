@@ -114,10 +114,19 @@ void Preview::updateViewWindow(const QVariantMap& m)
 void Preview::openSetGroupWindow(const QVariantMap& m)
 { // 打开分组窗口事件 会把当前孔所属组颜色/组名称(可能设置过)
     // 1. 更新分组窗口的ui信息
-    auto color = m[GroupColorField].toString();
-    auto group = m[GroupNameField].toString();
-    groupinfo->setGroupColor(color);// color可能是设置过的组颜色,没设置过是红色
-    groupinfo->setGroupName(group); // 组名称没设置过就是孔,更新分组窗口的UI信息
+//    auto type = m[GroupTypeField].toString();
+//    auto color = m[GroupColorField].toString();
+//    auto group = m[GroupNameField].toString();
+//    auto medicine = m[GroupMedicineField].toString();
+//    auto dose = m[GroupDoseField].toString();
+//    auto unit = m[GroupDoseUnitField].toString();
+//    groupinfo->setGroupType(type);
+//    groupinfo->setGroupColor(color);// color可能是设置过的组颜色,没设置过是红色
+//    groupinfo->setGroupName(group); // 组名称没设置过就是孔,更新分组窗口的UI信息
+//    groupinfo->setGroupMedicine(medicine);
+//    groupinfo->setGroupDose(dose);
+//    groupinfo->setGroupDoseUnit(unit);
+    groupinfo->setGroupInfo(m);
 
     // 2. 分组窗口设置的组信息去更新孔的数据
     int ret = groupinfo->exec();

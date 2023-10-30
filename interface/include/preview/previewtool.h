@@ -14,6 +14,8 @@
 #include "channelbox.h"
 #include "wellbox.h"
 #include "objectivebox.h"
+#include "zstackbox.h"
+#include "lensbox.h"
 
 class INTERFACE_IMEXPORT PreviewTool : public QWidget
 {
@@ -27,6 +29,8 @@ private:
     ChannelBox * channelbox;
     CameraBox * camerabox;
     FocusBox * focusbox;
+    ZStackBox * zstackbox;
+    LensBox * lensbox;
     PushButton * saveallbtn;
     CheckBox * exportToFile;
     LineEdit * filenameedit;
@@ -42,6 +46,9 @@ signals:
     void exposureChanged(int ms); // 1ms-15s
     void gainChanged(int percent); // 100%-5000%
     void brightChanged(int bright); // 0-100
+    // 是否勾选zstack和stitch
+    void zstackChanged(bool isChecked);
+    void stitchChanged(bool isChecked);
     // 上述所有信号都会触发此信号
     void infoChanged();
 

@@ -12,9 +12,13 @@ void WellPattern::updateGroupByGroupInfo(QCVariantMap m)
 { // 右击分组将分组窗口的组信息(color+name)+拖拽区域信息去更新孔信息(不需要更新points,viewsize)
 
     // 1. 更新孔的信息
+    auto gtype = m[GroupTypeField].toString();
     auto gcolor = m[GroupColorField].toString();
     auto gname = m[GroupNameField].toString();
-    LOG<<"well accept info from groupwin is "<<gname<<gcolor;
+    auto medicine = m[GroupMedicineField].toString();
+    auto dose = m[GroupDoseField].toString();
+    auto unit = m[GroupDoseUnitField].toString();
+    LOG<<"well accept info from groupwin is "<<gtype<<gname<<gcolor<<medicine<<dose<<unit;
 
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){
@@ -23,6 +27,10 @@ void WellPattern::updateGroupByGroupInfo(QCVariantMap m)
                 mHoleInfo[row][col].isselected = true;//框选内对应的点都设为选中
                 mHoleInfo[row][col].color = gcolor; // 颜色跟随分组窗口设置的颜色
                 mHoleInfo[row][col].group = gname; // 名称是分组窗口设置的分组
+                mHoleInfo[row][col].type = gtype; // 本孔分配的实验类型
+                mHoleInfo[row][col].medicine = medicine; // 本孔分配的样品
+                mHoleInfo[row][col].dose = dose; // 本孔分配的剂量
+                mHoleInfo[row][col].doseunit = unit; // 本孔分配的剂量单位
                 mHoleInfo[row][col].coordinate = QPoint(row,col); // 孔坐标
                 mDrapPoints[row][col] = false; // 拖拽区域内的点也要更新为false,不然还会绘制这个区域
             }
@@ -35,6 +43,10 @@ void WellPattern::updateGroupByGroupInfo(QCVariantMap m)
         mHoleInfo[mMousePos.x()][mMousePos.y()].color = gcolor;
         mHoleInfo[mMousePos.x()][mMousePos.y()].group = gname;
         mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
+        mHoleInfo[mMousePos.x()][mMousePos.y()].type = gtype; // 本孔分配的实验类型
+        mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = medicine; // 本孔分配的样品
+        mHoleInfo[mMousePos.x()][mMousePos.y()].dose = dose; // 本孔分配的剂量
+        mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = unit; // 本孔分配的剂量单位
         mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
     }
 
@@ -84,7 +96,7 @@ void WellPattern::updateGroupByViewInfo(QCVariantMap m)
     LOG<<"well accept info from view is "<<groupColor<<groupName<<coordinate
     <<"【"<<viewpoints<<"】"<<viewsize<<allgroup;
 
-    // 2. 根据视野窗口传来的组名 把coordinate对应的组(color+viewpoints,viewsize)都更新 (不需要更新isselected,group,allgroup)
+    // 2. 根据视野窗口传来的组名 把coordinate对应的组(color+viewpoints,viewsize)都更新 (不需要更新group,allgroup,dose,medicine,unit,type)
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
             auto holeinfo = mHoleInfo[row][col];
@@ -143,12 +155,23 @@ QPointVector WellPattern::allGroupHolePoints(const QString &groupName) const
 }
 
 void WellPattern::onSetGroupAct()
-{ // 当前孔的所属组颜色和名称传递给分组窗口去更新ui信息
+{ // 当前孔的所属组颜色和名称传递给分组窗口去更新ui信息(传递6个信息)
+    // updateGroupByGroupInfo函数内用到这6个信息
     auto color = mHoleInfo[mMousePos.x()][mMousePos.y()].color;
     auto name = mHoleInfo[mMousePos.x()][mMousePos.y()].group;
+    auto type = mHoleInfo[mMousePos.x()][mMousePos.y()].type;
+    auto dose = mHoleInfo[mMousePos.x()][mMousePos.y()].dose;
+    auto unit = mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit;
+    auto medicine = mHoleInfo[mMousePos.x()][mMousePos.y()].medicine;
+
     QVariantMap m;
     m[GroupColorField] = color;
     m[GroupNameField] = name;
+    m[GroupTypeField] = type;
+    m[GroupDoseUnitField] = unit;
+    m[GroupDoseField] = dose;
+    m[GroupMedicineField] = medicine;
+
     emit openSetGroupWindow(m);
 }
 
@@ -206,6 +229,10 @@ void WellPattern::initHoleInfo()
         QHoleInfoVector var;
         for (int col = 0; col < mcols; ++col){
             HoleInfo info;
+            info.type = QString();
+            info.medicine = QString();
+            info.doseunit = QString();
+            info.dose = QString();
             info.coordinate = QPoint(row,col);
             info.color = Qt::red;
             info.isselected = false;

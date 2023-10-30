@@ -11,6 +11,7 @@
 
 #include "label.h"
 #include "lineedit.h"
+#include "combobox.h"
 #include "colorbutton.h"
 
 class COMPONENT_IMEXPORT GroupInfo: public QDialog
@@ -19,19 +20,31 @@ class COMPONENT_IMEXPORT GroupInfo: public QDialog
 public:
     explicit GroupInfo(QWidget*parent= nullptr);
 
-    QColor groupColor() const;
+    QString groupType() const;
     QString groupName() const;
-    QVariantMap groupInfo() const;
+    QColor groupColor() const;
+    QString groupMedicine() const;
+    QString groupDose() const;
+    QString groupDoseUnit() const;
 
-    void setGroupColor(const QColor& color);
+    QVariantMap groupInfo() const;
+    void setGroupInfo(const QVariantMap& m);
+
+    void setGroupType(const QString& type);
     void setGroupName(const QString& name);
+    void setGroupColor(const QColor& color);
+    void setGroupMedicine(const QString& mdc);
+    void setGroupDose(const QString& d);
+    void setGroupDoseUnit(const QString& unit);
+
 private:
     void initObjects();
     void onClick();
+    ComboBox * grouptype;
     LineEdit * groupname;
-    LineEdit * tmp1;
-    LineEdit * tmp2;
-    LineEdit * tmp3;
+    LineEdit * medicine;
+    LineEdit * dose;
+    ComboBox * doseunit;
     PushButton * btn;
     ColorButton * cbtn;
 };
