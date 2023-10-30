@@ -103,7 +103,7 @@ typedef QByteArray(*TcpAssembleFuncPointer)(QCVariantMap m);
 
 struct HoleInfo {
     QString group;
-    QStringList allgroup;
+    QSet<QString> allgroup;
     QColor color;
     QPoint coordinate;
     QPointVector viewpoints;

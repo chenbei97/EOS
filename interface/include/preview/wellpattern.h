@@ -32,6 +32,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event) override;// 框选数量大于1不允许打开视野窗口,只能基于特定孔
     void mouseDoubleClickEvent(QMouseEvent*event) override;// 双击也能打开视野窗口
 
+    QSet<QString> allHoleGroupNames() const;// 返回所有分过的组,不重复
     void updateGroupByGroupInfo(QCVariantMap m);// 右击打开分组窗口的信息(color+name)拿去更新孔数据
     void updateGroupByViewInfo(QCVariantMap m); // 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
 private:

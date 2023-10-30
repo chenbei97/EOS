@@ -14,11 +14,11 @@ void WellPattern::updateGroupByGroupInfo(QCVariantMap m)
     // 1. 更新孔的信息
     auto gcolor = m[GroupColorField].toString();
     auto gname = m[GroupNameField].toString();
+    LOG<<"well accept info from groupwin is "<<gname<<gcolor;
+
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){
             auto pt = mDrapPoints[row][col]; // 右击分组时当前拖拽区域内的点是一组
-            if (!gname.isEmpty() && !mHoleInfo[row][col].allgroup.contains(gname))
-                mHoleInfo[row][col].allgroup.append(gname); // 不分拖拽区域,所有孔都更新相同的组别信息
             if (pt){ // 是拖拽区域的
                 mHoleInfo[row][col].isselected = true;//框选内对应的点都设为选中
                 mHoleInfo[row][col].color = gcolor; // 颜色跟随分组窗口设置的颜色
@@ -28,18 +28,46 @@ void WellPattern::updateGroupByGroupInfo(QCVariantMap m)
             }
         }
     }
-    LOG<<mHoleInfo[0][0].allgroup;
+
     // 2. 框选的时候会遗漏鼠标当前选中的点
     if (mMousePos != QPoint(-1,-1)) {// 没启用鼠标事件或者点击外围,这是{-1,-1}会越界
         mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = true; // 鼠标点击的这个
         mHoleInfo[mMousePos.x()][mMousePos.y()].color = gcolor;
         mHoleInfo[mMousePos.x()][mMousePos.y()].group = gname;
-        if (!gname.isEmpty() && !mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup.contains(gname))
-            mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup.append(gname);
         mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
         mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
     }
+
+    // 3. 更新已有的组信息(要在上边的group更新过以后再重新计算)
+    auto gnames = allHoleGroupNames();//有可能分了a,b组,b改名a,只有a了,所以要总是重新根据group算
+    //if (!gname.isEmpty()) gnames.insert(gname); // 新的组,无论是否添加过这个组
+    LOG<<"current groups = "<<gnames;
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            mHoleInfo[row][col].allgroup = gnames; // 不分拖拽区域,所有孔都更新相同的组别信息,用等于可以防止以前组信息还保留
+        }
+    }
+    mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = gnames;
     update();
+}
+
+QSet<QString> WellPattern::allHoleGroupNames() const
+{ // 返回所有分过的组,不重复
+    QSet<QString> set;
+    QMap<QString,int> map;
+
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col){
+            auto gname = mHoleInfo[row][col].group;
+            if (!gname.isEmpty()) {
+                map[gname]++;
+                set.insert(gname);
+            }
+        }
+    }
+    LOG<<"group's count = "<<map; // 统计每个组孔的数量
+
+    return set;
 }
 
 void WellPattern::updateGroupByViewInfo(QCVariantMap m)
@@ -52,8 +80,9 @@ void WellPattern::updateGroupByViewInfo(QCVariantMap m)
     auto coordinate = m[CoordinateField].toPoint();
     auto viewsize = m[ViewSizeField].toSize();
     auto viewpoints = m[ViewPointsField].value<QPointVector>();
-    auto allgroup = m[AllGroupsField].toStringList();
-    //LOG<<groupColor<<groupName<<coordinate<<viewpoints<<viewsize<<allgroup;
+    auto allgroup = m[AllGroupsField].value<QSet<QString>>();
+    LOG<<"well accept info from view is "<<groupColor<<groupName<<coordinate
+    <<"【"<<viewpoints<<"】"<<viewsize<<allgroup;
 
     // 2. 根据视野窗口传来的组名 把coordinate对应的组(color+viewpoints,viewsize)都更新 (不需要更新isselected,group,allgroup)
     for(int row = 0 ; row < mrows; ++ row) {
@@ -83,10 +112,15 @@ void WellPattern::onOpenViewAct()
         m[CoordinateField] = mMousePos; // 告知视野当前孔坐标
         m[GroupNameField] = mHoleInfo[mMousePos.x()][mMousePos.y()].group; // 所在组
         m[GroupColorField] = mHoleInfo[mMousePos.x()][mMousePos.y()].color; // 组的颜色
-        m[AllGroupsField] = mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup; // 已有的所有组(每次设置分组信息时会更新)
-        QVariant v;
-        v.setValue(allGroupHolePoints(mHoleInfo[mMousePos.x()][mMousePos.y()].group));
-        m[GroupPointsField] = v;
+        auto allgroups = mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup;
+        auto other_coord = allGroupHolePoints(mHoleInfo[mMousePos.x()][mMousePos.y()].group);
+        QVariant v1,v2;
+        v1.setValue(allgroups);
+        m[AllGroupsField] = v1; // 已有的所有组(每次设置分组信息时会更新)
+        v2.setValue(other_coord);
+        m[GroupPointsField] = v2;
+        LOG<<"well send info to view is "<<m[GroupNameField].toString()<<m[GroupColorField].toString()
+        <<mMousePos<<"【"<<other_coord<<"】"<<allgroups;//ViewPattern::setStrategy接收
         emit openViewWindow(m);
     }
 }
@@ -177,7 +211,7 @@ void WellPattern::initHoleInfo()
             info.isselected = false;
             info.viewpoints = QPointVector();
             info.group = QString();
-            info.allgroup = QStringList();
+            info.allgroup = QSet<QString>();
             info.viewsize = QSize(0,0);
             var.append(info);
         }

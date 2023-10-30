@@ -25,21 +25,24 @@ void ViewPattern::setStrategy(ViewPattern::DrawStrategy s, const QVariantMap& m)
     }
 
     // 2. 初始化InnerCircleRect策略需要的信息
-    mCurrentViewInfo = m; // 来自pattern传递的信息(groupname,groupcolor,grouppoints,coordinate)+objective/brand确定的viewsize信息
-    //auto groupcolor = m[GroupColorField].toString();
-    //auto coordinate = m[ViewPointField].toPoint();
-    //auto grouppoints = m[GroupPointsField].value<QPointVector>();
-    //auto allgroup = m[AllGroupsField].toStringList();
+    mCurrentViewInfo = m; // 来自pattern传递的信息(groupname,groupcolor,grouppoints,coordinate+allgroups)+objective/brand确定的viewsize信息
+    auto size = m[ViewSizeField].toSize();
+    auto groupname = m[GroupNameField].toString();
+    auto groupcolor = m[GroupColorField].toString();
+    auto coordinate = m[CoordinateField].toPoint();
+    auto grouppoints = m[GroupPointsField].value<QPointVector>();
+    auto allgroup = m[AllGroupsField].value<QSet<QString>>();
+    //WellPattern::onOpenViewAct()组装的数据
+    LOG<<"view accept info from well is "<<groupname<<groupcolor<<coordinate<<"【"<<grouppoints<<"】"<<allgroup<<size;
 
     // 3. 初始化视野尺寸,重新更新
-    auto size = m[ViewSizeField].toSize();
+
     mrows = size.width();
     mcols = size.height();
     initDrapPoints();//不能在这里调用
     initSelectPoints();// 先更新尺寸,才能基于尺寸更新视野已被选择的信息(上次设置的临时信息)
 
     // 4.更新应用到本组的使能,未分过组或者分过组但是没选过视野
-    auto groupname = m[GroupNameField].toString();
     int viewcount = viewPointCount();
     if (!groupname.isEmpty() && viewcount) // 这个孔不属于任何组
         applygroupact->setEnabled(true);
@@ -127,7 +130,7 @@ void ViewPattern::onApplyGroupAct()
     if (mCurrentViewInfo[GroupNameField].toString().isEmpty() || !viewPointCount())
         return; // ,多加一层保护总没坏处
 
-    // 2. 组装组名+组颜色+视野尺寸+当前孔坐标
+    // 2. 组装组名+组颜色+视野尺寸+当前孔坐标+已有的所有组
     QVariantMap m;
     m[GroupNameField] = mCurrentViewInfo[GroupNameField];// 组装组名称,方便pattern依据组名查找所有孔
     m[GroupColorField] = mCurrentViewInfo[GroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
@@ -149,6 +152,7 @@ void ViewPattern::onApplyGroupAct()
     QVariant v;
     v.setValue(viewpoints);
     m[ViewPointsField] = v;
+    LOG<<"view send viewpoins info to well is 【"<<viewpoints<<"】";//WellPattern::updateGroupByViewInfo接收
     emit applyGroupEvent(m);
 
     // 4.更新同组其它孔的视野信息和临时信息
@@ -203,7 +207,7 @@ void ViewPattern::updateApplyGroup()
 //    emit applyGroupEvent(m);
 //
 //    // 4. 还应该把其它组的所有孔信息也清除,不仅仅是本组的孔(触发应用到所有组的孔)
-//    foreach(auto groupname, m[AllGroupsField].toStringList()) {
+//    foreach(auto groupname, m[AllGroupsField].value<QSet<QString>>()) {
 //        m[GroupNameField] = groupname;
 //        emit applyGroupEvent(m);
 //    }
