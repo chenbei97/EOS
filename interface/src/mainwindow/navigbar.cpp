@@ -55,11 +55,13 @@ void NavigBar::mousePressEvent(QMouseEvent *event)
             switch (c) {
                 case 1: emit mainClicked();break;
                 case 2: emit previewClicked();break;
-                case 3: emit protocolClicked();break;
-                case 4: emit dataClicked();break;
-                case 5: emit analysisClicked();break;
+                case 3: emit dataClicked();break;
+                case 4: emit analysisClicked();break;
+                case 5: emit settingClicked();break;
                 default:break;
             }
+            if (c) // logo不
+                emit buttonClicked(c-1);
         }
     }
     event->accept();

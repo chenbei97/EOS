@@ -13,6 +13,7 @@
 #include "navigbar.h"
 #include "appselect.h"
 #include "preview.h"
+#include "setting.h"
 
 class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 {
@@ -23,6 +24,7 @@ private:
     NavigBar * navigbar;
     AppSelect * appselect;
     Preview * preview;
+    Setting * setting;
     QStackedWidget * stack;
 private slots:
     void onAppSelected(int app);

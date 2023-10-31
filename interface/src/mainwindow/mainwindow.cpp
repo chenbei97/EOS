@@ -13,12 +13,16 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     navigbar = new NavigBar;
     appselect = new AppSelect;
     preview = new Preview;
+    setting = new Setting;
     stack = new QStackedWidget;
 
     navigbar->setMinimumHeight(NavigBarHeight);
 
     stack->addWidget(appselect);
     stack->addWidget(preview);
+    stack->addWidget(new QWidget);
+    stack->addWidget(new QWidget);
+    stack->addWidget(setting);
 
     auto w = new QWidget;
     auto s = new QVBoxLayout;
@@ -31,8 +35,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     resize(MainWindowWidth,MainWindowHeight);
 
-    connect(navigbar,&NavigBar::mainClicked,this,[=]{stack->setCurrentIndex(0);});
-    connect(navigbar,&NavigBar::previewClicked,this,[=]{stack->setCurrentIndex(1);});
+    connect(navigbar,&NavigBar::buttonClicked,stack,&QStackedWidget::setCurrentIndex);
 
     connect(appselect,&AppSelect::proliferationClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect,&AppSelect::scratchClicked,this,[=]{stack->setCurrentIndex(1);});

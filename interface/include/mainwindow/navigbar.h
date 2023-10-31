@@ -25,8 +25,9 @@ private:
 signals:
     void mainClicked();
     void previewClicked();
-    void protocolClicked();
     void dataClicked();
     void analysisClicked();
+    void settingClicked();
+    void buttonClicked(int option);
 };
 #endif //EOSI_NAVIGBAR_H
