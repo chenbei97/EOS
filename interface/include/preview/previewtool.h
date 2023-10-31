@@ -16,7 +16,9 @@
 #include "objectivebox.h"
 #include "zstackbox.h"
 #include "lensbox.h"
+#include "savebox.h"
 #include "timebox.h"
+#include "historybox.h"
 
 class INTERFACE_IMEXPORT PreviewTool : public QWidget
 {
@@ -25,17 +27,16 @@ public:
     explicit PreviewTool(QWidget*parent= nullptr);
     PreviewToolInfo toolInfo() const;
 private:
+    HistoryBox * historybox;
     WellBox * wellbox;
     ObjectiveBox * objectivebox;
     ChannelBox * channelbox;
     CameraBox * camerabox;
     FocusBox * focusbox;
-    ZStackBox * zstackbox;
     LensBox * lensbox;
     TimeBox * timebox;
-    PushButton * saveallbtn;
-    CheckBox * exportToFile;
-    LineEdit * filenameedit;
+    ZStackBox * zstackbox;
+    SaveBox * savebox;
     QVBoxLayout * lay;
 signals:
     // wellbox的信息

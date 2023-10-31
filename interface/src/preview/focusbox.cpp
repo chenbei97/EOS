@@ -37,15 +37,11 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     btnlay->addStretch();
     btnlay->addWidget(rightbtn);
     btnlay->addSpacing(FocusBoxButtonMargin);
-
-    auto blay = new QHBoxLayout;
-    blay->addStretch();
-    blay->addWidget(autofocusbtn);
+    btnlay->addWidget(autofocusbtn);
 
     auto lay = new QVBoxLayout;
     lay->addWidget(slider);
     lay->addLayout(btnlay);
-    lay->addLayout(blay);
 
     setLayout(lay);
 

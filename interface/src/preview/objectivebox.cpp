@@ -19,7 +19,7 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
     lay->addWidget(rbtn4);
     lay->addWidget(rbtn10);
     lay->addWidget(rbtn20);
-    lay->addWidget(rbtn40);
+    //lay->addWidget(rbtn40);
 
     QButtonGroup * group = new QButtonGroup;
     group->addButton(rbtn4,0);

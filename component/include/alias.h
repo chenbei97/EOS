@@ -144,6 +144,7 @@ typedef const QVector<HoleInfo>& QCHoleInfoVector;
 typedef QVector<QVector<HoleInfo>> QHoleInfo2DVector;
 typedef const QVector<QVector<HoleInfo>>& QCHoleInfo2DVector;
 
+typedef QMap<QString,QString> TimeInfo;
 typedef QMap<QString,QString> LensInfo;
 typedef QMap<QString,QString> ZStackInfo;
 typedef QMap<QString,QString> WellInfo;

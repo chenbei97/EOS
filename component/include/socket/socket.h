@@ -30,6 +30,7 @@
 #define SocketPort 3000
 #define LocalHost "localhost"
 #define SocketWaitTime 3000
+#define DefaultDateTimeFormat "yyyy_MM_dd hh::mm"
 static const char* FrameField = "frame";
 static const char* SeparateField = "@@@";
 #define AppendSeparateField(s) (s+SeparateField)
@@ -199,6 +200,11 @@ static const char* BrightField = "bright";
 static const char* BrightFieldLabel = "bright: ";
 #define BrightLowLimit 0
 #define BrightUpLimit 100
+
+static const char* IsScheduleField = "is_schedule";
+static const char* TotalTimeField = "total_time";
+static const char* DurationTimeField = "duration_time";
+static const char* StartTimeField = "start_time";
 
 static const QList<QFieldList> SocketNeedMapFields{
         ObjectiveFields,Brand1Fields,Brand2Fields,Brand3Fields,Brand4Fields,

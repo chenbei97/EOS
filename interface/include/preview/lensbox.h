@@ -20,6 +20,10 @@ public:
 private:
     TriangleMove * pattern;
 signals:
+    void leftMove();
+    void rightMove();
+    void topMove();
+    void bottomMove();
 };
 
 

@@ -79,7 +79,7 @@
 #define InscribedRectColor QColor("#00A2E8")
 #define TriangleLength 40
 #define TriangleGap 10
-#define TriangleMinSize 200
+#define TriangleMinSize 150
 static const char* GroupTypeField = "grouptype";
 static const char* GroupNameField = "groupname";
 static const char* GroupColorField = "groupcolor";

@@ -28,6 +28,7 @@ using std::modf;
 #endif
 
 // (3) 常量
+#define DefaultDateTimeFormat "yyyy_MM_dd hh::mm"
 #define DefaultPainterFont QFont(DefaultFontFamily,DefaultFontSize,QFont::Bold)
 #define DefaultPainterMetric (QFontMetrics(DefaultPainterFont))
 #define DefaultPainterPixelHeight (DefaultPainterMetric.height()) //指定font下文字像素的高度
@@ -63,7 +64,7 @@ static const QStringList TimeBoxTimeUnitFields = {
 };
 
 static const QFieldList NavigBarFields = {
-    "Logo","Main","Preview","Protocol","Data","Analysis"
+    "Logo","Main","Preview","Data","Analysis","Settings"
 };
 #define NavigBarFieldsCount  (NavigBarFields.count())
 
@@ -102,7 +103,7 @@ static const QFieldList AppFields = {
     #define AppSelectMoveVerDistance (AppSelectButtonVerGap+AppSelectButtonHeight) // 垂直方向下一个按钮相对移动距离=verbtngap+btnheight
     #define AppSelectButtonRoundRadius 25 // 圆角半径
 
-    #define FocusBoxButtonMargin 100 // 2个按钮到边界的距离
+    #define FocusBoxButtonMargin 50 // 2个按钮到边界的距离
     #define PreviewToolBarMaxWidth 800 // 预览界面工具栏的宽度
     #define FocusToolStepSpinMaxWidth 100 // 设置焦距中间的step步进spibox设置的宽度不能太宽
 

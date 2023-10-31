@@ -17,6 +17,12 @@ class INTERFACE_IMEXPORT TimeBox: public GroupBox
     Q_OBJECT
 public:
     explicit TimeBox(QWidget*parent= nullptr);
+    bool checkTime() const;
+    bool isSchedule() const;
+    long long totalTime() const;
+    long long durationTime() const;
+    QDateTime startTime() const;
+    TimeInfo timeInfo() const;
 private:
     void initObjects();
     void initAttributes();
@@ -34,6 +40,11 @@ private:
     SpinBox * durationtime;
     ComboBox * totalunit;
     ComboBox * durationunit;
+    CheckBox * brbox;
+    CheckBox * phbox;
+    CheckBox * gfpbox;
+    CheckBox * rfpbox;
+    CheckBox * dapibox;
     Label * tipinfo;
     QTimer timer; // 定时更新datetimeedit
 };

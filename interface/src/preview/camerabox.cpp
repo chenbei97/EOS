@@ -12,7 +12,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
 {
     cameratool = new CameraTool;
     currentchannel = new Label(QString("%1%2").arg(ChannelFieldLabel).arg(BRField));
-    savebtn = new PushButton(tr("保存相机通道设置"));
+    savebtn = new PushButton(tr("保存当前通道设置"));
     combinebtn = new PushButton(tr("组合通道"));
     capturebtn = new PushButton(tr("拍照"));
 

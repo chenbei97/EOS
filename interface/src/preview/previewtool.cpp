@@ -10,29 +10,19 @@
 
 PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
 {
+    historybox = new HistoryBox;
     wellbox = new WellBox;
     objectivebox = new ObjectiveBox;
     channelbox = new ChannelBox;
+    focusbox = new FocusBox;
     camerabox = new CameraBox;
     lensbox = new LensBox;
-    focusbox = new FocusBox;
-    zstackbox = new ZStackBox;
     timebox = new TimeBox;
-
-    filenameedit = new LineEdit("please input filename");
-    exportToFile = new CheckBox(tr("导出到文件?"));
-    saveallbtn = new PushButton(tr("保存所有设置"));
-    filenameedit->hide();
-
-    auto blay = new QHBoxLayout;
-    blay->addStretch();
-    blay->addWidget(filenameedit);
-    blay->addWidget(exportToFile);
-    blay->addWidget(saveallbtn);
-    auto box = new GroupBox(tr("保存"));
-    box->setLayout(blay);
+    zstackbox = new ZStackBox;
+    savebox = new SaveBox;
 
     lay = new QVBoxLayout;
+    lay->addWidget(historybox);
     lay->addWidget(wellbox);
     lay->addWidget(objectivebox);
     lay->addWidget(channelbox);
@@ -41,16 +31,9 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lay->addWidget(lensbox);
     lay->addWidget(timebox);
     lay->addWidget(zstackbox);
-
-    auto b3 = new GroupBox("启动实验"); // 按钮+实验信息预览+预计
-    b3->setMinimumHeight(80);
-
-    lay->addWidget(b3);
-    lay->addWidget(box);
-
+    lay->addWidget(savebox);
     setLayout(lay);
 
-    connect(exportToFile,&CheckBox::checkedChanged,this,[=](bool enable){filenameedit->setVisible(enable);});
 
     connect(wellbox,&WellBox::wellbrandChanged,this,&PreviewTool::wellbrandChanged);
     connect(wellbox,&WellBox::manufacturerChanged,this,&PreviewTool::manufacturerChanged);

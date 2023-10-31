@@ -11,11 +11,7 @@ CheckBox::CheckBox(QWidget*parent): QWidget(parent)
     lay->setSpacing(0);
     setLayout(lay);
 
-    connect(checkbox,&QCheckBox::stateChanged,this,
-            [=](auto state){
-        if (state == Qt::Checked) emit checkedChanged(true);
-        else if (state == Qt::Unchecked) emit checkedChanged(false);
-    });
+    connect(checkbox,&QCheckBox::stateChanged,this,&CheckBox::onStateChanged);
 
     //setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
 }
@@ -31,12 +27,28 @@ CheckBox::CheckBox(const QString &text, QWidget *parent)
     lay->setSpacing(0);
     setLayout(lay);
 
-    connect(checkbox,&QCheckBox::stateChanged,this,
-            [=](auto state){
-                if (state == Qt::Checked) emit checkedChanged(true);
-                else if (state == Qt::Unchecked) emit checkedChanged(false);
-            });
+    connect(checkbox,&QCheckBox::stateChanged,this,&CheckBox::onStateChanged);
     //setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
+}
+
+CheckBox::CheckBox(const QString &text, bool checked, QWidget *parent)
+{
+    checkbox = new QCheckBox(text);
+    setChecked(checked);
+
+    auto lay = new QVBoxLayout;
+    lay->addWidget(checkbox);
+    lay->setMargin(0);
+    lay->setSpacing(0);
+    setLayout(lay);
+
+    connect(checkbox,&QCheckBox::stateChanged,this,&CheckBox::onStateChanged);
+}
+
+void CheckBox::onStateChanged(int state)
+{
+    if (state == Qt::Checked) emit checkedChanged(true);
+    else if (state == Qt::Unchecked) emit checkedChanged(false);
 }
 
 void CheckBox::setText(const QString& text)

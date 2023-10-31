@@ -19,6 +19,11 @@ LensBox::LensBox(QWidget*parent): GroupBox(parent)
 
     setLayout(lay);
     setTitle(tr("镜头"));
+
+    connect(pattern,&TriangleMove::leftTriangleClicked,this,&LensBox::leftMove);
+    connect(pattern,&TriangleMove::rightTriangleClicked,this,&LensBox::rightMove);
+    connect(pattern,&TriangleMove::topTriangleClicked,this,&LensBox::topMove);
+    connect(pattern,&TriangleMove::bottomTriangleClicked,this,&LensBox::bottomMove);
 }
 
 LensInfo LensBox::lensInfo() const

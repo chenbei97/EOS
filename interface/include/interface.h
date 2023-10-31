@@ -14,6 +14,8 @@
 #include "preview.h"
 #include "previewtool.h"
 #include "cameratool.h"
+#include "historybox.h"
+#include "savebox.h"
 #include "camerabox.h"
 #include "channelbox.h"
 #include "zstackbox.h"

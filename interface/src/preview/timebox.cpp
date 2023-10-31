@@ -15,43 +15,38 @@ TimeBox::TimeBox(QWidget *parent) : GroupBox(parent)
     initConnections();
     initLayout();
     setTitle(tr("时间"));
+    timeInfo();
+}
+
+TimeInfo TimeBox::timeInfo() const
+{
+    TimeInfo info;
+
+    info[TotalTimeField] = QString::number(totalTime());
+    info[DurationTimeField] = QString::number(durationTime());
+    info[IsScheduleField] = isSchedule();
+    info[StartTimeField] = startTime().toString(DefaultDateTimeFormat);
+    info[PHField] = phbox->isChecked();
+    info[BRField] = brbox->isChecked();
+    info[GFPField] = gfpbox->isChecked();
+    info[RFPField] = rfpbox->isChecked();
+    info[DAPIField] = dapibox->isChecked();
+
+    return info;
 }
 
 void TimeBox::refreshInfo()
 {
-    // 1. 取实验时长转为秒
-    long long total = 0;
-    if (totalunit->currentText() == HourField)
-        total = totaltime->value() * 3600;
-    else
-        total = totaltime->value() * 60;
+    // 1. 检查时间信息设置是否正确
+    if (!checkTime()) return;
 
-    // 2. 取实验间隔转为秒
-    long long duration = 0;
-    if (durationunit->currentText()==HourField)
-        duration = durationtime->value() * 3600;
-    else
-        duration = durationtime->value()  * 60;
-
-    // 3. 间隔时间不能小于拍图时间，这个拍图时间是后端给定的，例如30mins
-    if (duration<TimeBoxPhotoTimeLimit) {
-        tipinfo->setText(TimeBoxPhotoTimeWaring);
-        return;
-    }
-
-    // 4.总实验时长要大于实验间隔时间,不然不能完成实验
-    if (total<duration) {
-        tipinfo->setText(TimeBoxTotalBeyondDurationWaring);
-        return;
-    }
-
-    // 5. 预计的总拍照次数 = 总时长/间隔
-    auto count = total / duration; // 向下取整
+    // 2. 预计的总拍照次数 = 总时长/间隔
+    auto count = totalTime() / durationTime(); // 向下取整
     QDateTime datetime;
-    if (scantype->isChecked())
+    if (isSchedule())
         datetime = datetimeedit->dateTime();
     else datetime = QDateTime::currentDateTime(); // 立即扫描是基于当前时间进行计算
-    auto end = datetime.addSecs(total).toString(DateTimeDefaultFormat);
+    auto end = datetime.addSecs(totalTime()).toString(DateTimeDefaultFormat);
     tipinfo->setText(tr("预计结束时间: %1  总扫描次数: %2").arg(end).arg(count));
 }
 
@@ -63,7 +58,7 @@ void TimeBox::toggleScanType(bool isSchedule)
 
 void TimeBox::updateDateTimeEdit()
 {
-    if (!scantype->isChecked()) return;
+    //if (!isSchedule()) return;//禁用状态也还是给更新
     datetimeedit->setMinimumDateTime(QDateTime::currentDateTime());
 }
 
@@ -83,7 +78,7 @@ void TimeBox::updateDurationTimeUnit(const QString& unit)
 
 void TimeBox::initObjects()
 {
-    scantype = new CheckBox(tr("计划执行?"));
+    scantype = new CheckBox(tr("计划执行?"),true);
     datetimeedit = new QDateTimeEdit(QDateTime::currentDateTime());
     tipinfo = new Label(tr("预计结束时间: %1  总扫描次数: %2").arg(0).arg(0));
 
@@ -91,11 +86,16 @@ void TimeBox::initObjects()
     durationtime = new SpinBox;
     totalunit = new ComboBox(TimeBoxTimeUnitFields);
     durationunit = new ComboBox(TimeBoxTimeUnitFields);
+
+    brbox = new CheckBox(BRField);
+    phbox = new CheckBox(PHField);
+    gfpbox = new CheckBox(GFPField);
+    rfpbox = new CheckBox(RFPField);
+    dapibox = new CheckBox(DAPIField);
 }
 
 void TimeBox::initAttributes()
 {
-    scantype->setChecked(true);
     datetimeedit->setMinimumDateTime(QDateTime::currentDateTime());
 
     totaltime->setRange(1,LONG_MAX);
@@ -133,12 +133,83 @@ void TimeBox::initLayout()
     durlay->addWidget(durationunit);
     durlay->addStretch();
 
+    auto boxlay = new QHBoxLayout;
+    boxlay->addWidget(new Label(tr("实验通道: ")));
+    boxlay->addWidget(brbox);
+    boxlay->addWidget(phbox);
+    boxlay->addWidget(gfpbox);
+    boxlay->addWidget(rfpbox);
+    boxlay->addWidget(dapibox);
+    boxlay->addStretch();
+    boxlay->setSpacing(10);
+
     auto lay = new QVBoxLayout;
     lay->addLayout(totallay);
     lay->addLayout(durlay);
+    lay->addLayout(boxlay);
     lay->addWidget(scantype);
     lay->addWidget(datetimeedit);
     lay->addWidget(tipinfo);
 
     setLayout(lay);
+}
+
+bool TimeBox::isSchedule() const
+{
+    return scantype->isChecked();
+}
+
+bool TimeBox::checkTime() const
+{
+    // 1. 取实验时长转为秒
+    auto total = totalTime();
+
+    // 2. 取实验间隔转为秒
+    auto duration = durationTime();
+
+    // 3. 间隔时间不能小于拍图时间，这个拍图时间是后端给定的，例如30mins
+    if (duration<TimeBoxPhotoTimeLimit) {
+        tipinfo->setText(TimeBoxPhotoTimeWaring);
+        return false;
+    }
+
+    // 4.总实验时长要大于实验间隔时间,不然不能完成实验
+    if (total<duration) {
+        tipinfo->setText(TimeBoxTotalBeyondDurationWaring);
+        return false;
+    }
+    return true;
+}
+
+long long TimeBox::totalTime() const
+{
+    long long total = 0;
+    if (totalunit->currentText() == HourField)
+        total = totaltime->value() * 3600;
+    else
+        total = totaltime->value() * 60;
+
+    return total;
+}
+
+long long TimeBox::durationTime() const
+{
+    long long duration = 0;
+    if (durationunit->currentText()==HourField)
+        duration = durationtime->value() * 3600;
+    else
+        duration = durationtime->value()  * 60;
+
+    return duration;
+}
+
+QDateTime TimeBox::startTime() const
+{
+    if (!isSchedule()) return QDateTime();
+
+    auto datetime = datetimeedit->dateTime();
+    if (datetime < QDateTime::currentDateTime()) {
+        return QDateTime::currentDateTime(); // 有可能用户设置时间后又做了一些别的事导致这个时间过时了
+    }
+    return datetime;
 }
