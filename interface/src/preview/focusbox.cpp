@@ -75,7 +75,12 @@ void FocusBox::subtractFocus()
     slider->subtractValue(step->value());
 }
 
-int FocusBox::focus() const
+double FocusBox::focus() const
 {
     return slider->value();
+}
+
+double FocusBox::focusStep() const
+{
+    return step->value();
 }

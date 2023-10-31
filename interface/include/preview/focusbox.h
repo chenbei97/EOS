@@ -17,7 +17,9 @@ class INTERFACE_IMEXPORT FocusBox: public GroupBox
 public:
     explicit FocusBox(QWidget*parent= nullptr);
     void setEnabled(bool enabled);
-    int focus() const;
+    double focus() const;
+    double focusStep() const;
+
 private:
     DoubleSlider * slider;
     RoundButton * leftbtn;

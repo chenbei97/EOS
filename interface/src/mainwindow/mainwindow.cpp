@@ -36,4 +36,13 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     connect(appselect,&AppSelect::proliferationClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect,&AppSelect::scratchClicked,this,[=]{stack->setCurrentIndex(1);});
+    connect(appselect, SIGNAL(appClicked(int)),this, SLOT(onAppSelected(int)));
+}
+
+
+void MainWindow::onAppSelected(int app)
+{ // 把选择的app信息传给预览界面
+    QVariantMap m;
+    m[AppSelectField] = QString::number(app);
+    preview->setPreviewInfo(m);
 }

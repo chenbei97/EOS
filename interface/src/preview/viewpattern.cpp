@@ -33,7 +33,7 @@ void ViewPattern::setStrategy(ViewPattern::DrawStrategy s, const QVariantMap& m)
     auto grouppoints = m[GroupPointsField].value<QPointVector>();
     auto allgroup = m[AllGroupsField].value<QSet<QString>>();
     //WellPattern::onOpenViewAct()组装的数据
-    LOG<<"view accept info from well is "<<groupname<<groupcolor<<coordinate<<"【"<<grouppoints<<"】"<<allgroup<<size;
+    //LOG<<"view accept info from well is "<<groupname<<groupcolor<<coordinate<<"【"<<grouppoints<<"】"<<allgroup<<size;
 
     // 3. 初始化视野尺寸,重新更新
 
@@ -152,7 +152,7 @@ void ViewPattern::onApplyGroupAct()
     QVariant v;
     v.setValue(viewpoints);
     m[ViewPointsField] = v;
-    LOG<<"view send viewpoins info to well is 【"<<viewpoints<<"】";//WellPattern::updateGroupByViewInfo接收
+    //LOG<<"view send viewpoins info to well is 【"<<viewpoints<<"】";//WellPattern::updateGroupByViewInfo接收
     emit applyGroupEvent(m);
 
     // 4.更新同组其它孔的视野信息和临时信息

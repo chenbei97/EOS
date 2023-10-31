@@ -26,11 +26,9 @@ TimeInfo TimeBox::timeInfo() const
     info[DurationTimeField] = QString::number(durationTime());
     info[IsScheduleField] = isSchedule();
     info[StartTimeField] = startTime().toString(DefaultDateTimeFormat);
-    info[PHField] = phbox->isChecked();
-    info[BRField] = brbox->isChecked();
-    info[GFPField] = gfpbox->isChecked();
-    info[RFPField] = rfpbox->isChecked();
-    info[DAPIField] = dapibox->isChecked();
+    QString channels = QString("%1,%2,%3,%4,%5").arg(brbox->isChecked()).arg(phbox->isChecked())
+            .arg(gfpbox->isChecked()).arg(rfpbox->isChecked()).arg(dapibox->isChecked());
+    info[ExperChannelField] = channels;
 
     return info;
 }

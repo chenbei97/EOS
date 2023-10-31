@@ -26,7 +26,7 @@ public:
     void setSuffix(const QString& s);
     void setSingleStep(int step);
     void setMouseEvent(bool enabled);
-    int value() const;
+    double value() const;
     void setValue(int val);
 
     void addValue(double val);

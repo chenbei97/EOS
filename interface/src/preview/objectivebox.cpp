@@ -21,17 +21,33 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
     lay->addWidget(rbtn20);
     //lay->addWidget(rbtn40);
 
-    QButtonGroup * group = new QButtonGroup;
-    group->addButton(rbtn4,0);
-    group->addButton(rbtn10,1);
-    group->addButton(rbtn20,2);
-    group->addButton(rbtn40,3);
+//    QButtonGroup * group = new QButtonGroup;
+//    group->addButton(rbtn4,0);
+//    group->addButton(rbtn10,1);
+//    group->addButton(rbtn20,2);
+//    group->addButton(rbtn40,3);
     rbtn4->setChecked(true);
 
     setLayout(lay);
     setTitle(tr("物镜"));
 
-    connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&ObjectiveBox::objectiveChanged);
+    //connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&ObjectiveBox::objectiveChanged);
+    connect(rbtn4,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
+    connect(rbtn10,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
+    connect(rbtn20,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
+    connect(rbtn40,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
+}
+
+void ObjectiveBox::onClicked()
+{
+    if (rbtn4->isChecked())
+            emit objectiveChanged(0);
+    else if (rbtn10->isChecked())
+            emit objectiveChanged(1);
+    else if (rbtn20->isChecked())
+            emit objectiveChanged(2);
+    else if (rbtn40->isChecked())
+            emit objectiveChanged(3);
 }
 
 ObjectiveInfo ObjectiveBox::objectiveInfo() const

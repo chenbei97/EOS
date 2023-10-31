@@ -35,7 +35,7 @@ void AppSelect::mousePressEvent(QMouseEvent *event)
 
     for(int c = 0; c < rects.count(); ++c) {
         if (rects[c].contains(pos)) {
-            LOG<<"click app index = "<<c;
+            //LOG<<"click app index = "<<c;
             switch (c) {
                 case 0: emit proliferationClicked();break;
                 case 1: emit scratchClicked();break;
@@ -47,6 +47,8 @@ void AppSelect::mousePressEvent(QMouseEvent *event)
                 case 7: emit customClicked();break;
                 default:break;
             }
+            emit appClicked(c);
+            emit appClicked(AppFields[c]);
         }
     }
     event->accept();

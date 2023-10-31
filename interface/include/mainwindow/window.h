@@ -37,6 +37,7 @@ using std::modf;
 #define FocusToolFocusLabel "focus: "
 #define FocusToolStepLabel "step: "
 static const char* FocusField = "focus";
+static const char* FocusStepField = "focusstep";
 static const char* LiveField = "live";
 static const char* PhotoField = "photo";
 static const char* ZStackField = "zstack";
@@ -59,6 +60,7 @@ static const char* MinutesFieldSuffix = " minutes";
 #define TimeBoxPhotoTimeWaring (QObject::tr("警告:实验间隔时间不能低于%1分钟!").arg(TimeBoxPhotoTimeLimit/60))
 #define TimeBoxTotalBeyondDurationWaring (QObject::tr("警告:实验时长至少大于等于一个实验间隔!"))
 #define DateTimeDefaultFormat "yyyy/MM/dd hh::mm"
+static const char* PreviewToolField = "previewtool";
 static const QStringList TimeBoxTimeUnitFields = {
         HourField,MinuteField,
 };
@@ -72,6 +74,7 @@ static const QFieldList AppFields = {
     QObject::tr("增殖"),QObject::tr("划痕"),QObject::tr("侵袭"),QObject::tr("转染"),
     QObject::tr("形态学"),QObject::tr("类器官"),QObject::tr("药效和毒理"),QObject::tr("自定义")
 };
+static const char* AppSelectField = "appselect";
 
 #define ScreenWidth 2560
 

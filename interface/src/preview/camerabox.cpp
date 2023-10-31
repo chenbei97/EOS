@@ -30,19 +30,27 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     setLayout(lay);
     setTitle(tr("亮度"));
 
-    connect(cameratool,&CameraTool::exposureChanged,this,&CameraBox::exposureChanged);
-    connect(cameratool,&CameraTool::gainChanged,this,&CameraBox::gainChanged);
-    connect(cameratool,&CameraTool::brightChanged,this,&CameraBox::brightChanged);
     connect(savebtn,&PushButton::clicked,this,&CameraBox::onSaveBtn);
+    connect(combinebtn,&PushButton::clicked,this,&CameraBox::onCombineBtn);
+    connect(capturebtn,&PushButton::clicked,this,&CameraBox::onCaptureBtn);
 }
 
 void CameraBox::onSaveBtn()
-{
+{ // 保存参数也不需要
     auto channel = currentchannel->text().remove(ChannelFieldLabel);
     camerainfo[channel] = saveInfo();
-
-    emit infoChanged(camerainfo);
+    emit cameraInfoChanged(camerainfo);
     //LOG<<"camera info = "<<camerainfo;
+}
+
+void CameraBox::onCaptureBtn()
+{
+    emit photoTaking();
+}
+
+void CameraBox::onCombineBtn()
+{
+
 }
 
 void CameraBox::setEnabled(bool enabled)
@@ -56,7 +64,7 @@ void CameraBox::setChannel(int option)
 { // channelbox设置通道后来响应这里的因为
     auto channel = ChannelFields[option];
     currentchannel->setText(QString("%1%2").arg(ChannelFieldLabel).arg(channel));
-
+    cameratool->blockSignals(true);
     if (camerainfo.keys().contains(channel)) { // 切换通道,如果通道有保存过的值,同步UI
         cameratool->setBright(camerainfo[channel][BrightField].toUInt());
         cameratool->setExposure(camerainfo[channel][ExposureField].toUInt());
@@ -66,6 +74,7 @@ void CameraBox::setChannel(int option)
         cameratool->setExposure(0);
         cameratool->setGain(0);
     }
+    cameratool->blockSignals(false);
 }
 
 MultiCameraInfo CameraBox::cameraInfo() const

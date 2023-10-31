@@ -32,6 +32,8 @@ signals:
     void organoidClicked();
     void pharmtoxiClicked();
     void customClicked();
+    void appClicked(int index);
+    void appClicked(const QString& app);
 };
 
 #endif //EOSI_APPSELECT_H

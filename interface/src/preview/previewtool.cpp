@@ -13,8 +13,8 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     historybox = new HistoryBox;
     wellbox = new WellBox;
     objectivebox = new ObjectiveBox;
-    channelbox = new ChannelBox;
     focusbox = new FocusBox;
+    channelbox = new ChannelBox;
     camerabox = new CameraBox;
     lensbox = new LensBox;
     timebox = new TimeBox;
@@ -25,8 +25,8 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lay->addWidget(historybox);
     lay->addWidget(wellbox);
     lay->addWidget(objectivebox);
-    lay->addWidget(channelbox);
     lay->addWidget(focusbox);
+    lay->addWidget(channelbox);
     lay->addWidget(camerabox);
     lay->addWidget(lensbox);
     lay->addWidget(timebox);
@@ -34,29 +34,17 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lay->addWidget(savebox);
     setLayout(lay);
 
-
+    // 1. 信号直连
     connect(wellbox,&WellBox::wellbrandChanged,this,&PreviewTool::wellbrandChanged);
     connect(wellbox,&WellBox::manufacturerChanged,this,&PreviewTool::manufacturerChanged);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::objectiveChanged);
-    connect(wellbox,&WellBox::wellbrandChanged,this,&PreviewTool::infoChanged);
-    connect(wellbox,&WellBox::manufacturerChanged,this,&PreviewTool::infoChanged);
-    connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::infoChanged);
-
-    connect(camerabox,&CameraBox::exposureChanged,this,&PreviewTool::exposureChanged);
-    connect(camerabox,&CameraBox::gainChanged,this,&PreviewTool::gainChanged);
-    connect(camerabox,&CameraBox::brightChanged,this,&PreviewTool::brightChanged);
-    // 不需要滑动条移动就会触发信息改变,只能是保存相机信息那个动作才可以触发
-    connect(camerabox,&CameraBox::infoChanged,this,&PreviewTool::infoChanged);
-    //connect(camerabox,&CameraBox::exposureChanged,this,&PreviewTool::infoChanged);
-    //connect(camerabox,&CameraBox::gainChanged,this,&PreviewTool::infoChanged);
-    //connect(camerabox,&CameraBox::brightChanged,this,&PreviewTool::infoChanged);
-
+    connect(camerabox,&CameraBox::cameraInfoChanged,this,&PreviewTool::cameraInfoChanged);
+    connect(camerabox,&CameraBox::photoTaking,this,&PreviewTool::photoTaking);
     connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::channelChanged);
-    connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
-    connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::infoChanged);
-
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
+    // 2. 信号槽函数
+    connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
     //LOG<<"wellinfo = "<<wellbox->wellInfo();
     //LOG<<"camerainfo = "<<camerabox->cameraInfo();
 }
@@ -69,11 +57,9 @@ PreviewToolInfo PreviewTool::toolInfo() const
     auto wellinfo = wellbox->wellInfo();
     foreach(auto key,wellinfo.keys())
         info[key] = wellinfo[key];
-
     // 2. objective
     auto objectiveinfo = objectivebox->objectiveInfo();
     info[ObjectiveField] = objectiveinfo[ObjectiveField];
-
     // 3. channel
     auto channelinfo = channelbox->channelInfo();
     info[ChannelField] = channelinfo[ChannelField];
@@ -102,6 +88,19 @@ PreviewToolInfo PreviewTool::toolInfo() const
     info[ZStackField] = zstackinfo[ZStackField];
     info[StitchField] = zstackinfo[StitchField];
 
-    LOG<<"tool info = "<<info;
+    // 6. focus
+    auto focus = focusbox->focus();
+    auto focusstep = focusbox->focusStep();
+    info[FocusField] = QString::number(focus);
+    info[FocusStepField] = QString::number(focusstep);
+
+    // 7. exper
+    auto experinfo = timebox->timeInfo();
+    foreach(auto key,experinfo.keys())
+            info[key] = experinfo[key];
+
+    // 8.
+
+    //LOG<<"tool info = "<<info;
     return info;
 }

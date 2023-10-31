@@ -63,15 +63,15 @@ void ViewPattern::mouseMoveEvent(QMouseEvent *event)
 
 void ViewPattern::mouseReleaseEvent(QMouseEvent *event)
 { // 拖拽区域点个数为0才是预览事件
-    if (mMousePoint == QPoint(-1,-1)){
+    if (mMousePoint == QPoint(-1,-1) || event->button()==Qt::RightButton){ // 右击不触发
         saveviewact->setEnabled(false);
         return; // 可能会点到边缘位置,不能选点,由于绘图没有死区,这不设置也行
     }
     saveviewact->setEnabled(true);
 
-    if (drapPointCount()<1) // 没有拖拽区域单击才是预览事件
+    if (drapPointCount()<1 ) // 没有拖拽区域单击才是预览事件
     {
-        //LOG<<"preview event is emit";
+        LOG<<"preview event is emit";
         emit previewEvent(mMousePoint);
     }
 

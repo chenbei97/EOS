@@ -30,30 +30,24 @@ private:
     HistoryBox * historybox;
     WellBox * wellbox;
     ObjectiveBox * objectivebox;
+    FocusBox * focusbox;
     ChannelBox * channelbox;
     CameraBox * camerabox;
-    FocusBox * focusbox;
     LensBox * lensbox;
     TimeBox * timebox;
     ZStackBox * zstackbox;
     SaveBox * savebox;
     QVBoxLayout * lay;
 signals:
-    // wellbox的信息
-    void wellbrandChanged(int option);
+    void wellbrandChanged(int option);// wellbox的信息
     void manufacturerChanged(int option);
     void objectiveChanged(int option);
-    // 通道选择
-    void channelChanged(int option);
-    // 相机不同通道的信息
-    void exposureChanged(int ms); // 1ms-15s
-    void gainChanged(int percent); // 100%-5000%
-    void brightChanged(int bright); // 0-100
-    // 是否勾选zstack和stitch
-    void zstackChanged(bool isChecked);
+    void channelChanged(int option);// 通道选择
+    void cameraInfoChanged(const MultiCameraInfo&m);// 通道配置改变
+    void zstackChanged(bool isChecked);// 是否勾选zstack和stitch
     void stitchChanged(bool isChecked);
-    // 上述所有信号都会触发此信号
-    void infoChanged();
+    // 只有camerabox的拍照会触发该信号
+    void photoTaking();
 
 };
 

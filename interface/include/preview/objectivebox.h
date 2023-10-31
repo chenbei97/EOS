@@ -22,6 +22,7 @@ private:
     QRadioButton *  rbtn10;
     QRadioButton *  rbtn20;
     QRadioButton *  rbtn40;
+    void onClicked();
 signals:
     void objectiveChanged(int option);
 };

@@ -153,6 +153,7 @@ typedef QMap<QString,QString> ChannelInfo;
 typedef QMap<QString,QString> CameraInfo;
 typedef QMap<QString,CameraInfo> MultiCameraInfo;
 typedef QVariantMap PreviewToolInfo;
+typedef QVariantMap PreviewInfo;
 
 //struct ChannelInfo {
 //    QString channel;

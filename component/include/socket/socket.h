@@ -205,6 +205,7 @@ static const char* IsScheduleField = "is_schedule";
 static const char* TotalTimeField = "total_time";
 static const char* DurationTimeField = "duration_time";
 static const char* StartTimeField = "start_time";
+static const char* ExperChannelField = "exper_channel";
 
 static const QList<QFieldList> SocketNeedMapFields{
         ObjectiveFields,Brand1Fields,Brand2Fields,Brand3Fields,Brand4Fields,

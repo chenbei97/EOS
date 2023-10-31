@@ -28,13 +28,13 @@ private:
     PushButton * capturebtn;
     PushButton * combinebtn;
     MultiCameraInfo camerainfo;
-
-    void onSaveBtn();
     CameraInfo saveInfo() const;
+private slots:
+    void onSaveBtn();
+    void onCombineBtn();
+    void onCaptureBtn();
 signals:
-    void exposureChanged(int ms); // 1ms-15s
-    void gainChanged(int percent); // 100%-5000%
-    void brightChanged(int bright); // 0-100
-    void infoChanged(const MultiCameraInfo &);
+    void cameraInfoChanged(const MultiCameraInfo &);
+    void photoTaking();
 };
 #endif //EOSI_CAMERABOX_H

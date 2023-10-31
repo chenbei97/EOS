@@ -58,10 +58,10 @@ void DoubleSlider::setSingleStep(int step)
     slider->setSingleStep(step);
 }
 
-int DoubleSlider::value() const
+double DoubleSlider::value() const
 {
-    return slider->sliderPosition();
-    //return slider->value(); // 总是慢一拍
+    //return slider->sliderPosition();
+    return accumulateval;
 }
 
 void DoubleSlider::setValue(int value)

@@ -21,7 +21,10 @@ class INTERFACE_IMEXPORT Preview : public QWidget
     Q_OBJECT
 public:
     explicit Preview(QWidget*parent= nullptr);
+    void setPreviewInfo(const QVariantMap& m);// 用于appselect传递当前app信息
+    PreviewInfo previewInfo() const;
 private:
+    PreviewInfo previewinfo;
     CameraMode * cameramode;
     QWidget * livecanvas;
     PreviewPhotoCanvas * photocanvas;
@@ -32,15 +35,22 @@ private:
     DockWidget * dock;
     QMainWindow * dockcanvas;
     GroupInfo * groupinfo;
-
+    QScrollArea * scrollarea;
+private:
+    void initObjects();
+    void initAttributes();
+    void initLayout();
+    void initConnections();
+private:
     void updateViewWindow(const QVariantMap& m);
-    void openSetGroupWindow(const QVariantMap& m);
-
+    void updateSetGroupWindow(const QVariantMap& m);
+    void updateViewPatternUi();
+private:
     void onManufacturerChanged(int option);
     void onWellbrandChanged(int option);
     void onObjectiveChanged(int option);
-    void updateViewSize();
+    void takingPhoto();
+    void previewView(const QPoint& point);
 
-    void onInfoChanged();
 };
 #endif //EOSI_PREVIEW_H

@@ -18,7 +18,7 @@ void WellPattern::updateGroupByGroupInfo(QCVariantMap m)
     auto medicine = m[GroupMedicineField].toString();
     auto dose = m[GroupDoseField].toString();
     auto unit = m[GroupDoseUnitField].toString();
-    LOG<<"well accept info from groupwin is "<<gtype<<gname<<gcolor<<medicine<<dose<<unit;
+    //LOG<<"well accept info from groupwin is "<<gtype<<gname<<gcolor<<medicine<<dose<<unit;
 
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){
@@ -93,8 +93,7 @@ void WellPattern::updateGroupByViewInfo(QCVariantMap m)
     auto viewsize = m[ViewSizeField].toSize();
     auto viewpoints = m[ViewPointsField].value<QPointVector>();
     auto allgroup = m[AllGroupsField].value<QSet<QString>>();
-    LOG<<"well accept info from view is "<<groupColor<<groupName<<coordinate
-    <<"【"<<viewpoints<<"】"<<viewsize<<allgroup;
+    //LOG<<"well accept info from view is "<<groupColor<<groupName<<coordinate<<"【"<<viewpoints<<"】"<<viewsize<<allgroup;
 
     // 2. 根据视野窗口传来的组名 把coordinate对应的组(color+viewpoints,viewsize)都更新 (不需要更新group,allgroup,dose,medicine,unit,type)
     for(int row = 0 ; row < mrows; ++ row) {
@@ -131,8 +130,8 @@ void WellPattern::onOpenViewAct()
         m[AllGroupsField] = v1; // 已有的所有组(每次设置分组信息时会更新)
         v2.setValue(other_coord);
         m[GroupPointsField] = v2;
-        LOG<<"well send info to view is "<<m[GroupNameField].toString()<<m[GroupColorField].toString()
-        <<mMousePos<<"【"<<other_coord<<"】"<<allgroups;//ViewPattern::setStrategy接收
+//        LOG<<"well send info to view is "<<m[GroupNameField].toString()<<m[GroupColorField].toString()
+//        <<mMousePos<<"【"<<other_coord<<"】"<<allgroups;//ViewPattern::setStrategy接收
         emit openViewWindow(m);
     }
 }
@@ -243,24 +242,6 @@ void WellPattern::initHoleInfo()
             var.append(info);
         }
         mHoleInfo.append(var);
-    }
-    update();
-}
-
-void WellPattern::clearHolePattern()
-{
-    for(int row = 0 ; row < mrows; ++ row) {
-        for (int col = 0; col < mcols; ++col){
-            HoleInfo info = mHoleInfo[row][col];
-            info.coordinate = QPoint(row,col);
-            info.color = Qt::red;
-            info.isselected = false;
-            info.viewpoints = QPointVector();
-            //info.group = QString(); // 无需改动组名,已有的组名和视野窗口尺寸
-            //info.allgroup = QStringList(); // 如果不去除分组信息的话,可能会出现组在但是无高亮,从而没设置这些组的信息导致实验信息保存有问题
-            //info.viewsize = QSize(0,0);
-            mHoleInfo[row][col] = info;
-        }
     }
     update();
 }
