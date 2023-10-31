@@ -46,9 +46,9 @@ signals:
     void cameraInfoChanged(const MultiCameraInfo&m);// 通道配置改变
     void zstackChanged(bool isChecked);// 是否勾选zstack和stitch
     void stitchChanged(bool isChecked);
-    // 只有camerabox的拍照会触发该信号
-    void photoTaking();
-
+    void photoTaking();// 只有camerabox的拍照会触发该信号
+signals:
+    void objectiveSettingChanged(int option);
 };
 
 #endif //EOSI_PREVIEWTOOL_H

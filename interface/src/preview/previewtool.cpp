@@ -45,8 +45,10 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
     // 2. 信号槽函数
     connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
-    //LOG<<"wellinfo = "<<wellbox->wellInfo();
-    //LOG<<"camerainfo = "<<camerabox->cameraInfo();
+
+    // 3.外部信号
+    connect(this,&PreviewTool::objectiveSettingChanged,timebox,&TimeBox::onObjectiveSettingChanged);
+    connect(this,&PreviewTool::objectiveSettingChanged,channelbox,&ChannelBox::onObjectiveSettingChanged);
 }
 
 PreviewToolInfo PreviewTool::toolInfo() const

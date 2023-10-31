@@ -40,6 +40,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(appselect,&AppSelect::proliferationClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect,&AppSelect::scratchClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect, SIGNAL(appClicked(int)),this, SLOT(onAppSelected(int)));
+
+    connect(setting,&Setting::locationChanged,preview,&Preview::onLocationSettingChanged);
+    connect(setting,&Setting::objectiveChanged,preview,&Preview::objectiveSettingChanged);
+
+    setting->locationChanged(0); // 触发时机只能在setting构造出来之后,内部触发不会起作用
+    setting->objectiveChanged(0);
 }
 
 

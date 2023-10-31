@@ -6,10 +6,12 @@
  * @FilePath: \EOS\interface\src\navigbar.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#include "include/mainwindow/navigbar.h"
+#include "navigbar.h"
 
 NavigBar::NavigBar(QWidget*parent): QWidget(parent)
 {
+    lastPos = QPoint(-1,-1);
+    hightcolor.setAlpha(PatternColorAlpha);
     foreach(auto text, NavigBarFields)
         pixwidths << (NavigBarWidth-NavigPainterMetric.width(text))/2;
 
@@ -24,6 +26,14 @@ void NavigBar::paintEvent(QPaintEvent*event)
     auto pen = painter.pen();
     pen.setWidth(2);
     painter.setPen(pen);
+
+    auto rects = getRects();
+    for(int c = 0; c < rects.count(); ++c) {
+        auto rect = rects[c];
+        if(rect.contains(lastPos)) {
+            painter.fillRect(rect,hightcolor);
+        }
+    }
 
     QPainterPath path;
     for(int i = 0; i < NavigBarFieldsCount; ++i) {
@@ -46,11 +56,11 @@ void NavigBar::paintEvent(QPaintEvent*event)
 
 void NavigBar::mousePressEvent(QMouseEvent *event)
 {
-    auto pos = event->pos();
+    lastPos = event->pos();
     auto rects = getRects();
     
     for(int c = 0; c < rects.count(); ++c) {
-        if (rects[c].contains(pos)) {
+        if (rects[c].contains(lastPos)) {
             //LOG<<"click toolbar index = "<<c;
             switch (c) {
                 case 1: emit mainClicked();break;
@@ -64,6 +74,7 @@ void NavigBar::mousePressEvent(QMouseEvent *event)
                 emit buttonClicked(c-1);
         }
     }
+    update();
     event->accept();
 }
 

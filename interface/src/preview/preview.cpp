@@ -102,6 +102,7 @@ void Preview::initAttributes()
     pattern->setMinimumHeight(PreviewPatternMinHeight);
 
     previewinfo[PreviewToolField] = toolbar->toolInfo();
+    //previewinfo[CameraLocationField] = QString::number(0); // 默认是1号位
 }
 
 void Preview::initObjects()
@@ -133,4 +134,6 @@ void Preview::initConnections()
 
     connect(viewpattern,&ViewPattern::applyGroupEvent,pattern,&WellPattern::updateGroupByViewInfo); // 更新孔窗口的分组信息
     connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewView);
+
+    connect(this,&Preview::objectiveSettingChanged,toolbar,&PreviewTool::objectiveSettingChanged);
 }

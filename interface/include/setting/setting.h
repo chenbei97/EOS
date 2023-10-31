@@ -10,12 +10,31 @@
 #define EOSI_SETTING_H
 
 #include "window.h"
+#include "objectivesetting.h"
 
 class INTERFACE_IMEXPORT Setting : public QWidget
 {
     Q_OBJECT
 public:
     explicit Setting(QWidget*parent= nullptr);
+private:
+    void initObjects();
+    void initAttributes();
+    void initLayout();
+    void initConnections();
+private:
+    QRadioButton * loginbtn;
+    GroupBox * b1;
+    QRadioButton * databasebtn;
+    GroupBox * b2;
+    QRadioButton * objectivebtn;
+    ObjectiveSetting * objectivesetting;
+    QButtonGroup * buttongroup;
+private:
+    void toggleSetting(int option);
+signals:
+    void locationChanged(int option);
+    void objectiveChanged(int option);
 };
 
 #endif //EOSI_SETTING_H

@@ -75,6 +75,25 @@ static const QFieldList AppFields = {
     QObject::tr("形态学"),QObject::tr("类器官"),QObject::tr("药效和毒理"),QObject::tr("自定义")
 };
 static const char* AppSelectField = "appselect";
+static const char* CameraLocationField = "camera_loc";
+static const char* CameraLocationField1 = "loc_1";
+static const char* CameraLocationField2 = "loc_2";
+static const char* CameraLocationField3 = "loc_3";
+static const char* CameraLocationField4 = "loc_4";
+static const char* Bright4xField = "br4x";
+static const char* PH4xField = "ph4x";
+static const char* Bright10xField = "br10x";
+static const char* PH10xField = "ph10x";
+static const char* Bright20xField = "br20x";
+static const char* PH20xField = "ph20x";
+static const char* Bright40xField = "br40x";
+static const char* PH40xField = "ph40x";
+static const char* NoneField = "none";
+static const QFieldList ObjectiveSettingFields = {
+    Bright4xField,PH4xField,Bright10xField,PH10xField,
+    Bright20xField,PH20xField,Bright40xField,PH40xField,
+    NoneField
+};
 
 #define ScreenWidth 2560
 

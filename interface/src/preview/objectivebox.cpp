@@ -19,7 +19,7 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
     lay->addWidget(rbtn4);
     lay->addWidget(rbtn10);
     lay->addWidget(rbtn20);
-    //lay->addWidget(rbtn40);
+    lay->addWidget(rbtn40);
 
 //    QButtonGroup * group = new QButtonGroup;
 //    group->addButton(rbtn4,0);
@@ -41,13 +41,13 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
 void ObjectiveBox::onClicked()
 {
     if (rbtn4->isChecked())
-            emit objectiveChanged(0);
+       emit objectiveChanged(0);
     else if (rbtn10->isChecked())
-            emit objectiveChanged(1);
+       emit objectiveChanged(1);
     else if (rbtn20->isChecked())
-            emit objectiveChanged(2);
+       emit objectiveChanged(2);
     else if (rbtn40->isChecked())
-            emit objectiveChanged(3);
+       emit objectiveChanged(3);
 }
 
 ObjectiveInfo ObjectiveBox::objectiveInfo() const
@@ -55,13 +55,13 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
     ObjectiveInfo m;
 
     if (rbtn4->isChecked())
-        m[ObjectiveField] = Objective4x; // 转换为idx无需在这里,这里需要实际字符串
+        m[ObjectiveField] = getIndexFromFields(Objective4x); // 转换为idx无需在这里,这里需要实际字符串
     else if (rbtn10->isChecked())
-        m[ObjectiveField] = Objective10x;
+        m[ObjectiveField] = getIndexFromFields(Objective10x);
     else if (rbtn20->isChecked())
-        m[ObjectiveField] = Objective20x;
+        m[ObjectiveField] = getIndexFromFields(Objective20x);
     else if (rbtn40->isChecked())
-        m[ObjectiveField] = Objective40x;
+        m[ObjectiveField] = getIndexFromFields(Objective40x);
 
     return m;
 }

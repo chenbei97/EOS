@@ -23,6 +23,8 @@ public:
     long long durationTime() const;
     QDateTime startTime() const;
     TimeInfo timeInfo() const;
+public slots:
+    void onObjectiveSettingChanged(int option);
 private:
     void initObjects();
     void initAttributes();
@@ -47,6 +49,8 @@ private:
     CheckBox * dapibox;
     Label * tipinfo;
     QTimer timer; // 定时更新datetimeedit
+signals:
+
 };
 
 #endif //EOSI_TIMEBOX_H

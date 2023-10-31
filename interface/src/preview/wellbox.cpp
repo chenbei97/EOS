@@ -50,8 +50,8 @@ WellInfo WellBox::wellInfo() const
 {
     WellInfo m;
 
-    m[BrandField] = wellbrandCombo->currentText();
-    m[ManufacturerField] = manufacturerCombo->currentText();
+    m[BrandField] = getIndexFromFields(wellbrandCombo->currentText());
+    m[ManufacturerField] = getIndexFromFields(manufacturerCombo->currentText());
 
     return m;
 }

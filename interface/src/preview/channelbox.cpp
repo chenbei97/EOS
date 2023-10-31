@@ -38,6 +38,25 @@ ChannelBox::ChannelBox(QWidget*parent): GroupBox(parent)
     connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&ChannelBox::channelChanged);
 }
 
+void ChannelBox::onObjectiveSettingChanged(int option)
+{
+    //LOG<<"option = "<<option;
+    if (option == ObjectiveSettingFields.indexOf(NoneField))
+        return;
+
+    bool r1 = ((option == ObjectiveSettingFields.indexOf(Bright4xField)) ||
+               (option == ObjectiveSettingFields.indexOf(Bright10xField)) ||
+               (option == ObjectiveSettingFields.indexOf(Bright20xField)) ||
+               (option == ObjectiveSettingFields.indexOf(Bright40xField)));
+    if (r1) {
+        brbox->setEnabled(true);
+        phbox->setEnabled(false);
+    } else {
+        brbox->setEnabled(false);
+        phbox->setEnabled(true);
+    }
+}
+
 ChannelInfo ChannelBox::channelInfo() const
 {
     ChannelInfo m;

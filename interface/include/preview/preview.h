@@ -23,6 +23,8 @@ public:
     explicit Preview(QWidget*parent= nullptr);
     void setPreviewInfo(const QVariantMap& m);// 用于appselect传递当前app信息
     PreviewInfo previewInfo() const;
+public slots:
+    void onLocationSettingChanged(int option);
 private:
     PreviewInfo previewinfo;
     CameraMode * cameramode;
@@ -51,6 +53,7 @@ private:
     void onObjectiveChanged(int option);
     void takingPhoto();
     void previewView(const QPoint& point);
-
+signals:
+    void objectiveSettingChanged(int option);
 };
 #endif //EOSI_PREVIEW_H

@@ -17,6 +17,8 @@ class INTERFACE_IMEXPORT ChannelBox: public GroupBox
 public:
     explicit ChannelBox(QWidget*parent= nullptr);
     ChannelInfo channelInfo() const;
+public slots:
+    void onObjectiveSettingChanged(int option);
 private:
     QRadioButton * brbox;
     QRadioButton * phbox;

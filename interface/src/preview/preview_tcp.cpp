@@ -11,8 +11,8 @@
 void Preview::takingPhoto()
 {
     auto toolinfo = toolbar->toolInfo();
-    LOG<<"tool info = "<<toolinfo;
     previewinfo[PreviewToolField] = toolinfo;
+    LOG<<"preview info = "<<previewinfo;
 
     //AssemblerPointer->assemble(TcpFramePool.frame0x0001,toolinfo);
 
@@ -30,4 +30,10 @@ void Preview::takingPhoto()
 void Preview::previewView(const QPoint &point)
 {
     
+}
+
+void Preview::onLocationSettingChanged(int option)
+{
+    LOG<<"option = "<<option;
+    previewinfo[CameraLocationField] = QString::number(option);
 }

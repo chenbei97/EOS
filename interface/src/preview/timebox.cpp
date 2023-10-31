@@ -18,6 +18,25 @@ TimeBox::TimeBox(QWidget *parent) : GroupBox(parent)
     timeInfo();
 }
 
+void TimeBox::onObjectiveSettingChanged(int option)
+{
+    //LOG<<"option = "<<option;
+    if (option == ObjectiveSettingFields.indexOf(NoneField))
+        return;
+
+    bool r1 = ((option == ObjectiveSettingFields.indexOf(Bright4xField)) ||
+                (option == ObjectiveSettingFields.indexOf(Bright10xField)) ||
+                (option == ObjectiveSettingFields.indexOf(Bright20xField)) ||
+                (option == ObjectiveSettingFields.indexOf(Bright40xField)));
+   if (r1) {
+        brbox->setEnabled(true);
+        phbox->setEnabled(false);
+   } else {
+       brbox->setEnabled(false);
+       phbox->setEnabled(true);
+   }
+}
+
 TimeInfo TimeBox::timeInfo() const
 {
     TimeInfo info;

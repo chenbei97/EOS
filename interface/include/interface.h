@@ -30,5 +30,6 @@
 #include "savebox.h"
 
 #include "setting.h"
+#include "objectivesetting.h"
 
 #endif //EOSI_INTERFACE_H
