@@ -14,7 +14,7 @@ TimeBox::TimeBox(QWidget *parent) : GroupBox(parent)
     initAttributes();
     initConnections();
     initLayout();
-    setTitle(tr("时间"));
+    setTitle(tr("实验"));
     timeInfo();
 }
 

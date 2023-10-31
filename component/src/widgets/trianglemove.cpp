@@ -15,12 +15,12 @@ TriangleMove::TriangleMove(QWidget *parent) : QWidget(parent)
     trianggap = TriangleGap;
 
     setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-    resize(TriangleMinSize,TriangleMinSize);
+    resize(TriangleMinWidth,TriangleMinHeight);
 }
 
 QSize TriangleMove::sizeHint() const
 {
-    return QSize(TriangleMinSize,TriangleMinSize);
+    return QSize(TriangleMinWidth,TriangleMinHeight);
 }
 
 void TriangleMove::setTriangleGap(double gap)
