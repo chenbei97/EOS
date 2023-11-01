@@ -17,6 +17,8 @@ class INTERFACE_IMEXPORT WellPattern: public Pattern
 public:
     explicit WellPattern(int rows,int cols,QWidget*parent= nullptr);
 
+    PreviewPatternInfo patternInfo() const;
+
     void setPatternSize(int rows,int cols) override;
     void initDrapPoints(); // 清除拖拽区域
     int drapPointCount() const; // 计算拖拽区域包含的点个数

@@ -56,7 +56,12 @@ WellInfo WellBox::wellInfo() const
     m[ManufacturerField] = getIndexFromFields(manufacturerCombo->currentText());
 
     // 把wellsize提取出来比较方便
-    if (brand.count("384")) m[WellsizeField] = "384";
+    if (brand.count(WellSize384)) m[WellsizeField] = WellSize384;
+    else if (brand.count(WellSize24)) m[WellsizeField] = WellSize24;
+    else if (brand.count(WellSize96)) m[WellsizeField] = WellSize96;
+    else if (brand.count(WellSize6) && !brand.count(WellSize96)){
+        m[WellsizeField] = WellSize6; // 96包含了6,所以包含6不能说明就是6,还不能是96
+    }
 
     return m;
 }

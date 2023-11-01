@@ -58,8 +58,11 @@ PreviewToolInfo PreviewTool::toolInfo() const
 
     // 1. wellbox的brand+manufacturer
     auto wellinfo = wellbox->wellInfo();
-    foreach(auto key,wellinfo.keys())
-        info[key] = wellinfo[key];
+    info[WellsizeField] = wellinfo[WellsizeField];
+    info[BrandField] = wellinfo[BrandField];
+    info[ManufacturerField] = wellinfo[ManufacturerField];
+//    foreach(auto key,wellinfo.keys())
+//        info[key] = wellinfo[key];
 
     // 2. objective
     auto objectiveinfo = objectivebox->objectiveInfo();

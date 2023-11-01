@@ -155,6 +155,7 @@ typedef QMap<QString,QString> ChannelInfo;
 typedef QMap<QString,QString> CameraInfo;
 typedef QMap<QString,CameraInfo> MultiCameraInfo;
 typedef QVariantMap PreviewToolInfo;
+typedef QVariantMap PreviewPatternInfo;
 typedef QVariantMap PreviewInfo;
 typedef QMap<QString,QString> LocationObjectiveInfo;
 //struct ChannelInfo {
