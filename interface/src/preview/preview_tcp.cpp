@@ -35,6 +35,9 @@ void Preview::previewView(const QPoint &point)
 void Preview::saveExperConfig(const QString& path)
 { // 保存实验配置
     //LOG<<path<<previewinfo;
+    previewinfo[PreviewPatternField] = pattern->patternInfo();
+    previewinfo[PreviewToolField] = toolbar->toolInfo();
+
     AssemblerPointer->assemble(TcpFramePool.frame0x0001,previewinfo);
     auto json = AssemblerPointer->message();
 

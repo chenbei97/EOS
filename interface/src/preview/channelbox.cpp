@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-19 10:19:59
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-19 10:20:26
- * @FilePath: \EOS\interface\src\window\channelbox.cpp
+ * @LastEditTime: 2023-11-01 16:14:22
+ * @FilePath: \EOS\interface\src\preview\channelbox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "channelbox.h"
@@ -60,15 +60,15 @@ ChannelInfo ChannelBox::channelInfo() const
     ChannelInfo m;
 
     if (brbox->isChecked())
-        m[ChannelField] = BRField; // 转换为idx无需在这里,这里需要实际字符串
+        m[CurrentChannelField] = BRField; // 转换为idx无需在这里,这里需要实际字符串
     else if (phbox->isChecked())
-        m[ChannelField] = PHField;
+        m[CurrentChannelField] = PHField;
     else if (gfpbox->isChecked())
-        m[ChannelField] = GFPField;
+        m[CurrentChannelField] = GFPField;
     else if (rfpbox->isChecked())
-        m[ChannelField] = RFPField;
+        m[CurrentChannelField] = RFPField;
     else if (dapibox->isChecked())
-        m[ChannelField] = DAPIField;
+        m[CurrentChannelField] = DAPIField;
 
     return m;
 }

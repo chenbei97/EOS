@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-18 15:53:52
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-18 15:54:32
- * @FilePath: \EOS\interface\src\window\previewtool.cpp
+ * @LastEditTime: 2023-11-01 16:15:02
+ * @FilePath: \EOS\interface\src\preview\previewtool.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "previewtool.h"
@@ -72,15 +72,15 @@ PreviewToolInfo PreviewTool::toolInfo() const
     info[ObjectiveTypeField] = objectiveinfo[ObjectiveTypeField];
 
     // 3. channel
-    auto channelinfo = channelbox->channelInfo();
-    info[ChannelField] = channelinfo[ChannelField];
+    auto channelinfo = channelbox->channelInfo();//这个属于临时信息,其实没用
+    info[CurrentChannelField] = channelinfo[CurrentChannelField];
 
     // 4. camerainfo,分不同通道,保存了gain,exposure,bright
     auto camerainfo = camerabox->cameraInfo();
 
-    QStringList channels;
+    QStringList channels;//所有保存过相机配置的通道
     if (!camerainfo.isEmpty()) { // 有保存过的通道参数
-        foreach(auto channel, camerainfo.keys()) {
+        foreach(auto channel, camerainfo.keys()) { // channel=PH,BR
             CameraInfo val = camerainfo[channel];// 每个通道的信息
 
             QVariantMap m;//把每个通道的信息转成QVarintMap
@@ -88,11 +88,12 @@ PreviewToolInfo PreviewTool::toolInfo() const
             m[ExposureField] = val[ExposureField];
             m[GainField] = val[GainField];
             m[BrightField] = val[BrightField];
-            info[channel] = m; // 这个channel字段存储这个CameraInfo
+            info[channel] = m; // 这个channel字段存储这个CameraInfo,"PH":m
             channels << channel;
         }
     }
-    info[ChannelField] = channels;//增加一个key=channel,和objective,well等是平级的,方便组装时判断
+    // 存储有哪些通道被设置过,方便信息组装,本身也是临时信息,没有用
+    info[CaptureChannelField] = channels;//增加一个key=capture_channel,方便组装时判断
 
     // 5. zstack,stitch
     auto zstackinfo = zstackbox->zstackInfo();

@@ -59,13 +59,14 @@ struct Field0x0001{
     // wellbox
     const QString manufacturer = ManufacturerField;
     const QString wellbrand = BrandField;
+    const QString wellsize = WellsizeField;
     // objective
     const QString objective = ObjectiveField;
     const QString objective_magnification = ObjectiveMagnificationField;
-    //
-    const QString wellsize = WellsizeField;
-
+    const QString objective_type = ObjectiveTypeField;
+    // channel
     const QString channel = ChannelField;
+
     const QString ph = PHField;
     const QString gfp = GFPField;
     const QString rfp = RFPField;

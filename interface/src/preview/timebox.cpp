@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-30 16:03:47
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-30 16:06:48
+ * @LastEditTime: 2023-11-01 16:15:40
  * @FilePath: \EOS\interface\src\preview\timebox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -41,7 +41,7 @@ TimeInfo TimeBox::timeInfo() const
     info[StartTimeField] = startTime().toString(DefaultDateTimeFormat);
     QString channels = QString("%1,%2,%3,%4,%5").arg(brbox->isChecked()).arg(phbox->isChecked())
             .arg(gfpbox->isChecked()).arg(rfpbox->isChecked()).arg(dapibox->isChecked());
-    info[ExperChannelField] = channels;
+    info[ChannelField] = channels;
 
     return info;
 }

@@ -95,6 +95,7 @@ void Preview::initAttributes()
     pattern->setMinimumHeight(PreviewPatternMinHeight);
 
     previewinfo[PreviewToolField] = toolbar->toolInfo();
+    previewinfo[PreviewPatternField] = pattern->patternInfo();
 }
 
 void Preview::initObjects()

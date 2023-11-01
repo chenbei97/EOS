@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-11-01 14:55:19
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 14:56:33
- * @FilePath: \EOS\component\include\constant.h
+ * @LastEditTime: 2023-11-01 16:15:29
+ * @FilePath: \EOS\component\include\fields.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #ifndef EOSI_FIELDS_H
@@ -138,6 +138,8 @@ static const QFieldList ObjectiveMagnificationFields = {
 // channel涉及的数据类型
 static const char* ChannelField = "channel";
 static const char* ChannelFieldLabel = "channel: ";
+static const char* CurrentChannelField = "current_channel";
+static const char* CaptureChannelField = "capture_channel";
 static const char* BRField = "BR";
 static const char* PHField = "PH";
 static const char* GFPField = "GFP";
@@ -203,7 +205,6 @@ static const char* IsScheduleField = "is_schedule";
 static const char* TotalTimeField = "total_time";
 static const char* DurationTimeField = "duration_time";
 static const char* StartTimeField = "start_time";
-static const char* ExperChannelField = "exper_channel";
 
 // groupinfo涉及的
 static const char* GroupTypeField = "grouptype";
