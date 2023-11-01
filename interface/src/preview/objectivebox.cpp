@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-23 13:55:14
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-23 14:13:59
- * @FilePath: \EOS\interface\src\window\objectivebox.cpp
+ * @LastEditTime: 2023-11-01 17:13:02
+ * @FilePath: \EOS\interface\src\preview\objectivebox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "objectivebox.h"
@@ -83,34 +83,40 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
 
     if (rbtn_loc1->isChecked()) {
         m[ObjectiveField] = rbtn_loc1->text(); // 传递实际字符串
-        m[CameraLocationField] = CameraLocationField1Index;
+        m[CameraLocationField] = QString::number(CameraLocationField1Index);
 
     }
     else if (rbtn_loc2->isChecked()) {
         m[ObjectiveField] = rbtn_loc2->text();
-        m[CameraLocationField] = CameraLocationField2Index;
+        m[CameraLocationField] = QString::number(CameraLocationField2Index);
     }
     else if (rbtn_loc3->isChecked()) {
         m[ObjectiveField] = rbtn_loc3->text();
-        m[CameraLocationField] = CameraLocationField3Index;
+        m[CameraLocationField] = QString::number(CameraLocationField3Index);
     }
     else if (rbtn_loc4->isChecked()) {
         m[ObjectiveField] = rbtn_loc4->text();
-        m[CameraLocationField] = CameraLocationField4Index;
+        m[CameraLocationField] = QString::number(CameraLocationField4Index);
     }
 
     //LOG<<m; // 注意! : 由于objectivesetting信号是异步的,此时rbtn_loc1其实并未赋值,所以构造函数初始化时要保持一致
 
     // 为了方便增加ObjectiveMagnificationField字段只放物镜的倍数,方便更新view窗口的尺寸
     // objective=br4x,ObjectiveMagnification=4x,ObjectiveType=br;
-    if (m[ObjectiveField].contains(Objective4x)) m[ObjectiveMagnificationField]=Objective4x;
-    else if (m[ObjectiveField].contains(Objective10x)) m[ObjectiveMagnificationField]=Objective10x;
-    else if (m[ObjectiveField].contains(Objective20x)) m[ObjectiveMagnificationField]=Objective20x;
-    else if (m[ObjectiveField].contains(Objective40x)) m[ObjectiveMagnificationField]=Objective40x;
+    if (m[ObjectiveField].contains(Objective4x)) 
+        m[ObjectiveMagnificationField]=Objective4x;
+    else if (m[ObjectiveField].contains(Objective10x)) 
+        m[ObjectiveMagnificationField]=Objective10x;
+    else if (m[ObjectiveField].contains(Objective20x)) 
+        m[ObjectiveMagnificationField]=Objective20x;
+    else if (m[ObjectiveField].contains(Objective40x)) 
+        m[ObjectiveMagnificationField]=Objective40x;
 
     // 同理增加,ObjectiveTypeField
-    if (m[ObjectiveField].contains(ObjectivePH)) m[ObjectiveTypeField]=ObjectivePH;
-    else if (m[ObjectiveField].contains(ObjectiveBR)) m[ObjectiveTypeField]=ObjectiveBR;
+    if (m[ObjectiveField].contains(ObjectivePH)) 
+        m[ObjectiveTypeField]=getIndexFromFields(ObjectivePH);
+    else if (m[ObjectiveField].contains(ObjectiveBR)) 
+        m[ObjectiveTypeField]=getIndexFromFields(ObjectiveBR);
 
     return m;
 }

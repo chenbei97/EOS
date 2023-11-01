@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-19 11:16:44
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-19 13:36:05
- * @FilePath: \EOS\interface\src\window\wellbox.cpp
+ * @LastEditTime: 2023-11-01 16:24:18
+ * @FilePath: \EOS\interface\src\preview\wellbox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "wellbox.h"
@@ -56,11 +56,11 @@ WellInfo WellBox::wellInfo() const
     m[ManufacturerField] = getIndexFromFields(manufacturerCombo->currentText());
 
     // 把wellsize提取出来比较方便
-    if (brand.count(WellSize384)) m[WellsizeField] = WellSize384;
-    else if (brand.count(WellSize24)) m[WellsizeField] = WellSize24;
-    else if (brand.count(WellSize96)) m[WellsizeField] = WellSize96;
+    if (brand.count(WellSize384)) m[WellsizeField] = getIndexFromFields(WellSize384);
+    else if (brand.count(WellSize24)) m[WellsizeField] = getIndexFromFields(WellSize24);
+    else if (brand.count(WellSize96)) m[WellsizeField] = getIndexFromFields(WellSize96);
     else if (brand.count(WellSize6) && !brand.count(WellSize96)){
-        m[WellsizeField] = WellSize6; // 96包含了6,所以包含6不能说明就是6,还不能是96
+        m[WellsizeField] = getIndexFromFields(WellSize6); // 96包含了6,所以包含6不能说明就是6,还不能是96
     }
 
     return m;

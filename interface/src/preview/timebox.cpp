@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-30 16:03:47
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 16:15:40
+ * @LastEditTime: 2023-11-01 17:09:57
  * @FilePath: \EOS\interface\src\preview\timebox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -22,10 +22,12 @@ void TimeBox::disableChannel(const QString &obj)
 { // obj = br4x,ph4x
     if (obj.contains(ObjectiveBR)) {
         phbox->setEnabled(false);
+        phbox->setChecked(false); // 被禁用时也要取消掉勾选
         brbox->setEnabled(true);
     } else if (obj.contains(ObjectivePH)) {
         phbox->setEnabled(true);
         brbox->setEnabled(false);
+        brbox->setChecked(false);// 被禁用时也要取消掉勾选
     } else {
         // 可能是无镜头 none 对通道的勾选没有影响
     }

@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-30 13:43:21
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-30 13:49:10
+ * @LastEditTime: 2023-11-01 16:55:34
  * @FilePath: \EOS\interface\src\preview\zstackbox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -30,8 +30,8 @@ ZStackInfo ZStackBox::zstackInfo() const
 {
     ZStackInfo info;
 
-    info[ZStackField] = zstack->isChecked();
-    info[StitchField] = stitchimage->isChecked();
+    info[ZStackField] = QString::number((int)zstack->isChecked());
+    info[StitchField] = QString::number((int)stitchimage->isChecked());
 
     return info;
 }

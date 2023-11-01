@@ -6,6 +6,10 @@
         "list": "cpp",
         "random": "cpp",
         "vector": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "xhash": "cpp",
+        "xstring": "cpp",
+        "chrono": "cpp",
+        "xlocmon": "cpp"
     }
 }

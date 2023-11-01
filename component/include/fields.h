@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-11-01 14:55:19
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 16:15:29
+ * @LastEditTime: 2023-11-01 17:22:19
  * @FilePath: \EOS\component\include\fields.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -129,7 +129,7 @@ static const char* Objective10x = "10x";
 static const char* Objective20x = "20x";
 static const char* Objective40x = "40x";
 static const QFieldList ObjectiveTypeFields = {
-        ObjectivePH,ObjectiveBR,
+        ObjectiveBR,ObjectivePH
 };
 static const QFieldList ObjectiveMagnificationFields = {
         Objective4x,Objective10x,Objective20x,Objective40x
@@ -172,6 +172,8 @@ static const QFieldList ChannelFields = {
 #define BrightUpLimit 100
 #define FocusToolFocusMaxVal 50000
 #define FocusToolStepMaxVal 25000
+static const char* CameraLocationField = "camera_loc";
+static const char* CameraChannelField = "camera_channel";
 static const char* ExposureField = "exposure";
 static const char* ExposureFieldLabel = "exposure: ";
 static const char* ExposureFieldUnit = "ms";
@@ -183,8 +185,7 @@ static const char* BrightFieldLabel = "bright: ";
 static const char* FocusToolFocusLabel = "focus: ";
 static const char* FocusToolStepLabel = "step: ";
 static const char* FocusField = "focus";
-static const char* FocusStepField = "focusstep";
-static const char* CameraLocationField = "camera_loc";
+static const char* FocusStepField = "focus_step";
 static const char* CameraLocationField1 = "loc_1";
 static const char* CameraLocationField2 = "loc_2";
 static const char* CameraLocationField3 = "loc_3";
@@ -252,10 +253,10 @@ static const QFieldList NavigBarFields = {
 // 需要手动转换成idx的字段
 static const QList<QFieldList> SocketNeedMapFields{
         Brand1Fields,Brand2Fields,Brand3Fields,Brand4Fields,
-        ChannelFields,ManufacturerFields,ObjectiveMagnificationFields,
-        CameraLocationFieldFields,AppFields
+        ChannelFields,ManufacturerFields,ObjectiveMagnificationFields,ObjectiveTypeFields,
+        CameraLocationFieldFields,AppFields,WellsizeFields
 };
-
+// #include "qdebug.h"
 static QString getIndexFromFields (QCString field)
 { // 用于把这些字段统一映射为0,1,2,3方便下位机读取
     // 例如4x,jpg,bright,avi都应该映射为0
