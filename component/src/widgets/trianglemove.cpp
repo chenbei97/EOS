@@ -12,7 +12,7 @@ TriangleMove::TriangleMove(QWidget *parent) : QWidget(parent)
 {
     mLastPos = QPoint(-1,-1);
     highcolor  = Qt::green;
-    highcolor.setAlpha(PatternColorAlpha);
+    highcolor.setAlpha(DefaultColorAlpha);
     trianglen = TriangleLength;
     trianggap = TriangleGap;
 

@@ -10,41 +10,17 @@
 #define EOSI_SQLSTATEMENTS_H
 
 #include "alias.h"
-
-enum class SQLType {Mysql,Sqlite};
-Q_ENUMS(SQLType)
-
-// 驱动的相关设置
-static const char* SqliteDriver = "sqlite";
-static const char* QSqliteDriver = "QSLITE";
-static const char* SqlcipherDriver = "sqlcipher";
-static const char* QSqlcipherDriver = "SQLITECIPHER";
-static const char* MysqlDriver = "mysql";
-static const char* QMysqlDriver = "QMYSQL";
-static const char* SqliteFileSuffix = ".db3";
-//#define UseSqlcipher true
-static const char*  SqliteDataBasePassword = "cb199791";
-static const char*  MysqlDataBaseConnections = "MYSQL_OPT_CONNECT_TIMEOUT=1;";
-static const char*  SqliteDataBaseConnectionsFirst =
-        "QSQLITE_USE_CIPHER=sqlcipher; ""SQLCIPHER_LEGACY=1; "
-        "SQLCIPHER_LEGACY_PAGE_SIZE=4096;QSQLITE_CREATE_KEY";
-static const char*  SqliteDataBaseConnectionsAgain =
-        "QSQLITE_USE_CIPHER=sqlcipher; ""SQLCIPHER_LEGACY=1; "
-        "SQLCIPHER_LEGACY_PAGE_SIZE=4096";
+#include "constant.h"
 
 // （1）表信息，表架构等
 // （1.1）数据源固定名称
-static const char*  DataBaseName = "eosi";
+static const char*  DataBaseName = "eos";
 // （1.2）表的名称
 static const char * LoginInfoTableName = "logininfo";
 static const char* ExperGeneralConfigTableName = "experconfig";
 static const char* GroupPointTableName = "grouppoint";
 // （1.3）每张表的所有字段，按照顺序存储
-static const char * LoginInfoUserField = "user";
-static const char * LoginInfoPwdField = "pwd";
-static const char * LoginInfoPLoginField = "last_login";
-static const char * LoginInfoDefaultUser = "admin";
-static const char * LoginInfoDefaultPwd = "123456";
+static const char * LoginInfoLastLoginField = "last_login";
 
 static const QFieldList LoginInfoConfigFields = {
         "user","pwd","last_login"

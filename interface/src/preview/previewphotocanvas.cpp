@@ -94,6 +94,6 @@ PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)
     mcols = 0;
     mMousePoint = QPoint(-1,-1);
     mLastPos = {-1,-1};
-    mMouseClickColor.setAlpha(PatternColorAlpha);
+    mMouseClickColor.setAlpha(DefaultColorAlpha);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 }

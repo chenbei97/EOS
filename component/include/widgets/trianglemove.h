@@ -11,6 +11,7 @@
 
 #include "widgets.h"
 #include "alias.h"
+#include "constant.h"
 
 class COMPONENT_IMEXPORT TriangleMove: public QWidget
 {

@@ -11,7 +11,7 @@
 NavigBar::NavigBar(QWidget*parent): QWidget(parent)
 {
     lastPos = QPoint(-1,-1);
-    hightcolor.setAlpha(PatternColorAlpha);
+    hightcolor.setAlpha(DefaultColorAlpha);
     foreach(auto text, NavigBarFields)
         pixwidths << (NavigBarWidth-NavigPainterMetric.width(text))/2;
 

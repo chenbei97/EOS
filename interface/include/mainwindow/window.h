@@ -28,81 +28,14 @@ using std::modf;
 #endif
 
 // (3) 常量
-#define WarningChinese tr("警告")
-#define InformationChinese tr("消息")
-#define CriticalChinese tr("错误")
-#define DefaultDateTimeFormat "yyyy_MM_dd hh::mm"
-#define DefaultPainterFont QFont(DefaultFontFamily,DefaultFontSize,QFont::Bold)
-#define DefaultPainterMetric (QFontMetrics(DefaultPainterFont))
-#define DefaultPainterPixelHeight (DefaultPainterMetric.height()) //指定font下文字像素的高度
-#define FocusToolFocusMaxVal 50000
-#define FocusToolStepMaxVal 25000
-#define FocusToolFocusLabel "focus: "
-#define FocusToolStepLabel "step: "
-static const char* FocusField = "focus";
-static const char* FocusStepField = "focusstep";
-static const char* LiveField = "live";
-static const char* PhotoField = "photo";
-static const char* ZStackField = "zstack";
-static const char* StitchField = "stitch";
-#define LiveFieldMetricWidth DefaultPainterMetric.width(LiveField)
-#define PhotoFieldMetricWidth DefaultPainterMetric.width(PhotoField)
+// navigbar
 #define NavigPainterFontSize 20
 #define NavigPainterFont (QFont(DefaultFontFamily,NavigPainterFontSize,QFont::Bold))
 #define NavigPainterMetric (QFontMetrics(NavigPainterFont))
 #define NavigPainterPixelHeight (NavigPainterMetric.height()) //指定font下文字像素的高度
 #define NavigBarColor QColor("#767C85")
-#define AppSelectColor QColor("#2F7CAD")
-#define PreviewPhotoCanvasViewRectColor QColor("#00A2E8")
+
 #define PointToIDCoefficient 1000 // kx1+y1=kx2+y2=> k=(y2-y1)/(x1-x2),k取什么值?找不到这样的2个坐标能等于k,由于wellsize最大384,实际上k>384就能保证id唯一了
-static const char* HourField = "hour";
-static const char* MinuteField = "minute";
-static const char* HoursFieldSuffix = " hours";
-static const char* MinutesFieldSuffix = " minutes";
-#define TimeBoxPhotoTimeLimit 1800
-#define TimeBoxPhotoTimeWaring (QObject::tr("警告:实验间隔时间不能低于%1分钟!").arg(TimeBoxPhotoTimeLimit/60))
-#define TimeBoxTotalBeyondDurationWaring (QObject::tr("警告:实验时长至少大于等于一个实验间隔!"))
-static const char* PreviewToolField = "previewtool";
-static const QStringList TimeBoxTimeUnitFields = {
-        HourField,MinuteField,
-};
-
-static const QFieldList NavigBarFields = {
-    "Logo","Main","Preview","Data","Analysis","Settings"
-};
-#define NavigBarFieldsCount  (NavigBarFields.count())
-
-static const QFieldList AppFields = {
-    QObject::tr("增殖"),QObject::tr("划痕"),QObject::tr("侵袭"),QObject::tr("转染"),
-    QObject::tr("形态学"),QObject::tr("类器官"),QObject::tr("药效和毒理"),QObject::tr("自定义")
-};
-static const char* AppSelectField = "appselect";
-static const char* CameraLocationField = "camera_loc";
-static const char* CameraLocationField1 = "loc_1";
-static const char* CameraLocationField2 = "loc_2";
-static const char* CameraLocationField3 = "loc_3";
-static const char* CameraLocationField4 = "loc_4";
-static const QFieldList CameraLocationFieldFields = {
-        CameraLocationField1,CameraLocationField2,CameraLocationField3,CameraLocationField4
-};
-#define CameraLocationField1Index  CameraLocationFieldFields.indexOf(CameraLocationField1)
-#define CameraLocationField2Index  CameraLocationFieldFields.indexOf(CameraLocationField2)
-#define CameraLocationField3Index  CameraLocationFieldFields.indexOf(CameraLocationField3)
-#define CameraLocationField4Index  CameraLocationFieldFields.indexOf(CameraLocationField4)
-static const char* Bright4xField = "br4x";
-static const char* PH4xField = "ph4x";
-static const char* Bright10xField = "br10x";
-static const char* PH10xField = "ph10x";
-static const char* Bright20xField = "br20x";
-static const char* PH20xField = "ph20x";
-static const char* Bright40xField = "br40x";
-static const char* PH40xField = "ph40x";
-static const char* NoneField = "none";
-static const QFieldList ObjectiveSettingFields = {
-    Bright4xField,PH4xField,Bright10xField,PH10xField,
-    Bright20xField,PH20xField,Bright40xField,PH40xField,
-    NoneField
-};
 
 #define ScreenWidth 2560
 

@@ -228,8 +228,8 @@ Pattern::Pattern(int rows, int cols,QWidget*parent):mrows(rows),mcols(cols),QWid
     mMouseEvent = false;
     mMousePos = {-1,-1};
     mLastPos = {-1,-1};
-    mInnerCircleColor.setAlpha(PatternColorAlpha);
-    mMouseClickColor.setAlpha(PatternColorAlpha);
+    mInnerCircleColor.setAlpha(DefaultColorAlpha);
+    mMouseClickColor.setAlpha(DefaultColorAlpha);
     //setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
 }
 

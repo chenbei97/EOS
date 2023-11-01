@@ -10,6 +10,11 @@
 #define EOSI_PUBLIC_H
 
 // (1) 头文件包含
+#include "alias.h"
+#include "utilities.h"
+#include "fields.h"
+#include "constant.h"
+
 #include "tcpsocket.h"
 #include "assemble.h"
 #include "assemblecontrol.h"

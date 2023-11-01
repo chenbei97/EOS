@@ -20,6 +20,8 @@
 #include "qvector.h"
 #include "qpair.h"
 #include "qqueue.h"
+#include "qset.h"
+#include "qdebug.h"
 
 #include <random>
 using std::sort;

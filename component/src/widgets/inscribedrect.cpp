@@ -212,7 +212,7 @@ InscribedRect::InscribedRect(QWidget *parent) : QWidget(parent)
     mcols = InscribedRectDefaultCols;
     mMousePoint = QPoint(-1,-1);
     mLastPos = {-1,-1};
-    mMouseClickColor.setAlpha(PatternColorAlpha);
+    mMouseClickColor.setAlpha(DefaultColorAlpha);
     mDrapRect = QRectF();
     mInnerRectSize = InscribedRectSize;
     setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -224,7 +224,7 @@ InscribedRect::InscribedRect(int row,int col,QWidget *parent) : QWidget(parent)
     mcols = col;
     mMousePoint = QPoint(-1,-1);
     mLastPos = {-1,-1};
-    mMouseClickColor.setAlpha(PatternColorAlpha);
+    mMouseClickColor.setAlpha(DefaultColorAlpha);
     mDrapRect = QRectF();
     mInnerRectSize = InscribedRectSize;
     setContextMenuPolicy(Qt::ActionsContextMenu);

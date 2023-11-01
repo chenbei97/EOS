@@ -11,6 +11,7 @@
 
 #include "widgets.h"
 #include "alias.h"
+#include "constant.h"
 #include "groupinfo.h"
 #include "circle.h"
 

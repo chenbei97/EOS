@@ -12,6 +12,7 @@
 
 #include "widgets.h"
 #include "alias.h"
+#include "constant.h"
 
 class COMPONENT_IMEXPORT InscribedRect : public QWidget
 {

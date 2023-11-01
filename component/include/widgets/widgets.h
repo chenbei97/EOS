@@ -52,27 +52,16 @@
 #include "qevent.h"
 #include "qaction.h"
 #include "qmath.h"
-#include "qdatetime.h"
-#include "qdebug.h"
-#include "qscreen.h"
-#include "qdesktopwidget.h"
-#include "qapplication.h"
+
+#include "fields.h"
+#include "constant.h"
 
 // (3) 常量定义
-#define CURRENT_PATH (QDir::currentPath())
-#define CURRENT_THREAD (QThread::currentThread())
-#define DefaultFontSize 10
-#define DefaultFontFamily ("Times New Roman")
-#define PatternColorAlpha 125
 #define SplitterHandleWidth 2
 #define SplitterStyle ("QSplitter::handle { background-color: #F2A072 }")
 #define ProgressBarStyle ("QProgressBar{border:2px solid grey;border-radius:5px;text-align:center;}"\
                                     "QProgressBar::chunk{background-color: #CD96CD;width: 10px;margin: 0.5px;}")
 #define ColorButtonStyle QString("border:2px solid black;border-radius:20px;background-color:%1;")
-#define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
-
-#define UserScreenWidth (QApplication::desktop()->screenGeometry().width())
-#define UserScreenHeight (QApplication::desktop()->screenGeometry().height())
 #define ProgressBarMinHeight 40
 #define ColorButtonSize 40
 #define GroupInfoSize QSize(400,250)
@@ -85,22 +74,5 @@
 #define TriangleGap 10
 #define TriangleMinHeight 160
 #define TriangleMinWidth (TriangleMinHeight/0.618)
-static const char* GroupTypeField = "grouptype";
-static const char* GroupNameField = "groupname";
-static const char* GroupColorField = "groupcolor";
-static const char* GroupPointsField = "grouppoints";
-static const char* GroupMedicineField = "groupmedicine";
-static const char* GroupDoseField = "groupdose";
-static const char* GroupDoseUnitField = "groupdoseunit";
-static const char* AllGroupsField = "allgroups";
-static const char* CoordinateField = "coordinate";
-static const char* ViewSizeField = "viewsize";
-static const char* ViewPointsField = "viewpoints";
-static const QStringList GroupDoseUnitFields =  {
-        "mg/mL","mg/L","g/mL","g/L",
-};
-static const QStringList GroupTypeFields = {
-        QObject::tr("控制组"),QObject::tr("对照组"),QObject::tr("对照3"),
-};
 
 #endif //EOSI_WIDGETS_H

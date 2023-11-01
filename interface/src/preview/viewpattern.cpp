@@ -318,7 +318,7 @@ ViewPattern::ViewPattern(QWidget *parent) : QWidget(parent)
     mcols = 0;
     mMousePoint = QPoint(-1,-1);
     mLastPos = {-1,-1};
-    mMouseClickColor.setAlpha(PatternColorAlpha);
+    mMouseClickColor.setAlpha(DefaultColorAlpha);
     //initDrapPoints();// 无需调用,构造出来默认不会有拖拽框
     //initSelectPoints();//无需调用,因为当前孔未知
 

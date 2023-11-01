@@ -50,8 +50,13 @@ WellInfo WellBox::wellInfo() const
 {
     WellInfo m;
 
-    m[BrandField] = getIndexFromFields(wellbrandCombo->currentText());
+    auto brand = wellbrandCombo->currentText();
+
+    m[BrandField] = getIndexFromFields(brand);
     m[ManufacturerField] = getIndexFromFields(manufacturerCombo->currentText());
+
+    // 把wellsize提取出来比较方便
+    if (brand.count("384")) m[WellsizeField] = "384";
 
     return m;
 }
