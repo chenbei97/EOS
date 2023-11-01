@@ -19,8 +19,14 @@ public:
     explicit SaveBox(QWidget*parent= nullptr);
 private:
     PushButton * loadbtn;
-    PushButton * saveallbtn;
+    PushButton * exportallbtn;
     CheckBox * exportToFile;
     LineEdit * filenameedit;
+private:
+    void loadExper();
+    void showExport(bool enable);
+    void exportFile();
+signals:
+    void exportFilePath(const QString&path);
 };
 #endif //EOSI_SAVEBOX_H

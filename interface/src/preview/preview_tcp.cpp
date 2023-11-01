@@ -32,8 +32,12 @@ void Preview::previewView(const QPoint &point)
     
 }
 
-void Preview::onLocationSettingChanged(int option)
-{
-    LOG<<"option = "<<option;
-    previewinfo[CameraLocationField] = QString::number(option);
+void Preview::saveExperConfig(const QString& path)
+{ // 保存实验配置
+    //LOG<<path<<previewinfo;
+    AssemblerPointer->assemble(TcpFramePool.frame0x0001,previewinfo);
+    auto json = AssemblerPointer->message();
+
+    JsonReadWrite m; // 借助工具类写到文件内
+    m.writeJson(path,json);
 }

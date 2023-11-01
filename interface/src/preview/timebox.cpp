@@ -18,23 +18,17 @@ TimeBox::TimeBox(QWidget *parent) : GroupBox(parent)
     timeInfo();
 }
 
-void TimeBox::onObjectiveSettingChanged(int option)
-{
-    //LOG<<"option = "<<option;
-    if (option == ObjectiveSettingFields.indexOf(NoneField))
-        return;
-
-    bool r1 = ((option == ObjectiveSettingFields.indexOf(Bright4xField)) ||
-                (option == ObjectiveSettingFields.indexOf(Bright10xField)) ||
-                (option == ObjectiveSettingFields.indexOf(Bright20xField)) ||
-                (option == ObjectiveSettingFields.indexOf(Bright40xField)));
-   if (r1) {
-        brbox->setEnabled(true);
+void TimeBox::disableChannel(const QString &obj)
+{ // obj = br4x,ph4x
+    if (obj.contains(ObjectiveBR)) {
         phbox->setEnabled(false);
-   } else {
-       brbox->setEnabled(false);
-       phbox->setEnabled(true);
-   }
+        brbox->setEnabled(true);
+    } else if (obj.contains(ObjectivePH)) {
+        phbox->setEnabled(true);
+        brbox->setEnabled(false);
+    } else {
+        // 可能是无镜头 none 对通道的勾选没有影响
+    }
 }
 
 TimeInfo TimeBox::timeInfo() const
@@ -63,7 +57,7 @@ void TimeBox::refreshInfo()
     if (isSchedule())
         datetime = datetimeedit->dateTime();
     else datetime = QDateTime::currentDateTime(); // 立即扫描是基于当前时间进行计算
-    auto end = datetime.addSecs(totalTime()).toString(DateTimeDefaultFormat);
+    auto end = datetime.addSecs(totalTime()).toString(DefaultDateTimeFormat);
     tipinfo->setText(tr("预计结束时间: %1  总扫描次数: %2").arg(end).arg(count));
 }
 
@@ -122,6 +116,10 @@ void TimeBox::initAttributes()
     durationtime->setRange(1,LONG_MAX);
     durationtime->setSuffix(HoursFieldSuffix);
     durationtime->setValue(1.0);
+
+    // objectivesetting,默认是br4x,故objectivebox默认是br4x,故默认brbox是启用,phbox禁用
+    brbox->setEnabled(true);
+    phbox->setEnabled(false);
 }
 
 void TimeBox::initConnections()

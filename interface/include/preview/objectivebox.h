@@ -17,14 +17,17 @@ class INTERFACE_IMEXPORT ObjectiveBox: public GroupBox
 public:
     explicit ObjectiveBox(QWidget*parent= nullptr);
     ObjectiveInfo objectiveInfo() const;
+public slots:
+    void onObjectiveSettingChanged(const LocationObjectiveInfo& m);
 private:
-    QRadioButton *  rbtn4;
-    QRadioButton *  rbtn10;
-    QRadioButton *  rbtn20;
-    QRadioButton *  rbtn40;
+    QRadioButton *  rbtn_loc1;
+    QRadioButton *  rbtn_loc2;
+    QRadioButton *  rbtn_loc3;
+    QRadioButton *  rbtn_loc4;
+    QMap<QString,QRadioButton*> location_button;
     void onClicked();
 signals:
-    void objectiveChanged(int option);
+    void objectiveChanged(const QString& obj);
 };
 
 #endif //EOSI_OBJECTIVEBOX_H

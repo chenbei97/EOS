@@ -16,6 +16,10 @@ ChannelBox::ChannelBox(QWidget*parent): GroupBox(parent)
     rfpbox = new QRadioButton(RFPField);
     dapibox = new QRadioButton(DAPIField);
 
+    // objectivesetting,默认是br4x,故objectivebox默认是br4x,故默认brbox是启用,phbox禁用
+    brbox->setEnabled(true);
+    phbox->setEnabled(false);
+
     auto lay = new QHBoxLayout;
 
     lay->addWidget(brbox);
@@ -38,22 +42,16 @@ ChannelBox::ChannelBox(QWidget*parent): GroupBox(parent)
     connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&ChannelBox::channelChanged);
 }
 
-void ChannelBox::onObjectiveSettingChanged(int option)
-{
-    //LOG<<"option = "<<option;
-    if (option == ObjectiveSettingFields.indexOf(NoneField))
-        return;
-
-    bool r1 = ((option == ObjectiveSettingFields.indexOf(Bright4xField)) ||
-               (option == ObjectiveSettingFields.indexOf(Bright10xField)) ||
-               (option == ObjectiveSettingFields.indexOf(Bright20xField)) ||
-               (option == ObjectiveSettingFields.indexOf(Bright40xField)));
-    if (r1) {
-        brbox->setEnabled(true);
+void ChannelBox::disableChannel(const QString &obj)
+{ // obj = br4x,ph4x
+    if (obj.contains(ObjectiveBR)) {
         phbox->setEnabled(false);
-    } else {
-        brbox->setEnabled(false);
+        brbox->setEnabled(true);
+    } else if (obj.contains(ObjectivePH)) {
         phbox->setEnabled(true);
+        brbox->setEnabled(false);
+    } else {
+        // 可能是无镜头 none 对通道的勾选没有影响
     }
 }
 

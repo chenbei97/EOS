@@ -30,6 +30,8 @@
 #define SocketPort 3000
 #define LocalHost "localhost"
 #define SocketWaitTime 3000
+static const char* ConfigFileSuffix = ".eos";
+static const char* MatchConfigFileSuffix = "*.eos";
 #define DefaultDateTimeFormat "yyyy_MM_dd hh::mm"
 static const char* FrameField = "frame";
 static const char* SeparateField = "@@@";
@@ -47,16 +49,22 @@ static const QFieldList WellsizeFields = {
 static const char* WellsizeField = "wellsize";
 static const char* WellsizeFieldLabel = "wellsize: ";
 
-static const QFieldList ObjectiveFields = {
-        "4x","10x","20x","40x",
-};
-#define Objective4x  "4x"
-#define Objective10x  "10x"
-#define Objective20x  "20x"
-#define Objective40x  "40x"
 static const char* ObjectiveField = "objective";
+static const char* ObjectiveMagnificationField = "objective_magnification";
+static const char* ObjectiveTypeField = "objective_type";
 static const char* ObjectiveFieldLabel = "objective: ";
-
+#define ObjectivePH "ph"
+#define ObjectiveBR "br"
+static const QFieldList ObjectiveTypeFields = {
+        ObjectivePH,ObjectiveBR,
+};
+#define Objective4x "4x"
+#define Objective10x "10x"
+#define Objective20x "20x"
+#define Objective40x "40x"
+static const QFieldList ObjectiveMagnificationFields = {
+        Objective4x,Objective10x,Objective20x,Objective40x
+};
 static const QFieldList ChannelFields = {
         "BR","PH","GFP","RFP","DAPI"
 };
@@ -208,8 +216,8 @@ static const char* StartTimeField = "start_time";
 static const char* ExperChannelField = "exper_channel";
 
 static const QList<QFieldList> SocketNeedMapFields{
-        ObjectiveFields,Brand1Fields,Brand2Fields,Brand3Fields,Brand4Fields,
-        ChannelFields,ManufacturerFields
+        Brand1Fields,Brand2Fields,Brand3Fields,Brand4Fields,
+        ChannelFields,ManufacturerFields,ObjectiveMagnificationFields,
 };
 
 static QString getIndexFromFields (QCString field)
@@ -259,12 +267,15 @@ struct Field0x0001{
     // 不需要传递给下位机(但是Tcp用过的字段)
     const QString path = "path"; // 本命令需要回复路径
     // 传给下位机json涉及的字段
-    const QString objective = ObjectiveField;
+    // wellbox
+    const QString manufacturer = ManufacturerField;
     const QString wellbrand = BrandField;
+    // objective
+    const QString objective = ObjectiveField;
+    const QString objective_magnification = ObjectiveMagnificationField;
+    //
     const QString wellsize = WellsizeField;
-    const QString welldish = DishField;
-    const QString wellflask = FlaskField;
-    const QString wellslide = SlideField;
+
     const QString channel = ChannelField;
     const QString ph = PHField;
     const QString gfp = GFPField;
@@ -273,6 +284,10 @@ struct Field0x0001{
     const QString exposure = ExposureField;
     const QString gain = GainField;
     const QString bright = BrightField;
+
+//    const QString welldish = DishField;
+//    const QString wellflask = FlaskField;
+//    const QString wellslide = SlideField;
     //const QString imageformat = "imageformat";
     //const QString videoformat = "videoformat";
     //const QString x = "x";
@@ -334,43 +349,43 @@ static QByteArray assemble0x0001(QCVariantMap m)
 {// preview界面调整各种参数时发送的toolInfo+patternInfo
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0001;
-
-    object[Field0x0001.wellbrand] = getIndexFromFields(m[Field0x0001.wellbrand].toString());
-    object[Field0x0001.wellsize] = getIndexFromFields(m[Field0x0001.wellsize].toString());
-    object[Field0x0001.welldish] = getIndexFromFields(m[Field0x0001.welldish].toString());
-    object[Field0x0001.wellslide] = getIndexFromFields(m[Field0x0001.wellslide].toString());
-    object[Field0x0001.wellflask] = getIndexFromFields(m[Field0x0001.wellflask].toString());
-    object[Field0x0001.objective] = getIndexFromFields(m[Field0x0001.objective].toString());
-
-    auto channels = m[Field0x0001.channel].value<QStringList>();
-    // 应该是个QStringList对象,previewtool.cpp加进去的
-
-    QJsonArray channelCameraInfo; // 组列表
-    if (!channels.isEmpty()) { // 例如channels= {"PH","GFP"}
-
-        QJsonArray channelInfoArr; // 保存所有通道信息的列表,这个是channel字段的值
-
-        foreach(auto currentChannel, channels) {
-            // 通道信息用QVarintMap保存的,有4个key,channel,exposure,gain,bright
-            auto channelInfo = m[currentChannel].value<QVariantMap>();
-
-            Q_ASSERT(currentChannel == channelInfo[ChannelField]);
-            auto exposure = channelInfo[ExposureField].toString();
-            auto gain = channelInfo[GainField].toString();
-            auto bright = channelInfo[BrightField].toString();
-            //LOG<<exposure<<gain<<bright;
-
-            QJsonObject currentChannelInfoObject; // 每个通道的3个信息
-            currentChannelInfoObject[ChannelField] = getIndexFromFields(currentChannel); // 如PH转为0
-            currentChannelInfoObject[ExposureField] = exposure;
-            currentChannelInfoObject[GainField] = gain;
-            currentChannelInfoObject[BrightField] = bright;
-
-            channelInfoArr.append(currentChannelInfoObject); // 所有通道的信息组成列表,这个列表是channel字段的值
-        }
-
-        object[ChannelField] = channelInfoArr; // channel字段
-    }
+//
+//    object[Field0x0001.wellbrand] = getIndexFromFields(m[Field0x0001.wellbrand].toString());
+//    object[Field0x0001.wellsize] = getIndexFromFields(m[Field0x0001.wellsize].toString());
+//    object[Field0x0001.welldish] = getIndexFromFields(m[Field0x0001.welldish].toString());
+//    object[Field0x0001.wellslide] = getIndexFromFields(m[Field0x0001.wellslide].toString());
+//    object[Field0x0001.wellflask] = getIndexFromFields(m[Field0x0001.wellflask].toString());
+//    object[Field0x0001.objective] = getIndexFromFields(m[Field0x0001.objective].toString());
+//
+//    auto channels = m[Field0x0001.channel].value<QStringList>();
+//    // 应该是个QStringList对象,previewtool.cpp加进去的
+//
+//    QJsonArray channelCameraInfo; // 组列表
+//    if (!channels.isEmpty()) { // 例如channels= {"PH","GFP"}
+//
+//        QJsonArray channelInfoArr; // 保存所有通道信息的列表,这个是channel字段的值
+//
+//        foreach(auto currentChannel, channels) {
+//            // 通道信息用QVarintMap保存的,有4个key,channel,exposure,gain,bright
+//            auto channelInfo = m[currentChannel].value<QVariantMap>();
+//
+//            Q_ASSERT(currentChannel == channelInfo[ChannelField]);
+//            auto exposure = channelInfo[ExposureField].toString();
+//            auto gain = channelInfo[GainField].toString();
+//            auto bright = channelInfo[BrightField].toString();
+//            //LOG<<exposure<<gain<<bright;
+//
+//            QJsonObject currentChannelInfoObject; // 每个通道的3个信息
+//            currentChannelInfoObject[ChannelField] = getIndexFromFields(currentChannel); // 如PH转为0
+//            currentChannelInfoObject[ExposureField] = exposure;
+//            currentChannelInfoObject[GainField] = gain;
+//            currentChannelInfoObject[BrightField] = bright;
+//
+//            channelInfoArr.append(currentChannelInfoObject); // 所有通道的信息组成列表,这个列表是channel字段的值
+//        }
+//
+//        object[ChannelField] = channelInfoArr; // channel字段
+//    }
 
     //LOG<<object;
 

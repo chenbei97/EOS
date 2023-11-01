@@ -14,6 +14,12 @@ Setting::Setting(QWidget *parent) : QWidget(parent)
     initAttributes();
     initConnections();
     initLayout();
+    toggleSetting(2);
+}
+
+void Setting::emitSignals()
+{
+    objectivesetting->emitSignals();
 }
 
 void Setting::toggleSetting(int option)
@@ -73,6 +79,6 @@ void Setting::initObjects()
 void Setting::initConnections()
 {
     connect(buttongroup,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&Setting::toggleSetting);
-    connect(objectivesetting,&ObjectiveSetting::locationChanged,this,&Setting::locationChanged);
-    connect(objectivesetting,&ObjectiveSetting::objectiveChanged,this,&Setting::objectiveChanged);
+    connect(objectivesetting,&ObjectiveSetting::objectiveSettingChanged,this,&Setting::objectiveSettingChanged);
+    //objectivesetting->emitSignals();
 }

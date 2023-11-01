@@ -28,6 +28,9 @@ using std::modf;
 #endif
 
 // (3) 常量
+#define WarningChinese tr("警告")
+#define InformationChinese tr("消息")
+#define CriticalChinese tr("错误")
 #define DefaultDateTimeFormat "yyyy_MM_dd hh::mm"
 #define DefaultPainterFont QFont(DefaultFontFamily,DefaultFontSize,QFont::Bold)
 #define DefaultPainterMetric (QFontMetrics(DefaultPainterFont))
@@ -59,7 +62,6 @@ static const char* MinutesFieldSuffix = " minutes";
 #define TimeBoxPhotoTimeLimit 1800
 #define TimeBoxPhotoTimeWaring (QObject::tr("警告:实验间隔时间不能低于%1分钟!").arg(TimeBoxPhotoTimeLimit/60))
 #define TimeBoxTotalBeyondDurationWaring (QObject::tr("警告:实验时长至少大于等于一个实验间隔!"))
-#define DateTimeDefaultFormat "yyyy/MM/dd hh::mm"
 static const char* PreviewToolField = "previewtool";
 static const QStringList TimeBoxTimeUnitFields = {
         HourField,MinuteField,
@@ -80,6 +82,13 @@ static const char* CameraLocationField1 = "loc_1";
 static const char* CameraLocationField2 = "loc_2";
 static const char* CameraLocationField3 = "loc_3";
 static const char* CameraLocationField4 = "loc_4";
+static const QFieldList CameraLocationFieldFields = {
+        CameraLocationField1,CameraLocationField2,CameraLocationField3,CameraLocationField4
+};
+#define CameraLocationField1Index  CameraLocationFieldFields.indexOf(CameraLocationField1)
+#define CameraLocationField2Index  CameraLocationFieldFields.indexOf(CameraLocationField2)
+#define CameraLocationField3Index  CameraLocationFieldFields.indexOf(CameraLocationField3)
+#define CameraLocationField4Index  CameraLocationFieldFields.indexOf(CameraLocationField4)
 static const char* Bright4xField = "br4x";
 static const char* PH4xField = "ph4x";
 static const char* Bright10xField = "br10x";

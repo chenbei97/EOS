@@ -18,7 +18,7 @@ public:
     explicit ChannelBox(QWidget*parent= nullptr);
     ChannelInfo channelInfo() const;
 public slots:
-    void onObjectiveSettingChanged(int option);
+    void disableChannel(const QString& obj);
 private:
     QRadioButton * brbox;
     QRadioButton * phbox;

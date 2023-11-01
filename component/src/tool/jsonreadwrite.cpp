@@ -67,7 +67,7 @@ QByteArray JsonReadWrite::readJson(const QString& path)
     QByteArray json;
 
     QFile file(path);
-    if (file.open(QIODevice::ReadOnly|QIODevice::Text))
+    if (file.open(QIODevice::ReadOnly|QIODevice::Text|QIODevice::Truncate))
     {
         QTextStream stream(&file);
         stream.setCodec("utf-8");

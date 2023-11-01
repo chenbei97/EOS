@@ -61,10 +61,15 @@ void CameraBox::setEnabled(bool enabled)
 }
 
 void CameraBox::setChannel(int option)
-{ // channelbox设置通道后来响应这里的因为
+{
+    // 1. channelbox设置通道后更新相机设置显示的当前通道信息
     auto channel = ChannelFields[option];
     currentchannel->setText(QString("%1%2").arg(ChannelFieldLabel).arg(channel));
+
+    // 2. 防止3个滑动条设置信息的时候触发信号
     cameratool->blockSignals(true);
+
+    // 3.切换通道时,新切换的通道如果设置过信息就同步到界面上
     if (camerainfo.keys().contains(channel)) { // 切换通道,如果通道有保存过的值,同步UI
         cameratool->setBright(camerainfo[channel][BrightField].toUInt());
         cameratool->setExposure(camerainfo[channel][ExposureField].toUInt());

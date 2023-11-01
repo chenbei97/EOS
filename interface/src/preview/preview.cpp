@@ -37,22 +37,15 @@ void Preview::onWellbrandChanged(int option)
 
 }
 
-void Preview::onObjectiveChanged(int option)
+void Preview::onObjectiveChanged(const QString& obj)
 {
     //LOG<<"objective option = "<<option;
     updateViewPatternUi();
 }
 
-void Preview::setPreviewInfo(const QVariantMap &m)
+void Preview::setAppInfo(const QString& app)
 { // 用于appselect传递当前app信息
-    foreach(auto key,m.keys())
-        previewinfo[key] = m[key];
-    //LOG<<"previewinfo = "<<previewinfo;
-}
-
-PreviewInfo Preview::previewInfo() const
-{
-    return previewinfo;
+    previewinfo[AppSelectField] = app;
 }
 
 void Preview::initLayout()
@@ -102,7 +95,6 @@ void Preview::initAttributes()
     pattern->setMinimumHeight(PreviewPatternMinHeight);
 
     previewinfo[PreviewToolField] = toolbar->toolInfo();
-    //previewinfo[CameraLocationField] = QString::number(0); // 默认是1号位
 }
 
 void Preview::initObjects()
@@ -126,6 +118,7 @@ void Preview::initConnections()
     connect(toolbar,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
     connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(toolbar,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
+    connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::saveExperConfig);
 
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
 

@@ -41,17 +41,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(appselect,&AppSelect::scratchClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect, SIGNAL(appClicked(int)),this, SLOT(onAppSelected(int)));
 
-    connect(setting,&Setting::locationChanged,preview,&Preview::onLocationSettingChanged);
-    connect(setting,&Setting::objectiveChanged,preview,&Preview::objectiveSettingChanged);
-
-    setting->locationChanged(0); // 触发时机只能在setting构造出来之后,内部触发不会起作用
-    setting->objectiveChanged(0);
+    connect(setting,&Setting::objectiveSettingChanged,preview,&Preview::objectiveSettingChanged);
+    setting->emitSignals(); // 把objectivesetting的初始配置触发一下去更新previewtool
 }
 
 
 void MainWindow::onAppSelected(int app)
 { // 把选择的app信息传给预览界面
-    QVariantMap m;
-    m[AppSelectField] = QString::number(app);
-    preview->setPreviewInfo(m);
+    preview->setAppInfo(QString::number(app));
 }

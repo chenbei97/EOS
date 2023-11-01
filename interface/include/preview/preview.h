@@ -21,10 +21,7 @@ class INTERFACE_IMEXPORT Preview : public QWidget
     Q_OBJECT
 public:
     explicit Preview(QWidget*parent= nullptr);
-    void setPreviewInfo(const QVariantMap& m);// 用于appselect传递当前app信息
-    PreviewInfo previewInfo() const;
-public slots:
-    void onLocationSettingChanged(int option);
+    void setAppInfo(const QString& app);// 用于appselect传递当前app信息
 private:
     PreviewInfo previewinfo;
     CameraMode * cameramode;
@@ -50,10 +47,11 @@ private:
 private:
     void onManufacturerChanged(int option);
     void onWellbrandChanged(int option);
-    void onObjectiveChanged(int option);
+    void onObjectiveChanged(const QString& obj);
     void takingPhoto();
     void previewView(const QPoint& point);
+    void saveExperConfig(const QString& path);
 signals:
-    void objectiveSettingChanged(int option);
+    void objectiveSettingChanged(const LocationObjectiveInfo& m);
 };
 #endif //EOSI_PREVIEW_H

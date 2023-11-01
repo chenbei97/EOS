@@ -37,6 +37,10 @@
 #include "qmainwindow.h"
 #include "qstackedwidget.h"
 
+#include "qfiledialog.h"
+#include "qfile.h"
+#include "qfileinfo.h"
+
 #include "qlayout.h"
 #include "qboxlayout.h"
 #include "qformlayout.h"

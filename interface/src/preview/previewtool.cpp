@@ -43,12 +43,13 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::channelChanged);
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
+    connect(savebox,&SaveBox::exportFilePath,this,&PreviewTool::exportFilePath);
     // 2. 信号槽函数
     connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
-
+    connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBox::disableChannel);
+    connect(objectivebox,&ObjectiveBox::objectiveChanged,timebox,&TimeBox::disableChannel);
     // 3.外部信号
-    connect(this,&PreviewTool::objectiveSettingChanged,timebox,&TimeBox::onObjectiveSettingChanged);
-    connect(this,&PreviewTool::objectiveSettingChanged,channelbox,&ChannelBox::onObjectiveSettingChanged);
+    connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
 }
 
 PreviewToolInfo PreviewTool::toolInfo() const
@@ -59,9 +60,14 @@ PreviewToolInfo PreviewTool::toolInfo() const
     auto wellinfo = wellbox->wellInfo();
     foreach(auto key,wellinfo.keys())
         info[key] = wellinfo[key];
+
     // 2. objective
     auto objectiveinfo = objectivebox->objectiveInfo();
-    info[ObjectiveField] = objectiveinfo[ObjectiveField];
+    info[CameraLocationField] = objectiveinfo[CameraLocationField];// 用了哪个位置的镜头
+    info[ObjectiveField] = objectiveinfo[ObjectiveField]; // br4x
+    info[ObjectiveMagnificationField] = objectiveinfo[ObjectiveMagnificationField]; // 4x,只放物镜的倍数,方便更新view窗口的尺寸
+    info[ObjectiveTypeField] = objectiveinfo[ObjectiveTypeField];
+
     // 3. channel
     auto channelinfo = channelbox->channelInfo();
     info[ChannelField] = channelinfo[ChannelField];

@@ -17,6 +17,7 @@ class INTERFACE_IMEXPORT Setting : public QWidget
     Q_OBJECT
 public:
     explicit Setting(QWidget*parent= nullptr);
+    void emitSignals();
 private:
     void initObjects();
     void initAttributes();
@@ -33,8 +34,7 @@ private:
 private:
     void toggleSetting(int option);
 signals:
-    void locationChanged(int option);
-    void objectiveChanged(int option);
+    void objectiveSettingChanged(const LocationObjectiveInfo& m);
 };
 
 #endif //EOSI_SETTING_H

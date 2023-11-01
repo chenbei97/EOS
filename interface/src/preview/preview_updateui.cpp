@@ -25,8 +25,7 @@ void Preview::updateViewWindow(const QVariantMap& m)
 
     // 3.根据当前brand/objective更新视野的尺寸
     auto toolinfo = toolbar->toolInfo();
-    //LOG<<"tool info = "<<toolinfo;
-    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
     auto brand = getIndexFromFields(toolinfo[BrandField].toString()).toUInt();
     auto manufacturer = getIndexFromFields(toolinfo[ManufacturerField].toString()).toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
@@ -51,7 +50,7 @@ void Preview::updateViewPatternUi()
 {
     // 1.更新视野的尺寸
     auto toolinfo = toolbar->toolInfo();
-    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
     auto brand = getIndexFromFields(toolinfo[BrandField].toString()).toUInt();
     auto manufacturer = getIndexFromFields(toolinfo[ManufacturerField].toString()).toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];

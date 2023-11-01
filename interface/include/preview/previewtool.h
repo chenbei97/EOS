@@ -41,14 +41,15 @@ private:
 signals:
     void wellbrandChanged(int option);// wellbox的信息
     void manufacturerChanged(int option);
-    void objectiveChanged(int option);
+    void objectiveChanged(const QString& obj);
     void channelChanged(int option);// 通道选择
     void cameraInfoChanged(const MultiCameraInfo&m);// 通道配置改变
     void zstackChanged(bool isChecked);// 是否勾选zstack和stitch
     void stitchChanged(bool isChecked);
+    void exportFilePath(const QString&path); // 保存文件配置的路径
     void photoTaking();// 只有camerabox的拍照会触发该信号
 signals:
-    void objectiveSettingChanged(int option);
+    void objectiveSettingChanged(const LocationObjectiveInfo& m);
 };
 
 #endif //EOSI_PREVIEWTOOL_H

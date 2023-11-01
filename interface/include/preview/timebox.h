@@ -24,7 +24,7 @@ public:
     QDateTime startTime() const;
     TimeInfo timeInfo() const;
 public slots:
-    void onObjectiveSettingChanged(int option);
+    void disableChannel(const QString &obj);
 private:
     void initObjects();
     void initAttributes();

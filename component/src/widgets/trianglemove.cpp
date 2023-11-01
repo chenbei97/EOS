@@ -11,6 +11,8 @@
 TriangleMove::TriangleMove(QWidget *parent) : QWidget(parent)
 {
     mLastPos = QPoint(-1,-1);
+    highcolor  = Qt::green;
+    highcolor.setAlpha(PatternColorAlpha);
     trianglen = TriangleLength;
     trianggap = TriangleGap;
 
@@ -33,9 +35,16 @@ void TriangleMove::setTriangleLength(double len)
     trianglen = len;
 }
 
+void TriangleMove::mouseReleaseEvent(QMouseEvent *event)
+{
+    mLastPos = QPoint(-1,-1);
+    update();
+}
+
 void TriangleMove::mousePressEvent(QMouseEvent *event)
 {
     mLastPos = event->pos();
+    update();
 
     auto leftpoly = getLeftTrianglePoints();
     auto rightpoly = getRightTrianglePoints();
@@ -67,10 +76,29 @@ void TriangleMove::paintEvent(QPaintEvent *event)
     pen.setWidth(2);
     painter.setPen(pen);
 
-    painter.drawPolygon(getLeftTrianglePoints());
-    painter.drawPolygon(getRightTrianglePoints());
-    painter.drawPolygon(getTopTrianglePoints());
-    painter.drawPolygon(getBottomTrianglePoints());
+    auto left = getLeftTrianglePoints();
+    auto right = getRightTrianglePoints();
+    auto top = getTopTrianglePoints();
+    auto bottom = getBottomTrianglePoints();
+
+    painter.drawPolygon(left);
+    painter.drawPolygon(right);
+    painter.drawPolygon(top);
+    painter.drawPolygon(bottom);
+
+    if (mLastPos == QPoint(-1,-1)) return;
+
+    QPainterPath path;
+    if (left.containsPoint(mLastPos,Qt::WindingFill))
+        path.addPolygon(left);
+    else if (right.containsPoint(mLastPos,Qt::WindingFill))
+        path.addPolygon(right);
+    else if (top.containsPoint(mLastPos,Qt::WindingFill))
+        path.addPolygon(top);
+    else if (bottom.containsPoint(mLastPos,Qt::WindingFill))
+        path.addPolygon(bottom);
+
+    painter.fillPath(path,highcolor);
 }
 
 

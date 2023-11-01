@@ -20,12 +20,14 @@ public:
     QSize sizeHint() const override;
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void setTriangleGap(double gap);
     void setTriangleLength(double len);
 private:
     QPoint mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
     double trianglen = TriangleLength;
     double trianggap = TriangleGap;
+    QColor highcolor  = Qt::green;
 private:
     QPolygonF getLeftTrianglePoints() const;
     QPolygonF getRightTrianglePoints() const;

@@ -16,11 +16,21 @@ class INTERFACE_IMEXPORT ObjectiveSetting: public GroupBox
     Q_OBJECT
 public:
     explicit ObjectiveSetting(QWidget *parent = nullptr);
+    void emitSignals();
 private:
     void initObjects();
+    void initAttributes();
     void initLayout();
     QButtonGroup * buttongroup1;
     QButtonGroup * buttongroup2;
+    void moveMachine();
+    void saveSetting();
+    void updateTipInfo();
+    void updateCheckedState();
+    Label * tipinfo;
+    QString tip;
+    LocationObjectiveInfo info;
+    QMap<QString,QRadioButton*> objective_button;
 private:
     QRadioButton * location_one;
     QRadioButton * location_two;
@@ -39,7 +49,6 @@ private:
     QRadioButton * none;
     PushButton * savebtn;
 signals:
-    void locationChanged(int option);
-    void objectiveChanged(int option);
+    void objectiveSettingChanged(const LocationObjectiveInfo& m);
 };
 #endif //EOSI_OBJECTIVESETTING_H
