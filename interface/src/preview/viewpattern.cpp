@@ -32,6 +32,7 @@ void ViewPattern::setStrategy(ViewPattern::DrawStrategy s, const QVariantMap& m)
     auto holecoordinate = m[HoleCoordinateField].toPoint();
     auto holegrouppoints = m[HoleGroupCoordinatesField].value<QPointVector>();
     auto wellallgroup = m[WellAllGroupsField].value<QSet<QString>>();
+    auto wellallholes =m[WellAllHolesField].value<QPoint2DVector>();
 
 //    LOG<<"view accept info from well is "<<holename<<holecolor<<holecoordinate
 //    <<"【"<<holegrouppoints<<"】"<<wellallgroup<<size;
@@ -144,7 +145,8 @@ void ViewPattern::onApplyGroupAct()
     m[HoleGroupColorField] = mCurrentViewInfo[HoleGroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
     m[HoleViewSizeField] = mCurrentViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
     m[HoleCoordinateField] = mCurrentViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
-    m[WellAllGroupsField] = mCurrentViewInfo[WellAllGroupsField]; // 所有组名信息顺带组装
+    m[WellAllGroupsField] = mCurrentViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
+    m[WellAllHolesField] = mCurrentViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
 
     // 3. 组装当前孔选择的所有视野坐标信息
     auto coordinate = mCurrentViewInfo[HoleCoordinateField].toPoint();// 当前孔坐标
@@ -180,11 +182,11 @@ void ViewPattern::onApplyGroupAct()
         }
     }
     auto groupPoints = mCurrentViewInfo[HoleGroupCoordinatesField].value<QPointVector>();//拿到本组其它孔的所有孔坐标
-            foreach(auto pt, groupPoints) {
-            auto pt_idx = pt.x()*PointToIDCoefficient+pt.y(); // 本组其他孔的临时数据区更新为当前孔的视野信息
-            mTmpViewSelectPoints[pt_idx] = vec;
-            mViewSelectPoints[pt_idx] = vec;
-        }
+    foreach(auto pt, groupPoints) {
+        auto pt_idx = pt.x()*PointToIDCoefficient+pt.y(); // 本组其他孔的临时数据区更新为当前孔的视野信息
+        mTmpViewSelectPoints[pt_idx] = vec;
+        mViewSelectPoints[pt_idx] = vec;
+    }
 }
 
 void ViewPattern::onApplyAllAct()
@@ -193,14 +195,14 @@ void ViewPattern::onApplyAllAct()
     if (!viewPointCount())
         return; // 多加一层保护总没坏处
 
-    // 2. 组装组颜色+视野尺寸 2个关键信息足够
+    // 2. 组装组颜色+视野尺寸+视野坐标 3个关键信息足够 + 孔板所有孔坐标
     QVariantMap m;
     m[HoleViewSizeField] = mCurrentViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
     m[HoleGroupColorField] = mCurrentViewInfo[HoleGroupColorField]; // 组装组颜色,可以把所有组颜色统一(可能没分过组默认颜色红色,无所谓)
     //m[HoleGroupNameField] = mCurrentViewInfo[HoleGroupNameField];// 组名信息顺带组装(应用到所有组时组名信息不重要了)
     //m[HoleCoordinateField] = mCurrentViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
     //m[WellAllGroupsField] = mCurrentViewInfo[WellAllGroupsField]; // 所有组名信息顺带组装
-
+    m[WellAllHolesField] = mCurrentViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
 
     // 3. 组装当前孔选择的所有视野坐标信息
     auto coordinate = mCurrentViewInfo[HoleCoordinateField].toPoint();// 当前孔坐标
@@ -216,6 +218,7 @@ void ViewPattern::onApplyAllAct()
     QVariant v;
     v.setValue(viewpoints);
     m[HoleViewPointsField] = v;
+    emit applyAllEvent(m);// 3个信息足够
 
     // 4.更新其它所有孔的视野信息和临时信息,不区分组
     QBool2DVector vec;
@@ -233,12 +236,14 @@ void ViewPattern::onApplyAllAct()
             }
         }
     }
-    auto groupPoints = mCurrentViewInfo[HoleGroupCoordinatesField].value<QPointVector>();//拿到所有分过组其它孔的所有孔坐标
-            foreach(auto pt, groupPoints) {
-            auto pt_idx = pt.x()*PointToIDCoefficient+pt.y(); // 本组其他孔的临时数据区更新为当前孔的视野信息
+    auto allholes = mCurrentViewInfo[WellAllHolesField].value<QPoint2DVector>();//拿到所有分过组的孔坐标
+    foreach(auto holes, allholes) {
+        foreach (auto hole, holes) {
+            auto pt_idx = hole.x()*PointToIDCoefficient+hole.y(); // 所有其他孔的临时数据区更新为当前孔的视野信息
             mTmpViewSelectPoints[pt_idx] = vec;
             mViewSelectPoints[pt_idx] = vec;
         }
+    }
 }
 
 void ViewPattern::initSelectPoints()

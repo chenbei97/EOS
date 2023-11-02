@@ -98,6 +98,20 @@ QPointVector WellPattern::getHoleGroupCoordinates(const QString &groupName) cons
     return vec;
 }
 
+QPoint2DVector WellPattern::getAllWellHoleCoordinates() const
+{
+    QPoint2DVector points;
+
+    auto allgroups = getAllWellGroupNames();
+
+    foreach(auto group,allgroups) { // 把所有组的孔向量列表添加
+        auto holes = getHoleGroupCoordinates(group);
+        points.append(holes);
+    }
+
+    return points;
+}
+
 void WellPattern::initHoleInfo()
 { // 初始化孔信息
     mHoleInfo.clear();
@@ -113,7 +127,7 @@ void WellPattern::initHoleInfo()
 
             info.isselected = false;
             info.allgroup = QSet<QString>();
-            info.allcoordinate = QSet<QPoint>();
+            info.allcoordinate = QPoint2DVector();
 
             info.type = QString();
             info.medicine = QString();

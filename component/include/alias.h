@@ -43,6 +43,8 @@ typedef QVector<QPoint> QPointVector;
 typedef const QVector<QPoint>& QCPointVector;
 typedef QVector<QPointF> QPointFVector;
 typedef const QVector<QPointF>& QCPointFVector;
+typedef QVector<QVector<QPoint>> QPoint2DVector;
+typedef const QVector<QVector<QPoint>>& QCPoint2DVector;
 typedef QVector<QRect> QRectVector;
 typedef const QVector<QRect>& QCRectVector;
 typedef QVector<QRectF> QRectFVector;
@@ -124,7 +126,7 @@ struct HoleInfo {
 
     // 每次打开分组窗口就会重新计算分过的组名和所有选中的孔坐标
     QSet<QString> allgroup; // 孔板所有分过的组别信息
-    QSet<QPoint> allcoordinate; // 孔板所有选过的孔坐标
+    QPoint2DVector allcoordinate; // 孔板所有选过的孔坐标
 
     friend QDebug operator<<(QDebug debug, const HoleInfo& s) {
         debug << "(group,coordinate,color,viewsize,viewpoints,"

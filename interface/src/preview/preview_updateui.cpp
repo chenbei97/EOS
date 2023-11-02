@@ -93,6 +93,6 @@ void Preview::updateSetGroupWindow(const QVariantMap& m)
     // 2. 分组窗口设置的组信息去更新孔的数据
     int ret = groupinfo->exec();
     if (ret == QDialog::Accepted) {
-        pattern->updateGroupByGroupInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
+        pattern->updateHoleInfoByGroupInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
     }
 }
