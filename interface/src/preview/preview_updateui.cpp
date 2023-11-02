@@ -16,8 +16,8 @@ void Preview::updateViewWindow(const QVariantMap& m)
 //    stack->setCurrentWidget(photocanvas);
 
     // 2. 更新视野窗口的标题
-    auto point = m[CoordinateField].toPoint(); //双击或者右键打开视野窗口带来的孔信息
-    auto groupname = m[GroupNameField].toString();
+    auto point = m[HoleCoordinateField].toPoint(); //双击或者右键打开视野窗口带来的孔信息
+    auto groupname = m[HoleGroupNameField].toString();
     if (groupname.isEmpty()) groupname = tr("未设置组");
     dock->setWindowTitle(tr("选择孔内视野(%1,%2)-组别(%3)")
                                  .arg(QChar(point.x()+65)).arg(point.y()+1).arg(groupname));
@@ -38,7 +38,7 @@ void Preview::updateViewWindow(const QVariantMap& m)
 
     // 4. 更新视野绘制小正方形行列数
     auto nm = m;
-    nm[ViewSizeField] = QSize(size,size);
+    nm[HoleViewSizeField] = QSize(size,size);
 
     // 5. 鼠标点击边缘设置无策略或者有效时更新视野窗口策略
     if (point == QPoint(-1,-1))
@@ -61,11 +61,11 @@ void Preview::updateViewPatternUi()
 
     // 2. 孔的信息不需要改变,仅仅需要更新视野窗口去更新视野窗口绘制和临时保存信息
     auto currentViewInfo = viewpattern->currentViewInfo();//拿到之前的设置,其它不用改
-    currentViewInfo[ViewSizeField] = QSize(size,size);
+    currentViewInfo[HoleViewSizeField] = QSize(size,size);
     viewpattern->setStrategy(ViewPattern::InnerCircleRect,currentViewInfo); // 重新更新下尺寸信息,其他的不用改
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
-    //viewpattern->updateApplyGroup(); // 重新刷新下分组信息更新孔图案,如果内部注释掉了pattern的更新代码,其余部分setStrategy-initSelectPoints其实操作过了
+    //viewpattern->updatePatternUi(); // 重新刷新下分组信息更新孔图案,如果内部注释掉了pattern的更新代码,其余部分setStrategy-initSelectPoints其实操作过了
     dock->setWindowTitle(tr("选择孔内视野"));
 
     // 4. 视野尺寸/孔板尺寸 变的话所有信息都重新初始化

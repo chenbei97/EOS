@@ -62,7 +62,7 @@ int WellPattern::drapPointCount() const
     return count;
 }
 
-QSet<QString> WellPattern::allHoleGroupNames() const
+QSet<QString> WellPattern::getAllWellGroupNames() const
 { // 返回所有分过的组,不重复
     QSet<QString> set;
     QMap<QString,int> map;
@@ -81,7 +81,7 @@ QSet<QString> WellPattern::allHoleGroupNames() const
     return set;
 }
 
-QPointVector WellPattern::allGroupHolePoints(const QString &groupName) const
+QPointVector WellPattern::getHoleGroupCoordinates(const QString &groupName) const
 { // 获取组内的所有孔坐标传递给视野窗口在应用到本组时可以更新其它孔的视野数据区信息
     if (groupName.isEmpty()) return QPointVector();
 
@@ -105,17 +105,20 @@ void WellPattern::initHoleInfo()
         QHoleInfoVector var;
         for (int col = 0; col < mcols; ++col){
             HoleInfo info;
+            info.group = QString();
+            info.coordinate = QPoint(row,col);
+            info.color = Qt::red;
+            info.viewsize = QSize(0,0);
+            info.viewpoints = QPointVector();
+
+            info.isselected = false;
+            info.allgroup = QSet<QString>();
+            info.allcoordinate = QSet<QPoint>();
+
             info.type = QString();
             info.medicine = QString();
             info.doseunit = QString();
             info.dose = QString();
-            info.coordinate = QPoint(row,col);
-            info.color = Qt::red;
-            info.isselected = false;
-            info.viewpoints = QPointVector();
-            info.group = QString();
-            info.allgroup = QSet<QString>();
-            info.viewsize = QSize(0,0);
             var.append(info);
         }
         mHoleInfo.append(var);

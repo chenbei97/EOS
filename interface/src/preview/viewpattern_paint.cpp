@@ -13,8 +13,8 @@ void ViewPattern::drawSelectRect(QPainter &painter)
 { // 根据当前孔的组颜色去绘制视野已经被选择的小矩形区域
 
     // 计算当前孔的唯一id
-    auto coordinate = mCurrentViewInfo[CoordinateField].toPoint();
-    auto groupcolor = mCurrentViewInfo[GroupColorField].toString();
+    auto coordinate = mCurrentViewInfo[HoleCoordinateField].toPoint();
+    auto groupcolor = mCurrentViewInfo[HoleGroupColorField].toString();
     auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
 
     auto  rects = getInnerRects();

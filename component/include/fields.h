@@ -208,17 +208,19 @@ static const char* DurationTimeField = "duration_time";
 static const char* StartTimeField = "start_time";
 
 // groupinfo涉及的
-static const char* GroupTypeField = "grouptype";
-static const char* GroupNameField = "groupname";
-static const char* GroupColorField = "groupcolor";
-static const char* GroupPointsField = "grouppoints";
-static const char* GroupMedicineField = "groupmedicine";
-static const char* GroupDoseField = "groupdose";
-static const char* GroupDoseUnitField = "groupdoseunit";
-static const char* AllGroupsField = "allgroups";
-static const char* CoordinateField = "coordinate";
-static const char* ViewSizeField = "viewsize";
-static const char* ViewPointsField = "viewpoints";
+static const char* HoleGroupNameField = "holegroupname"; // 本孔所属组名称
+static const char* HoleGroupColorField = "holegroupcolor"; // 本孔所属组颜色
+static const char* HoleGroupCoordinatesField = "holegroupcoordinates"; // 本孔所属组的所有孔坐标
+static const char* HoleCoordinateField = "Holecoordinate"; // 孔的坐标
+static const char* HoleExperTypeField = "holeexpertype"; // 本孔所属实验类型
+static const char* HoleMedicineField = "holemedicine"; // 本孔的药物信息
+static const char* HoleDoseField = "holedose"; // 本孔的剂量信息
+static const char* HoleDoseUnitField = "holedoseunit"; // 本孔的剂量单位信息
+static const char* HoleViewSizeField = "holeviewsize"; // 孔的视野尺寸
+static const char* HoleViewPointsField = "holeviewpoints";// 孔选择的视野坐标
+static const char* WellAllGroupsField = "wellallgroups"; // 孔板已分过的所有组名称
+static const char* WellAllHolesField = "wellallholes"; // 孔板已选过的所有孔坐标
+
 static const QStringList GroupDoseUnitFields =  {
         "mg/mL","mg/L","g/mL","g/L",
 };

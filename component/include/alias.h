@@ -113,7 +113,7 @@ struct HoleInfo {
     QColor color; // 本孔分配的组颜色
 
     // 拖拽区域控制的
-    bool isselected; // 本孔是否被分配分组
+    bool isselected; // 本孔是否被被选中
 
     // 初始化就赋值
     QPoint coordinate; // 本孔坐标
@@ -122,22 +122,28 @@ struct HoleInfo {
     QPointVector viewpoints; // 本孔分配的视野坐标
     QSize viewsize; // 本孔分配的视野尺寸
 
-    // 每次打开分组窗口就会重新计算已有的分组数
-    QSet<QString> allgroup; // 当前所有分过的组别信息
+    // 每次打开分组窗口就会重新计算分过的组名和所有选中的孔坐标
+    QSet<QString> allgroup; // 孔板所有分过的组别信息
+    QSet<QPoint> allcoordinate; // 孔板所有选过的孔坐标
 
     friend QDebug operator<<(QDebug debug, const HoleInfo& s) {
-        debug << "(type,group,medicine,dose,unit,allgroup,color,coordinate,viewpoints,viewsize,isselect)=[";
-        debug <<s.type<<",";
+        debug << "(group,coordinate,color,viewsize,viewpoints,"
+                 "isselect,allgroup,allcoordinate,"
+                 "type,medicine,dose,unit)=[";
         debug <<s.group<<",";
+        debug <<s.coordinate<<",";
+        debug <<s.color<<",";
+        debug <<s.viewsize<<",";
+        debug <<s.viewpoints<<",";
+
+        debug <<s.isselected<<",";
+        debug <<s.allgroup<<",";
+        debug <<s.allcoordinate<<",";
+
+        debug <<s.type<<",";
         debug <<s.medicine<<",";
         debug <<s.dose<<",";
-        debug <<s.doseunit<<",";
-        debug <<s.allgroup<<",";
-        debug <<s.color<<",";
-        debug <<s.coordinate<<",";
-        debug <<s.viewpoints<<",";
-        debug <<s.viewsize<<",";
-        debug <<s.isselected<<"]";
+        debug <<s.doseunit<<"]";
         return debug;
     }
 };
@@ -158,15 +164,4 @@ typedef QVariantMap PreviewToolInfo;
 typedef QVariantMap PreviewPatternInfo;
 typedef QVariantMap PreviewInfo;
 typedef QMap<QString,QString> LocationObjectiveInfo;
-//struct ChannelInfo {
-//    QString channel;
-//    bool isChecked;
-//    QString expousre;
-//    QString gain;
-//    QString bright;
-//
-
-//};
-
-
 #endif //EOSI_ALIAS_H

@@ -20,12 +20,12 @@ void WellPattern::onSetGroupAct()
     auto medicine = mHoleInfo[mMousePos.x()][mMousePos.y()].medicine;
 
     QVariantMap m;
-    m[GroupColorField] = color;
-    m[GroupNameField] = name;
-    m[GroupTypeField] = type;
-    m[GroupDoseUnitField] = unit;
-    m[GroupDoseField] = dose;
-    m[GroupMedicineField] = medicine;
+    m[HoleGroupColorField] = color;
+    m[HoleGroupNameField] = name;
+    m[HoleExperTypeField] = type;
+    m[HoleDoseUnitField] = unit;
+    m[HoleDoseField] = dose;
+    m[HoleMedicineField] = medicine;
 
     emit openSetGroupWindow(m);
 }
@@ -35,12 +35,12 @@ void WellPattern::updateGroupByGroupInfo(QCVariantMap m)
 { // 右击分组将分组窗口的组信息(color+name)+拖拽区域信息去更新孔信息(不需要更新points,viewsize)
 
     // 1. 更新孔的信息
-    auto gtype = m[GroupTypeField].toString();
-    auto gcolor = m[GroupColorField].toString();
-    auto gname = m[GroupNameField].toString();
-    auto medicine = m[GroupMedicineField].toString();
-    auto dose = m[GroupDoseField].toString();
-    auto unit = m[GroupDoseUnitField].toString();
+    auto gtype = m[HoleExperTypeField].toString();
+    auto gcolor = m[HoleGroupColorField].toString();
+    auto gname = m[HoleGroupNameField].toString();
+    auto medicine = m[HoleMedicineField].toString();
+    auto dose = m[HoleDoseField].toString();
+    auto unit = m[HoleDoseUnitField].toString();
     //LOG<<"well accept info from groupwin is "<<gtype<<gname<<gcolor<<medicine<<dose<<unit;
 
     for(int row = 0 ; row < mrows; ++ row) {
@@ -74,7 +74,7 @@ void WellPattern::updateGroupByGroupInfo(QCVariantMap m)
     }
 
     // 3. 更新已有的组信息(要在上边的group更新过以后再重新计算)
-    auto gnames = allHoleGroupNames();//有可能分了a,b组,b改名a,只有a了,所以要总是重新根据group算
+    auto gnames = getAllWellGroupNames();//有可能分了a,b组,b改名a,只有a了,所以要总是重新根据group算
     //if (!gname.isEmpty()) gnames.insert(gname); // 新的组,无论是否添加过这个组
     LOG<<"current groups = "<<gnames;
     for(int row = 0 ; row < mrows; ++ row) {
@@ -92,16 +92,16 @@ void WellPattern::onOpenViewAct()
     if (mMousePos != QPoint(-1,-1)){
         QVariantMap m;
         Q_ASSERT(mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate == mMousePos);
-        m[CoordinateField] = mMousePos; // 告知视野当前孔坐标
-        m[GroupNameField] = mHoleInfo[mMousePos.x()][mMousePos.y()].group; // 所在组
-        m[GroupColorField] = mHoleInfo[mMousePos.x()][mMousePos.y()].color; // 组的颜色
+        m[HoleCoordinateField] = mMousePos; // 告知视野当前孔坐标
+        m[HoleGroupNameField] = mHoleInfo[mMousePos.x()][mMousePos.y()].group; // 所在组
+        m[HoleGroupColorField] = mHoleInfo[mMousePos.x()][mMousePos.y()].color; // 组的颜色
         auto allgroups = mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup;
-        auto other_coord = allGroupHolePoints(mHoleInfo[mMousePos.x()][mMousePos.y()].group);
+        auto groupcoordinates = getHoleGroupCoordinates(mHoleInfo[mMousePos.x()][mMousePos.y()].group);
         QVariant v1,v2;
         v1.setValue(allgroups);
-        m[AllGroupsField] = v1; // 已有的所有组(每次设置分组信息时会更新)
-        v2.setValue(other_coord);
-        m[GroupPointsField] = v2;
+        m[WellAllGroupsField] = v1; // 已有的所有组(每次设置分组信息时会更新)
+        v2.setValue(groupcoordinates);
+        m[HoleGroupCoordinatesField] = v2;
 //        LOG<<"well send info to view is "<<m[GroupNameField].toString()<<m[GroupColorField].toString()
 //        <<mMousePos<<"【"<<other_coord<<"】"<<allgroups;//ViewPattern::setStrategy接收
         emit openViewWindow(m);
@@ -113,14 +113,16 @@ void WellPattern::updateGroupByViewInfo(QCVariantMap m)
 {// 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
     // 数据包括视野窗口的组名+组颜色+视野尺寸+当前孔坐标+所有组名+所有视野坐标信息
 
-    // 1. 拿到应用到组视野窗口传递来的5个信息
-    auto groupName = m[GroupNameField].toString();
-    auto groupColor = m[GroupColorField].toString();
-    auto coordinate = m[CoordinateField].toPoint();
-    auto viewsize = m[ViewSizeField].toSize();
-    auto viewpoints = m[ViewPointsField].value<QPointVector>();
-    auto allgroup = m[AllGroupsField].value<QSet<QString>>();
-    //LOG<<"well accept info from view is "<<groupColor<<groupName<<coordinate<<"【"<<viewpoints<<"】"<<viewsize<<allgroup;
+    // 1. 拿到应用到组视野窗口传递来的6个信息(ViewPattern::onApplyGroupAct) 关键信息4个
+    auto groupName = m[HoleGroupNameField].toString();
+    auto groupColor = m[HoleGroupColorField].toString();
+    auto coordinate = m[HoleCoordinateField].toPoint();
+    auto viewsize = m[HoleViewSizeField].toSize();
+    auto viewpoints = m[HoleViewPointsField].value<QPointVector>();
+    auto allgroup = m[WellAllGroupsField].value<QSet<QString>>();
+
+    LOG<<"well accept info from view is "<<groupColor<<groupName<<coordinate<<
+    "【"<<viewpoints<<"】"<<viewsize<<allgroup;
 
     // 2. 根据视野窗口传来的组名 把coordinate对应的组(color+viewpoints,viewsize)都更新 (不需要更新group,allgroup,dose,medicine,unit,type)
     for(int row = 0 ; row < mrows; ++ row) {
@@ -130,7 +132,7 @@ void WellPattern::updateGroupByViewInfo(QCVariantMap m)
                 //Q_ASSERT(holeinfo.coordinate == coordinate); // 组其它孔坐标和当前传递的孔坐标不同
                 // Q_ASSERT(holeinfo.color == groupColor); // 本组不同孔颜色可能不同
                 // Q_ASSERT(holeinfo.isselected == true); // 不肯定是被选中的孔,切换objective时会更新mrows,此时isselected可能false
-                Q_ASSERT(holeinfo.allgroup == allgroup);
+                Q_ASSERT(holeinfo.allgroup == allgroup);// 这个是一定相等
                 holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
                 holeinfo.color = groupColor; // 本组应用的组颜色(有可能同组不同孔的颜色不同,帮助统一化)
                 holeinfo.viewpoints = viewpoints; // 本组应用的视野数量和位置信息

@@ -11,7 +11,7 @@ public:
     explicit ViewPattern(QWidget*parent= nullptr);
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());// 设置策略+传递孔的信息+视野尺寸信息+应用到组使能
     QVariantMap currentViewInfo() const;// 切换brand,objective时外部拿到当前的视野孔信息,然后更新其中尺寸字段重新调用setStrategy
-    void updateApplyGroup();// objective更新后视野窗口更新了,但是孔图案的ui绘制点还在,要刷新一下
+    void updatePatternUi();// objective更新后视野窗口更新了,但是孔图案的ui绘制点还在,要刷新一下(过时,preview.initHoleInfo直接做了这部分工作)
 private: // 动作菜单
     DrawStrategy strategy = NoStrategy;
     QVariantMap mCurrentViewInfo;
@@ -25,6 +25,7 @@ private: // 动作菜单
     void onSaveViewAct();// 保存选择的视野到当前孔id对应的视野数据区并保存到临时信息用于initSelectPoints重新初始化
     void onApplyGroupAct();//传递视野窗口的组名+组颜色+视野尺寸+当前孔坐标+所有视野坐标信息+更新同组其它孔的视野信息和临时信息
     void onApplyAllAct();
+    /*鼠标右击,鼠标释放,构造函数,setStrategy,onSaveViewAct,onRemoveViewAct控制使能*/
 private:
     QMap<int,QBool2DVector> mViewSelectPoints; // 视野已选择的信息
     QMap<int,QBool2DVector> mTmpViewSelectPoints; // 临时变量

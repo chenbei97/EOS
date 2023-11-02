@@ -20,12 +20,12 @@ QVariantMap GroupInfo::groupInfo() const
 {
     QVariantMap m;
 
-    m[GroupTypeField] = groupType();
-    m[GroupNameField] = groupName();
-    m[GroupColorField] = groupColor();
-    m[GroupMedicineField] = groupMedicine();
-    m[GroupDoseField] = groupDose();
-    m[GroupDoseUnitField] = groupDoseUnit();
+    m[HoleExperTypeField] = groupType();
+    m[HoleGroupNameField] = groupName();
+    m[HoleGroupColorField] = groupColor();
+    m[HoleMedicineField] = groupMedicine();
+    m[HoleDoseField] = groupDose();
+    m[HoleDoseUnitField] = groupDoseUnit();
 
     return m;
 }
@@ -33,12 +33,12 @@ QVariantMap GroupInfo::groupInfo() const
 void GroupInfo::setGroupInfo(const QVariantMap &m)
 {
 
-    auto type = m[GroupTypeField].toString();
-    auto color = m[GroupColorField].toString();
-    auto group = m[GroupNameField].toString();
-    auto medicine = m[GroupMedicineField].toString();
-    auto dose = m[GroupDoseField].toString();
-    auto unit = m[GroupDoseUnitField].toString();
+    auto type = m[HoleExperTypeField].toString();
+    auto color = m[HoleGroupColorField].toString();
+    auto group = m[HoleGroupNameField].toString();
+    auto medicine = m[HoleMedicineField].toString();
+    auto dose = m[HoleDoseField].toString();
+    auto unit = m[HoleDoseUnitField].toString();
 
     setGroupType(type);
     setGroupColor(color);
