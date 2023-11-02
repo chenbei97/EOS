@@ -21,7 +21,7 @@ class INTERFACE_IMEXPORT Preview : public QWidget
     Q_OBJECT
 public:
     explicit Preview(QWidget*parent= nullptr);
-    void setAppInfo(const QString& app);// 用于appselect传递当前app信息
+    void setAppInfo(int app);// 用于appselect传递当前app信息
 private:
     PreviewInfo previewinfo;
     CameraMode * cameramode;

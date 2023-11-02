@@ -6,7 +6,7 @@
  * @FilePath: \EOS\interface\src\window\mainwindow.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#include "include/mainwindow/mainwindow.h"
+#include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
@@ -39,14 +39,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     connect(appselect,&AppSelect::proliferationClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect,&AppSelect::scratchClicked,this,[=]{stack->setCurrentIndex(1);});
-    connect(appselect, SIGNAL(appClicked(int)),this, SLOT(onAppSelected(int)));
+    connect(appselect, QOverload<int>::of(&AppSelect::appClicked),preview,&Preview::setAppInfo);
 
     connect(setting,&Setting::objectiveSettingChanged,preview,&Preview::objectiveSettingChanged);
     setting->emitSignals(); // 把objectivesetting的初始配置触发一下去更新previewtool
-}
-
-
-void MainWindow::onAppSelected(int app)
-{ // 把选择的app信息传给预览界面
-    preview->setAppInfo(QString::number(app));
 }

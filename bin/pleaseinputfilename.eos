@@ -1,0 +1,18 @@
+{
+    "brand": "0",
+    "camera_loc": "0",
+    "channel": "0,0,0,0,0",
+    "duration_time": "3600",
+    "focus": "0",
+    "focus_step": "0.1",
+    "frame": "0x0001",
+    "manufacturer": "0",
+    "objective": "br4x",
+    "objective_magnification": "0",
+    "objective_type": "0",
+    "start_time": "2023_11_02 08::27",
+    "stitch": "0",
+    "total_time": "3600",
+    "wellsize": "0",
+    "zstack": "0"
+}

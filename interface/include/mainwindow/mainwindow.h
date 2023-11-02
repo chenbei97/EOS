@@ -26,7 +26,5 @@ private:
     Preview * preview;
     Setting * setting;
     QStackedWidget * stack;
-private slots:
-    void onAppSelected(int app);
 };
 #endif //EOSI_MAINWINDOW_H

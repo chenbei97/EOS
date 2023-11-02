@@ -43,9 +43,9 @@ void Preview::onObjectiveChanged(const QString& obj)
     updateViewPatternUi();
 }
 
-void Preview::setAppInfo(const QString& app)
+void Preview::setAppInfo(int app)
 { // 用于appselect传递当前app信息
-    previewinfo[AppSelectField] = app;
+    previewinfo[AppSelectField] = QString::number(app);
 }
 
 void Preview::initLayout()

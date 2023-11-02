@@ -54,7 +54,6 @@ typedef struct { // 注册过的帧头命令
 
 struct Field0x0001{
     // 不需要传递给下位机(但是Tcp用过的字段)
-    const QString path = "path"; // 本命令需要回复路径
     const QString capture_channel = CaptureChannelField;//配置过相机参数的所有通道
     // 传给下位机json涉及的字段
     // wellbox
@@ -87,6 +86,8 @@ struct Field0x0001{
     const QString start_time = StartTimeField;
     const QString is_schedule = IsScheduleField;
     const QString channel = ChannelField;
+    // global
+    const QString app = AppSelectField;
 };
 
 struct Field0x0002 {
@@ -133,10 +134,11 @@ static QByteArray assemble0x0000(QCVariantMap m)
 
 static QVariant parse0x0001(QCVariantMap m)
 { // preview界面调整各种参数时发送的toolInfo+patternInfo 回复要显示的图片路径
-    if (!m.keys().contains(Field0x0001.path)) return QVariant();
-    if (!m.keys().contains(FrameField)) return QVariant();
-    auto path = m[Field0x0001.path].toString();
-    return path;
+//    if (!m.keys().contains(Field0x0001.path)) return QVariant();
+//    if (!m.keys().contains(FrameField)) return QVariant();
+//    auto path = m[Field0x0001.path].toString();
+//    return path;
+    return QVariant();
 }
 
 static QByteArray assemble0x0001(QCVariantMap m)
@@ -202,7 +204,9 @@ static QByteArray assemble0x0001(QCVariantMap m)
     object[Field0x0001.start_time] = toolinfo[Field0x0001.start_time].toString();
     object[Field0x0001.channel] = toolinfo[Field0x0001.channel].toString();
 
-    LOG<<object;
+    // 其它全局信息
+    object[Field0x0001.app] = m[Field0x0001.app].toString();
+    //LOG<<object;
 
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
