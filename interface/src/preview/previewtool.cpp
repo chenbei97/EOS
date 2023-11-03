@@ -40,6 +40,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::objectiveChanged);
     connect(camerabox,&CameraBox::cameraInfoChanged,this,&PreviewTool::cameraInfoChanged);
     connect(camerabox,&CameraBox::photoTaking,this,&PreviewTool::photoTaking);
+    connect(camerabox,&CameraBox::cameraAdjusted,this,&PreviewTool::cameraAdjusted);
     connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::channelChanged);
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);

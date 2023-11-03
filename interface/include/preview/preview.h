@@ -49,7 +49,8 @@ private:
     void onWellbrandChanged(int option);
     void onObjectiveChanged(const QString& obj);
     void takingPhoto();
-    void previewView(const QPoint& point);
+    void adjustCamera(int exp,int gain,int br);
+    void previewView(const QPoint& viewpoint);
     void saveExperConfig(const QString& path);
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);

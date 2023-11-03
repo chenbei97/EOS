@@ -325,7 +325,7 @@ int ViewPattern::drapPointCount() const
     return count;
 }
 
-QVariantMap ViewPattern::currentViewInfo() const
+ViewInfo ViewPattern::currentViewInfo() const
 { // 目的是为了切换brand,objective时外部拿到当前的视野孔信息,然后更新其中尺寸字段即可
     // 然后再次调用setStrategy->initSelectPoints()->更新视野信息/临时信息(不匹配时临时信息就被清除了)
     return mCurrentViewInfo;

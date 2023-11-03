@@ -8,13 +8,31 @@
  */
 #include "preview.h"
 
+void Preview::adjustCamera(int exp,int gain,int br)
+{
+    auto toolinfo = toolbar->toolInfo();
+
+    auto current_channel = toolinfo[CurrentChannelField].toString();
+
+    // 滑动条速度很快,这里组装不再通过Assembler来组装,可能同步会出问题,直接组装
+    QJsonObject object;
+    object[FrameField] = TcpFramePool.frame0x0005;
+    object[Field0x0004.bright] = br;
+    object[Field0x0004.current_channel] = getIndexFromFields(current_channel);
+    TcpAssemblerDoc.setObject(object);
+    auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());;
+
+    LOG<<msg<<exp<<gain<<br;
+
+    // 发送消息异步发送就行不需要同步,防止卡住
+}
+
 void Preview::takingPhoto()
 {
     auto toolinfo = toolbar->toolInfo();
-    auto patterninfo = pattern->patternInfo();
-    previewinfo[PreviewToolField] = toolinfo;
-    previewinfo[PreviewPatternField] = patterninfo;
-    //LOG<<"preview info = "<<previewinfo;
+//    auto patterninfo = pattern->patternInfo();
+//    previewinfo[PreviewToolField] = toolinfo;
+//    previewinfo[PreviewPatternField] = patterninfo;
 
     auto current_channel = toolinfo[CurrentChannelField].toString();
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
@@ -22,7 +40,7 @@ void Preview::takingPhoto()
 
     QVariantMap m;
 
-    m[ChannelField] = getIndexFromFields(current_channel);
+    m[CurrentChannelField] = getIndexFromFields(current_channel);
     m[BrightField] = current_info[BrightField];
     int exposure = current_info[ExposureField].toUInt();
     int gain = current_info[GainField].toUInt();
@@ -39,25 +57,66 @@ void Preview::takingPhoto()
 
     AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
     auto msg = AssemblerPointer->message();
-    //LOG<<exposure<<gain<<m[BrightField]<<m[ChannelField]<<msg;
-    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
+    LOG<<exposure<<gain<<m[BrightField]<<m[ChannelField]<<msg;
 
-    // 等待回复后调用相机拍照
-    if (ParserResult.toBool()) {
-        LOG<<"灯成功打开"; // 做这些事
-    }
+//    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
+//
+//    // 等待回复后调用相机拍照
+//    if (ParserResult.toBool()) {
+//        LOG<<"灯成功打开"; // 做这些事
+//    }
 
     // 拍照结束后回复拍照结束
+    QVariantMap m1;
+    m1[TurnOffLight] = "1";
+    m1[CurrentChannelField] = getIndexFromFields(current_channel);
+    AssemblerPointer->assemble(TcpFramePool.frame0x0005, m1);
+    auto msg1 = AssemblerPointer->message();
+    LOG<<msg1;
 }
 
-void Preview::previewView(const QPoint &point)
+void Preview::previewView(const QPoint &viewpoint)
 {
-    
+    if (viewpoint == QPoint(-1,-1)) return;
+
+    auto toolinfo = toolbar->toolInfo();
+//    auto patterninfo = pattern->patternInfo();
+//    previewinfo[PreviewToolField] = toolinfo;
+//    previewinfo[PreviewPatternField] = patterninfo;
+
+    // 预览事件需要的参数
+    auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
+    auto brand = toolinfo[BrandField].toUInt();
+    auto manufacturer = toolinfo[ManufacturerField].toUInt();
+    auto wellsize = toolinfo[WellsizeField].toUInt();
+    //auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];
+    auto holecoordinate = viewpattern->currentViewInfo()[HoleCoordinateField].toPoint();
+    auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
+    auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
+    auto bright = current_info[BrightField];
+
+    // 自己需要的相机参数
+    int exposure = current_info[ExposureField].toUInt();
+    int gain = current_info[GainField].toUInt();
+    //LOG<<wellsize<<viewpoint<<holecoordinate<<bright<<current_channel;
+
+    QVariantMap m;
+    m[ObjectiveField] = objective;
+    m[BrandField] = brand;
+    m[ManufacturerField] = manufacturer;
+    m[WellsizeField] = wellsize;
+    m[HoleCoordinateField] = QString("%1,%2").arg(holecoordinate.x()).arg(holecoordinate.y());
+    m[ViewCoordinateField] = QString("%1,%2").arg(viewpoint.x()).arg(viewpoint.y());
+    m[CurrentChannelField] = current_channel;
+    m[BrightField] = bright;
+
+    AssemblerPointer->assemble(TcpFramePool.frame0x0000,m);
+    auto msg = AssemblerPointer->message();
+    LOG<<msg;
 }
 
 void Preview::saveExperConfig(const QString& path)
 { // 保存实验配置
-    //LOG<<path<<previewinfo;
     previewinfo[PreviewPatternField] = pattern->patternInfo();
     previewinfo[PreviewToolField] = toolbar->toolInfo();
 

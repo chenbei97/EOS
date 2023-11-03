@@ -33,6 +33,17 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     connect(savebtn,&PushButton::clicked,this,&CameraBox::onSaveBtn);
     connect(combinebtn,&PushButton::clicked,this,&CameraBox::onCombineBtn);
     connect(capturebtn,&PushButton::clicked,this,&CameraBox::onCaptureBtn);
+    connect(cameratool,&CameraTool::exposureChanged,this,&CameraBox::adjustCamera);
+    connect(cameratool,&CameraTool::gainChanged,this,&CameraBox::adjustCamera);
+    connect(cameratool,&CameraTool::brightChanged,this,&CameraBox::adjustCamera);
+}
+
+void CameraBox::adjustCamera()
+{ // cameratool's ui调节时更改相机的2个参数和bright
+    auto exp = cameratool->exposure().toUInt();
+    auto gain = cameratool->gain().toUInt();
+    auto br = cameratool->bright().toUInt();
+    emit cameraAdjusted(exp,gain,br);
 }
 
 void CameraBox::onSaveBtn()

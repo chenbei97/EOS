@@ -48,6 +48,9 @@ set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
 set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
 set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
 
+set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
+set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
+
 set(COMPONENT_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/component/include
         ${PROJECT_SOURCE_DIR}/component/include/widgets
@@ -77,7 +80,7 @@ add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES}) # ${THEME
 
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
-        ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH} ${OPENCV_INCLUDE_PATH})
+        ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH} ${OPENCV_INCLUDE_PATH} ${TOUPCAM_INCLUDE_PATH})
 # （7）清理4个文件夹并重新复制
 # 1. remove_directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -161,7 +164,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
         component interface python310  # mingw必须显示指定python310,msvc指定与否都可
         ${OPENCV_LIBs_PATH} # ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH} #不行,还没复制这 ${OPENCV_LIBs_PATH}
-        ) # opencv连接libs就可以,不需要dll
+        ${TOUPCAM_LIB_PATH}) # opencv连接libs就可以,不需要dll
 
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)

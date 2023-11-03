@@ -50,12 +50,26 @@ typedef struct { // 注册过的帧头命令
     const QString frame0x0003 = "0x0003";
     const QString frame0x0004 = "0x0004";
     const QString frame0x0005 = "0x0005";
+    const QString frame0x0006 = "0x0006";
     const QString frame0x1000 = "0x1000";
 } TcpFrameList;
+
+struct Field0x0000 {
+    const QString viewpoint = ViewCoordinateField;
+    const QString holepoint = HoleCoordinateField;
+    const QString manufacturer = ManufacturerField;
+    const QString wellsize = WellsizeField;
+    const QString brand = BrandField;
+    const QString bright = BrightField;
+    const QString objective = ObjectiveField;
+    const QString current_channel = CurrentChannelField;
+    const QString state = StateField; // 解析使用
+};
 
 struct Field0x0001{
     // 不需要传递给下位机(但是Tcp用过的字段)
     const QString capture_channel = CaptureChannelField;//配置过相机参数的所有通道
+    const QString state = StateField; // 解析使用
     // 传给下位机json涉及的字段
     // wellbox
     const QString manufacturer = ManufacturerField;
@@ -105,39 +119,49 @@ struct Field0x0003 {
 };
 
 struct Field0x0004 {
-    const QString channel = ChannelField; // 拍照传递bright和当前通道参数即可
+    const QString current_channel = CurrentChannelField; // 拍照传递bright和当前通道参数即可
     const QString bright = BrightField;
+    const QString state = StateField;
 };
 
 struct Field0x0005 {
     const QString turnoff_light = TurnOffLight;
+    const QString state = StateField;
+};
+
+struct Field0x0006 {
+    const QString current_channel = CurrentChannelField; // 调节相机参数和拍照传递的相同
+    const QString bright = BrightField;
+    const QString state = StateField;
 };
 
 typedef struct {
-    //Field0x0000 field0x0000;
+    Field0x0000 field0x0000;
     Field0x0001 field0x0001;
     Field0x0002 field0x0002;
     Field0x0003 field0x0003;
     Field0x0004 field0x0004;
     Field0x0005 field0x0005;
+    Field0x0006 field0x0006;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
 static const TcpFrameList TcpFramePool;
 static const TcpFieldList TcpFieldPool;
 
-//#define Field0x0000 TcpFieldPool.field0x0000
+#define Field0x0000 TcpFieldPool.field0x0000
 #define Field0x0001 TcpFieldPool.field0x0001
 #define Field0x0002 TcpFieldPool.field0x0002
 #define Field0x0003 TcpFieldPool.field0x0003
 #define Field0x0004 TcpFieldPool.field0x0004
 #define Field0x0005 TcpFieldPool.field0x0005
+#define Field0x0006 TcpFieldPool.field0x0006
 
 static QVariant parse0x0000(QCVariantMap m)
 {
-    Q_UNUSED(m);
-    QVariant d;
-    return d;
+    if (!m.keys().contains(Field0x0000.state)) return false;
+    if (!m.keys().contains(FrameField)) return false;
+    return m[StateField].toString() == "ok";
 }
 
 static QByteArray assemble0x0000(QCVariantMap m)
@@ -146,18 +170,24 @@ static QByteArray assemble0x0000(QCVariantMap m)
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0000;
 
+    object[Field0x0000.brand] = m[BrandField].toString();
+    object[Field0x0000.manufacturer] = m[ManufacturerField].toString();
+    object[Field0x0000.wellsize] = m[WellsizeField].toString();
+    object[Field0x0000.objective] = m[ObjectiveField].toString();
+    object[Field0x0000.viewpoint] = m[ViewCoordinateField].toString();
+    object[Field0x0000.current_channel] = m[CurrentChannelField].toString();
+    object[Field0x0000.holepoint] = m[HoleCoordinateField].toString();
+
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
 static QVariant parse0x0001(QCVariantMap m)
-{ // preview界面调整各种参数时发送的toolInfo+patternInfo 回复要显示的图片路径
-//    if (!m.keys().contains(Field0x0001.path)) return QVariant();
-//    if (!m.keys().contains(FrameField)) return QVariant();
-//    auto path = m[Field0x0001.path].toString();
-//    return path;
-    return QVariant();
+{
+    if (!m.keys().contains(Field0x0001.state)) return false;
+    if (!m.keys().contains(FrameField)) return false;
+    return m[StateField].toString() == "ok";
 }
 
 static QByteArray assemble0x0001(QCVariantMap m)
@@ -284,10 +314,10 @@ static QByteArray assemble0x0001(QCVariantMap m)
 
 static QVariant parse0x0002(QCVariantMap m)
 { // 用于询问是否连接的命令,只要有回复不为空就ok,随便发
-    if (!m.keys().contains(Field0x0002.state)) return QVariant();
-    if (!m.keys().contains(FrameField)) return QVariant();
+    if (!m.keys().contains(Field0x0002.state)) return false;
+    if (!m.keys().contains(FrameField)) return false;
     auto text = m[Field0x0002.state].toString(); // 只要有回复就可
-    return !text.isEmpty();
+    return text=="ok";
 }
 
 static QByteArray assemble0x0002(QCVariantMap m)
@@ -325,7 +355,7 @@ static QByteArray assemble0x0004(QCVariantMap m)
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0004;
     object[Field0x0004.bright] = m[BrightField].toString();
-    object[Field0x0004.channel] = m[ChannelField].toString();
+    object[Field0x0004.current_channel] = m[CurrentChannelField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -334,17 +364,17 @@ static QByteArray assemble0x0004(QCVariantMap m)
 static QVariant parse0x0004(QCVariantMap m)
 {// 拍照要开灯事件
     if (!m.keys().contains(FrameField)) return false;
-    if (!m.keys().contains(BrightField)) return false;
-    auto ret = m[BrightField].toString();
+    if (!m.keys().contains(Field0x0004.state)) return false;
+    auto ret = m[Field0x0004.state].toString();
     return ret == "ok";
 }
 
 static QByteArray assemble0x0005(QCVariantMap m)
 { // 拍照要关灯事件
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0004;
-    object[Field0x0004.bright] = m[BrightField].toString();
-    object[Field0x0004.channel] = m[ChannelField].toString();
+    object[FrameField] = TcpFramePool.frame0x0005;
+    object[Field0x0005.turnoff_light] = m[Field0x0005.turnoff_light].toString();
+    object[Field0x0004.current_channel] = m[CurrentChannelField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -352,9 +382,27 @@ static QByteArray assemble0x0005(QCVariantMap m)
 
 static QVariant parse0x0005(QCVariantMap m)
 { // 拍照要关灯事件
-    if (!m.keys().contains(FrameField)) return QVariant();
-    if (!m.keys().contains(BrightField)) return QVariant();
-    auto ret = m[BrightField].toString();
+    if (!m.keys().contains(Field0x0005.state)) return false;
+    if (!m.keys().contains(FrameField)) return false;
+    return m[StateField].toString() == "ok";
+}
+
+static QByteArray assemble0x0006(QCVariantMap m)
+{ // 调节相机参数事件
+    QJsonObject object;
+    object[FrameField] = TcpFramePool.frame0x0006;
+    object[Field0x0006.bright] = m[BrightField].toString();
+    object[Field0x0006.current_channel] = m[CurrentChannelField].toString();
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parse0x0006(QCVariantMap m)
+{// 调节相机参数事件
+    if (!m.keys().contains(FrameField)) return false;
+    if (!m.keys().contains(Field0x0006.state)) return false;
+    auto ret = m[Field0x0006.state].toString();
     return ret == "ok";
 }
 
@@ -407,6 +455,8 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.frame0x0002,parse0x0002},
         {TcpFramePool.frame0x0003,parse0x0003},
         {TcpFramePool.frame0x0004,parse0x0004},
+        {TcpFramePool.frame0x0005,parse0x0005},
+        {TcpFramePool.frame0x0006,parse0x0006},
 //        {TcpFramePool.frame0x0004,parse0x0004},
 //        {TcpFramePool.frame0x1000,parse0x1000},
         {"test0x0",parse_test0x0},
@@ -419,7 +469,9 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
         {TcpFramePool.frame0x0002,assemble0x0002},
         {TcpFramePool.frame0x0003,assemble0x0003},
         {TcpFramePool.frame0x0004,assemble0x0004},
-//        {TcpFramePool.frame0x0004,assemble0x0004},
+        {TcpFramePool.frame0x0005,assemble0x0005},
+        {TcpFramePool.frame0x0006,assemble0x0006},
+
 //        {TcpFramePool.frame0x1000,assemble0x1000},
 
         {"test0x0",assemble_test0x0},

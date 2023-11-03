@@ -213,6 +213,7 @@ static const char* HoleGroupNameField = "holegroup_name"; // 本孔所属组名�
 static const char* HoleGroupColorField = "holegroup_color"; // 本孔所属组颜色
 static const char* HoleGroupCoordinatesField = "holegroup_coordinates"; // 本孔所属组的所有孔坐标
 static const char* HoleCoordinateField = "hole_coordinate"; // 孔的坐标
+static const char* ViewCoordinateField = "view_coordinate"; // 视野的坐标
 static const char* HoleExperTypeField = "hole_expertype"; // 本孔所属实验类型
 static const char* HoleMedicineField = "hole_medicine"; // 本孔的药物信息
 static const char* HoleDoseField = "hole_dose"; // 本孔的剂量信息

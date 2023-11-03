@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     LogInit;
     QApplication a(argc, argv);
     initApp(a);
-
+    //test_camera();
     //test_assemble_parse();
     //test_async();
     //test_opencv();

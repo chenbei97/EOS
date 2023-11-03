@@ -14,21 +14,64 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/xfeatures2d.hpp>
+#include <toupcam.h>
 #include <thread>
 using std::async;
 using std::promise;
 using std::future;
-using namespace cv;
+//using namespace cv;
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
+
+static void test_camera()
+{
+    uchar*          m_pData = nullptr;
+    int             m_res = 0;
+    ToupcamDeviceV2 m_cur;
+    HToupcam        m_hcam = nullptr;
+    if (m_hcam)
+    {
+        Toupcam_Close(m_hcam);
+        m_hcam = nullptr;
+    }
+    else {
+        ToupcamDeviceV2 arr[TOUPCAM_MAX] = {0};
+        unsigned count = Toupcam_EnumV2(arr);
+        if (0 == count)
+            QMessageBox::warning(nullptr, "Warning", "No camera found.");
+        else if (1 == count) {
+            m_cur = arr[0];
+            m_hcam = Toupcam_Open(m_cur.id);
+            Toupcam_get_eSize(m_hcam, (unsigned*)&m_res);
+            unsigned m_imgWidth = m_cur.model->res[m_res].width;
+            unsigned m_imgHeight = m_cur.model->res[m_res].height;
+            m_pData = new uchar[TDIBWIDTHBYTES(m_imgWidth * 24) * m_imgHeight];
+            Toupcam_put_Option(m_hcam, TOUPCAM_OPTION_BYTEORDER, 0); //Qimage use RGB byte order
+            Toupcam_put_AutoExpoEnable(m_hcam, 1);
+            Toupcam_put_Option(m_hcam, TOUPCAM_OPTION_BYTEORDER, 0); //Qimage use RGB byte order
+            Toupcam_put_AutoExpoEnable(m_hcam, 1);
+
+            unsigned exposuremax = 0, exposuremin = 0, exposuredef = 0;
+            unsigned short gainmax = 0, gainmin = 0, gaindef = 0;
+            Toupcam_get_ExpTimeRange(m_hcam, &exposuremin, &exposuremax, &exposuredef);
+            Toupcam_get_ExpoAGainRange(m_hcam, &gainmin, &gainmax, &gaindef);
+            unsigned time = 0;
+            unsigned short gain = 0;
+            int bAuto = 0;
+            Toupcam_get_AutoExpoEnable(m_hcam, &bAuto);
+            Toupcam_get_ExpoTime(m_hcam, &time);
+            Toupcam_get_ExpoAGain(m_hcam, &gain);
+        }
+    }
+}
 
 static void test_opencv()
 {
     auto path = CURRENT_PATH+"/images/cell.png";
-    cv::Mat src = cv::imread(path.toStdString().c_str(),IMREAD_GRAYSCALE);
+    cv::Mat src = cv::imread(path.toStdString().c_str(),cv::IMREAD_GRAYSCALE);
     if (!src.empty())
     {
         LOG << "src.depth()=" << src.depth();
-        cv::namedWindow("input", WINDOW_FREERATIO);//可调的自由比例
+        cv::namedWindow("input", cv::WINDOW_FREERATIO);//可调的自由比例
         cv::imshow("input", src);
         cv::waitKey(0);
         cv::destroyAllWindows();

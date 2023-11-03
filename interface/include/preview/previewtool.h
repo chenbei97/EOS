@@ -48,6 +48,7 @@ signals:
     void stitchChanged(bool isChecked);
     void exportFilePath(const QString&path); // 保存文件配置的路径
     void photoTaking();// 只有camerabox的拍照会触发该信号
+    void cameraAdjusted(int exp,int gain,int br);// 调整相机实时更改
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
 };

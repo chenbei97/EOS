@@ -118,6 +118,7 @@ void Preview::initConnections()
     connect(toolbar,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);
     connect(toolbar,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
     connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
+    connect(toolbar,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
     connect(toolbar,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
     connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::saveExperConfig);
 

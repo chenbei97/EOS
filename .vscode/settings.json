@@ -15,6 +15,10 @@
         "system_error": "cpp",
         "complex": "cpp",
         "format": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "atomic": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "ios": "cpp"
     }
 }
