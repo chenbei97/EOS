@@ -76,7 +76,7 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
 
     // 3. 更新已有的组信息(要在上边的group更新过以后再重新计算)
     auto gnames = getAllWellGroupNames();//有可能分了a,b组,b改名a,只有a了,所以要总是重新根据group算
-    LOG<<"current well all groups = "<<gnames;
+    //LOG<<"current well all groups = "<<gnames;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
             mHoleInfo[row][col].allgroup = gnames; // 不分拖拽区域,所有孔都更新相同的组别信息,用等于可以防止以前组信息还保留
@@ -86,7 +86,7 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
 
     // 4. 更新已有的所有选中的孔信息
     auto holes = getAllWellHoleCoordinates();// 所有按组得到的二维孔向量
-    LOG<<"current well all coordinates = "<<holes;
+    //LOG<<"current well all coordinates = "<<holes;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
             mHoleInfo[row][col].allcoordinate = holes; // 不分拖拽区域,所有孔都更新相同的已有孔信息

@@ -41,12 +41,13 @@ void TcpSocket::processMsgQueue()
     }
 }
 
-void TcpSocket::exec(const QString& f,const QByteArray& c)
+void TcpSocket::exec(const QString& f,const QByteArray& c,bool user_sync)
 {
     LOG<<"request msg = "<<c;
     frame = f;
     socket->write(c);
-    loop.exec(); // 阻塞直到解析完,此时TcpSocket或者ParsePointer拿到结果
+    if (user_sync) // 使用同步
+        loop.exec(); // 阻塞直到解析完,此时TcpSocket或者ParsePointer拿到结果
 }
 
 QVariantMap TcpSocket::result() const

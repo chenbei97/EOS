@@ -25,6 +25,8 @@ class ParseManager:
         self.path = "path"
         self.state = "state"
         self.activate_code = "activate_code"
+        self.bright = "bright"
+        self.channel = "channel"
         self.__socket = None
         self.parseFunctions = {
             "test0x0": self.__parsetest0x0,
@@ -33,6 +35,7 @@ class ParseManager:
             "0x0001": self.__parse0x0001,
             "0x0002": self.__parse0x0002,
             "0x0003": self.__parse0x0003,
+            "0x0004": self.__parse0x0004,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -97,6 +100,17 @@ class ParseManager:
         print("0x0003回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
+    def __parse0x0004(self,msg:dict): # 回复激活码
+        frame = msg[self.frame]
+        bright = msg[self.bright]
+        channel = msg[self.channel]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.bright] = "ok"
+        response = json.dumps(reponse)
+        response+=self.separate
+        print("0x0004回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
 class SocketServerManger:
     def __init__(self, port=3000):  # 测试本地链接,只需要提供端口
         self.__port = port

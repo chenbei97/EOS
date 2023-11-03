@@ -18,7 +18,7 @@ class COMPONENT_IMEXPORT TcpSocket: public QObject
 public:
     static TcpSocket& instance();
     void connectToHost(const QString &hostName = LocalHost, quint16 port = SocketPort);
-    void exec(const QString& f,const QByteArray& c);
+    void exec(const QString& f,const QByteArray& c,bool user_sync = true);
     QVariantMap result() const;
 private:
     explicit TcpSocket(QObject *parent = nullptr);

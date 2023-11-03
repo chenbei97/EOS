@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-19 09:15:26
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-19 09:15:59
- * @FilePath: \EOS\interface\src\window\camerabox.cpp
+ * @LastEditTime: 2023-11-02 17:36:07
+ * @FilePath: \EOS\interface\src\preview\camerabox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "camerabox.h"

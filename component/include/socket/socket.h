@@ -49,6 +49,7 @@ typedef struct { // 注册过的帧头命令
     const QString frame0x0002 = "0x0002";
     const QString frame0x0003 = "0x0003";
     const QString frame0x0004 = "0x0004";
+    const QString frame0x0005 = "0x0005";
     const QString frame0x1000 = "0x1000";
 } TcpFrameList;
 
@@ -88,14 +89,28 @@ struct Field0x0001{
     const QString channel = ChannelField;
     // global
     const QString app = AppSelectField;
+    // wellpattern
+    const QString group = GroupField;
+    const QString x = XField;
+    const QString y = YField;
+    const QString points = PointsField;
 };
 
 struct Field0x0002 {
-    const QString state = "state"; // 程序启动时发送命令询问是否连接上了
+    const QString state = StateField; // 程序启动时发送命令询问是否连接上了
 };
 
 struct Field0x0003 {
-    const QString activate_code = "activate_code"; // 询问激活码
+    const QString activate_code = ActivateCodeField; // 询问激活码
+};
+
+struct Field0x0004 {
+    const QString channel = ChannelField; // 拍照传递bright和当前通道参数即可
+    const QString bright = BrightField;
+};
+
+struct Field0x0005 {
+    const QString turnoff_light = TurnOffLight;
 };
 
 typedef struct {
@@ -103,6 +118,8 @@ typedef struct {
     Field0x0001 field0x0001;
     Field0x0002 field0x0002;
     Field0x0003 field0x0003;
+    Field0x0004 field0x0004;
+    Field0x0005 field0x0005;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
@@ -113,6 +130,8 @@ static const TcpFieldList TcpFieldPool;
 #define Field0x0001 TcpFieldPool.field0x0001
 #define Field0x0002 TcpFieldPool.field0x0002
 #define Field0x0003 TcpFieldPool.field0x0003
+#define Field0x0004 TcpFieldPool.field0x0004
+#define Field0x0005 TcpFieldPool.field0x0005
 
 static QVariant parse0x0000(QCVariantMap m)
 {
@@ -203,11 +222,61 @@ static QByteArray assemble0x0001(QCVariantMap m)
     object[Field0x0001.duration_time] = toolinfo[Field0x0001.duration_time].toString();
     object[Field0x0001.start_time] = toolinfo[Field0x0001.start_time].toString();
     object[Field0x0001.channel] = toolinfo[Field0x0001.channel].toString();
+    object[Field0x0001.is_schedule] = toolinfo[Field0x0001.is_schedule].toString();
 
     // 其它全局信息
     object[Field0x0001.app] = m[Field0x0001.app].toString();
-    //LOG<<object;
 
+    // 组-孔-视野的信息
+    QJsonArray arr; // "group"的值是个列表 arr group=[{},{},{}]
+    foreach(auto group, patterninfo.keys()) {
+        QJsonObject groupObject; // arr有多个groupObject对象,表示每个组的信息,"a组","b组" 每个小{}
+        QJsonArray groupValues; // groupObject的值是个列表,也就是"a组"的值是个列表,包含孔信息
+
+        auto groupinfo = patterninfo[group].value<QVariantMap>();
+
+        //LOG<<"hole keys = "<<groupinfo.keys();
+        foreach(auto holename,groupinfo.keys()) {
+            auto holeinfo = groupinfo[holename].value<QVariantMap>();
+
+            auto grouppoints = holeinfo[HoleGroupCoordinatesField].value<QPointVector>();
+
+            auto coordinate = holeinfo[HoleCoordinateField].toPoint();
+            auto viewsize = holeinfo[HoleViewSizeField].toSize();
+            auto viewpoints = holeinfo[HoleViewPointsField].value<QPointVector>();
+
+            //auto expertype = holeinfo[HoleExperTypeField].toString();
+            //auto medicine = holeinfo[HoleMedicineField].toString();
+            //auto dose = holeinfo[HoleDoseField].toString();
+            //auto unit = holeinfo[HoleDoseUnitField].toString();
+
+            //LOG<<coordinate<<viewsize<<viewpoints<<expertype<<medicine<<dose<<unit<<holename<<group<<grouppoints;
+
+            QJsonObject holeObject;// "a组"=[{},{},{}],是每个小的{}
+            //holeObject[HoleCoordinateField] = QString("(%1,%2)").arg(QChar(coordinate.x()+65)).arg(coordinate.y());
+            holeObject[Field0x0001.x] = coordinate.x();
+            holeObject[Field0x0001.y] = coordinate.y();
+
+            QJsonArray pointValues; // point字段的值是个列表
+            for(int viewcount = 0; viewcount<viewpoints.count(); ++viewcount) {
+                QJsonObject viewObject;
+                auto viewpoint_x = viewpoints[viewcount].x();
+                auto viewpoint_y = viewpoints[viewcount].y();
+
+                //viewObject[HoleCoordinateField] = QString("(%1,%2)").arg(viewpoint_x).arg(viewpoint_y);
+                viewObject[Field0x0001.x] = viewpoint_x;
+                viewObject[Field0x0001.y] = viewpoint_y;
+                pointValues.append(viewObject);
+            }
+
+            holeObject[Field0x0001.points] = pointValues;
+            groupValues.append(holeObject);
+        }
+        groupObject[group] = groupValues;
+        arr.append(groupObject);
+    }
+    object[Field0x0001.group] = arr;
+    //LOG<<object;
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -249,6 +318,44 @@ static QByteArray assemble0x0003(QCVariantMap m)
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
+}
+
+static QByteArray assemble0x0004(QCVariantMap m)
+{ // 拍照要开灯事件
+    QJsonObject object;
+    object[FrameField] = TcpFramePool.frame0x0004;
+    object[Field0x0004.bright] = m[BrightField].toString();
+    object[Field0x0004.channel] = m[ChannelField].toString();
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parse0x0004(QCVariantMap m)
+{// 拍照要开灯事件
+    if (!m.keys().contains(FrameField)) return false;
+    if (!m.keys().contains(BrightField)) return false;
+    auto ret = m[BrightField].toString();
+    return ret == "ok";
+}
+
+static QByteArray assemble0x0005(QCVariantMap m)
+{ // 拍照要关灯事件
+    QJsonObject object;
+    object[FrameField] = TcpFramePool.frame0x0004;
+    object[Field0x0004.bright] = m[BrightField].toString();
+    object[Field0x0004.channel] = m[ChannelField].toString();
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parse0x0005(QCVariantMap m)
+{ // 拍照要关灯事件
+    if (!m.keys().contains(FrameField)) return QVariant();
+    if (!m.keys().contains(BrightField)) return QVariant();
+    auto ret = m[BrightField].toString();
+    return ret == "ok";
 }
 
 /*---------以下都是临时测试函数,以后可以注释掉-----------------*/
@@ -299,6 +406,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.frame0x0001,parse0x0001},
         {TcpFramePool.frame0x0002,parse0x0002},
         {TcpFramePool.frame0x0003,parse0x0003},
+        {TcpFramePool.frame0x0004,parse0x0004},
 //        {TcpFramePool.frame0x0004,parse0x0004},
 //        {TcpFramePool.frame0x1000,parse0x1000},
         {"test0x0",parse_test0x0},
@@ -310,6 +418,7 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
         {TcpFramePool.frame0x0001,assemble0x0001},
         {TcpFramePool.frame0x0002,assemble0x0002},
         {TcpFramePool.frame0x0003,assemble0x0003},
+        {TcpFramePool.frame0x0004,assemble0x0004},
 //        {TcpFramePool.frame0x0004,assemble0x0004},
 //        {TcpFramePool.frame0x1000,assemble0x1000},
 

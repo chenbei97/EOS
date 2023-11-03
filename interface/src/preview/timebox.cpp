@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-30 16:03:47
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 17:09:57
+ * @LastEditTime: 2023-11-02 15:58:14
  * @FilePath: \EOS\interface\src\preview\timebox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -39,7 +39,7 @@ TimeInfo TimeBox::timeInfo() const
 
     info[TotalTimeField] = QString::number(totalTime());
     info[DurationTimeField] = QString::number(durationTime());
-    info[IsScheduleField] = isSchedule();
+    info[IsScheduleField] = QString::number((int)isSchedule());
     info[StartTimeField] = startTime().toString(DefaultDateTimeFormat);
     QString channels = QString("%1,%2,%3,%4,%5").arg(brbox->isChecked()).arg(phbox->isChecked())
             .arg(gfpbox->isChecked()).arg(rfpbox->isChecked()).arg(dapibox->isChecked());

@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-18 15:40:45
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-18 15:42:19
- * @FilePath: \EOS\interface\src\window\preview.cpp
+ * @LastEditTime: 2023-11-02 14:01:20
+ * @FilePath: \EOS\interface\src\preview\preview.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "preview.h"
@@ -94,8 +94,8 @@ void Preview::initAttributes()
 
     pattern->setMinimumHeight(PreviewPatternMinHeight);
 
-    previewinfo[PreviewToolField] = toolbar->toolInfo();
-    previewinfo[PreviewPatternField] = pattern->patternInfo();
+    //previewinfo[PreviewToolField] = toolbar->toolInfo();
+    //previewinfo[PreviewPatternField] = pattern->patternInfo();
 }
 
 void Preview::initObjects()

@@ -13,8 +13,9 @@ void SocketPanel::onSend()
 {
     edit->clear();
     testStateActivateCode();
-    testData1_2();
-    testData3();
+    //testData1_2();
+    //testData3();
+    testPhoto();
     //QThread::sleep(1);
 
 }
@@ -77,6 +78,22 @@ void SocketPanel::testData3()
     edit->append(recvText.arg(ParserResult.toString()));
 }
 
+void SocketPanel::testPhoto()
+{
+    QVariantMap m;
+    m[BrightField] = "20";
+    m[ChannelField] = "2";
+    AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
+    auto msg = AssemblerPointer->message();
+    edit->append(sendText.arg(QString::fromUtf8(msg)));
+    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
+    if (ParserResult.toBool()) {
+        edit->append(recvText.arg("灯成功打开,可以进行拍照!"));
+    } else {
+        edit->append(recvText.arg("灯没有打开,不可以进行拍照!"));
+    }
+}
+
 void SocketPanel::testStateActivateCode()
 {// 测试激活码状态连接
 //    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
@@ -89,12 +106,12 @@ void SocketPanel::testStateActivateCode()
     SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
     //if (ParserResult.toBool())
    if (SocketPointer->result()[TcpFramePool.frame0x0002].toBool())
-        edit->append(recvText.arg("socket is connect successful!"));
-    else edit->append(recvText.arg("socket is connect failed!"));
+        edit->append(recvText.arg("[synchronous] socket is connect successful!"));
+    else edit->append(recvText.arg("[synchronous] socket is connect failed!"));
 
     edit->append(sendText.arg(QString::fromUtf8(assemble0x0003(QVariantMap()))));
     SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
-    edit->append(recvText.arg("activate code is "+ParserResult.toString()));
+    edit->append(recvText.arg("[synchronous] activate code is "+ParserResult.toString()));
 }
 
 SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
@@ -113,10 +130,23 @@ SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
 
     connect(btn,&QPushButton::clicked,this,&SocketPanel::onSend);
     SocketInit;
+    connect(ParserPointer,&ParserControl::parseResult,this,&SocketPanel::parseResult0x0002_0x0003);
 
     SocketPython * pthread = new SocketPython();
     pthread->start();
 
     btn->click();
-    QThread::sleep(1);
+    //QThread::sleep(1);
+
+}
+
+void SocketPanel::parseResult0x0002_0x0003(const QString &f, const QVariant &d)
+{ // 可以通过同步或者异步拿到消息
+    //LOG<<"frame = "<<f<<" d = "<<d;
+    if (f == TcpFramePool.frame0x0002 && d.toBool()) {
+        edit->append(recvText.arg("[asynchronous] socket is connect successful!"));
+    }
+    if (f == TcpFramePool.frame0x0003 ) {
+        edit->append(recvText.arg("[asynchronous] activate code is "+d.toString()));
+    }
 }

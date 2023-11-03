@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-11-01 14:55:19
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 17:22:19
+ * @LastEditTime: 2023-11-02 17:33:59
  * @FilePath: \EOS\component\include\fields.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -138,6 +138,7 @@ static const QFieldList ObjectiveMagnificationFields = {
 // channel涉及的数据类型
 static const char* ChannelField = "channel";
 static const char* ChannelFieldLabel = "channel: ";
+static const char* CurrentInfoField = "current_info";
 static const char* CurrentChannelField = "current_channel";
 static const char* CaptureChannelField = "capture_channel";
 static const char* BRField = "BR";
@@ -208,16 +209,16 @@ static const char* DurationTimeField = "duration_time";
 static const char* StartTimeField = "start_time";
 
 // groupinfo涉及的
-static const char* HoleGroupNameField = "holegroupname"; // 本孔所属组名称
-static const char* HoleGroupColorField = "holegroupcolor"; // 本孔所属组颜色
-static const char* HoleGroupCoordinatesField = "holegroupcoordinates"; // 本孔所属组的所有孔坐标
-static const char* HoleCoordinateField = "Holecoordinate"; // 孔的坐标
-static const char* HoleExperTypeField = "holeexpertype"; // 本孔所属实验类型
-static const char* HoleMedicineField = "holemedicine"; // 本孔的药物信息
-static const char* HoleDoseField = "holedose"; // 本孔的剂量信息
-static const char* HoleDoseUnitField = "holedoseunit"; // 本孔的剂量单位信息
-static const char* HoleViewSizeField = "holeviewsize"; // 孔的视野尺寸
-static const char* HoleViewPointsField = "holeviewpoints";// 孔选择的视野坐标
+static const char* HoleGroupNameField = "holegroup_name"; // 本孔所属组名称
+static const char* HoleGroupColorField = "holegroup_color"; // 本孔所属组颜色
+static const char* HoleGroupCoordinatesField = "holegroup_coordinates"; // 本孔所属组的所有孔坐标
+static const char* HoleCoordinateField = "hole_coordinate"; // 孔的坐标
+static const char* HoleExperTypeField = "hole_expertype"; // 本孔所属实验类型
+static const char* HoleMedicineField = "hole_medicine"; // 本孔的药物信息
+static const char* HoleDoseField = "hole_dose"; // 本孔的剂量信息
+static const char* HoleDoseUnitField = "hole_doseunit"; // 本孔的剂量单位信息
+static const char* HoleViewSizeField = "hole_viewsize"; // 孔的视野尺寸
+static const char* HoleViewPointsField = "hole_viewpoints";// 孔选择的视野坐标
 static const char* WellAllGroupsField = "wellallgroups"; // 孔板已分过的所有组名称
 static const char* WellAllHolesField = "wellallholes"; // 孔板已选过的所有孔坐标
 
@@ -251,6 +252,11 @@ static const QFieldList NavigBarFields = {
         "Logo","Main","Preview","Data","Analysis","Settings"
 };
 
+//wellpattern涉及的
+static const char* GroupField = "group";
+static const char* XField = "x";
+static const char* YField = "y";
+static const char* PointsField = "points";
 
 // 需要手动转换成idx的字段
 static const QList<QFieldList> SocketNeedMapFields{

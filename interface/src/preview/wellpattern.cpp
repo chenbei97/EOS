@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-27 08:53:17
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-27 08:54:02
+ * @LastEditTime: 2023-11-02 14:29:25
  * @FilePath: \EOS\interface\src\preview\wellpattern.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -12,6 +12,46 @@ PreviewPatternInfo WellPattern::patternInfo() const
 {
     PreviewPatternInfo info;
 
+    auto allgroups = getAllWellGroupNames();
+
+    foreach(auto group,allgroups) {
+        
+        QVariantMap groupInfo;
+        auto holes = getHoleGroupCoordinates(group);
+
+        foreach(auto hole,holes) 
+        {
+            QVariantMap holeInfo; // 这个孔存储的所有信息都在这里保存
+
+            QVariant v1;
+            v1.setValue(holes);
+            holeInfo[HoleGroupCoordinatesField] = v1; // 0. 每个孔都会存储本组所有的孔坐标信息
+
+            auto currentholeinfo = mHoleInfo[hole.x()][hole.y()];
+            Q_ASSERT(currentholeinfo.group == group); // group,color,isselected,allgroup,allcoordinate不用装
+            Q_ASSERT(currentholeinfo.coordinate == hole);
+            //currentholeinfo.color 颜色没用
+            Q_ASSERT(currentholeinfo.isselected == true);
+            Q_ASSERT(currentholeinfo.allgroup == allgroups);// 5条信息无需装
+
+            holeInfo[HoleCoordinateField] = hole; // 1. 坐标信息
+            holeInfo[HoleViewSizeField] = currentholeinfo.viewsize; // 2. 视野信息
+            QVariant v2;
+            v2.setValue(currentholeinfo.viewpoints);
+            holeInfo[HoleViewPointsField] = v2;
+            holeInfo[HoleExperTypeField] = currentholeinfo.type; // 3.备忘录信息
+            holeInfo[HoleMedicineField] = currentholeinfo.medicine;
+            holeInfo[HoleDoseField] = currentholeinfo.dose;
+            holeInfo[HoleDoseUnitField] = currentholeinfo.doseunit;
+
+            auto holename = QString("(%1,%2)").arg(hole.x()).arg(hole.y());
+            groupInfo[holename] = holeInfo;
+            //LOG<<groupInfo;
+        }
+        //LOG<<group<<"'s hole count = "<<groupInfo.keys().count();
+        info[group] = groupInfo; // 存储了每个组的信息
+    }
+    //LOG<<"group's count = "<<info.keys().count();
     return info;
 }
 
@@ -76,7 +116,7 @@ QSet<QString> WellPattern::getAllWellGroupNames() const
             }
         }
     }
-    LOG<<"group's count = "<<map; // 统计每个组孔的数量
+    //LOG<<"group's count = "<<map; // 统计每个组孔的数量
 
     return set;
 }

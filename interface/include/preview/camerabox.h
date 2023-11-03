@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-19 09:15:08
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-19 09:15:51
- * @FilePath: \EOS\interface\include\window\camerabox.h
+ * @LastEditTime: 2023-11-02 17:31:56
+ * @FilePath: \EOS\interface\include\preview\camerabox.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #ifndef EOSI_CAMERABOX_H
@@ -21,6 +21,7 @@ public:
     void setEnabled(bool enabled);
     void setChannel(int option);
     MultiCameraInfo cameraInfo() const;
+    CameraInfo saveInfo() const;
 private:
     CameraTool * cameratool;
     Label * currentchannel;
@@ -28,7 +29,6 @@ private:
     PushButton * capturebtn;
     PushButton * combinebtn;
     MultiCameraInfo camerainfo;
-    CameraInfo saveInfo() const;
 private slots:
     void onSaveBtn();
     void onCombineBtn();

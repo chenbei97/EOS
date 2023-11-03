@@ -50,6 +50,12 @@ void SaveBox::exportFile()
     if (dir.isEmpty()) return;
 
     auto path = dir + +"/" + filename + ConfigFileSuffix;
+    if (pathExisted(path)) {
+        int ret = QMessageBox::warning(this,WarningChinese,tr("已有同名的设置,是否覆盖?"),
+                                       QMessageBox::Yes|QMessageBox::No);
+        if (ret == QMessageBox::No)
+            return;
+    }
     emit exportFilePath(path);
 }
 

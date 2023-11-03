@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-18 15:53:52
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 16:15:02
+ * @LastEditTime: 2023-11-02 17:36:35
  * @FilePath: \EOS\interface\src\preview\previewtool.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -72,11 +72,14 @@ PreviewToolInfo PreviewTool::toolInfo() const
     info[ObjectiveTypeField] = objectiveinfo[ObjectiveTypeField];
 
     // 3. channel
-    auto channelinfo = channelbox->channelInfo();//这个属于临时信息,其实没用
-    info[CurrentChannelField] = channelinfo[CurrentChannelField];
+    auto channelinfo = channelbox->channelInfo();//这个属于临时信息,其实没用(拍照这里有用,当前拍的通道)
+    info[CurrentChannelField] = channelinfo[CurrentChannelField]; // 实际字符串 PH
 
     // 4. camerainfo,分不同通道,保存了gain,exposure,bright
     auto camerainfo = camerabox->cameraInfo();
+    QVariant v;
+    v.setValue(camerabox->saveInfo());
+    info[CurrentInfoField] = v;
 
     QStringList channels;//所有保存过相机配置的通道
     if (!camerainfo.isEmpty()) { // 有保存过的通道参数

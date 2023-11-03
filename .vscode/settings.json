@@ -10,6 +10,11 @@
         "xhash": "cpp",
         "xstring": "cpp",
         "chrono": "cpp",
-        "xlocmon": "cpp"
+        "xlocmon": "cpp",
+        "future": "cpp",
+        "system_error": "cpp",
+        "complex": "cpp",
+        "format": "cpp",
+        "fstream": "cpp"
     }
 }

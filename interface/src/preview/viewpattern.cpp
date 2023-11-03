@@ -351,7 +351,7 @@ ViewPattern::ViewPattern(QWidget *parent) : QWidget(parent)
     saveviewact->setEnabled(true);
     removeviewact->setEnabled(false);
     applygroupact->setEnabled(false);
-    applyallact->setEnabled(true);// 应用到所有组可以不需要当前孔是否分了组
+    applyallact->setEnabled(false);// 应用到所有组可以不需要当前孔是否分了组,但是没有点不能应用
 
     connect(saveviewact,&QAction::triggered,this,&ViewPattern::onSaveViewAct);
     connect(removeviewact,&QAction::triggered,this,&ViewPattern::onRemoveViewAct);
