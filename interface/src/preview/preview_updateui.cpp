@@ -26,15 +26,14 @@ void Preview::updateViewWindow(const QVariantMap& m)
     // 3.根据当前brand/objective更新视野的尺寸
     auto toolinfo = toolbar->toolInfo();
     auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
-    auto brand = getIndexFromFields(toolinfo[BrandField].toString()).toUInt();
-    auto manufacturer = getIndexFromFields(toolinfo[ManufacturerField].toString()).toUInt();
+    auto brand = toolinfo[BrandField].toUInt();
+    auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
     if (size > view_well_6_4x*10)
         dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
     else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
-    //    LOG<<" manufacturer = "<<manufacturer<<" brand = "<<brand<<"objective = "<<objective<<" size = "<<size
-//       <<" current hole = "<<pattern->currentMousePoint(); // 有可能是没选孔(不过已经避免了brand,objective的触发了不会发生)
+    LOG<<" manufacturer = "<<manufacturer<<" brand = "<<brand<<" objective = "<<objective<<" size = "<<size;
 
     // 4. 更新视野绘制小正方形行列数
     auto nm = m;
@@ -51,8 +50,8 @@ void Preview::updateViewPatternUi()
     // 1.更新视野的尺寸
     auto toolinfo = toolbar->toolInfo();
     auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
-    auto brand = getIndexFromFields(toolinfo[BrandField].toString()).toUInt();
-    auto manufacturer = getIndexFromFields(toolinfo[ManufacturerField].toString()).toUInt();
+    auto brand = toolinfo[BrandField].toUInt();
+    auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
     if (size > view_well_6_4x*10)
         dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);

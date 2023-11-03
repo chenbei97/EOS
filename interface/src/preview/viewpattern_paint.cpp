@@ -70,18 +70,31 @@ void ViewPattern::drawInnerLine(QPainter &painter)
     painter.drawLine(p21,p22);
 
     // 绘制内部线
-    auto tops = getInnerVerticalLineTopPoints();
-    auto bottoms = getInnerVerticalLineBottomPoints();
-    auto lefts = getInnerHorizonalLineLeftPoints();
-    auto rights = getInnerHorizonalLineRightPoints();
-
-    Q_ASSERT(tops.count() == bottoms.count());
-    Q_ASSERT(lefts.count() == rights.count());
-    for(int i = 0; i < tops.count(); i++) {
-        painter.drawLine(tops.at(i),bottoms.at(i));
+//    auto tops = getInnerVerticalLineTopPoints();
+//    auto bottoms = getInnerVerticalLineBottomPoints();
+//    auto lefts = getInnerHorizonalLineLeftPoints();
+//    auto rights = getInnerHorizonalLineRightPoints();
+//
+//    Q_ASSERT(tops.count() == bottoms.count());
+//    Q_ASSERT(lefts.count() == rights.count());
+//    for(int i = 0; i < tops.count(); i++) {
+//        painter.drawLine(tops.at(i),bottoms.at(i));
+//    }
+//    for(int i = 0; i < lefts.count(); i++) {
+//        painter.drawLine(lefts.at(i),rights.at(i));
+//    }
+    // 优化一下改为直接画线,少做几次循环操作
+    auto hor_offset = getInnerRectWidth();
+    for (int i = 1; i <= mrows-1; ++i) {
+        auto top = p11 + QPointF(i*hor_offset,0);
+        auto bottom = p21 + QPointF(i*hor_offset,0);
+        painter.drawLine(top,bottom);
     }
-    for(int i = 0; i < lefts.count(); i++) {
-        painter.drawLine(lefts.at(i),rights.at(i));
+    auto ver_offset = getInnerRectHeight(); // 点之间y坐标相差的是小矩形高度
+    for (int i = 1; i <= mcols-1; ++i){
+        auto top = p11 + QPointF(0,ver_offset*i);
+        auto bottom = p12 + QPointF(0,ver_offset*i);
+        painter.drawLine(top,bottom);
     }
 
     // 高亮鼠标区域

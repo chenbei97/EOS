@@ -226,16 +226,19 @@ void ViewPattern::onApplyAllAct()
         QBoolVector var;
         for (int col = 0; col < mcols; ++col){
             var.append(false);
+            if(mViewSelectPoints[idx][row][col]) {
+                var[col] = true; // 优化一下变成1个循环
+            }
         }
         vec.append(var);
     }
-    for(int r = 0; r < mrows; ++r) {
-        for(int c = 0; c < mcols; ++c) {
-            if (mViewSelectPoints[idx][r][c]) {// 使用当前孔的视野信息更新
-                vec[r][c] = true;
-            }
-        }
-    }
+//    for(int r = 0; r < mrows; ++r) {
+//        for(int c = 0; c < mcols; ++c) {
+//            if (mViewSelectPoints[idx][r][c]) {// 使用当前孔的视野信息更新
+//                vec[r][c] = true;
+//            }
+//        }
+//    }
     auto allholes = mCurrentViewInfo[WellAllHolesField].value<QPoint2DVector>();//拿到所有分过组的孔坐标
     foreach(auto holes, allholes) {
         foreach (auto hole, holes) {

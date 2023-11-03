@@ -39,7 +39,7 @@ void Preview::takingPhoto()
 
     AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
     auto msg = AssemblerPointer->message();
-    LOG<<exposure<<gain<<m[BrightField]<<m[ChannelField]<<msg;
+    //LOG<<exposure<<gain<<m[BrightField]<<m[ChannelField]<<msg;
     SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
 
     // 等待回复后调用相机拍照
