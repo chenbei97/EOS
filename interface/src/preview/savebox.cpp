@@ -32,12 +32,6 @@ SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
     connect(loadbtn,&PushButton::clicked,this,&SaveBox::loadExper);
 }
 
-void SaveBox::loadExper()
-{
-
-}
-
-
 void SaveBox::exportFile()
 {
     auto filename = filenameedit->text().simplified();

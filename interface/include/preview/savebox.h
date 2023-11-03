@@ -23,10 +23,10 @@ private:
     CheckBox * exportToFile;
     LineEdit * filenameedit;
 private:
-    void loadExper();
     void showExport(bool enable);
     void exportFile();
 signals:
     void exportFilePath(const QString&path);
+    void loadExper();
 };
 #endif //EOSI_SAVEBOX_H

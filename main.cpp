@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
     LogInit;
     QApplication a(argc, argv);
     initApp(a);
+    //StartPythonPointer->start("Eos_I","Eos_main","main");
     StartPythonPointer->start("../test","test_socket","test_server");
     //test_camera();
     //test_assemble_parse();
