@@ -8,6 +8,28 @@
  */
 #include "preview.h"
 
+void Preview::toggleChannel(int option)
+{
+    auto toolinfo = toolbar->toolInfo();
+
+    auto current_channel = toolinfo[CurrentChannelField].toString();
+    auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
+
+    QVariantMap m;
+    m[CurrentChannelField] = getIndexFromFields(current_channel);
+    m[BrightField] = current_info[BrightField];
+
+    AssemblerPointer->assemble(TcpFramePool.frame0x0006,m);
+    auto msg = AssemblerPointer->message();
+    //LOG<<m[BrightField]<<m[CurrentChannelField]<<msg;
+
+    SocketPointer->exec(TcpFramePool.frame0x0006,msg, true);
+
+    if (ParserResult.toBool()) {
+        LOG<<"切换通道到"<<m[CurrentChannelField];
+    }
+}
+
 void Preview::adjustLens(int option)
 { // 0-left,1-rop,2-right,3-bottom
 
@@ -18,7 +40,12 @@ void Preview::adjustLens(int option)
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
 
-    LOG<<msg;
+    //LOG<<msg;
+    SocketPointer->exec(TcpFramePool.frame0x0008,msg, true);
+
+    if (ParserResult.toBool()) {
+        LOG<<"移动镜头方向: "<<option;
+    }
 }
 
 void Preview::adjustCamera(int exp,int gain,int br)
@@ -30,14 +57,23 @@ void Preview::adjustCamera(int exp,int gain,int br)
     // 滑动条速度很快,这里组装不再通过Assembler来组装,可能同步会出问题,直接组装
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0005;
-    object[Field0x0004.bright] = br;
-    object[Field0x0004.current_channel] = getIndexFromFields(current_channel);
+    object[Field0x0005.bright] = br;
+    object[Field0x0005.current_channel] = getIndexFromFields(current_channel);
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());;
 
-    LOG<<msg<<exp<<gain<<br;
+    //LOG<<msg<<exp<<gain<<br;
+
 
     // 发送消息异步发送就行不需要同步,防止卡住
+    SocketPointer->exec(TcpFramePool.frame0x0005,msg, false);
+
+    connect(ParserPointer,&ParserControl::parseResult,[this](auto f, auto d){
+        static int count = 0;
+        if (d.toBool() && f == TcpFramePool.frame0x0005) {
+            LOG<<"调整相机参数"<<++count<<"次"; // 做这些事
+        }
+    });
 }
 
 void Preview::takingPhoto()
@@ -49,7 +85,7 @@ void Preview::takingPhoto()
 
     auto current_channel = toolinfo[CurrentChannelField].toString();
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
-    //auto save_channels = toolinfo[CaptureChannelField].toStringList();//保存过设置的所有通道
+
 
     QVariantMap m;
 
@@ -58,6 +94,7 @@ void Preview::takingPhoto()
     int exposure = current_info[ExposureField].toUInt();
     int gain = current_info[GainField].toUInt();
 
+//auto save_channels = toolinfo[CaptureChannelField].toStringList();//保存过设置的所有通道
 // 不从保存过的参数去拿,而是从UI的信息直接去拿
 //    if (save_channels.contains(current_channel)) {
 //        // 例如当前通道PH,设置过PH的相机参数
@@ -70,14 +107,13 @@ void Preview::takingPhoto()
 
     AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
     auto msg = AssemblerPointer->message();
-    LOG<<exposure<<gain<<m[BrightField]<<m[ChannelField]<<msg;
+    //LOG<<exposure<<gain<<m[BrightField]<<m[CurrentChannelField]<<msg;
 
-//    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
-//
-//    // 等待回复后调用相机拍照
-//    if (ParserResult.toBool()) {
-//        LOG<<"灯成功打开"; // 做这些事
-//    }
+    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
+    // 等待回复后调用相机拍照
+    if (ParserResult.toBool()) {
+        LOG<<"灯成功打开"; // 做这些事
+    }
 
     // 拍照结束后回复拍照结束
     QVariantMap m1;
@@ -85,7 +121,11 @@ void Preview::takingPhoto()
     m1[CurrentChannelField] = getIndexFromFields(current_channel);
     AssemblerPointer->assemble(TcpFramePool.frame0x0007, m1);
     auto msg1 = AssemblerPointer->message();
-    LOG<<msg1;
+    //LOG<<msg1;
+    SocketPointer->exec(TcpFramePool.frame0x0007,msg, true);
+    if (ParserResult.toBool()) {
+        LOG<<"灯成功关闭";
+    }
 }
 
 void Preview::previewView(const QPoint &viewpoint)
@@ -118,14 +158,19 @@ void Preview::previewView(const QPoint &viewpoint)
     m[BrandField] = brand;
     m[ManufacturerField] = manufacturer;
     m[WellsizeField] = wellsize;
-    m[HoleCoordinateField] = QString("%1,%2").arg(holecoordinate.x()).arg(holecoordinate.y());
-    m[ViewCoordinateField] = QString("%1,%2").arg(viewpoint.x()).arg(viewpoint.y());
+    m[HoleCoordinateField] = holecoordinate;
+    m[ViewCoordinateField] = viewpoint;
     m[CurrentChannelField] = current_channel;
     m[BrightField] = bright;
 
     AssemblerPointer->assemble(TcpFramePool.frame0x0000,m);
     auto msg = AssemblerPointer->message();
     LOG<<msg;
+    SocketPointer->exec(TcpFramePool.frame0x0000,msg, true);
+    LOG<<ParserResult;
+    if (ParserResult.toBool()) {
+        LOG<<"预览点击到位";
+    }
 }
 
 void Preview::saveExperConfig(const QString& path)

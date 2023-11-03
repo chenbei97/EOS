@@ -57,8 +57,12 @@ typedef struct { // 注册过的帧头命令
 } TcpFrameList;
 
 struct Field0x0000 {
-    const QString viewpoint = ViewCoordinateField;
-    const QString holepoint = HoleCoordinateField;
+    //const QString viewpoint = ViewCoordinateField;
+    //const QString holepoint = HoleCoordinateField;
+    const QString view_x = ViewXCoordinateField;
+    const QString view_y = ViewYCoordinateField;
+    const QString hole_x = HoleXCoordinateField;
+    const QString hole_y = HoleYCoordinateField;
     const QString manufacturer = ManufacturerField;
     const QString wellsize = WellsizeField;
     const QString brand = BrandField;
@@ -198,9 +202,13 @@ static QByteArray assemble0x0000(QCVariantMap m)
     object[Field0x0000.manufacturer] = m[ManufacturerField].toString();
     object[Field0x0000.wellsize] = m[WellsizeField].toString();
     object[Field0x0000.objective] = m[ObjectiveField].toString();
-    object[Field0x0000.viewpoint] = m[ViewCoordinateField].toString();
     object[Field0x0000.current_channel] = m[CurrentChannelField].toString();
-    object[Field0x0000.holepoint] = m[HoleCoordinateField].toString();
+    auto holepoint = m[HoleCoordinateField].toPoint();
+    auto viewpoint = m[ViewCoordinateField].toPoint();
+    object[Field0x0000.hole_x] = holepoint.x();
+    object[Field0x0000.hole_y] = holepoint.y();
+    object[Field0x0000.view_x] = viewpoint.x();
+    object[Field0x0000.view_y] = viewpoint.y();
 
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();

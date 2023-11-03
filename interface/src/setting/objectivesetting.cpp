@@ -76,7 +76,11 @@ void ObjectiveSetting::moveMachine()
         m[CameraLocationField] = 3;
     AssemblerPointer->assemble(TcpFramePool.frame0x0009,m);
 
-    LOG<<AssemblerMessage;
+    //LOG<<AssemblerMessage;
+    SocketPointer->exec(TcpFramePool.frame0x0009,AssemblerMessage,true);
+    if (ParserResult.toBool()) {
+        LOG<<"移动电机到位置"<<m[CameraLocationField].toInt();
+    }
 }
 
 void ObjectiveSetting::updateCheckedState()

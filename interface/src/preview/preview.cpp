@@ -121,6 +121,7 @@ void Preview::initConnections()
     connect(toolbar,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
     connect(toolbar,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
     connect(toolbar,&PreviewTool::directionMove,this,&Preview::adjustLens);
+    connect(toolbar,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
     connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::saveExperConfig);
 
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});

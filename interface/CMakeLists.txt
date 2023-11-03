@@ -26,7 +26,6 @@ find_package(Qt5 COMPONENTS
         MultimediaWidgets
         OpenGL
         REQUIRED)
-
 add_library(${DLLNAME} SHARED
         ${INTERFACE_SOURCES}
         ${INTERFACE_HEADERS})
@@ -38,7 +37,6 @@ target_include_directories(${DLLNAME}
         ${PROJECT_SOURCE_DIR}/interface/include/preview
         ${PROJECT_SOURCE_DIR}/interface/include/setting
         ${PROJECT_SOURCE_DIR}/interface/include/mainwindow
-#        ${PROJECT_SOURCE_DIR}/interface/inc/sql
         ${PROJECT_SOURCE_DIR}/interface/include
         )
 

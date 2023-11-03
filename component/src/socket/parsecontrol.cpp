@@ -35,19 +35,27 @@ ParserControl::ParserControl(QObject *parent) : QObject(parent)
     parsethread.start();
 }
 
-QVariant ParserControl::result() const
+QVariant ParserControl::result()
 {
-    return res;
+    auto r = res;
+    res = QVariant();//取走后要清除上次的内容防止下次被使用
+    return r;
 }
 
-QString ParserControl::frame() const
+QString ParserControl::frame()
 {
-    return fram;
+    auto f = fram;
+    fram.clear();
+    return f;
 }
 
-QVariantMap ParserControl::response() const
+QVariantMap ParserControl::response()
 {
-    return parseresult;
+    auto d = parseresult;
+    d[fram].clear();
+    fram.clear();
+    res = QVariant();
+    return d;
 }
 
 ParserControl::~ParserControl()

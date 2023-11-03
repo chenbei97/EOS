@@ -17,9 +17,9 @@ class COMPONENT_IMEXPORT ParserControl : public QObject
     Q_OBJECT
 public:
     static ParserControl& instance();
-    QVariant result() const;
-    QString frame() const;
-    QVariantMap response() const;
+    QVariant result();
+    QString frame();
+    QVariantMap response();
 private:
     explicit ParserControl(QObject *parent = nullptr);
     ~ParserControl();
