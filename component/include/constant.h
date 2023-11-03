@@ -72,6 +72,7 @@ static const char* StateField = "state";
 static const char* ActivateCodeField = "activate_code";
 static const char* TurnOffLight = "turnoff_light";
 static const char* IsCheckedField = "isChecked";
+static const char* DirectionField = "direction";
 static const char* DishField = "dish";
 static const char* DishFieldLabel = "dish: ";
 static const char* FlaskField = "flask";

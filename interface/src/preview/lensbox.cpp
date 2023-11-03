@@ -24,6 +24,7 @@ LensBox::LensBox(QWidget*parent): GroupBox(parent)
     connect(pattern,&TriangleMove::rightTriangleClicked,this,&LensBox::rightMove);
     connect(pattern,&TriangleMove::topTriangleClicked,this,&LensBox::topMove);
     connect(pattern,&TriangleMove::bottomTriangleClicked,this,&LensBox::bottomMove);
+    connect(pattern,&TriangleMove::triangleClicked,this,&LensBox::directionMove);
 }
 
 LensInfo LensBox::lensInfo() const

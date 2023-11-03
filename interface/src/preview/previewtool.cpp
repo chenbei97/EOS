@@ -45,6 +45,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
     connect(savebox,&SaveBox::exportFilePath,this,&PreviewTool::exportFilePath);
+    connect(lensbox,&LensBox::directionMove,this,&PreviewTool::directionMove);
     // 2. 信号槽函数
     connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBox::disableChannel);

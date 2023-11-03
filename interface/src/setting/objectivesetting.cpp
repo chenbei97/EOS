@@ -65,7 +65,18 @@ void ObjectiveSetting::saveSetting()
 
 void ObjectiveSetting::moveMachine()
 {
+    QVariantMap  m;
+    if (location_one->isChecked())
+        m[CameraLocationField] = 0;
+    else if (location_two->isChecked())
+        m[CameraLocationField] = 1;
+    else if (location_three->isChecked())
+        m[CameraLocationField] = 2;
+    else if (location_four->isChecked())
+        m[CameraLocationField] = 3;
+    AssemblerPointer->assemble(TcpFramePool.frame0x0009,m);
 
+    LOG<<AssemblerMessage;
 }
 
 void ObjectiveSetting::updateCheckedState()

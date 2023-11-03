@@ -54,15 +54,19 @@ void TriangleMove::mousePressEvent(QMouseEvent *event)
     if (leftpoly.containsPoint(mLastPos,Qt::WindingFill)) {
         LOG <<"left Triangle";
         emit leftTriangleClicked();
+        emit triangleClicked(0);
     } else if (rightpoly.containsPoint(mLastPos,Qt::WindingFill)) {
         LOG <<"right Triangle";
         emit rightTriangleClicked();
+        emit triangleClicked(2);
     } else if (toppoly.containsPoint(mLastPos,Qt::WindingFill)) {
         LOG <<"top Triangle";
         emit topTriangleClicked();
+        emit triangleClicked(1);
     } else if (bottompoly.containsPoint(mLastPos,Qt::WindingFill)) {
         LOG <<"botttom Triangle";
         emit bottomTriangleClicked();
+        emit triangleClicked(3);
     }
 
     event->accept();

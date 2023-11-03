@@ -8,6 +8,19 @@
  */
 #include "preview.h"
 
+void Preview::adjustLens(int option)
+{ // 0-left,1-rop,2-right,3-bottom
+
+    // 点调节镜头
+    QJsonObject object;
+    object[FrameField] = TcpFramePool.frame0x0008;
+    object[DirectionField] = option;
+    TcpAssemblerDoc.setObject(object);
+    auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
+
+    LOG<<msg;
+}
+
 void Preview::adjustCamera(int exp,int gain,int br)
 {
     auto toolinfo = toolbar->toolInfo();
@@ -70,7 +83,7 @@ void Preview::takingPhoto()
     QVariantMap m1;
     m1[TurnOffLight] = "1";
     m1[CurrentChannelField] = getIndexFromFields(current_channel);
-    AssemblerPointer->assemble(TcpFramePool.frame0x0005, m1);
+    AssemblerPointer->assemble(TcpFramePool.frame0x0007, m1);
     auto msg1 = AssemblerPointer->message();
     LOG<<msg1;
 }

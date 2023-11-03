@@ -24,6 +24,7 @@ signals:
     void rightMove();
     void topMove();
     void bottomMove();
+    void directionMove(int option);
 };
 
 

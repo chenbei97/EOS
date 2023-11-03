@@ -50,6 +50,7 @@ private:
     void onObjectiveChanged(const QString& obj);
     void takingPhoto();
     void adjustCamera(int exp,int gain,int br);
+    void adjustLens(int option);
     void previewView(const QPoint& viewpoint);
     void saveExperConfig(const QString& path);
 signals:

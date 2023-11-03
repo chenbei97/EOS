@@ -39,6 +39,7 @@ signals:
     void rightTriangleClicked();
     void topTriangleClicked();
     void bottomTriangleClicked();
+    void triangleClicked(int option);
 };
 
 #endif //EOSI_TRIANGLEMOVE_H
