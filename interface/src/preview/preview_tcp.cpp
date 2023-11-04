@@ -68,12 +68,15 @@ void Preview::adjustCamera(int exp,int gain,int br)
     // 发送消息异步发送就行不需要同步,防止卡住
     SocketPointer->exec(TcpFramePool.frame0x0005,msg, false);
 
-    connect(ParserPointer,&ParserControl::parseResult,[this](auto f, auto d){
-        static int count = 0;
-        if (d.toBool() && f == TcpFramePool.frame0x0005) {
-            LOG<<"调整相机参数"<<++count<<"次"; // 做这些事
-        }
-    });
+
+}
+
+void Preview::onAdjustCamera(const QString & f,const QVariant & d)
+{
+    static int count = 0;
+    if (d.toBool() && f == TcpFramePool.frame0x0005) {
+        LOG<<"调整相机参数"<<++count<<"次"; // 做这些事
+    }
 }
 
 void Preview::takingPhoto()

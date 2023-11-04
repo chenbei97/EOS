@@ -122,7 +122,7 @@ class ParseManager:
         frame = msg[self.frame]
         reponse = defaultdict()
         reponse[self.frame] = frame
-        reponse[self.state] = "yes,has connected"
+        reponse[self.state] = "ok"
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0002回复: ", reponse)

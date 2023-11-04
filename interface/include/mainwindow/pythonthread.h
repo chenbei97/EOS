@@ -1,10 +1,13 @@
 #ifndef EOSI_PYTHONTHREAD_H
 #define EOSI_PYTHONTHREAD_H
 
-#include "public.h"
+#include "window.h"
 #include "Python.h"
 
-class PythonThread : public QThread
+class StartPython;
+#define StartPythonPointer (&StartPython::instance());
+
+class INTERFACE_IMEXPORT PythonThread : public QThread
 {
     Q_OBJECT
 public:
@@ -17,16 +20,16 @@ private:
     QString funcName;
 };
 
-class StartPython: public QObject
+class INTERFACE_IMEXPORT StartPython: public QObject
 {
     Q_OBJECT
 public:
     static StartPython& instance();
     void start(const QString &path, const QString &file, const QString &func);
+    void quit();
 private:
     explicit StartPython(QObject*parent= nullptr);
     ~StartPython();
     PythonThread * thread;
 };
-#define  StartPythonPointer (&StartPython::instance())
 #endif //EOSI_PYTHONTHREAD_H

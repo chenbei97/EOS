@@ -7,7 +7,6 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "test/test.h"
-#include "pythonthread.h"
 
 SQLType CurrentSqlType; // 必须定义
 
@@ -19,7 +18,7 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     initApp(a);
     //StartPythonPointer->start("Eos_I","Eos_main","main");
-    StartPythonPointer->start("../test","test_socket","test_server");
+    //StartPython::instance().start("../test","test_socket","test_server");
     //test_camera();
     //test_assemble_parse();
     //test_async();
@@ -50,4 +49,6 @@ void initApp(QApplication& a)
     //qRegisterMetaType<QList<int>>("QList<int>");
     a.setWindowIcon(QApplication::style()->standardIcon(QStyle::SP_DesktopIcon));
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+
+    //connect(&a,&QApplication::aboutToQuit,)
 }

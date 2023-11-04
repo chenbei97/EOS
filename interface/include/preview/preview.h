@@ -50,6 +50,7 @@ private:
     void onObjectiveChanged(const QString& obj);
     void takingPhoto();
     void adjustCamera(int exp,int gain,int br);
+    void onAdjustCamera(const QString &f,const QVariant & d);
     void adjustLens(int option);
     void toggleChannel(int option);
     void previewView(const QPoint& viewpoint);

@@ -12,6 +12,7 @@
 #include "navigbar.h"
 #include "appselect.h"
 #include "mainwindow.h"
+#include "pythonthread.h"
 
 #include "preview.h"
 #include "cameramode.h"

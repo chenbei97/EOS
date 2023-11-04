@@ -18,6 +18,7 @@ ObjectiveSetting::ObjectiveSetting(QWidget*parent):GroupBox(parent)
     connect(locationbtn,&PushButton::clicked,this,&ObjectiveSetting::moveMachine);
     connect(savebtn,&PushButton::clicked,this,&ObjectiveSetting::saveSetting);
     connect(buttongroup1,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&ObjectiveSetting::updateCheckedState);
+    connect(ParserPointer,&ParserControl::parseResult,this,&ObjectiveSetting::onMoveMachine);
 }
 
 void ObjectiveSetting::emitSignals()
@@ -77,11 +78,21 @@ void ObjectiveSetting::moveMachine()
     AssemblerPointer->assemble(TcpFramePool.frame0x0009,m);
 
     //LOG<<AssemblerMessage;
-    SocketPointer->exec(TcpFramePool.frame0x0009,AssemblerMessage,true);
-    if (ParserResult.toBool()) {
-        LOG<<"移动电机到位置"<<m[CameraLocationField].toInt();
+    SocketPointer->exec(TcpFramePool.frame0x0009,AssemblerMessage, false);
+//    auto d = ParserResult; // 在不使用同步时这里只能拿到invalid qqvariant
+//    LOG<<d;
+//    if (d.toBool()) {
+//        LOG<<"移动电机到位置"<<m[CameraLocationField].toInt();
+//    }
+}
+
+void ObjectiveSetting::onMoveMachine(const QString& f,const QVariant& d)
+{
+    if (f == TcpFramePool.frame0x0009 && d.toBool()) {
+        LOG<<"移动电机成功"; // 使用异步时可以绑定信号来实现
     }
 }
+
 
 void ObjectiveSetting::updateCheckedState()
 {

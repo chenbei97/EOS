@@ -14,12 +14,17 @@
 #include "appselect.h"
 #include "preview.h"
 #include "setting.h"
+#include "Python.h"
+#include "toupcam.h"
+#include "pythonthread.h"
 
 class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget*parent= nullptr);
+    ~MainWindow();
+    void closeEvent(QCloseEvent*event) override;
 private:
     NavigBar * navigbar;
     AppSelect * appselect;

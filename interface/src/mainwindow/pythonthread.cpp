@@ -53,15 +53,30 @@ void StartPython::start(const QString &path, const QString &file, const QString 
         thread = new PythonThread(path,file,func);
     if (!thread->isRunning())
         thread->start();
-//    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
-//    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
-//    else LOG<<"socket is connect failed!";
-//    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
-//    LOG<<"activate code is "<<ParserResult.toString();
+    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
+    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
+    else LOG<<"socket is connect failed!";
+    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
+    LOG<<"activate code is "<<ParserResult.toString();
+}
+
+void StartPython::quit()
+{
+    LOG<<"quit python thread";
+    if (thread)
+    {
+        thread->quit();
+        thread->wait();
+        delete thread;
+    }
 }
 
 StartPython::~StartPython() noexcept
 {
-    thread->quit();
-    thread->wait();
+    if (thread)
+    {
+        thread->quit();
+        thread->wait();
+        delete thread;
+    }
 }

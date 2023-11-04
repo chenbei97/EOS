@@ -18,6 +18,8 @@ public:
     explicit ObjectiveSetting(QWidget *parent = nullptr);
     void emitSignals();
 private:
+    void onMoveMachine(const QString& f,const QVariant& d);
+private:
     void initObjects();
     void initAttributes();
     void initLayout();
