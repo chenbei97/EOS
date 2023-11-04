@@ -17,12 +17,15 @@ set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
 set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
 set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
 
+set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
+set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
+
 add_definitions(-DINTERFACE_LIBRARY=0) # 添加预定义宏,=号不能有空格,用于指定类导出或导入
 
 file(GLOB_RECURSE INTERFACE_HEADERS  "include/*.h")
 file(GLOB_RECURSE INTERFACE_SOURCES "src/*.cpp")
 
-link_directories(${PYTHON310_LIB_PATH})
+link_directories(${PYTHON310_LIB_PATH}) # python引入lib只能在这里
 
 find_package(Qt5 COMPONENTS
         Core
@@ -37,7 +40,7 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 add_library(${DLLNAME} SHARED
         ${INTERFACE_SOURCES}
-        ${INTERFACE_HEADERS})
+        ${INTERFACE_HEADERS} include/mainwindow/startpython.h src/mainwindow/startpython.cpp)
 set_target_properties(${DLLNAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${DLLNAME}

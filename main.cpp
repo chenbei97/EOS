@@ -17,12 +17,13 @@ int main(int argc, char *argv[]) {
     LogInit;
     QApplication a(argc, argv);
     initApp(a);
-    //StartPythonPointer->start("Eos_I","Eos_main","main");
-    //StartPython::instance().start("../test","test_socket","test_server");
+    //StartPythonPointer->start("../test","test_socket","test_server");
     //test_camera();
     //test_assemble_parse();
     //test_async();
     //test_opencv();
+
+    ToupCameraPointer->haveCamera();
 
 #ifdef usetesttcp
     test_tcp();
@@ -49,6 +50,7 @@ void initApp(QApplication& a)
     //qRegisterMetaType<QList<int>>("QList<int>");
     a.setWindowIcon(QApplication::style()->standardIcon(QStyle::SP_DesktopIcon));
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-
+    //QTimer::singleShot(0,qApp,SLOT(quit()));
+    QObject::connect(qApp,&QApplication::aboutToQuit, []{StartPythonPointer->quit();});
     //connect(&a,&QApplication::aboutToQuit,)
 }

@@ -70,7 +70,8 @@ file(GLOB TESTFILES  "${PROJECT_SOURCE_DIR}/test/*.h" "${PROJECT_SOURCE_DIR}/tes
 add_subdirectory(component)
 add_subdirectory(interface)
 #（4）链接的库目录 必须add_executable之前
-link_directories(${PYTHON310_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib)
+link_directories(${PYTHON310_LIB_PATH} ${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib) # ${PYTHON310_LIB_PATH}只能在这里,不能在target_link_libraries
+# ${OPENCV_LIBs_PATH},相反 不能放link_directories 只能在target_link_libraries, ${TOUPCAM_LIB_PATH}测试是2个都可以放
 
 # （5）查找包 // C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\include
 find_package(Qt5 COMPONENTS Core Gui Widgets Sql Network
@@ -163,8 +164,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Sql Qt5::Network Qt5::Concurrent
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
         component interface python310  # mingw必须显示指定python310,msvc指定与否都可
-        ${OPENCV_LIBs_PATH} # ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH} #不行,还没复制这 ${OPENCV_LIBs_PATH}
-        ${TOUPCAM_LIB_PATH}) # opencv连接libs就可以,不需要dll
+        ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH} # bin下已经放好了2个文件 ${OPENCV_LIBs_PATH}
+        ${TOUPCAM_LIB_PATH}) # opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
 
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)

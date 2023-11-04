@@ -1,7 +1,22 @@
+/*** 
+ * @Author: chenbei97 chenbei_electric@163.com
+ * @Date: 2023-10-18 10:42:11
+ * @LastEditors: chenbei97 chenbei_electric@163.com
+ * @LastEditTime: 2023-10-18 10:42:59
+ * @FilePath: \EOS\interface\include\pythonthread.cpp
+ * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
+ */
+
 #include "pythonthread.h"
 
 void PythonThread::run()
 {
+    //LOG<<"python thread is running";
+    if (!flag) {
+        quit();
+        wait();
+        Py_Finalize();
+    }
     Py_Initialize();
     if (!Py_IsInitialized()){LOG << "inital python failed!";
     }else LOG << "inital python successful!";
@@ -24,59 +39,18 @@ void PythonThread::run()
 }
 
 PythonThread::PythonThread(const QString &path, const QString &file, const QString &func, QObject *parent)
-: prefixPath(path),fileName(file),funcName(func), QThread(parent)
+: prefixPath(path),fileName(file),funcName(func),flag(true),QThread(parent)
 {
 
 }
 
+void PythonThread::setFlag(bool enable)
+{
+    flag = enable;
+}
 
-PythonThread :: ~ PythonThread()
+
+PythonThread::~ PythonThread()
 {
     Py_Finalize();
-}
-
-StartPython &StartPython::instance()
-{
-    static StartPython instance;
-    return instance;
-}
-
-StartPython::StartPython(QObject *parent) : QObject(parent)
-{
-    thread = nullptr;
-    SocketInit;
-}
-
-void StartPython::start(const QString &path, const QString &file, const QString &func)
-{
-    if (thread == nullptr)
-        thread = new PythonThread(path,file,func);
-    if (!thread->isRunning())
-        thread->start();
-    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
-    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
-    else LOG<<"socket is connect failed!";
-    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
-    LOG<<"activate code is "<<ParserResult.toString();
-}
-
-void StartPython::quit()
-{
-    LOG<<"quit python thread";
-    if (thread)
-    {
-        thread->quit();
-        thread->wait();
-        delete thread;
-    }
-}
-
-StartPython::~StartPython() noexcept
-{
-    if (thread)
-    {
-        thread->quit();
-        thread->wait();
-        delete thread;
-    }
 }
