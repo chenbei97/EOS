@@ -42,12 +42,23 @@ ToupCamera::ToupCamera(QObject*parent):QObject(parent)
         getGainRange();
         setGain(100);
         gain();
+
+        Toupcam_StartPullModeWithCallback(toupcam,captureCallback,this);
     }
 }
 
-ImageInfo ToupCamera::capture()
+void ToupCamera::captureCallback(unsigned int nEvent, void *ctxEvent)
 {
-    if (!toupcam) return {};
+    // 这个函数应该写在拍图的事件回调 TOUPCAM_EVENT_IMAGE
+    if (nEvent == TOUPCAM_EVENT_IMAGE) {
+        Q_ASSERT(ctxEvent == ToupCameraPointer);
+        ToupCameraPointer->capture();
+    }
+}
+
+void ToupCamera::capture()
+{
+    if (!toupcam) return;
 
     int bStill = 0; // 拉取图像要求设置为0
     int bits = rgbBit(); // 默认就是24bit
@@ -59,7 +70,9 @@ ImageInfo ToupCamera::capture()
     // imgdata分配了多大内存读取就使用多大内存,_msize可以计算分配的内存
     auto image = QImage::fromData(imgdata.get(), _msize(imgdata.get()),"JPG");
     auto pair = qMakePair(image,info);
-    return pair;
+
+    // 把数据发出去,别的地方使用
+    emit imageCaptured(pair);
 }
 
 void ToupCamera::print_imageInfo(ToupcamFrameInfoV3* info)

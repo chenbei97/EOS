@@ -116,6 +116,10 @@ void Preview::takingPhoto()
     // 等待回复后调用相机拍照
     if (ParserResult.toBool()) {
         LOG<<"灯成功打开"; // 做这些事
+
+        ToupCameraPointer->setExposure(exposure);
+        ToupCameraPointer->setGain(gain);
+        ToupCameraPointer->capture();
     }
 
     // 拍照结束后回复拍照结束

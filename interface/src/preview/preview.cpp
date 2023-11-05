@@ -119,11 +119,13 @@ void Preview::initConnections()
     connect(toolbar,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
     connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(toolbar,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
-    connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);
     connect(toolbar,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
     connect(toolbar,&PreviewTool::directionMove,this,&Preview::adjustLens);
     connect(toolbar,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
     connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::saveExperConfig);
+
+    connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);
+    //connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::onC)
 
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
 

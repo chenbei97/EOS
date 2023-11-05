@@ -15,6 +15,7 @@
 #include "previewphotocanvas.h"
 #include "wellpattern.h"
 #include "viewpattern.h"
+#include "toupcamera.h"
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {

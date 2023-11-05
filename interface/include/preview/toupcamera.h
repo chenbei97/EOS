@@ -14,6 +14,7 @@
 #include "toupcam.h"
 
 typedef QPair<QImage,ToupcamFrameInfoV3> ImageInfo;
+Q_DECLARE_METATYPE(ToupcamFrameInfoV3);
 
 class INTERFACE_IMEXPORT ToupCamera: public QObject
 {
@@ -27,7 +28,8 @@ public:
     bool haveCamera() const;
     unsigned cameraCount() const;
 
-    ImageInfo capture();
+    static void captureCallback(unsigned nEvent, void* ctxEvent);
+    void capture();
 
     void print_imageInfo(ToupcamFrameInfoV3* info);
 
@@ -53,12 +55,13 @@ public:
 private:
     HToupcam toupcam = nullptr;
     ToupcamDeviceV2 * camera = nullptr;
-    //uchar* imagedata = nullptr;
     ToupcamDeviceV2 * devicelist = nullptr;
     unsigned devicecount = 0;
     QSharedPointer<uchar> imgdata = nullptr;
 private:
     explicit ToupCamera(QObject*parent= nullptr);
+signals:
+    void imageCaptured(const ImageInfo& info);
 };
 
 #define  ToupCameraPointer (&ToupCamera::instance())
