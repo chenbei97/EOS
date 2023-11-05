@@ -41,23 +41,24 @@ static void test_camera()
         else if (1 == count) {
             m_cur = arr[0];
             m_hcam = Toupcam_Open(m_cur.id);
-            Toupcam_get_eSize(m_hcam, (unsigned*)&m_res);
-            unsigned m_imgWidth = m_cur.model->res[m_res].width;
+            Toupcam_get_eSize(m_hcam, (unsigned*)&m_res);//获取视频分辨率的索引,0=(2048,1536),1=(1024,768),2=(680,510)
+            unsigned m_imgWidth = m_cur.model->res[m_res].width; // ToupcamResolution存了该相机的分辨率
             unsigned m_imgHeight = m_cur.model->res[m_res].height;
             m_pData = new uchar[TDIBWIDTHBYTES(m_imgWidth * 24) * m_imgHeight];
             Toupcam_put_Option(m_hcam, TOUPCAM_OPTION_BYTEORDER, 0); //Qimage use RGB byte order
+            
             Toupcam_put_AutoExpoEnable(m_hcam, 1);
-            Toupcam_put_Option(m_hcam, TOUPCAM_OPTION_BYTEORDER, 0); //Qimage use RGB byte order
-            Toupcam_put_AutoExpoEnable(m_hcam, 1);
-
-            unsigned exposuremax = 0, exposuremin = 0, exposuredef = 0;
-            unsigned short gainmax = 0, gainmin = 0, gaindef = 0;
-            Toupcam_get_ExpTimeRange(m_hcam, &exposuremin, &exposuremax, &exposuredef);
-            Toupcam_get_ExpoAGainRange(m_hcam, &gainmin, &gainmax, &gaindef);
-            unsigned time = 0;
-            unsigned short gain = 0;
             int bAuto = 0;
             Toupcam_get_AutoExpoEnable(m_hcam, &bAuto);
+
+            unsigned exposuremax = 0, exposuremin = 0, exposuredef = 0;
+            Toupcam_get_ExpTimeRange(m_hcam, &exposuremin, &exposuremax, &exposuredef);
+
+            unsigned short gainmax = 0, gainmin = 0, gaindef = 0;
+            Toupcam_get_ExpoAGainRange(m_hcam, &gainmin, &gainmax, &gaindef);
+
+            unsigned time = 0;
+            unsigned short gain = 0;
             Toupcam_get_ExpoTime(m_hcam, &time);
             Toupcam_get_ExpoAGain(m_hcam, &gain);
         }

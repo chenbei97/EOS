@@ -19,6 +19,7 @@
         "atomic": "cpp",
         "deque": "cpp",
         "forward_list": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "new": "cpp"
     }
 }

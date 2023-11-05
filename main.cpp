@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     //test_async();
     //test_opencv();
 
-    ToupCameraPointer->haveCamera();
+    ToupCameraPointer;
 
 #ifdef usetesttcp
     test_tcp();

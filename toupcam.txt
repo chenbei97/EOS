@@ -1,20 +1,65 @@
+（1）获取连接的相机数量
+        ToupcamDeviceV2 arr[TOUPCAM_MAX] = {0};
+        unsigned count = Toupcam_EnumV2(arr);
+（2）打开和关闭相机手柄
+HToupcam hcam = nullptr;
+ToupcamDeviceV2 device;
+hcam = Toupcam_Open(device.id); id是char型
+hcam = Toupcam_OpenByIndex(0); 这个传整数就可
+Toupcam_Close(hcam);
+hcam = nullptr;
+（3）设置和获取视频分辨率
+Toupcam_put_Size(hcam,2560,1280)
+Toupcam_put_eSize(hcam, 0); 0=(2048,1536),1=(1024,768),2=(680,510)
+Toupcam_get_eSize(HToupcam h, unsigned* pnResolutionIndex);
+Toupcam_get_Size(HToupcam h, int* pWidth, int* pHeight);
+unsigned imgWidth = device.model->res[resolutionIndex].width; // ToupcamResolution存了该相机的分辨率
+unsigned imgHeight = device.model->res[resolutionIndex].height;
+（4）设置RGB还是BGR
+Toupcam_put_Option(hcam, TOUPCAM_OPTION_BYTEORDER, 0); // 因为QImage用的RGB所以设置0,1是BGR
+int byteorder = 0;
+Toupcam_get_Option(toupcam, TOUPCAM_OPTION_BYTEORDER, &byteorder);
+byteorder?LOG<<"image is rgb":LOG<<"image is bgr";
+（5）设置曝光方式
+Toupcam_put_AutoExpoEnable(hcam, 1); // 0-禁止曝光 1-自动连续曝光 2-只曝光1次
+Toupcam_get_AutoExpoEnable(HToupcam h, int* bAutoExposure);
+（6）设置曝光和获取曝光
+Toupcam_put_ExpoTime(toupcam, exp);
+unsigned exp = 0;
+Toupcam_get_ExpoTime(toupcam, &exp);
+Toupcam_get_ExpTimeRange(toupcam,&s.min,&s.max,&s.def);
+（7）设置增益和获取增益
+Toupcam_put_ExpoAGain(toupcam, gain);
+ushort g = 0;
+Toupcam_get_ExpoAGain(toupcam, &g);
+Toupcam_get_ExpoAGainRange(toupcam,&s.min,&s.max,&s.def);
+#define TOUPCAM_EXPOGAIN_DEF 100     /* exposure gain, default value */
+#define TOUPCAM_EXPOGAIN_MIN 100     /* exposure gain, minimum value */
+
+
 // 定义了一个结构体的别名，关闭相机这用到
 typedef struct Toupcam_t { int unused; } *HToupcam, *HToupCam;
-
+TOUPCAM_API(HRESULT)  Toupcam_put_AutoExpoRange(HToupcam h, unsigned maxTime, unsigned minTime, unsigned short maxGain, unsigned short minGain);
+TOUPCAM_API(HRESULT)  Toupcam_get_AutoExpoRange(HToupcam h, unsigned* maxTime, unsigned* minTime, unsigned short* maxGain, unsigned short* minGain);
 exposure gain 默认值和最小值是100
+TOUPCAM_API(HRESULT)  Toupcam_put_MaxAutoExpoTimeAGain(HToupcam h, unsigned maxTime, unsigned short maxGain);
+TOUPCAM_API(HRESULT)  Toupcam_get_MaxAutoExpoTimeAGain(HToupcam h, unsigned* maxTime, unsigned short* maxGain);
+TOUPCAM_API(HRESULT)  Toupcam_put_MinAutoExpoTimeAGain(HToupcam h, unsigned minTime, unsigned short minGain);
+TOUPCAM_API(HRESULT)  Toupcam_get_MinAutoExpoTimeAGain(HToupcam h, unsigned* minTime, unsigned short* minGain);
+TOUPCAM_API(HRESULT)  Toupcam_get_ExpoTime(HToupcam h, unsigned* Time); /* in microseconds */
+TOUPCAM_API(HRESULT)  Toupcam_put_ExpoTime(HToupcam h, unsigned Time); /* in microseconds */
+TOUPCAM_API(HRESULT)  Toupcam_get_RealExpoTime(HToupcam h, unsigned* Time); /* in microseconds, based on 50HZ/60HZ/DC */
+TOUPCAM_API(HRESULT)  Toupcam_get_ExpTimeRange(HToupcam h, unsigned* nMin, unsigned* nMax, unsigned* nDef);
+
+
 hue -180 ~ 180,默认0
-
 SATURATION 0~255 默认128
-
 BRIGHTNESS -64 ~ 64 默认0
-
 CONTRAST -100 ~ 100
-
 GAMMA 20~180 默认100
 
 TOUPCAM_API(HRESULT)  Toupcam_get_ResolutionNumber(HToupcam h);
 TOUPCAM_API(HRESULT)  Toupcam_get_Resolution(HToupcam h, unsigned nResolutionIndex, int* pWidth, int* pHeight);
-
 TOUPCAM_API(HRESULT)  Toupcam_put_Hue(HToupcam h, int Hue);
 TOUPCAM_API(HRESULT)  Toupcam_get_Hue(HToupcam h, int* Hue);
 TOUPCAM_API(HRESULT)  Toupcam_put_Saturation(HToupcam h, int Saturation);
@@ -26,16 +71,7 @@ TOUPCAM_API(HRESULT)  Toupcam_put_Contrast(HToupcam h, int Contrast);
 TOUPCAM_API(HRESULT)  Toupcam_get_Gamma(HToupcam h, int* Gamma); /* percent */
 TOUPCAM_API(HRESULT)  Toupcam_put_Gamma(HToupcam h, int Gamma);  /* percent */
 
-TOUPCAM_API(HRESULT)  Toupcam_put_AutoExpoRange(HToupcam h, unsigned maxTime, unsigned minTime, unsigned short maxGain, unsigned short minGain);
-TOUPCAM_API(HRESULT)  Toupcam_get_AutoExpoRange(HToupcam h, unsigned* maxTime, unsigned* minTime, unsigned short* maxGain, unsigned short* minGain);
-TOUPCAM_API(HRESULT)  Toupcam_put_MaxAutoExpoTimeAGain(HToupcam h, unsigned maxTime, unsigned short maxGain);
-TOUPCAM_API(HRESULT)  Toupcam_get_MaxAutoExpoTimeAGain(HToupcam h, unsigned* maxTime, unsigned short* maxGain);
-TOUPCAM_API(HRESULT)  Toupcam_put_MinAutoExpoTimeAGain(HToupcam h, unsigned minTime, unsigned short minGain);
-TOUPCAM_API(HRESULT)  Toupcam_get_MinAutoExpoTimeAGain(HToupcam h, unsigned* minTime, unsigned short* minGain);
-TOUPCAM_API(HRESULT)  Toupcam_get_ExpoTime(HToupcam h, unsigned* Time); /* in microseconds */
-TOUPCAM_API(HRESULT)  Toupcam_put_ExpoTime(HToupcam h, unsigned Time); /* in microseconds */
-TOUPCAM_API(HRESULT)  Toupcam_get_RealExpoTime(HToupcam h, unsigned* Time); /* in microseconds, based on 50HZ/60HZ/DC */
-TOUPCAM_API(HRESULT)  Toupcam_get_ExpTimeRange(HToupcam h, unsigned* nMin, unsigned* nMax, unsigned* nDef);
+
 
 
 

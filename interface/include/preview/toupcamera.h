@@ -18,11 +18,32 @@ class INTERFACE_IMEXPORT ToupCamera: public QObject
     Q_OBJECT
 public:
     static ToupCamera& instance();
+
     bool haveCamera() const;
+    unsigned cameraCount() const;
+
+    QSize resolution() const;
+
+    void setByteOrder(int option);
+    int byteOrder() const;
+
+    void setExposureOption(int option);
+    int exposureOption() const;
+
+    ValueRangeUnSigned getExposureRange() const;
+    void setExposure(unsigned exp);
+    unsigned exposure() const;
+
+    ValueRangeUShort getGainRange() const;
+    void setGain(ushort gain);
+    ushort gain() const;
 private:
     HToupcam toupcam = nullptr;
-    ToupcamDeviceV2 camera;
+    ToupcamDeviceV2 * camera = nullptr;
     uchar* imagedata = nullptr;
+    ToupcamDeviceV2 * devicelist = nullptr;
+    unsigned devicecount = 0;
+    QSharedPointer<uchar> imgdata;
 private:
     explicit ToupCamera(QObject*parent= nullptr);
 };

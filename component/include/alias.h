@@ -105,6 +105,42 @@ typedef const QVariantMap& QCVariantMap;
 typedef QVariant(*TcpParseFuncPointer)(QCVariantMap m);
 typedef QByteArray(*TcpAssembleFuncPointer)(QCVariantMap m);
 
+struct ValueRangeInt{
+    int min;
+    int max;
+    int def;
+    friend QDebug operator<<(QDebug debug, const ValueRangeInt& s) {
+        debug <<"min = "<<s.min<<" ";
+        debug <<"max = "<<s.max<<" ";
+        debug <<"def = "<<s.def;
+        return debug;
+    }
+};
+
+struct ValueRangeUShort{
+    ushort min;
+    ushort max;
+    ushort def;
+    friend QDebug operator<<(QDebug debug, const ValueRangeUShort& s) {
+        debug <<"min = "<<s.min<<" ";
+        debug <<"max = "<<s.max<<" ";
+        debug <<"def = "<<s.def;
+        return debug;
+    }
+};
+
+struct ValueRangeUnSigned{
+    unsigned min;
+    unsigned max;
+    unsigned def;
+    friend QDebug operator<<(QDebug debug, const ValueRangeUnSigned& s) {
+        debug <<"min = "<<s.min<<" ";
+        debug <<"max = "<<s.max<<" ";
+        debug <<"def = "<<s.def;
+        return debug;
+    }
+};
+
 struct HoleInfo {
     // 分组窗口去更新的信息
     QString type; // 本孔分配的实验类型
