@@ -22,16 +22,17 @@ ToupCamera::ToupCamera(QObject*parent):QObject(parent)
     LOG<<"camera's count = "<<devicecount;
     if (devicecount) {
         camera = &devicelist[0];
-        toupcam = Toupcam_Open(camera->id); // id是w_char类型
 
-        auto resolu = resolution();
-        imgdata = QSharedPointer<uchar> // 3通道,每通道8bit
-                (new uchar[TDIBWIDTHBYTES(resolu.width() * 24) * resolu.height()]);
+        openCamera();
 
-        setByteOrder(0);
+        setRgbBit(0); // 24bit
+        rgbBit();
+        allocateImageBuffer();
+
+        setByteOrder(0); // rgb
         byteOrder();
 
-        setExposureOption(1);
+        setExposureOption(1); // auto continuity exposure
         exposureOption();
 
         getExposureRange();
@@ -42,6 +43,117 @@ ToupCamera::ToupCamera(QObject*parent):QObject(parent)
         setGain(100);
         gain();
     }
+}
+
+ImageInfo ToupCamera::capture()
+{
+    if (!toupcam) return {};
+
+    int bStill = 0; // 拉取图像要求设置为0
+    int bits = rgbBit(); // 默认就是24bit
+    int rowPitch = 0; // 默认的填充方法 对于24bit 使用TDIBWIDTHBYTES(24*width)*height填充
+    ToupcamFrameInfoV3 info;
+    Toupcam_PullImageV3(toupcam, imgdata.get(), bStill, bits, rowPitch, &info);
+    print_imageInfo(&info);
+
+    // imgdata分配了多大内存读取就使用多大内存,_msize可以计算分配的内存
+    auto image = QImage::fromData(imgdata.get(), _msize(imgdata.get()),"JPG");
+    auto pair = qMakePair(image,info);
+    return pair;
+}
+
+void ToupCamera::print_imageInfo(ToupcamFrameInfoV3* info)
+{
+    LOG<<"w = "<<info->width<<" h = "<<info->height
+    <<"exp = "<<info->expotime<<" gain = "<<info->expogain;
+}
+
+void ToupCamera::openCamera()
+{
+    toupcam = Toupcam_Open(camera->id); // id是w_char类型
+}
+
+void ToupCamera::closeCamera()
+{
+    if (toupcam)
+        Toupcam_Close(toupcam);
+}
+
+unsigned ToupCamera::cameraCount() const
+{
+    return devicecount;
+}
+
+bool ToupCamera::haveCamera() const
+{
+    return cameraCount() != 0;
+}
+
+void ToupCamera::setRgbBit(int option)
+{ // 0(RGB24)|1(RGB48) |2(RGB32)|3 (Grey8)|4 (Grey16)|5(RGB64)
+    if (option < 0 || option > 5 || !toupcam) return;
+
+    Toupcam_put_Option(toupcam, TOUPCAM_OPTION_RGB, option);
+}
+
+int ToupCamera::rgbBit() const
+{
+    if (!toupcam) return -1;
+
+    int option = 0;
+    Toupcam_get_Option(toupcam, TOUPCAM_OPTION_RGB, &option);
+    LOG<<"image rgb's option is "<<option;
+}
+
+void ToupCamera::allocateImageBuffer()
+{ // 根据选择的bits/TOUPCAM_OPTION_RGB 来分配内存空间
+    /***
+    bits: 24 (RGB24), 32 (RGB32), 48 (RGB48), 8 (Grey), 16 (Grey), 64 (RGB64)
+        在RAW模式下，此参数将被忽略。
+        bits=0表示使用基于TOUPACM_OPTION_RGB的默认位 也就是RGB24
+        当bits和TOUPACM_OPTION_RGB不一致时，将不得不执行格式转换，从而导致效率损失。
+        TOUPCAM_OPTION_RGB可选: 0(RGB24)|1(RGB48) |2(RGB32)|3 (Grey8)|4 (Grey16)|5(RGB64),也就是说bits要和TOUPCAM_OPTION_RGB一致
+        Toupcam_put_Option(hcam, TOUPCAM_OPTION_RGB, 0);
+      rowPitch: 从一行到下一行的距离。rowPitch=0表示使用默认的行间距。rowPitch=-1表示零填充
+      | format                             | 0 means default row pitch     | -1 means zero padding |
+      | RGB       | RGB24                  | TDIBWIDTHBYTES(24 * Width)    | Width * 3             |
+      |           | RGB32                  | Width * 4                     | Width * 4             |
+      |           | RGB48                  | TDIBWIDTHBYTES(48 * Width)    | Width * 6             |
+      |           | GREY8                  | TDIBWIDTHBYTES(8 * Width)     | Width                 |
+      |           | GREY16                 | TDIBWIDTHBYTES(16 * Width)    | Width * 2             |
+      |           | RGB64                  | Width * 8                     | Width * 8             |
+   ***/
+
+    auto resolu = resolution();
+    auto bits = rgbBit();
+    // width取10,带入(240+31)&(~31) /8 忽略低5bit 然后再除8,忽略低5bit就是10000=16一定可以被8整除
+    switch (bits) { // 根据位数来分配对应的buffer_size存储图片
+        case 0: // RGB24
+            imgdata = QSharedPointer<uchar> // TDIBWIDTHBYTES(24 * Width) TDIBWIDTHBYTES的含义是忽略低5bit取整
+                    (new uchar[TDIBWIDTHBYTES(resolu.width() * 24) * resolu.height()]);
+            break;
+        case 1: // RGB32
+            imgdata = QSharedPointer<uchar> // Width * 4
+                    (new uchar[resolu.width() * 4 * resolu.height()]);
+            break;
+        case 2: // RGB48
+            imgdata = QSharedPointer<uchar> // TDIBWIDTHBYTES(48 * Width)
+                    (new uchar[TDIBWIDTHBYTES(resolu.width() *48) * resolu.height()]);
+            break;
+        case 3: // GREY8
+            imgdata = QSharedPointer<uchar> // TDIBWIDTHBYTES(8 * Width)
+                    (new uchar[TDIBWIDTHBYTES(resolu.width() * 8) * resolu.height()]);
+            break;
+        case 4: // GREY16
+            imgdata = QSharedPointer<uchar> // TDIBWIDTHBYTES(16 * Width)
+                    (new uchar[TDIBWIDTHBYTES(resolu.width() * 16) * resolu.height()]);
+            break;
+        case 5: // RGB64
+            imgdata = QSharedPointer<uchar> // 8 * Width
+                    (new uchar[resolu.width() * 8 * resolu.height()]);
+            break;
+    }
+
 }
 
 QSize ToupCamera::resolution() const
@@ -61,16 +173,6 @@ QSize ToupCamera::resolution() const
     LOG<<"resolution = "<<QSize(imgWidth,imgHeight);
 
     return QSize(imgWidth,imgHeight);
-}
-
-unsigned ToupCamera::cameraCount() const
-{
-    return devicecount;
-}
-
-bool ToupCamera::haveCamera() const
-{
-    return cameraCount() != 0;
 }
 
 void ToupCamera::setByteOrder(int option)

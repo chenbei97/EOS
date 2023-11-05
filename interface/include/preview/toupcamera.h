@@ -13,19 +13,32 @@
 #include "window.h"
 #include "toupcam.h"
 
+typedef QPair<QImage,ToupcamFrameInfoV3> ImageInfo;
+
 class INTERFACE_IMEXPORT ToupCamera: public QObject
 {
     Q_OBJECT
 public:
     static ToupCamera& instance();
 
+    void openCamera();
+    void closeCamera();
+
     bool haveCamera() const;
     unsigned cameraCount() const;
+
+    ImageInfo capture();
+
+    void print_imageInfo(ToupcamFrameInfoV3* info);
 
     QSize resolution() const;
 
     void setByteOrder(int option);
     int byteOrder() const;
+
+    void setRgbBit(int option);
+    int rgbBit() const;
+    void allocateImageBuffer();
 
     void setExposureOption(int option);
     int exposureOption() const;
@@ -40,10 +53,10 @@ public:
 private:
     HToupcam toupcam = nullptr;
     ToupcamDeviceV2 * camera = nullptr;
-    uchar* imagedata = nullptr;
+    //uchar* imagedata = nullptr;
     ToupcamDeviceV2 * devicelist = nullptr;
     unsigned devicecount = 0;
-    QSharedPointer<uchar> imgdata;
+    QSharedPointer<uchar> imgdata = nullptr;
 private:
     explicit ToupCamera(QObject*parent= nullptr);
 };

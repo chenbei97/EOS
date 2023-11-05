@@ -1,0 +1,193 @@
+（1）获取连接的相机数量
+        ToupcamDeviceV2 arr[TOUPCAM_MAX] = {0};
+        unsigned count = Toupcam_EnumV2(arr);
+（2）打开和关闭相机手柄
+HToupcam hcam = nullptr;
+ToupcamDeviceV2 device;
+hcam = Toupcam_Open(device.id); id是char型
+hcam = Toupcam_OpenByIndex(0); 这个传整数就可
+Toupcam_Close(hcam);
+hcam = nullptr;
+（3）设置和获取视频分辨率
+Toupcam_put_Size(hcam,2560,1280)
+Toupcam_put_eSize(hcam, 0); 0=(2048,1536),1=(1024,768),2=(680,510)
+Toupcam_get_eSize(HToupcam h, unsigned* pnResolutionIndex);
+Toupcam_get_Size(HToupcam h, int* pWidth, int* pHeight);
+unsigned imgWidth = device.model->res[resolutionIndex].width; // ToupcamResolution存了该相机的分辨率
+unsigned imgHeight = device.model->res[resolutionIndex].height;
+（4）设置RGB还是BGR
+Toupcam_put_Option(hcam, TOUPCAM_OPTION_BYTEORDER, 0); // 因为QImage用的RGB所以设置0,1是BGR
+int byteorder = 0;
+Toupcam_get_Option(toupcam, TOUPCAM_OPTION_BYTEORDER, &byteorder);
+byteorder?LOG<<"image is rgb":LOG<<"image is bgr";
+（5）设置曝光方式
+Toupcam_put_AutoExpoEnable(hcam, 1); // 0-禁止曝光 1-自动连续曝光 2-只曝光1次
+Toupcam_get_AutoExpoEnable(HToupcam h, int* bAutoExposure);
+（6）设置曝光和获取曝光
+Toupcam_put_ExpoTime(toupcam, exp);
+unsigned exp = 0;
+Toupcam_get_ExpoTime(toupcam, &exp);
+Toupcam_get_ExpTimeRange(toupcam,&s.min,&s.max,&s.def);
+
+Toupcam_get_RealExpoTime(HToupcam h, unsigned* Time); /* in microseconds, based on 50HZ/60HZ/DC */
+Toupcam_put_MinAutoExpoTimeAGain(HToupcam h, unsigned minTime, unsigned short minGain);
+Toupcam_get_MinAutoExpoTimeAGain(HToupcam h, unsigned* minTime, unsigned short* minGain);
+// 获取自动曝光的范围
+Toupcam_put_AutoExpoRange(HToupcam h, unsigned maxTime, unsigned minTime, unsigned short maxGain, unsigned short minGain);
+Toupcam_get_AutoExpoRange(HToupcam h, unsigned* maxTime, unsigned* minTime, unsigned short* maxGain, unsigned short* minGain);
+
+（7）设置增益和获取增益
+Toupcam_put_ExpoAGain(toupcam, gain);
+ushort g = 0;
+Toupcam_get_ExpoAGain(toupcam, &g);
+Toupcam_get_ExpoAGainRange(toupcam,&s.min,&s.max,&s.def);
+#define TOUPCAM_EXPOGAIN_DEF 100     /* exposure gain, default value */
+#define TOUPCAM_EXPOGAIN_MIN 100     /* exposure gain, minimum value */
+Toupcam_put_MaxAutoExpoTimeAGain(HToupcam h, unsigned maxTime, unsigned short maxGain);
+Toupcam_get_MaxAutoExpoTimeAGain(HToupcam h, unsigned* maxTime, unsigned short* maxGain);
+
+（8）事件回调: 处理函数,事件函数
+typedef void (__stdcall* PTOUPCAM_EVENT_CALLBACK)(unsigned nEvent, void* ctxEvent); // 回调函数是(unsigned,void*)无返回的函数指针
+Toupcam_StartPushModeV2(HToupcam h, PTOUPCAM_DATA_CALLBACK_V2 funData, void* ctxData);
+Toupcam_StartPullModeWithCallback(HToupcam h, PTOUPCAM_EVENT_CALLBACK funEvent, void* ctxEvent);
+
+需要关注的2个事件: 存图和获取帧事件
+#define TOUPCAM_EVENT_IMAGE             0x0004    /* live image arrived, use Toupcam_PullImageXXXX to get this image */
+#define TOUPCAM_EVENT_STILLIMAGE        0x0005    /* snap (still) frame arrived, use Toupcam_PullStillImageXXXX to get this frame */
+注意: 不要在funEvent内调用相机关闭和停止会造成死锁
+注意: 不要在funEvent设置Toupcam_put_Option的一些选项 TOUPCAM_OPTION_TRIGGER, TOUPCAM_OPTION_BITDEPTH, TOUPCAM_OPTION_PIXEL_FORMAT, TOUPCAM_OPTION_BINNING, TOUPCAM_OPTION_ROTATE, it will fail with error code E_WRONG_THREAD
+用法: 绑定回调函数funEvent,ctcEvent传入this或者self
+
+def StartPullModeWithCallback(self, fun, ctx):
+    __EVENT_CALLBACK = ctypes.WINFUNCTYPE(None, ctypes.c_uint, ctypes.py_object) # 函数类型,(none,uint,py_object)
+    self.__fun = fun
+    self.__ctx = ctx # self
+    self.__cb = __class__.__EVENT_CALLBACK(__class__.__eventCallbackFun) # self._cb=>self.__eventCallbackFun=>self.__fun
+    self.__lib.Toupcam_StartPullModeWithCallback(self.__h, self.__cb, ctypes.py_object(self))
+@staticmethod
+def __eventCallbackFun(nEvent, ctx):# nEvent就是func,ctx是self
+    if ctx:
+        ctx.__callbackFun(nEvent)
+
+def __callbackFun(self, nEvent):
+    if self.__fun:
+        self.__fun(nEvent, self.__ctx) # 又传入func,self,因为fun本身可以传func,self
+----------------------------------------------------------------------
+（9）拉取静态图像
+Toupcam_PullImageV3(HToupcam h, void* pImageData, int bStill, int bits, int rowPitch, ToupcamFrameInfoV3* pInfo);
+#define TOUPCAM_EVENT_IMAGE             0x0004    /* live image arrived, use Toupcam_PullImageXXXX to get this image */
+返回图片的二进制数据和图片的信息，需要传递的参数如下
+bStill: 若要提取静止图像，请设置为1，否则为0
+bits: 24 (RGB24), 32 (RGB32), 48 (RGB48), 8 (Grey), 16 (Grey), 64 (RGB64)
+    在RAW模式下，此参数将被忽略。
+    bits=0表示使用基于TOUPACM_OPTION_RGB的默认位，也就是RGB24
+    当bits和TOUPACM_OPTION_RGB不一致时，将不得不执行格式转换，从而导致效率损失。
+    TOUPCAM_OPTION_RGB可选: 0 (RGB24)   |   1 (RGB48)   |   2 (RGB32)   |   3 (Grey8)   |  4 (Grey16)   |   5 (RGB64) 
+    也就是说bits要和TOUPCAM_OPTION_RGB一致
+    Toupcam_put_Option(hcam, TOUPCAM_OPTION_RGB, 0);
+rowPitch: 从一行到下一行的距离。rowPitch=0表示使用默认的行间距。rowPitch=-1表示零填充
+    | format                             | 0 means default row pitch     | -1 means zero padding |
+    | RGB       | RGB24                  | TDIBWIDTHBYTES(24 * Width)    | Width * 3             |
+    |           | RGB32                  | Width * 4                     | Width * 4             |
+    |           | RGB48                  | TDIBWIDTHBYTES(48 * Width)    | Width * 6             |
+    |           | GREY8                  | TDIBWIDTHBYTES(8 * Width)     | Width                 |
+    |           | GREY16                 | TDIBWIDTHBYTES(16 * Width)    | Width * 2             |
+    |           | RGB64                  | Width * 8                     | Width * 8             |
+
+#define TDIBWIDTHBYTES(bits)  ((unsigned)(((bits) + 31) & (~31)) / 8)
+// bits带入24*w就是(24*w+31), ~31是按位取反也就是0001_1111=>1110_0000,然后相与含义是忽略低5bit就是10000=16一定可以被8整除
+// 271=1_0000_1111&1110_0000=1_0000_0000=256=>/8=>32
+bufsize = ((self.w * 24 + 31) // 8) * self.h (271 // 32 * 4)和(271 // 8) 结果不一样前者32后者33
+bufsize = (271 // 16 * 2) * 10 这样也可以,但是(271 // 8 * 1)就不行了
+PullImageV3(self.buf, 0, 24, 0, None)
+
+首先绑定回调函数,回调函数处理特定事件
+self.hcam.StartPullModeWithCallback(self.cameraCallback, self) 
+def cameraCallback(nEvent, ctx): # ctx其实就是self
+    if nEvent == toupcam.TOUPCAM_EVENT_IMAGE:
+        ctx.soft_camera_callback()
+
+def soft_camera_callback(self):
+    try:
+        if self.hcam is not None: # 存图事件可以获取这张图像
+            self.hcam.PullImageV3(self.buf, 0, 24, 0, None)
+            img = np.frombuffer(self.buf, dtype='uint8')
+            img = img.reshape(self.h, self.w, 3)
+            img = img[:, :, [2, 1, 0]] # BGR to RGB
+            self.frame = img
+    except toupcam.HRESULTException as ex:
+            Eos_log.debug('pull image failed, hr=0x{:x}'.format(ex.hr))
+
+（10）拉取帧
+Toupcam_PullStillImageV2(HToupcam h, void* pImageData, int bits, ToupcamFrameInfoV2* pInfo);
+#define TOUPCAM_EVENT_STILLIMAGE        0x0005    /* snap (still) frame arrived, use Toupcam_PullStillImageXXXX to get this frame */
+
+
+// 定义了一个结构体的别名，关闭相机这用到
+typedef struct Toupcam_t { int unused; } *HToupcam, *HToupCam;
+
+// 分辨率结构体
+typedef struct {
+    unsigned    width;
+    unsigned    height;
+} ToupcamResolution;
+
+// 照相机模型结构体
+typedef struct {
+    const wchar_t*      name;        /* model name, in Windows, we use unicode */
+    unsigned long long  flag;        /* TOUPCAM_FLAG_xxx, 64 bits */
+    unsigned            maxspeed;    /* number of speed level, same as Toupcam_get_MaxSpeed(), speed range = [0, maxspeed], closed interval */
+    unsigned            preview;     /* number of preview resolution, same as Toupcam_get_ResolutionNumber() */
+    unsigned            still;       /* number of still resolution, same as Toupcam_get_StillResolutionNumber() */
+    unsigned            maxfanspeed; /* maximum fan speed, fan speed range = [0, max], closed interval */
+    unsigned            ioctrol;     /* number of input/output control */
+    float               xpixsz;      /* physical pixel size in micrometer */
+    float               ypixsz;      /* physical pixel size in micrometer */
+    ToupcamResolution   res[16];
+} ToupcamModelV2; /* camera model v2 */
+
+// 照相机实例结构体
+typedef struct {
+    wchar_t               displayname[64];    /* display name */
+    wchar_t               id[64];             /* unique and opaque id of a connected camera, for Toupcam_Open */
+    const ToupcamModelV2* model;
+} ToupcamDeviceV2; /* camera instance for enumerating */
+
+// 所有连接到照相机的照相机实例
+oupcam_EnumV2(ToupcamDeviceV2 arr[TOUPCAM_MAX]);
+
+// 打开指定ID或者索引的照相机实例
+Toupcam_Open(const wchar_t* camId);
+Toupcam_OpenByIndex(unsigned index); 
+
+// 关闭/停止/暂停照相机,关闭后不能再使用HToupcam
+Toupcam_Close(HToupcam h);
+Toupcam_Stop(HToupcam h);
+Toupcam_Pause(HToupcam h, int bPause); /* 1 => pause, 0 => continue */
+
+// 触发相机？ 拍照？
+Toupcam_Trigger(HToupcam h, unsigned short nNumber);
+TOUPCAM_API(HRESULT)  Toupcam_PullImageV3(HToupcam h, void* pImageData, int bStill, int bits, int rowPitch, ToupcamFrameInfoV3* pInfo);
+TOUPCAM_API(HRESULT)  Toupcam_WaitImageV3(HToupcam h, unsigned nWaitMS, void* pImageData, int bStill, int bits, int rowPitch, ToupcamFrameInfoV3* pInfo);
+
+// 每一帧图像的包含信息
+typedef struct {
+    unsigned            width;
+    unsigned            height;
+    unsigned            flag;       /* TOUPCAM_FRAMEINFO_FLAG_xxxx */
+    unsigned            seq;        /* frame sequence number */
+    unsigned long long  timestamp;  /* microsecond */
+} ToupcamFrameInfoV2;
+typedef struct {
+    unsigned            width;
+    unsigned            height;
+    unsigned            flag;       /* TOUPCAM_FRAMEINFO_FLAG_xxxx */
+    unsigned            seq;        /* frame sequence number */
+    unsigned long long  timestamp;  /* microsecond */
+    unsigned            shutterseq; /* sequence shutter counter */
+    unsigned            expotime;   /* exposure time */
+    unsigned short      expogain;   /* exposure gain */
+    unsigned short      blacklevel; /* black level */
+} ToupcamFrameInfoV3;
+
+

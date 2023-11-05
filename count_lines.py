@@ -26,4 +26,6 @@ def f(path):
 if __name__ == '__main__':
     f(path)
     print("total lines = ",total_lines, "file count = ",file_count)
+    # bufsize = (271 // 16 * 2) * 10
+    # print(bufsize)
     time.sleep(1)

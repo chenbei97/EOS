@@ -22,6 +22,41 @@ using std::future;
 //using namespace cv;
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 
+static void test_sharepointer()
+{
+    // 1. 原始图像的尺寸是QSize(1038, 576)=>597888
+    QImage img(CURRENT_PATH+"/images/cell.png");
+    LOG<<"img size = "<<img.size();// QSize(1038, 576)
+
+    // 2. 文件读取的size是617719,和wxh的结果并不相等
+    QFile file(CURRENT_PATH+"/images/cell.png");
+    file.open(QIODevice::ReadOnly);
+    int nSize = file.size();
+    auto buff = new char[nSize + 1];
+    QDataStream in(&file);
+    auto buffsize = in.readRawData(buff, nSize);
+    LOG<<"buffsize = "<<buffsize<<" nsize = "<<nSize; // buffsize =  617719  nsize =  617719
+
+    // 3. 从buff读取图像的二进制数据生成图像,尺寸不变为(1038, 576),RGB-32bit
+    QImage image;
+    image.loadFromData(reinterpret_cast<uchar*>(buff), buffsize);
+    auto imgsize = image.size();
+    Q_ASSERT(imgsize == img.size());
+    LOG<<"img size = "<<image.size()<<" "<<image.depth()<<image.format(); // img size =  QSize(1038, 576)   32 QImage::Format_RGB32
+
+    // 4. 智能指针分配buffsize这么大的内存,_msize可以计算指针指向的分配内存大小,分配的必须大于buffsize
+    QSharedPointer<uchar> imgdata = QSharedPointer<uchar>(new uchar[buffsize]); // imgsize.width() * 4 * img.height()
+    //QSharedPointer<uchar> imgdata = QSharedPointer<uchar>(new uchar[imgsize.width()  * img.height()]); // 1038x576=597888<617719,内存分配不够
+    memcpy(imgdata.get(),buff,buffsize);
+    Q_ASSERT(_msize(imgdata.get()) == buffsize);
+    //LOG<<imgsize.width() * 4 * img.height()<< _msize(imgdata.get()); // 2391552 2391552
+
+    // 5. 从智能指针指向的二进制数据重新读取并保存
+    auto bimg = QImage::fromData(imgdata.get(), _msize(imgdata.get()));
+    LOG<<"bimg size = "<<bimg.size()<<" "<<bimg.depth()<<bimg.format(); // bimg size =  QSize(1038, 576)   32 QImage::Format_RGB32
+    bimg.save("123.jpg");
+}
+
 static void test_camera()
 {
     uchar*          m_pData = nullptr;
