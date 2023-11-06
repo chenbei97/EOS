@@ -79,6 +79,13 @@ void Preview::onAdjustCamera(const QString & f,const QVariant & d)
     }
 }
 
+//void Preview::showCapturedImage(const ImageInfo &info)
+//{
+//    auto image = info.first;
+//    auto img = image.scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
+//    livecanvas->setPixmap(QPixmap::fromImage(img));
+//}
+
 void Preview::takingPhoto()
 {
     auto toolinfo = toolbar->toolInfo();
@@ -94,8 +101,8 @@ void Preview::takingPhoto()
 
     m[CurrentChannelField] = getIndexFromFields(current_channel);
     m[BrightField] = current_info[BrightField];
-    int exposure = current_info[ExposureField].toUInt();
-    int gain = current_info[GainField].toUInt();
+    int exp = current_info[ExposureField].toUInt();
+    int ga = current_info[GainField].toUInt();
 
 //auto save_channels = toolinfo[CaptureChannelField].toStringList();//保存过设置的所有通道
 // 不从保存过的参数去拿,而是从UI的信息直接去拿
@@ -103,8 +110,8 @@ void Preview::takingPhoto()
 //        // 例如当前通道PH,设置过PH的相机参数
 //        auto camera_info = toolinfo[current_channel].value<QVariantMap>();
 //        Q_ASSERT(camera_info[ChannelField].toString() == current_channel);
-//        exposure = camera_info[ExposureField].toUInt();
-//        gain = camera_info[GainField].toUInt();
+//        exp = camera_info[ExposureField].toUInt();
+//        ga = camera_info[GainField].toUInt();
 //        m[BrightField] = camera_info[BrightField];
 //    }
 
@@ -117,9 +124,18 @@ void Preview::takingPhoto()
     if (ParserResult.toBool()) {
         LOG<<"灯成功打开"; // 做这些事
 
-        ToupCameraPointer->setExposure(exposure);
-        ToupCameraPointer->setGain(gain);
-        ToupCameraPointer->capture();
+//        ToupCameraPointer->setExposure(exp);
+//        ToupCameraPointer->setGain(ga);
+//        LOG<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
+//        auto pix = ToupCameraPointer->capture();
+        setExposure(exp);
+        setGain(ga);
+
+        auto pix = capture();
+        LOG<<exposure()<<gain()<<pix.isNull();
+        QVariantMap m;
+        m[ImageField] = pix;
+        photocanvas->setStrategy(PreviewPhotoCanvas::SinglePixmap,m);
     }
 
     // 拍照结束后回复拍照结束

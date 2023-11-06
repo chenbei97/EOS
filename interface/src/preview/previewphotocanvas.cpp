@@ -26,12 +26,17 @@ void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
         painter.setPen(pen);
     }
 
-    if (strategy == NoStrategy) {
-        event->accept();
-        return;
+    switch (strategy) {
+        case NoStrategy:
+            break;
+        case SinglePixmap:
+            auto image = mStrategyInfo[ImageField].value<QImage>();
+            auto img = image.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+            auto targetRect = QRectF(0,0,width(),height());
+            auto sourceRect = targetRect;
+            painter.drawImage(targetRect,image,sourceRect);
+            break;
     }
-
-    // 其他策略
     event->accept();
 }
 
@@ -75,16 +80,9 @@ void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, const Q
     mDrapRect = QRectF(); // 上次的框选痕迹还在要清除
 
     // 2. 初始化xx策略需要的信息
-    mCurrentHoleInfo = m;
+    mStrategyInfo = m;
 
     update();
-}
-
-
-
-QVariantMap PreviewPhotoCanvas::currentHoleInfo() const
-{ //
-    return mCurrentHoleInfo;
 }
 
 PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)

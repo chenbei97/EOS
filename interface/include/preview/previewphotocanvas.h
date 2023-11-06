@@ -15,17 +15,16 @@ class INTERFACE_IMEXPORT PreviewPhotoCanvas: public QWidget
 {
     Q_OBJECT
 public:
-    enum DrawStrategy {NoStrategy};
+    enum DrawStrategy {NoStrategy,SinglePixmap};
     explicit PreviewPhotoCanvas(QWidget*parent= nullptr);
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());
-    QVariantMap currentHoleInfo() const;
     void mousePressEvent(QMouseEvent *event) override;// 左键点击清除框选,计算鼠标点击的小矩形区域坐标
     void mouseMoveEvent(QMouseEvent *event) override;// 绘制拖拽框
     void mouseReleaseEvent(QMouseEvent *event) override;// 拖拽区域点个数为0才是预览事件
     void paintEvent(QPaintEvent *event) override;
 private:
     DrawStrategy strategy = NoStrategy;
-    QVariantMap mCurrentHoleInfo;
+    QVariantMap mStrategyInfo;
     int mrows = 0;
     int mcols = 0;
     QRectF mDrapRect; // 鼠标拖动生成的矩形

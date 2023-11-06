@@ -101,7 +101,7 @@ void Preview::initAttributes()
 void Preview::initObjects()
 {
     cameramode = new CameraMode;
-    livecanvas = new QWidget;
+    livecanvas = new Label;
     photocanvas = new PreviewPhotoCanvas;
     stack = new QStackedWidget;
     pattern = new WellPattern(2,3);
@@ -111,6 +111,8 @@ void Preview::initObjects()
     dock = new DockWidget(tr("选择孔内视野"));
     dockcanvas = new QMainWindow;
     scrollarea = new QScrollArea;
+    Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持
+
 }
 
 void Preview::initConnections()
@@ -125,7 +127,8 @@ void Preview::initConnections()
     connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::saveExperConfig);
 
     connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);
-    //connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::onC)
+    //connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::showCapturedImage);
+    connect(this, &Preview::evtCallback, this, &Preview::processCallback);
 
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
 

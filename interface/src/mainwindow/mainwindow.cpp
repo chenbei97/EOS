@@ -37,6 +37,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     resize(MainWindowWidth,MainWindowHeight);
 
     connect(navigbar,&NavigBar::buttonClicked,stack,&QStackedWidget::setCurrentIndex);
+    connect(navigbar,&NavigBar::buttonClicked,[this](auto id){
+        if (id == 1) preview->openCamera();
+        else  preview->closeCamera();
+    });
     connect(appselect,&AppSelect::proliferationClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect,&AppSelect::scratchClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect, QOverload<int>::of(&AppSelect::appClicked),preview,&Preview::setAppInfo);

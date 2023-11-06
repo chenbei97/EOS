@@ -28,12 +28,11 @@ public:
     bool haveCamera() const;
     unsigned cameraCount() const;
 
-    static void captureCallback(unsigned nEvent, void* ctxEvent);
-    void capture();
-
-    void print_imageInfo(ToupcamFrameInfoV3* info);
+    QImage capture();
 
     QSize resolution() const;
+
+    double frameRate() const;
 
     void setByteOrder(int option);
     int byteOrder() const;
@@ -60,8 +59,15 @@ private:
     QSharedPointer<uchar> imgdata = nullptr;
 private:
     explicit ToupCamera(QObject*parent= nullptr);
+    static void __stdcall eventCallBack(unsigned nEvent, void* ctxEvent);
+    void processCallback(unsigned nEvent);
+    void captureLiveImage();
+    void captureStillImage();
+    void print_imageInfo(ToupcamFrameInfoV3* info);
 signals:
     void imageCaptured(const ImageInfo& info);
+signals:
+    void evtCallback(unsigned nEvent);
 };
 
 #define  ToupCameraPointer (&ToupCamera::instance())

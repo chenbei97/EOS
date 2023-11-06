@@ -69,6 +69,7 @@ static const char* MinuteField = "minute";
 static const char* HoursFieldSuffix = " hours";
 static const char* MinutesFieldSuffix = " minutes";
 static const char* StateField = "state";
+static const char* ImageField = "image";
 static const char* ActivateCodeField = "activate_code";
 static const char* TurnOffLight = "turnoff_light";
 static const char* IsCheckedField = "isChecked";

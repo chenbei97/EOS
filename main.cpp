@@ -18,13 +18,11 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     initApp(a);
     //StartPythonPointer->start("../test","test_socket","test_server");
-    test_sharepointer();
+    //test_sharepointer();
     //test_camera();
     //test_assemble_parse();
     //test_async();
     //test_opencv();
-
-    ToupCameraPointer;
 
 #ifdef usetesttcp
     test_tcp();
