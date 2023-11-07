@@ -10,13 +10,40 @@
 
 PushButton::PushButton(QWidget*parent):QPushButton(parent)
 {
-
+    checked = false;
+    setAutoFillBackground(true);
+    //setFlat(true);
 }
 
 
 PushButton::PushButton(const QString&text,QWidget*parent):QPushButton(parent)
 {
+    checked = false;
+    setAutoFillBackground(true);
+    //setFlat(true);
     setText(text);
+    //setStyleSheet("background-color:#F0F0F0");
+    //resetBackGroundColor();
 }
 
+bool PushButton::isChecked() const
+{
+    return checked;
+}
+
+void PushButton::setBackGroundColor(QCColor color)
+{
+    auto pal = palette();
+    pal.setColor(QPalette::Button,color);
+    setPalette(pal);
+    checked = true;
+}
+
+void PushButton::resetBackGroundColor()
+{
+    auto pal = palette();
+    pal.setColor(QPalette::Button,"#F0F0F0");
+    setPalette(pal);
+    checked = false;
+}
 

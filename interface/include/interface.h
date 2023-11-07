@@ -25,6 +25,7 @@
 #include "wellbox.h"
 #include "focusbox.h"
 #include "channelbox.h"
+#include "channelboxx.h"
 #include "cameratool.h"
 #include "camerabox.h"
 #include "zstackbox.h"

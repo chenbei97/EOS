@@ -69,7 +69,8 @@ struct Field0x0000 {
     const QString bright = BrightField;
     const QString objective = ObjectiveField;
     const QString viewsize = ViewSizeField;
-    const QString current_channel = CurrentChannelField;
+    const QString ishole = IsHoleField;
+    //const QString current_channel = CurrentChannelField;
     const QString state = StateField; // 解析使用
 };
 
@@ -126,8 +127,8 @@ struct Field0x0003 {
 };
 
 struct Field0x0004 {
-    const QString current_channel = CurrentChannelField; // 拍照
-    const QString bright = BrightField;
+    //const QString current_channel = CurrentChannelField; // 拍照不再需要传递当前通道
+    const QString bright = BrightField;// 拍照
     const QString state = StateField;
 };
 
@@ -138,14 +139,15 @@ struct Field0x0005 {
 };
 
 struct Field0x0006 {
+    const QString turnoff_light = TurnOffLight;
     const QString current_channel = CurrentChannelField; // 切换通道
     const QString bright = BrightField;
     const QString state = StateField;
 };
 
-struct Field0x0007 { // 开关灯
-    const QString turnoff_light = TurnOffLight;
-    const QString current_channel = CurrentChannelField;
+struct Field0x0007 {
+//    const QString turnoff_light = TurnOffLight;
+//    const QString current_channel = CurrentChannelField;
     const QString state = StateField;
 };
 
@@ -204,13 +206,14 @@ static QByteArray assemble0x0000(QCVariantMap m)
     object[Field0x0000.wellsize] = m[WellsizeField].toString();
     object[Field0x0000.objective] = m[ObjectiveField].toString();
     object[Field0x0000.viewsize] = m[HoleViewSizeField].toString();
-    object[Field0x0000.current_channel] = m[CurrentChannelField].toString();
+    //object[Field0x0000.current_channel] = m[CurrentChannelField].toString();
     auto holepoint = m[HoleCoordinateField].toPoint();
     auto viewpoint = m[ViewCoordinateField].toPoint();
     object[Field0x0000.hole_x] = holepoint.x();
     object[Field0x0000.hole_y] = holepoint.y();
     object[Field0x0000.view_x] = viewpoint.x();
     object[Field0x0000.view_y] = viewpoint.y();
+    object[Field0x0000.ishole] = m[IsHoleField].toInt();
 
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
@@ -388,7 +391,7 @@ static QByteArray assemble0x0004(QCVariantMap m)
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0004;
     object[Field0x0004.bright] = m[BrightField].toString();
-    object[Field0x0004.current_channel] = m[CurrentChannelField].toString();
+    //object[Field0x0004.current_channel] = m[CurrentChannelField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -407,7 +410,7 @@ static QByteArray assemble0x0005(QCVariantMap m)
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0005;
     object[Field0x0005.bright] = m[BrightField].toString();
-    object[Field0x0004.current_channel] = m[CurrentChannelField].toString();
+    object[Field0x0005.current_channel] = m[CurrentChannelField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -425,6 +428,7 @@ static QByteArray assemble0x0006(QCVariantMap m)
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0006;
     object[Field0x0006.bright] = m[BrightField].toString();
+    object[Field0x0006.turnoff_light] = m[TurnOffLight].toString();
     object[Field0x0006.current_channel] = m[CurrentChannelField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
@@ -440,18 +444,18 @@ static QVariant parse0x0006(QCVariantMap m)
 }
 
 static QByteArray assemble0x0007(QCVariantMap m)
-{ // 关灯
+{
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0007;
-    object[Field0x0007.turnoff_light] = m[TurnOffLight].toString();
-    object[Field0x0007.current_channel] = m[CurrentChannelField].toString();
+//    object[Field0x0007.turnoff_light] = m[TurnOffLight].toString();
+//    object[Field0x0007.current_channel] = m[CurrentChannelField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
 static QVariant parse0x0007(QCVariantMap m)
-{// 关灯
+{
     if (!m.keys().contains(FrameField)) return false;
     if (!m.keys().contains(Field0x0007.state)) return false;
     auto ret = m[StateField].toString();
@@ -469,7 +473,7 @@ static QByteArray assemble0x0008(QCVariantMap m)
 }
 
 static QVariant parse0x0008(QCVariantMap m)
-{// 关灯
+{// 移动镜头
     if (!m.keys().contains(FrameField)) return false;
     if (!m.keys().contains(Field0x0008.state)) return false;
     auto ret = m[StateField].toString();

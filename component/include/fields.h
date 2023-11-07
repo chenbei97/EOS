@@ -227,6 +227,7 @@ static const char* HoleViewSizeField = "hole_viewsize"; // 孔的视野尺寸
 static const char* HoleViewPointsField = "hole_viewpoints";// 孔选择的视野坐标
 static const char* WellAllGroupsField = "wellallgroups"; // 孔板已分过的所有组名称
 static const char* WellAllHolesField = "wellallholes"; // 孔板已选过的所有孔坐标
+static const char* IsHoleField = "ishole"; // 是孔坐标触发还是视野坐标触发
 
 static const QStringList GroupDoseUnitFields =  {
         "mg/mL","mg/L","g/mL","g/L",

@@ -14,7 +14,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     wellbox = new WellBox;
     objectivebox = new ObjectiveBox;
     focusbox = new FocusBox;
-    channelbox = new ChannelBox;
+    channelbox = new ChannelBoxx;
     camerabox = new CameraBox;
     timebox = new TimeBox;
     zstackbox = new ZStackBox;
@@ -39,14 +39,14 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(camerabox,&CameraBox::cameraInfoChanged,this,&PreviewTool::cameraInfoChanged);
     connect(camerabox,&CameraBox::photoTaking,this,&PreviewTool::photoTaking);
     connect(camerabox,&CameraBox::cameraAdjusted,this,&PreviewTool::cameraAdjusted);
-    connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::channelChanged);
+    connect(channelbox,&ChannelBoxx::channelChanged,this,&PreviewTool::channelChanged);
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
     connect(savebox,&SaveBox::exportFilePath,this,&PreviewTool::exportFilePath);
     connect(focusbox,&FocusBox::directionMove,this,&PreviewTool::directionMove);
     // 2. 信号槽函数
-    connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
-    connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBox::disableChannel);
+    connect(channelbox,&ChannelBoxx::channelChanged,camerabox,&CameraBox::setChannel);
+    connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBoxx::disableChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,timebox,&TimeBox::disableChannel);
     // 3.外部信号
     connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);

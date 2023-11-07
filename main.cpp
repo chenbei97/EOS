@@ -29,7 +29,6 @@ int main(int argc, char *argv[]) {
 #else
     MainWindow w;
     setWindowAlignCenter(&w);
-    //TriangleMove w;
     w.show();
 #endif
     return QApplication::exec();

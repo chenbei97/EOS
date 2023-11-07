@@ -18,6 +18,11 @@ class COMPONENT_IMEXPORT PushButton : public QPushButton
 public:
     explicit PushButton(QWidget*parent=nullptr);
     explicit PushButton(const QString&text,QWidget*parent=nullptr);
+    void setBackGroundColor(QCColor color);
+    void resetBackGroundColor();
+    bool isChecked() const;
+private:
+    bool checked = false;
 };
 
 

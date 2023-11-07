@@ -49,6 +49,8 @@ void CameraBox::adjustCamera()
 void CameraBox::onSaveBtn()
 { // 保存参数也不需要
     auto channel = currentchannel->text().remove(ChannelFieldLabel);
+    if (channel == NoneField) return;
+
     camerainfo[channel] = saveInfo();
     emit cameraInfoChanged(camerainfo);
     //LOG<<"camera info = "<<camerainfo;
@@ -73,6 +75,12 @@ void CameraBox::setEnabled(bool enabled)
 
 void CameraBox::setChannel(int option)
 {
+    if (option < 0) {
+        currentchannel->setText(QString("%1%2").arg(ChannelFieldLabel).arg(NoneField));
+        setEnabled(false);
+        return;
+    }
+    setEnabled(true);
     // 1. channelbox设置通道后更新相机设置显示的当前通道信息
     auto channel = ChannelFields[option];
     currentchannel->setText(QString("%1%2").arg(ChannelFieldLabel).arg(channel));
@@ -85,10 +93,10 @@ void CameraBox::setChannel(int option)
         cameratool->setBright(camerainfo[channel][BrightField].toUInt());
         cameratool->setExposure(camerainfo[channel][ExposureField].toUInt());
         cameratool->setGain(camerainfo[channel][GainField].toUInt());
-    } else {
-        cameratool->setBright(0);
-        cameratool->setExposure(0);
-        cameratool->setGain(0);
+    } else { // 这里不要重置ui的数字,方便操作
+//        cameratool->setBright(0);
+//        cameratool->setExposure(0);
+//        cameratool->setGain(0);
     }
     cameratool->blockSignals(false);
 }

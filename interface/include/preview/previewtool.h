@@ -11,7 +11,8 @@
 
 #include "window.h"
 #include "camerabox.h"
-#include "channelbox.h"
+//#include "channelbox.h"
+#include "channelboxx.h"
 #include "wellbox.h"
 #include "objectivebox.h"
 #include "zstackbox.h"
@@ -31,7 +32,7 @@ private:
     WellBox * wellbox;
     ObjectiveBox * objectivebox;
     FocusBox * focusbox;
-    ChannelBox * channelbox;
+    ChannelBoxx * channelbox;
     CameraBox * camerabox;
     TimeBox * timebox;
     ZStackBox * zstackbox;

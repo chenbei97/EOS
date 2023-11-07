@@ -40,6 +40,7 @@ class ParseManager:
         self.turnoff_light = "turnoff_light"
         self.direction = "direction"
         self.camera_loc = "camera_loc"
+        self.ishole = "ishole"
         self.__socket = None
         self.parseFunctions = {
             "test0x0": self.__parsetest0x0,
@@ -99,7 +100,8 @@ class ParseManager:
         objective = msg[self.objective]
         manufacturer = msg[self.manufacturer]
         viewsize = msg[self.viewsize]
-        current_channel = msg[self.current_channel]
+        #current_channel = msg[self.current_channel]
+        ishole = msg[self.ishole]
 
         reponse = defaultdict()
         reponse[self.frame] = frame
@@ -143,7 +145,7 @@ class ParseManager:
     def __parse0x0004(self,msg:dict): # 拍照
         frame = msg[self.frame]
         bright = msg[self.bright]
-        channel = msg[self.current_channel]
+        #channel = msg[self.current_channel]
         reponse = defaultdict()
         reponse[self.frame] = frame
         reponse[self.state] = "ok"
@@ -168,6 +170,7 @@ class ParseManager:
         frame = msg[self.frame]
         bright = msg[self.bright]
         channel = msg[self.current_channel]
+        turnoff_light = msg[self.turnoff_light] # = 1
         reponse = defaultdict()
         reponse[self.frame] = frame
         reponse[self.state] = "ok"
@@ -178,7 +181,7 @@ class ParseManager:
 
     def __parse0x0007(self,msg:dict): # 回复关灯
         frame = msg[self.frame]
-        turnoff_light = msg[self.turnoff_light]
+
         reponse = defaultdict()
         reponse[self.frame] = frame
         reponse[self.state] = "ok"

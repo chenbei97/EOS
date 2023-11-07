@@ -11,22 +11,29 @@
 void Preview::toggleChannel(int option)
 {
     auto toolinfo = toolbar->toolInfo();
-
     auto current_channel = toolinfo[CurrentChannelField].toString();
+
+    if (current_channel.isEmpty()) {
+        LOG<<"toggle channel isvalid";
+        Q_ASSERT(option == -1); // 如果没有通道,此时是空字符串,切option=1,那么这个时候就直接关灯即可
+        // 不过关灯需要知道关哪个灯,这个工作在channelboxx已经做了,这里什么也不做
+        return; // 灯全灭的情况直接返回
+    }
+
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
 
     QVariantMap m;
     m[CurrentChannelField] = getIndexFromFields(current_channel);
     m[BrightField] = current_info[BrightField];
+    m[TurnOffLight] = 0;
 
     AssemblerPointer->assemble(TcpFramePool.frame0x0006,m);
     auto msg = AssemblerPointer->message();
-    //LOG<<m[BrightField]<<m[CurrentChannelField]<<msg;
 
     SocketPointer->exec(TcpFramePool.frame0x0006,msg, true);
 
     if (ParserResult.toBool()) {
-        LOG<<"切换通道到"<<m[CurrentChannelField];
+        LOG<<"开灯! 当前开灯通道为 "<<m[CurrentChannelField];
     }
 }
 
@@ -54,6 +61,11 @@ void Preview::adjustCamera(int exp,int gain,int br)
 
     auto current_channel = toolinfo[CurrentChannelField].toString();
 
+    if (current_channel.isEmpty()) {
+        LOG<<"have no channel";
+        return; // 如果通道无效,没有开灯,调节参数没有意义,不发给下位机
+    }
+
     // 滑动条速度很快,这里组装不再通过Assembler来组装,可能同步会出问题,直接组装
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0005;
@@ -62,13 +74,8 @@ void Preview::adjustCamera(int exp,int gain,int br)
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());;
 
-    //LOG<<msg<<exp<<gain<<br;
-
-
     // 发送消息异步发送就行不需要同步,防止卡住
     SocketPointer->exec(TcpFramePool.frame0x0005,msg, false);
-
-
 }
 
 void Preview::onAdjustCamera(const QString & f,const QVariant & d)
@@ -94,13 +101,12 @@ void Preview::takingPhoto()
 //    previewinfo[PreviewToolField] = toolinfo;
 //    previewinfo[PreviewPatternField] = patterninfo;
 
-    auto current_channel = toolinfo[CurrentChannelField].toString();
+    //auto current_channel = toolinfo[CurrentChannelField].toString();
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
-
 
     QVariantMap m;
 
-    m[CurrentChannelField] = getIndexFromFields(current_channel);
+    //m[CurrentChannelField] = getIndexFromFields(current_channel);
     m[BrightField] = current_info[BrightField];
     int exp = current_info[ExposureField].toUInt();
     int ga = current_info[GainField].toUInt();
@@ -118,38 +124,27 @@ void Preview::takingPhoto()
 
     AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
     auto msg = AssemblerPointer->message();
-    //LOG<<exposure<<gain<<m[BrightField]<<m[CurrentChannelField]<<msg;
 
     SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
     // 等待回复后调用相机拍照
     if (ParserResult.toBool()) {
-        LOG<<"灯成功打开"; // 做这些事
+
 #ifndef usetoupcamera
         ToupCameraPointer->setExposure(exp);
         ToupCameraPointer->setGain(ga);
-        LOG<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
         auto pix = ToupCameraPointer->capture();
 #else
         setExposure(exp);
         setGain(ga);
         auto pix = capture();
-        LOG<<exposure()<<gain()<<pix.isNull();
 #endif
+        LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
+        <<" 曝光和增益为 "<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
+
         QVariantMap m;
         m[ImageField] = pix;
         photocanvas->setData(m);
-    }
 
-    // 拍照结束后回复拍照结束
-    QVariantMap m1;
-    m1[TurnOffLight] = "1";
-    m1[CurrentChannelField] = getIndexFromFields(current_channel);
-    AssemblerPointer->assemble(TcpFramePool.frame0x0007, m1);
-    auto msg1 = AssemblerPointer->message();
-    //LOG<<msg1;
-    SocketPointer->exec(TcpFramePool.frame0x0007,msg, true);
-    if (ParserResult.toBool()) {
-        LOG<<"灯成功关闭";
     }
 }
 
@@ -169,7 +164,7 @@ void Preview::previewViewByClickView(const QPoint &viewpoint)
     auto wellsize = toolinfo[WellsizeField].toUInt();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
     auto holecoordinate = viewpattern->currentViewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
-    auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
+    //auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     auto bright = current_info[BrightField];
 
@@ -188,16 +183,15 @@ void Preview::previewViewByClickView(const QPoint &viewpoint)
     m[HoleViewSizeField] = viewsize;
     m[HoleCoordinateField] = holecoordinate;
     m[ViewCoordinateField] = viewpoint;
-    m[CurrentChannelField] = current_channel;
+    //m[CurrentChannelField] = current_channel;// 不需要再发当前通道了
     m[BrightField] = bright;
+    m[IsHoleField] = 0;
 
     AssemblerPointer->assemble(TcpFramePool.frame0x0000,m);
     auto msg = AssemblerPointer->message();
-    LOG<<msg;
     SocketPointer->exec(TcpFramePool.frame0x0000,msg, true);
-    LOG<<ParserResult;
     if (ParserResult.toBool()) {
-        LOG<<"预览点击到位";
+        LOG<<"已经移动电机到指定视野坐标 "<<viewpoint;
     }
 }
 
@@ -218,7 +212,7 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
     //auto holecoordinate = viewpattern->currentViewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
     auto holecoordinate = holepoint; // 所以才为什么只能分成previewViewByClickHole和previewViewByClickView 2个函数写了
-    auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
+    //auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     auto bright = current_info[BrightField];
 
@@ -236,16 +230,15 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     m[HoleViewSizeField] = viewsize;
     m[HoleCoordinateField] = holecoordinate;
     m[ViewCoordinateField] = QPoint(-1,-1);//点孔触发视野坐标没有意义
-    m[CurrentChannelField] = current_channel;
+    //m[CurrentChannelField] = current_channel; // 不需要再发当前通道了
     m[BrightField] = bright;
+    m[IsHoleField] = 1;
 
     AssemblerPointer->assemble(TcpFramePool.frame0x0000,m);
     auto msg = AssemblerPointer->message();
-    LOG<<msg;
     SocketPointer->exec(TcpFramePool.frame0x0000,msg, true);
-    LOG<<ParserResult;
     if (ParserResult.toBool()) {
-        LOG<<"预览点击到位";
+        LOG<<"已经移动电机到指定孔坐标 "<<holepoint;
     }
 }
 
