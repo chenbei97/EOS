@@ -17,7 +17,10 @@ void ViewPattern::drawSelectRect(QPainter &painter)
     auto groupcolor = mCurrentViewInfo[HoleGroupColorField].toString();
     auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
 
+    if (mViewSelectPoints[idx].isEmpty()) return; // 删孔后清除缓存信息这里是空直接返回否则遍历越界
+
     auto  rects = getInnerRects();
+
     // 绘制框选的所有孔
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {

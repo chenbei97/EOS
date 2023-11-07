@@ -60,14 +60,17 @@ WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,col
     mMouseEvent = true;
     setgroupact = new QAction(tr("分组"));
     openviewact = new QAction(tr("选点"));
+    removeholeact = new QAction(tr("删孔"));
     addAction(setgroupact);
     addAction(openviewact);
+    addAction(removeholeact);
     setContextMenuPolicy(Qt::ActionsContextMenu);
     initDrapPoints();
     initHoleInfo();
 
     connect(setgroupact,&QAction::triggered,this,&WellPattern::onSetGroupAct);
     connect(openviewact,&QAction::triggered,this,&WellPattern::onOpenViewAct);
+    connect(removeholeact,&QAction::triggered,this,&WellPattern::onRemoveHoleAct);
 }
 
 void WellPattern::setPatternSize(int rows, int cols)

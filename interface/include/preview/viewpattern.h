@@ -12,6 +12,7 @@ public:
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());// 设置策略+传递孔的信息+视野尺寸信息+应用到组使能
     ViewInfo currentViewInfo() const;// 切换brand,objective时外部拿到当前的视野孔信息,然后更新其中尺寸字段重新调用setStrategy
     void updatePatternUi();// objective更新后视野窗口更新了,但是孔图案的ui绘制点还在,要刷新一下(过时,preview.initHoleInfo直接做了这部分工作)
+    void clearViewWindowCache(const QPoint& holepoint);
 private: // 动作菜单
     DrawStrategy strategy = NoStrategy;
     QVariantMap mCurrentViewInfo;

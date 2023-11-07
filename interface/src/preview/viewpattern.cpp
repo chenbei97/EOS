@@ -57,6 +57,26 @@ void ViewPattern::setStrategy(ViewPattern::DrawStrategy s, const QVariantMap& m)
     update();
 }
 
+void ViewPattern::clearViewWindowCache(const QPoint &holepoint)
+{ // 删孔时清除该孔的缓存信息
+    // 1. 计算这个孔的id
+    auto idx = holepoint.x()*PointToIDCoefficient+holepoint.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
+
+    // 此时点击视野坐标会越界所以还是需要重新分配空间
+    QBool2DVector vec;
+    for(int row = 0 ; row < mrows; ++ row) {
+        QBoolVector var;
+        for (int col = 0; col < mcols; ++col){
+            var.append(false);
+        }
+        vec.append(var);
+    }
+    mViewSelectPoints[idx] = vec;
+    mTmpViewSelectPoints[idx] = vec;
+
+    update();
+}
+
 void ViewPattern::onSaveViewAct()
 { // 保存选择的视野到当前孔id对应的视野数据区并保存到临时信息用于initSelectPoints重新初始化
 

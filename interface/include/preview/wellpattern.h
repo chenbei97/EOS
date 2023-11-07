@@ -43,13 +43,16 @@ private:
     QHoleInfo2DVector mHoleInfo; // 每个孔的所有信息用结构体封装
 private:
     QAction * setgroupact;
-    void onSetGroupAct();// 当前孔的所属组颜色和名称传递给分组窗口去更新ui信息,触发openSetGroupWindow信号
     QAction * openviewact;
+    QAction * removeholeact;
+    void onSetGroupAct();// 当前孔的所属组颜色和名称传递给分组窗口去更新ui信息,触发openSetGroupWindow信号
     void onOpenViewAct();//打开选择视野窗口的事件,需要传递当前孔的coordinate+group+color+grouppoints+allgroups,触发openViewWindow信号
+    void onRemoveHoleAct();
     QPointVector getHoleGroupCoordinates(const QString& groupName) const;// 获取组内的所有孔坐标传递给视野窗口在应用到本组时可以更新其它孔的视野数据区信息
     QPoint2DVector getAllWellHoleCoordinates() const;
 signals:
     void openSetGroupWindow(const QVariantMap& m); // 打开分组窗口事件,分组动作触发传递当前孔的color+group
     void openViewWindow(const QVariantMap& m); // 打开视野窗口的信号
+    void clearViewWindowCache(const QPoint& holepoint); // 删孔需要清除视野窗口对应的缓存信息
 };
 #endif //EOSI_WELLPATTERN_H

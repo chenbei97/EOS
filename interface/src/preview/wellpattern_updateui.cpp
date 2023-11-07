@@ -8,7 +8,7 @@
  */
 #include "wellpattern.h"
 
-// (1) 打开分组的对话框,更新分组对话框的UI信息
+// (1) 打开分组的对话框(以当前鼠标位置的孔信息去更新),更新分组对话框的UI信息
 void WellPattern::onSetGroupAct()
 { // 当前孔的所属组颜色和名称传递给分组窗口去更新ui信息(传递6个信息)
     // updateGroupByGroupInfo函数内用到这6个信息
@@ -52,6 +52,10 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
                 mHoleInfo[row][col].color = gcolor; // 颜色跟随分组窗口设置的颜色
                 mHoleInfo[row][col].coordinate = QPoint(row,col); // 孔坐标
 
+                mHoleInfo[row][col].viewpoints = QPointVector(); //每次分组就把视野坐标信息要清除掉
+                // 否则重新分组后视野坐标点的绘制还在继续
+                emit clearViewWindowCache(QPoint(row,col));//重新分组后清除缓存信息
+
                 mHoleInfo[row][col].type = gtype; // 本孔分配的实验类型
                 mHoleInfo[row][col].medicine = medicine; // 本孔分配的样品
                 mHoleInfo[row][col].dose = dose; // 本孔分配的剂量
@@ -67,11 +71,13 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
         mHoleInfo[mMousePos.x()][mMousePos.y()].color = gcolor;
         mHoleInfo[mMousePos.x()][mMousePos.y()].group = gname;
         mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
+        mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointVector();
         mHoleInfo[mMousePos.x()][mMousePos.y()].type = gtype; // 本孔分配的实验类型
         mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = medicine; // 本孔分配的样品
         mHoleInfo[mMousePos.x()][mMousePos.y()].dose = dose; // 本孔分配的剂量
         mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = unit; // 本孔分配的剂量单位
         mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
+        emit clearViewWindowCache(mMousePos);
     }
 
     // 3. 更新已有的组信息(要在上边的group更新过以后再重新计算)
@@ -181,5 +187,30 @@ void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
             mHoleInfo[hole.x()][hole.y()] = holeinfo;
         }
     }
+    update();
+}
+
+// (5) 删孔逻辑
+void WellPattern::onRemoveHoleAct()
+{ // 删孔就是清除当前鼠标的孔信息为默认即可
+  // 双击该孔出现视野对话框或者打开分组对话框都是以这个孔信息为准的
+  // 视野对话框因为有临时信息,需要清除,因为视野窗口尺寸不变临时信息没有被清除
+
+  // 不清除allgroup,coordinate,allcoordinate字段也可以,每次打开视野窗口都会更新
+    mHoleInfo[mMousePos.x()][mMousePos.y()].group = QString();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].color = Qt::red;
+    mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
+    mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = QSize(0,0);
+    mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointVector();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = false;
+    mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = QPoint2DVector();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = QSet<QString>();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].type = QString();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = QString();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = QString();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].dose = QString();
+
+    // 清除视野窗口的缓存信息
+    emit clearViewWindowCache(mMousePos);
     update();
 }
