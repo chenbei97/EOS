@@ -128,6 +128,7 @@ void Preview::initConnections()
     connect(toolbar,&PreviewTool::directionMove,this,&Preview::adjustLens);
     connect(toolbar,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
     connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::saveExperConfig);
+    connect(toolbar,&PreviewTool::loadExper,this,&Preview::loadExper);
 
     connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);
 #ifdef notusetoupcamera

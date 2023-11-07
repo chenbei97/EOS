@@ -50,6 +50,7 @@ signals:
     void photoTaking();// 只有camerabox的拍照会触发该信号
     void directionMove(int option); // 移动镜头
     void cameraAdjusted(int exp,int gain,int br);// 调整相机实时更改
+    void loadExper(); // 启动实验
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
 };

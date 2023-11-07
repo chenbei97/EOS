@@ -89,6 +89,7 @@ private:
     void previewViewByClickView(const QPoint& viewpoint);
     void previewViewByClickHole(const QPoint& holepoint);
     void saveExperConfig(const QString& path);
+    void loadExper();
 #ifndef notusetoupcamera
     void showCapturedImage(const QImage& image);
 #endif

@@ -255,3 +255,17 @@ void Preview::saveExperConfig(const QString& path)
     JsonReadWrite m; // 借助工具类写到文件内
     m.writeJson(path,json);
 }
+
+void Preview::loadExper()
+{
+    previewinfo[PreviewPatternField] = pattern->patternInfo();
+    previewinfo[PreviewToolField] = toolbar->toolInfo();
+
+    AssemblerPointer->assemble(TcpFramePool.frame0x0001,previewinfo);
+    auto json = AssemblerPointer->message();
+
+    SocketPointer->exec(TcpFramePool.frame0x0001,json);
+    if (ParserResult.toBool()) {
+        QMessageBox::information(this,InformationChinese,tr("启动实验成功!"));
+    }
+}

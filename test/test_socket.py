@@ -115,8 +115,7 @@ class ParseManager:
         frame = msg[self.frame]
         reponse = defaultdict()
         reponse[self.frame] = frame
-        path = r"c/user/appdata/" + str(randint(1, 100))+".jpg"
-        reponse[self.path] = path
+        reponse[self.state] = "ok"
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0001回复: ", reponse)
