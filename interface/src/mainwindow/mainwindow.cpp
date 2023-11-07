@@ -36,11 +36,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     //setAttribute(Qt::WA_DeleteOnClose,true);
     resize(MainWindowWidth,MainWindowHeight);
 
-    connect(navigbar,&NavigBar::buttonClicked,stack,&QStackedWidget::setCurrentIndex);
-    connect(navigbar,&NavigBar::buttonClicked,[this](auto id){
-        if (id == 1) preview->openCamera();
-        else  preview->closeCamera();
-    });
+    connect(navigbar,&NavigBar::buttonClicked,this,&MainWindow::navigbarSelect);
     connect(appselect,&AppSelect::proliferationClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect,&AppSelect::scratchClicked,this,[=]{stack->setCurrentIndex(1);});
     connect(appselect, QOverload<int>::of(&AppSelect::appClicked),preview,&Preview::setAppInfo);
@@ -51,4 +47,16 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     // start("Eos_I","Eos_main","main");
     StartPythonPointer->start("../test","test_socket","test_server");
+}
+
+void MainWindow::navigbarSelect(int id)
+{
+    stack->setCurrentIndex(id);
+//#ifdef notusetoupcamera
+//    if (id == 1) preview->openCamera();
+//        else  preview->closeCamera();
+//#else
+//    if (id == 1) ToupCameraPointer->openCamera();
+//    else  ToupCameraPointer->closeCamera();
+//#endif
 }

@@ -26,6 +26,11 @@ DoubleSlider::DoubleSlider(QWidget *parent) : QWidget(parent)
     connect(slider,&QSlider::sliderMoved,this,&DoubleSlider::valueChanged);
 }
 
+void DoubleSlider::setDirection(Qt::Orientation orientation)
+{
+    slider->setOrientation(orientation);
+}
+
 void DoubleSlider::setMouseEvent(bool enabled)
 {
     slider->setMouseEvent(enabled);

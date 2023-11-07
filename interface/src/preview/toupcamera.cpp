@@ -82,9 +82,11 @@ void ToupCamera::captureLiveImage()
         // imgdata分配了多大内存读取就使用多大内存,_msize可以计算分配的内存
         //auto image = QImage::fromData(imgdata.get(), _msize(imgdata.get()));
         auto image = QImage(imgdata.get(), info.width, info.height, QImage::Format_RGB888);
-        auto pair = qMakePair(image,info);
+
         //把数据发出去,别的地方使用
+        //auto pair = qMakePair(image,info);
         //emit imageCaptured(pair);
+        emit imageCaptured(image);
     } else {
         LOG<<"pull image failed";
     }

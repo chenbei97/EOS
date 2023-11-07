@@ -31,6 +31,8 @@ public:
 
     void addValue(double val);
     void subtractValue(double val);
+
+    void setDirection(Qt::Orientation orientation);
 private:
     Sliderx * slider;
     Label * prefix;

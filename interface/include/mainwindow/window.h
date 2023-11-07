@@ -67,7 +67,7 @@ using std::modf;
     #define AppSelectMoveVerDistance (AppSelectButtonVerGap+AppSelectButtonHeight) // 垂直方向下一个按钮相对移动距离=verbtngap+btnheight
     #define AppSelectButtonRoundRadius 25 // 圆角半径
 
-    #define FocusBoxButtonMargin 50 // 2个按钮到边界的距离
+    #define FocusBoxSpacing 80 // 水平布局间隔
     #define PreviewToolBarMaxWidth 800 // 预览界面工具栏的宽度
     #define FocusToolStepSpinMaxWidth 100 // 设置焦距中间的step步进spibox设置的宽度不能太宽
 

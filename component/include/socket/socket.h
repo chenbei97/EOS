@@ -68,6 +68,7 @@ struct Field0x0000 {
     const QString brand = BrandField;
     const QString bright = BrightField;
     const QString objective = ObjectiveField;
+    const QString viewsize = ViewSizeField;
     const QString current_channel = CurrentChannelField;
     const QString state = StateField; // 解析使用
 };
@@ -202,6 +203,7 @@ static QByteArray assemble0x0000(QCVariantMap m)
     object[Field0x0000.manufacturer] = m[ManufacturerField].toString();
     object[Field0x0000.wellsize] = m[WellsizeField].toString();
     object[Field0x0000.objective] = m[ObjectiveField].toString();
+    object[Field0x0000.viewsize] = m[HoleViewSizeField].toString();
     object[Field0x0000.current_channel] = m[CurrentChannelField].toString();
     auto holepoint = m[HoleCoordinateField].toPoint();
     auto viewpoint = m[ViewCoordinateField].toPoint();

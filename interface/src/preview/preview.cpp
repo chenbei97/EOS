@@ -94,6 +94,9 @@ void Preview::initAttributes()
 
     pattern->setMinimumHeight(PreviewPatternMinHeight);
 
+    livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
+    photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
+
     //previewinfo[PreviewToolField] = toolbar->toolInfo();
     //previewinfo[PreviewPatternField] = pattern->patternInfo();
 }
@@ -101,8 +104,8 @@ void Preview::initAttributes()
 void Preview::initObjects()
 {
     cameramode = new CameraMode;
-    livecanvas = new Label;
-    photocanvas = new PreviewPhotoCanvas;
+    livecanvas = new PhotoCanvas;
+    photocanvas = new PhotoCanvas;
     stack = new QStackedWidget;
     pattern = new WellPattern(2,3);
     groupinfo = new GroupInfo;
@@ -127,17 +130,21 @@ void Preview::initConnections()
     connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::saveExperConfig);
 
     connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);
-    //connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::showCapturedImage);
+#ifdef notusetoupcamera
     connect(this, &Preview::evtCallback, this, &Preview::processCallback);
+#else
+    connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::showCapturedImage);
+#endif
 
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
 
     connect(pattern,&WellPattern::openViewWindow,this,&Preview::updateViewWindow); // 打开和更新视野窗口
     connect(pattern,&WellPattern::openSetGroupWindow,this,&Preview::updateSetGroupWindow);// 打开分组窗口
+    connect(pattern,&WellPattern::mouseClicked,this,&Preview::previewViewByClickHole); // 点击孔也触发预览
 
     connect(viewpattern,&ViewPattern::applyGroupEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyGroup); // 按组更新孔窗口的信息
     connect(viewpattern,&ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不安组更新孔窗口的信息
-    connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewView);
+    connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
 
     connect(this,&Preview::objectiveSettingChanged,toolbar,&PreviewTool::objectiveSettingChanged);
 }

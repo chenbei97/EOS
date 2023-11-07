@@ -33,7 +33,6 @@ private:
     FocusBox * focusbox;
     ChannelBox * channelbox;
     CameraBox * camerabox;
-    LensBox * lensbox;
     TimeBox * timebox;
     ZStackBox * zstackbox;
     SaveBox * savebox;

@@ -10,44 +10,52 @@
 
 FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
 {
+    pattern = new TriangleMove;
     autofocusbtn = new PushButton(tr("自动聚焦"));
 
     slider = new DoubleSlider;
+    slider->setDirection(Qt::Vertical);
     slider->setRange(0,FocusToolFocusMaxVal);
-    slider->setPrefix(FocusToolFocusLabel);
+    slider->setPrefix("");
     slider->setMouseEvent(false);
 
     step = new SpinBox(true);
     step->setMaximumWidth(FocusToolStepSpinMaxWidth);
     step->setMaximum(FocusToolStepMaxVal);
-    auto steplabel = new Label(FocusToolStepLabel);
-    steplabel->setMaximumWidth(FocusToolStepSpinMaxWidth);
 
-    leftbtn = new RoundButton;
-    rightbtn = new RoundButton;
-    leftbtn->setStrategy(RoundButton::LeftTriangle);
-    rightbtn->setStrategy(RoundButton::RightTriangle);
+    topbtn = new RoundButton;
+    bottombtn = new RoundButton;
+    topbtn->setStrategy(RoundButton::TopTriangle);
+    bottombtn->setStrategy(RoundButton::BottomTriangle);
 
-    auto btnlay = new QHBoxLayout;
-    btnlay->addSpacing(FocusBoxButtonMargin);
-    btnlay->addWidget(leftbtn);
-    btnlay->addStretch();
-    btnlay->addWidget(steplabel);
-    btnlay->addWidget(step);
-    btnlay->addStretch();
-    btnlay->addWidget(rightbtn);
-    btnlay->addSpacing(FocusBoxButtonMargin);
-    btnlay->addWidget(autofocusbtn);
+    auto lay1 = new QVBoxLayout;
+    lay1->addWidget(topbtn);
+    lay1->addStretch();
+    lay1->addWidget(bottombtn);
 
-    auto lay = new QVBoxLayout;
+    auto lay2 = new QVBoxLayout;
+    lay2->addWidget(step);
+    lay2->addStretch();
+    lay2->addWidget(autofocusbtn);
+
+    auto lay = new QHBoxLayout;
+    lay->addWidget(pattern);
     lay->addWidget(slider);
-    lay->addLayout(btnlay);
+    lay->addLayout(lay1);
+    lay->addLayout(lay2);
+    lay->addStretch();
+    lay->setSpacing(FocusBoxSpacing);
 
     setLayout(lay);
 
-    connect(leftbtn,&PushButton::clicked,this,&FocusBox::subtractFocus);
-    connect(rightbtn,&PushButton::clicked,this,&FocusBox::addFocus);
+    connect(topbtn,&PushButton::clicked,this,&FocusBox::addFocus);
+    connect(bottombtn,&PushButton::clicked,this,&FocusBox::subtractFocus);
     connect(autofocusbtn,&PushButton::clicked,this,&FocusBox::onAutoFocus);
+    connect(pattern,&TriangleMove::leftTriangleClicked,this,&FocusBox::leftMove);
+    connect(pattern,&TriangleMove::rightTriangleClicked,this,&FocusBox::rightMove);
+    connect(pattern,&TriangleMove::topTriangleClicked,this,&FocusBox::topMove);
+    connect(pattern,&TriangleMove::bottomTriangleClicked,this,&FocusBox::bottomMove);
+    connect(pattern,&TriangleMove::triangleClicked,this,&FocusBox::directionMove);
     setTitle(tr("焦距"));
 }
 
@@ -59,8 +67,8 @@ void FocusBox::onAutoFocus()
 void FocusBox::setEnabled(bool enabled)
 {
     slider->setEnabled(enabled);
-    leftbtn->setEnabled(enabled);
-    rightbtn->setEnabled(enabled);
+    topbtn->setEnabled(enabled);
+    bottombtn->setEnabled(enabled);
     step->setEnabled(enabled);
 }
 

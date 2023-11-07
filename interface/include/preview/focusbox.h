@@ -21,14 +21,22 @@ public:
     double focusStep() const;
 
 private:
+    TriangleMove * pattern;
     DoubleSlider * slider;
-    RoundButton * leftbtn;
-    RoundButton * rightbtn;
+    RoundButton * topbtn;
+    RoundButton * bottombtn;
     SpinBox * step;
     PushButton * autofocusbtn;
     void addFocus();
     void subtractFocus();
     void onAutoFocus();
+
+signals:
+    void leftMove();
+    void rightMove();
+    void topMove();
+    void bottomMove();
+    void directionMove(int option);
 };
 
 #endif //EOSI_FOCUSBOX_H

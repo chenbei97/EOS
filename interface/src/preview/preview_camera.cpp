@@ -1,4 +1,14 @@
+/*** 
+ * @Author: chenbei97 chenbei_electric@163.com
+ * @Date: 2023-11-06 16:29:22
+ * @LastEditors: chenbei97 chenbei_electric@163.com
+ * @LastEditTime: 2023-11-07 08:31:24
+ * @FilePath: \EOS\interface\src\preview\preview_camera.cpp
+ * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
+ */
 #include "preview.h"
+
+#ifdef notusetoupcamera
 
 void Preview::openCamera()
 {
@@ -265,3 +275,4 @@ ushort Preview::gain() const
     return g;
 }
 
+#endif

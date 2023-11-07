@@ -65,7 +65,8 @@ private:
     void captureStillImage();
     void print_imageInfo(ToupcamFrameInfoV3* info);
 signals:
-    void imageCaptured(const ImageInfo& info);
+    //void imageCaptured(const ImageInfo& info);
+    void imageCaptured(const QImage& img);
 signals:
     void evtCallback(unsigned nEvent);
 };

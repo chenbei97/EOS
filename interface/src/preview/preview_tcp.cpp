@@ -79,12 +79,13 @@ void Preview::onAdjustCamera(const QString & f,const QVariant & d)
     }
 }
 
-//void Preview::showCapturedImage(const ImageInfo &info)
-//{
-//    auto image = info.first;
-//    auto img = image.scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
-//    livecanvas->setPixmap(QPixmap::fromImage(img));
-//}
+void Preview::showCapturedImage(const QImage& image)
+{
+    auto img = image.scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
+    QVariantMap m;
+    m[ImageField] = QPixmap::fromImage(img);
+    livecanvas->setData(m);
+}
 
 void Preview::takingPhoto()
 {
@@ -123,19 +124,20 @@ void Preview::takingPhoto()
     // 等待回复后调用相机拍照
     if (ParserResult.toBool()) {
         LOG<<"灯成功打开"; // 做这些事
-
-//        ToupCameraPointer->setExposure(exp);
-//        ToupCameraPointer->setGain(ga);
-//        LOG<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
-//        auto pix = ToupCameraPointer->capture();
+#ifndef usetoupcamera
+        ToupCameraPointer->setExposure(exp);
+        ToupCameraPointer->setGain(ga);
+        LOG<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
+        auto pix = ToupCameraPointer->capture();
+#else
         setExposure(exp);
         setGain(ga);
-
         auto pix = capture();
         LOG<<exposure()<<gain()<<pix.isNull();
+#endif
         QVariantMap m;
         m[ImageField] = pix;
-        photocanvas->setStrategy(PreviewPhotoCanvas::SinglePixmap,m);
+        photocanvas->setData(m);
     }
 
     // 拍照结束后回复拍照结束
@@ -151,7 +153,7 @@ void Preview::takingPhoto()
     }
 }
 
-void Preview::previewView(const QPoint &viewpoint)
+void Preview::previewViewByClickView(const QPoint &viewpoint)
 {
     if (viewpoint == QPoint(-1,-1)) return;
 
@@ -165,8 +167,8 @@ void Preview::previewView(const QPoint &viewpoint)
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto wellsize = toolinfo[WellsizeField].toUInt();
-    //auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];
-    auto holecoordinate = viewpattern->currentViewInfo()[HoleCoordinateField].toPoint();
+    auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
+    auto holecoordinate = viewpattern->currentViewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
     auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     auto bright = current_info[BrightField];
@@ -175,14 +177,65 @@ void Preview::previewView(const QPoint &viewpoint)
     int exposure = current_info[ExposureField].toUInt();
     int gain = current_info[GainField].toUInt();
     //LOG<<wellsize<<viewpoint<<holecoordinate<<bright<<current_channel;
+    ToupCameraPointer->setExposure(exposure);
+    ToupCameraPointer->setGain(gain);
 
     QVariantMap m;
     m[ObjectiveField] = objective;
     m[BrandField] = brand;
     m[ManufacturerField] = manufacturer;
     m[WellsizeField] = wellsize;
+    m[HoleViewSizeField] = viewsize;
     m[HoleCoordinateField] = holecoordinate;
     m[ViewCoordinateField] = viewpoint;
+    m[CurrentChannelField] = current_channel;
+    m[BrightField] = bright;
+
+    AssemblerPointer->assemble(TcpFramePool.frame0x0000,m);
+    auto msg = AssemblerPointer->message();
+    LOG<<msg;
+    SocketPointer->exec(TcpFramePool.frame0x0000,msg, true);
+    LOG<<ParserResult;
+    if (ParserResult.toBool()) {
+        LOG<<"预览点击到位";
+    }
+}
+
+void Preview::previewViewByClickHole(const QPoint &holepoint)
+{
+    if (holepoint == QPoint(-1,-1)) return;
+
+    auto toolinfo = toolbar->toolInfo();
+//    auto patterninfo = pattern->patternInfo();
+//    previewinfo[PreviewToolField] = toolinfo;
+//    previewinfo[PreviewPatternField] = patterninfo;
+
+    // 预览事件需要的参数
+    auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
+    auto brand = toolinfo[BrandField].toUInt();
+    auto manufacturer = toolinfo[ManufacturerField].toUInt();
+    auto wellsize = toolinfo[WellsizeField].toUInt();
+    auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
+    //auto holecoordinate = viewpattern->currentViewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
+    auto holecoordinate = holepoint; // 所以才为什么只能分成previewViewByClickHole和previewViewByClickView 2个函数写了
+    auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
+    auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
+    auto bright = current_info[BrightField];
+
+    // 自己需要的相机参数
+    int exposure = current_info[ExposureField].toUInt();
+    int gain = current_info[GainField].toUInt();
+    ToupCameraPointer->setExposure(exposure);
+    ToupCameraPointer->setGain(gain);
+
+    QVariantMap m;
+    m[ObjectiveField] = objective;
+    m[BrandField] = brand;
+    m[ManufacturerField] = manufacturer;
+    m[WellsizeField] = wellsize;
+    m[HoleViewSizeField] = viewsize;
+    m[HoleCoordinateField] = holecoordinate;
+    m[ViewCoordinateField] = QPoint(-1,-1);//点孔触发视野坐标没有意义
     m[CurrentChannelField] = current_channel;
     m[BrightField] = bright;
 

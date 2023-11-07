@@ -16,7 +16,6 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     focusbox = new FocusBox;
     channelbox = new ChannelBox;
     camerabox = new CameraBox;
-    lensbox = new LensBox;
     timebox = new TimeBox;
     zstackbox = new ZStackBox;
     savebox = new SaveBox;
@@ -28,7 +27,6 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lay->addWidget(focusbox);
     lay->addWidget(channelbox);
     lay->addWidget(camerabox);
-    lay->addWidget(lensbox);
     lay->addWidget(timebox);
     lay->addWidget(zstackbox);
     lay->addWidget(savebox);
@@ -45,7 +43,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
     connect(savebox,&SaveBox::exportFilePath,this,&PreviewTool::exportFilePath);
-    connect(lensbox,&LensBox::directionMove,this,&PreviewTool::directionMove);
+    connect(focusbox,&FocusBox::directionMove,this,&PreviewTool::directionMove);
     // 2. 信号槽函数
     connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBox::disableChannel);

@@ -6,18 +6,19 @@
  * @FilePath: \EOS\interface\include\preview\photocanvas.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#ifndef EOSI_PREVIEWPHOTOCANVAS_H
-#define EOSI_PREVIEWPHOTOCANVAS_H
+#ifndef EOSI_PHOTOCANVAS_H
+#define EOSI_PHOTOCANVAS_H
 
-#include "window.h"
+#include "widgets.h"
 
-class INTERFACE_IMEXPORT PreviewPhotoCanvas: public QWidget
+class COMPONENT_IMEXPORT PhotoCanvas: public QWidget
 {
     Q_OBJECT
 public:
     enum DrawStrategy {NoStrategy,SinglePixmap};
-    explicit PreviewPhotoCanvas(QWidget*parent= nullptr);
+    explicit PhotoCanvas(QWidget*parent= nullptr);
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());
+    void setData(const QVariantMap& m);
     void mousePressEvent(QMouseEvent *event) override;// 左键点击清除框选,计算鼠标点击的小矩形区域坐标
     void mouseMoveEvent(QMouseEvent *event) override;// 绘制拖拽框
     void mouseReleaseEvent(QMouseEvent *event) override;// 拖拽区域点个数为0才是预览事件
@@ -25,8 +26,6 @@ public:
 private:
     DrawStrategy strategy = NoStrategy;
     QVariantMap mStrategyInfo;
-    int mrows = 0;
-    int mcols = 0;
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QPoint mMousePoint = QPoint(-1,-1);
     QPoint mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
@@ -35,4 +34,4 @@ signals:
     void mouseClicked(const QPoint& point);
 };
 
-#endif //EOSI_PREVIEWPHOTOCANVAS_H
+#endif //EOSI_PHOTOCANVAS_H

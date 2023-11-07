@@ -9,9 +9,11 @@
 #ifndef EOSI_LENSBOX_H
 #define EOSI_LENSBOX_H
 
-#include "window.h"
+#include "widgets.h"
+#include "trianglemove.h"
+#include "groupbox.h"
 
-class INTERFACE_IMEXPORT LensBox: public GroupBox
+class COMPONENT_IMEXPORT LensBox: public GroupBox
 {
 Q_OBJECT
 public:

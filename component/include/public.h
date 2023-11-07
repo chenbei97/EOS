@@ -43,6 +43,7 @@
 #include "protocolpattern.h"
 #include "inscribedrect.h"
 #include "trianglemove.h"
+#include "lensbox.h"
 #include "label.h"
 #include "checkbox.h"
 #include "progressbar.h"
@@ -56,6 +57,7 @@
 #include "colorbutton.h"
 #include "doubleslider.h"
 #include "circle.h"
+#include "photocanvas.h"
 
 #include "qtimer.h"
 #include "qtextcodec.h"

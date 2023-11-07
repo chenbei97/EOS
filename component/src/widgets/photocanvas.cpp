@@ -6,9 +6,9 @@
  * @FilePath: \EOS\interface\src\preview\photocanvas.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#include "previewphotocanvas.h"
+#include "photocanvas.h"
 
-void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
+void PhotoCanvas::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -31,6 +31,7 @@ void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
             break;
         case SinglePixmap:
             auto image = mStrategyInfo[ImageField].value<QImage>();
+            if(image.isNull()) return;
             auto img = image.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
             auto targetRect = QRectF(0,0,width(),height());
             auto sourceRect = targetRect;
@@ -40,7 +41,7 @@ void PreviewPhotoCanvas::paintEvent(QPaintEvent *event)
     event->accept();
 }
 
-void PreviewPhotoCanvas::mousePressEvent(QMouseEvent *event)
+void PhotoCanvas::mousePressEvent(QMouseEvent *event)
 { // 左键点击清除框选,计算鼠标点击的小矩形区域坐标
     if (event->button() == Qt::LeftButton) {
         mDrapRect.setWidth(0);
@@ -55,7 +56,7 @@ void PreviewPhotoCanvas::mousePressEvent(QMouseEvent *event)
     update();
 }
 
-void PreviewPhotoCanvas::mouseMoveEvent(QMouseEvent *event)
+void PhotoCanvas::mouseMoveEvent(QMouseEvent *event)
 { // 绘制拖拽框
     if (event->buttons() & Qt::LeftButton){
         auto end = event->pos(); // 鼠标停下的点
@@ -65,19 +66,18 @@ void PreviewPhotoCanvas::mouseMoveEvent(QMouseEvent *event)
     event->accept();
 }
 
-void PreviewPhotoCanvas::mouseReleaseEvent(QMouseEvent *event)
+void PhotoCanvas::mouseReleaseEvent(QMouseEvent *event)
 {
     event->accept();
 }
 
-
-void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, const QVariantMap& m)
+void PhotoCanvas::setStrategy(PhotoCanvas::DrawStrategy s, const QVariantMap& m)
 { //
     // 1. 初始化通用信息
     strategy = s;
-    mMousePoint = {-1,-1}; // 必须更新,否则上次的鼠标点还在会导致切换物镜或者brand出现越界
+    mMousePoint = {-1,-1};
     mLastPos = {-1,-1};
-    mDrapRect = QRectF(); // 上次的框选痕迹还在要清除
+    mDrapRect = QRectF();
 
     // 2. 初始化xx策略需要的信息
     mStrategyInfo = m;
@@ -85,11 +85,15 @@ void PreviewPhotoCanvas::setStrategy(PreviewPhotoCanvas::DrawStrategy s, const Q
     update();
 }
 
-PreviewPhotoCanvas::PreviewPhotoCanvas(QWidget *parent) : QWidget(parent)
+void PhotoCanvas::setData(const QVariantMap &m)
+{
+    mStrategyInfo = m;
+    update();
+}
+
+PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
 {
     strategy = NoStrategy;
-    mrows = 0;
-    mcols = 0;
     mMousePoint = QPoint(-1,-1);
     mLastPos = {-1,-1};
     mMouseClickColor.setAlpha(DefaultColorAlpha);

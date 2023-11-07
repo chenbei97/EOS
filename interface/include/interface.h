@@ -18,7 +18,6 @@
 
 #include "preview.h"
 #include "cameramode.h"
-#include "previewphotocanvas.h"
 #include "viewpattern.h"
 #include "wellpattern.h"
 #include "previewtool.h"
@@ -28,7 +27,6 @@
 #include "channelbox.h"
 #include "cameratool.h"
 #include "camerabox.h"
-#include "lensbox.h"
 #include "zstackbox.h"
 #include "savebox.h"
 

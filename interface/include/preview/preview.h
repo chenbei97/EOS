@@ -12,11 +12,15 @@
 #include "window.h"
 #include "previewtool.h"
 #include "cameramode.h"
-#include "previewphotocanvas.h"
+#include "photocanvas.h"
 #include "wellpattern.h"
 #include "viewpattern.h"
-//#include "toupcamera.h"
+
+#ifdef notusetoupcamera
 #include "toupcam.h"
+#else
+#include "toupcamera.h"
+#endif
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -24,13 +28,15 @@ class INTERFACE_IMEXPORT Preview : public QWidget
 public:
     explicit Preview(QWidget*parent= nullptr);
     void setAppInfo(int app);// 用于appselect传递当前app信息
+#ifdef notusetoupcamera
     void openCamera();
     void closeCamera();
+#endif
 private:
     PreviewInfo previewinfo;
     CameraMode * cameramode;
-    Label * livecanvas;
-    PreviewPhotoCanvas * photocanvas;
+    PhotoCanvas * livecanvas;
+    PhotoCanvas * photocanvas;
     ViewPattern * viewpattern;
     QStackedWidget * stack;
     PreviewTool * toolbar;
@@ -40,6 +46,7 @@ private:
     GroupInfo * groupinfo;
     QScrollArea * scrollarea;
 private:
+#ifdef notusetoupcamera
     HToupcam toupcam = nullptr;
     ToupcamDeviceV2 * camera = nullptr;
     QSharedPointer<uchar> imgdata = nullptr;
@@ -60,6 +67,7 @@ private:
     void setGain(ushort gain);
     ushort gain() const;
     void allocateImageBuffer();
+#endif
 private:
     void initObjects();
     void initAttributes();
@@ -78,11 +86,16 @@ private:
     void onAdjustCamera(const QString &f,const QVariant & d);
     void adjustLens(int option);
     void toggleChannel(int option);
-    void previewView(const QPoint& viewpoint);
+    void previewViewByClickView(const QPoint& viewpoint);
+    void previewViewByClickHole(const QPoint& holepoint);
     void saveExperConfig(const QString& path);
-    //void showCapturedImage(const ImageInfo& info);
+#ifndef notusetoupcamera
+    void showCapturedImage(const QImage& image);
+#endif
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
+#ifdef notusetoupcamera
     void evtCallback(unsigned nEvent);
+#endif
 };
 #endif //EOSI_PREVIEW_H

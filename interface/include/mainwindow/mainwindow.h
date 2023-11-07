@@ -31,5 +31,7 @@ private:
     Preview * preview;
     Setting * setting;
     QStackedWidget * stack;
+private:
+    void navigbarSelect(int id);
 };
 #endif //EOSI_MAINWINDOW_H

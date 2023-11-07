@@ -31,6 +31,7 @@ class ParseManager:
         self.objective = "objective"
         self.wellsize = "wellsize"
         self.manufacturer = "manufacturer"
+        self.viewsize = "viewsize"
         self.state = "state"
         self.activate_code = "activate_code"
         self.bright = "bright"
@@ -97,6 +98,7 @@ class ParseManager:
         wellsize = msg[self.wellsize]
         objective = msg[self.objective]
         manufacturer = msg[self.manufacturer]
+        viewsize = msg[self.viewsize]
         current_channel = msg[self.current_channel]
 
         reponse = defaultdict()
