@@ -31,6 +31,7 @@
 #include "mysqlreadwrite.h"
 #include "sqlitereadwrite.h"
 #include "jsonreadwrite.h"
+#include "configreadwrite.h"
 #include "log.h"
 
 #include "colorbutton.h"

@@ -256,11 +256,15 @@ void Preview::exportExperConfig(const QString& path)
 void Preview::importExperConfig(const QString& path)
 {// 导入实验配置,对于camera_channel和group字段要特殊解析
 
-    JsonReadWrite m; // 借助工具类读取文件内
+    ConfigReadWrite m; // 借助工具类读取文件内
     auto json = m.readJson(path);
 
     m.parseJson(json);
     auto result = m.map();
+
+    foreach(auto key,result.keys()){
+        LOG<<key<<result[key];
+    }
 
     toolbar->importExperConfig(result);
 }

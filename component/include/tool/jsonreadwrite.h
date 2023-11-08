@@ -13,7 +13,7 @@
 
 class COMPONENT_IMEXPORT JsonReadWrite : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     explicit JsonReadWrite(QObject *parent = nullptr);
     QByteArray readJson(const QString&path);
@@ -25,10 +25,10 @@ public:
     void writeJson(const QString&path,const QByteArray&json);
 
     QVariantMap map() const;
-private:
-    void parseObject(const QJsonObject& object);
-    void parseArray(const QJsonArray& array);
+
 protected:
+    virtual void parseObject(const QJsonObject& object);
+    void parseArray(const QJsonArray& array);
     QVariantMap parseData;
 signals:
 
