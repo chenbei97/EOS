@@ -17,5 +17,6 @@ class COMPONENT_IMEXPORT TextEdit: public QTextEdit
 public:
     explicit TextEdit(QWidget*parent= nullptr);
     explicit TextEdit(const QString& text,QWidget*parent= nullptr);
+    void setIndent(int moveLength,const QString& indent="    ");
 };
 #endif //EOSI_TEXTEDIT_H

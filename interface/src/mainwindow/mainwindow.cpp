@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     setting->emitSignals(); // 把objectivesetting的初始配置触发一下去更新previewtool
 
 
-    // start("Eos_I","Eos_main","main");
+    //StartPythonPointer->start("Eos_I","Eos_main","main");
     StartPythonPointer->start("../test","test_socket","test_server");
 }
 

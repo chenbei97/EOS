@@ -15,6 +15,7 @@
 #include "photocanvas.h"
 #include "wellpattern.h"
 #include "viewpattern.h"
+#include "summarydialog.h"
 
 #ifdef notusetoupcamera
 #include "toupcam.h"

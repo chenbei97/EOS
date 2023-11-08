@@ -30,6 +30,8 @@
 #include "camerabox.h"
 #include "zstackbox.h"
 #include "savebox.h"
+#include "summarypanel.h"
+#include "summarydialog.h"
 
 #include "setting.h"
 #include "objectivesetting.h"

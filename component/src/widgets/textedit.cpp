@@ -17,3 +17,10 @@ TextEdit::TextEdit(const QString& text,QWidget*parent): QTextEdit(text,parent)
 {
 
 }
+
+void TextEdit::setIndent(int moveLength,const QString& indent)
+{ // 到左侧需要移动的光标距离
+    QTextCursor cursorPosition = this->textCursor();
+    cursorPosition.movePosition(QTextCursor::Left,QTextCursor::MoveAnchor,moveLength);
+    cursorPosition.insertText(indent,QTextCharFormat());
+}

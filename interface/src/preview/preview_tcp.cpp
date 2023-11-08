@@ -261,6 +261,13 @@ void Preview::loadExper()
     previewinfo[PreviewPatternField] = pattern->patternInfo();
     previewinfo[PreviewToolField] = toolbar->toolInfo();
 
+    auto dlg = new SummaryDialog(previewinfo);
+    setWindowAlignCenter(dlg);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    int ret = dlg->exec();
+    if (ret == QDialog::Rejected)
+        return;
+
     AssemblerPointer->assemble(TcpFramePool.frame0x0001,previewinfo);
     auto json = AssemblerPointer->message();
 

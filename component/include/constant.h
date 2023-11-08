@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-11-01 15:08:16
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 15:09:22
+ * @LastEditTime: 2023-11-08 10:36:47
  * @FilePath: \EOS\component\include\constant.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -27,7 +27,7 @@ Q_ENUMS(SQLType)
 #define WarningChinese tr("警告")
 #define InformationChinese tr("消息")
 #define CriticalChinese tr("错误")
-#define DefaultDateTimeFormat "yyyy_MM_dd hh::mm"
+#define DefaultDateTimeFormat "yyyy_MM_dd hh:mm"
 #define CURRENT_PATH (QDir::currentPath())
 #define CURRENT_THREAD (QThread::currentThread())
 #define DefaultFontSize 10
