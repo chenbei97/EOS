@@ -64,6 +64,12 @@ void FocusBox::onAutoFocus()
 
 }
 
+void FocusBox::importExperConfig(double focus, double s)
+{
+    slider->setValue(focus);
+    step->setValue(s);
+}
+
 void FocusBox::setEnabled(bool enabled)
 {
     slider->setEnabled(enabled);

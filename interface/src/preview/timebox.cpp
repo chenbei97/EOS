@@ -15,7 +15,35 @@ TimeBox::TimeBox(QWidget *parent) : GroupBox(parent)
     initConnections();
     initLayout();
     setTitle(tr("实验"));
-    timeInfo();
+}
+
+void TimeBox::importExperConfig(bool is_schedule,long long total,long long duration,
+                                const QStringList&channels,const QString& objective)
+{
+    scantype->setChecked(is_schedule);
+
+    totalunit->setCurrentIndex(1);
+    totaltime->setValue(total / 60.0); // 切成分钟表示
+
+    durationunit->setCurrentIndex(1);
+    durationtime->setValue(duration/60.0);
+
+    Q_ASSERT(channels.count() == 5);
+    brbox->setChecked(channels[0].toUInt());
+    phbox->setChecked(channels[1].toUInt());
+    gfpbox->setChecked(channels[2].toUInt());
+    rfpbox->setChecked(channels[3].toUInt());
+    dapibox->setChecked(channels[4].toUInt());
+
+    // 物镜硬件决定br和ph不能勾选并禁用
+    if (objective.contains(BRField,Qt::CaseInsensitive)) {
+        phbox->setChecked(false);
+        phbox->setEnabled(false);
+    }
+    if (objective.contains(PHField,Qt::CaseInsensitive)) {
+        brbox->setChecked(false);
+        brbox->setEnabled(false);
+    }
 }
 
 void TimeBox::disableChannel(const QString &obj)

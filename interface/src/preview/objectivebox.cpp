@@ -121,3 +121,21 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
     return m;
 }
 
+void ObjectiveBox::importExperConfig(const QString &objective)
+{
+    QStringList objectives = {rbtn_loc1->text(),rbtn_loc2->text(),
+            rbtn_loc3->text(),rbtn_loc4->text()};
+    if (!objectives.contains(objective)) {
+        // 可能没有这个硬件配置,就默认第1个
+        rbtn_loc1->setChecked(true);
+        return;
+    }
+    // 相等的那个为true
+    rbtn_loc1->setChecked(rbtn_loc1->text() == objective);
+    rbtn_loc2->setChecked(rbtn_loc2->text() == objective);
+    rbtn_loc3->setChecked(rbtn_loc3->text() == objective);
+    rbtn_loc4->setChecked(rbtn_loc4->text() == objective);
+
+    // 手动触发下信号,去更新channelbox和timebox的选项是否可以勾选br或者ph
+    onClicked();
+}

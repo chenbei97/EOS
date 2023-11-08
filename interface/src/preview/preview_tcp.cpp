@@ -254,7 +254,7 @@ void Preview::exportExperConfig(const QString& path)
 }
 
 void Preview::importExperConfig(const QString& path)
-{// 导入实验配置,对于camera_channel和group字段要特殊解析,camera_loc会影响硬件配置
+{// 导入实验配置,对于camera_channel和group字段要特殊解析
 
     JsonReadWrite m; // 借助工具类读取文件内
     auto json = m.readJson(path);
@@ -262,14 +262,7 @@ void Preview::importExperConfig(const QString& path)
     m.parseJson(json);
     auto result = m.map();
 
-    auto camera_loc = result[CameraLocationField].toUInt();
-    auto brand = result[BrandField].toUInt();
-    auto manufacturer = result[ManufacturerField].toUInt();
-    auto objective = result[ObjectiveField].toString();
-    auto focus = result[FocusField].toDouble();
-    auto step = result[FocusStepField].toDouble();
-    auto is_schedule = result[IsScheduleField].toBool();
-
+    toolbar->importExperConfig(result);
 }
 
 void Preview::loadExper()

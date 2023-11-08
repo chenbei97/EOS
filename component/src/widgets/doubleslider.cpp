@@ -14,6 +14,8 @@ DoubleSlider::DoubleSlider(QWidget *parent) : QWidget(parent)
     suffix = new Label;
     prefix = new Label;
 
+    suffix->setText("0.0");
+
     auto hlay = new QHBoxLayout;
     hlay->addWidget(prefix);
     hlay->addWidget(slider);
@@ -38,7 +40,9 @@ void DoubleSlider::setMouseEvent(bool enabled)
 
 void DoubleSlider::onSliderChanged(int val)
 {
-    auto text = QString("%1 %2").arg(val).arg(suffixtext);
+    QString s = QString("%1").arg(val);
+    if (!s.contains(".")) s+=".0";
+    auto text = QString("%1 %2").arg(s).arg(suffixtext);
     suffix->setText(text);
 }
 
@@ -69,8 +73,20 @@ double DoubleSlider::value() const
     return accumulateval;
 }
 
+void DoubleSlider::setValue(double val)
+{ // 后缀名义上的值
+    accumulateval = val;
+    QString s = QString("%1").arg(accumulateval);
+    if (!s.contains(".")) s+=".0";
+    auto text = QString("%1 %2").arg(s).arg(suffixtext);
+    suffix->setText(text);
+    slider->blockSignals(true);
+    setValue((int)accumulateval-1);
+    slider->blockSignals(false);
+}
+
 void DoubleSlider::setValue(int value)
-{
+{ // 给滑动条设置值
     slider->setValue(value);
     slider->setSliderPosition(value);
     if (value<=slider->minimum())
@@ -108,7 +124,9 @@ void DoubleSlider::addValue(double val)
     accumulateval += val;
     if (accumulateval >= (double)slider->maximum() || qAbs(accumulateval - (double)slider->maximum())<1e-5)
         accumulateval = (double)slider->maximum();
-    auto text = QString("%1 %2").arg(accumulateval).arg(suffixtext); // 数特别大的话用num
+    QString s = QString("%1").arg(accumulateval);
+    if (!s.contains(".")) s+=".0";
+    auto text = QString("%1 %2").arg(s).arg(suffixtext); // 数特别大的话用num
 #endif
     suffix->setText(text);
     slider->blockSignals(true); // 防止触发slidermove信号,这个是int的会重新设置suffix
@@ -139,7 +157,9 @@ void DoubleSlider::subtractValue(double val)
     accumulateval -= val;
     if (qAbs(accumulateval - (double)slider->minimum())<1e-5 || accumulateval<=(double)slider->minimum())
         accumulateval = (double)slider->minimum(); // 有可能差值是个很小的正数,也要视为0
-    auto text = QString("%1 %2").arg(accumulateval).arg(suffixtext);
+    QString s = QString("%1").arg(accumulateval);
+    if (!s.contains(".")) s+=".0";
+    auto text = QString("%1 %2").arg(s).arg(suffixtext);
 #endif
     suffix->setText(text);
     slider->blockSignals(true);

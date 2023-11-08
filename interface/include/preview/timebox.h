@@ -17,6 +17,8 @@ class INTERFACE_IMEXPORT TimeBox: public GroupBox
     Q_OBJECT
 public:
     explicit TimeBox(QWidget*parent= nullptr);
+    void importExperConfig(bool is_schedule,long long total,long long duration,
+                           const QStringList&channels,const QString& objective);
     bool checkTime() const;
     bool isSchedule() const;
     long long totalTime() const;

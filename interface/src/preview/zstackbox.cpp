@@ -26,6 +26,12 @@ ZStackBox::ZStackBox(QWidget *parent) : GroupBox(parent)
     connect(stitchimage,&CheckBox::checkedChanged,this,&ZStackBox::stitchChanged);
 }
 
+void ZStackBox::importExperConfig(bool zstack, bool stitch)
+{
+    this->zstack->setChecked(zstack);
+    this->stitchimage->setChecked(stitch);
+}
+
 ZStackInfo ZStackBox::zstackInfo() const
 {
     ZStackInfo info;

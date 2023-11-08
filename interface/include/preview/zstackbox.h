@@ -16,6 +16,7 @@ class INTERFACE_IMEXPORT ZStackBox: public GroupBox
     Q_OBJECT
 public:
     explicit ZStackBox(QWidget*parent= nullptr);
+    void importExperConfig(bool zstack,bool stitch);
     ZStackInfo zstackInfo() const;
 private:
     CheckBox * zstack;

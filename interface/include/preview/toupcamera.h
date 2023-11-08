@@ -22,6 +22,7 @@ class INTERFACE_IMEXPORT ToupCamera: public QObject
 public:
     static ToupCamera& instance();
 
+    bool isOpen() const;
     void openCamera();
     void closeCamera();
 

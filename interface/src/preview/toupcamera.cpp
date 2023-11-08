@@ -110,6 +110,12 @@ void ToupCamera::print_imageInfo(ToupcamFrameInfoV3* info)
     <<"exp = "<<info->expotime<<" gain = "<<info->expogain;
 }
 
+bool ToupCamera::isOpen() const
+{
+    LOG<<"camera is open? "<<(toupcam!= nullptr);
+    return toupcam != nullptr;
+}
+
 void ToupCamera::openCamera()
 {
     if (toupcam){

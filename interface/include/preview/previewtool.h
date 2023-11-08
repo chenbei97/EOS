@@ -27,6 +27,7 @@ class INTERFACE_IMEXPORT PreviewTool : public QWidget
 public:
     explicit PreviewTool(QWidget*parent= nullptr);
     PreviewToolInfo toolInfo() const;
+    void importExperConfig(const QVariantMap& m);
 private:
     HistoryBox * historybox;
     WellBox * wellbox;

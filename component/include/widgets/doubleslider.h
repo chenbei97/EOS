@@ -27,7 +27,7 @@ public:
     void setSingleStep(int step);
     void setMouseEvent(bool enabled);
     double value() const;
-    void setValue(int val);
+    void setValue(double val);
 
     void addValue(double val);
     void subtractValue(double val);
@@ -41,6 +41,7 @@ private:
     double accumulateval = 0.0;
     double fracval = 0.0;
     double intval = 0.0;
+    void setValue(int val);
 private slots:
     void onSliderChanged(int val);
 signals:

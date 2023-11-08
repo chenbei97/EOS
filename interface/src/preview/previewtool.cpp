@@ -121,3 +121,41 @@ PreviewToolInfo PreviewTool::toolInfo() const
     //LOG<<"tool info = "<<info;
     return info;
 }
+
+void PreviewTool::importExperConfig(const QVariantMap &m)
+{
+    auto camera_loc = m[CameraLocationField].toUInt();
+
+    { // 1.wellbox
+        auto brand = m[BrandField].toUInt();
+        auto manufacturer = m[ManufacturerField].toUInt();
+        wellbox->importExperConfig(manufacturer,brand);
+    }
+
+    // 2. objectivebox
+    auto objective = m[ObjectiveField].toString(); // br4x
+    objectivebox->importExperConfig(objective);
+    // camera_loc自动跟随objective的设置,无需导入
+
+    { // 3. focusbox
+        auto focus = m[FocusField].toDouble();
+        auto step = m[FocusStepField].toDouble();
+        focusbox->importExperConfig(focus,step);
+    }
+
+    { // 4.stackbox
+        auto zstack = m[ZStackField].toBool();
+        auto stitch = m[StitchField].toBool();
+        zstackbox->importExperConfig(zstack,stitch);
+    }
+
+    { // 5. timebox
+        auto is_schedule = m[IsScheduleField].toBool();
+        auto total = m[TotalTimeField].toLongLong();
+        auto duration = m[DurationTimeField].toLongLong();
+        auto channels = m[ChannelField].toString().split(",",QString::SkipEmptyParts);
+        timebox->importExperConfig(is_schedule,total,duration,channels,objective);
+    }
+
+
+}

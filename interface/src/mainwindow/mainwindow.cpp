@@ -56,7 +56,10 @@ void MainWindow::navigbarSelect(int id)
     if (id == 1) preview->openCamera();
         else  preview->closeCamera();
 #else
-    if (id == 1) ToupCameraPointer->openCamera();
-    else  ToupCameraPointer->closeCamera();
+//    if (id == 1)
+//        ToupCameraPointer->openCamera();
+//    else  ToupCameraPointer->closeCamera();
+    if (ToupCameraPointer->isOpen()) return;
+    ToupCameraPointer->openCamera();
 #endif
 }

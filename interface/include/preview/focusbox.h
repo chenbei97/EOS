@@ -16,10 +16,10 @@ class INTERFACE_IMEXPORT FocusBox: public GroupBox
     Q_OBJECT
 public:
     explicit FocusBox(QWidget*parent= nullptr);
+    void importExperConfig(double focus,double step);
     void setEnabled(bool enabled);
     double focus() const;
     double focusStep() const;
-
 private:
     TriangleMove * pattern;
     DoubleSlider * slider;

@@ -16,6 +16,7 @@ class INTERFACE_IMEXPORT ObjectiveBox: public GroupBox
     Q_OBJECT
 public:
     explicit ObjectiveBox(QWidget*parent= nullptr);
+    void importExperConfig(const QString&objective);
     ObjectiveInfo objectiveInfo() const;
 public slots:
     void onObjectiveSettingChanged(const LocationObjectiveInfo& m);
