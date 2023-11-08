@@ -42,6 +42,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(channelbox,&ChannelBoxx::channelChanged,this,&PreviewTool::channelChanged);
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
+    connect(historybox,&HistoryBox::importFilePath,this,&PreviewTool::importFilePath);
     connect(savebox,&SaveBox::exportFilePath,this,&PreviewTool::exportFilePath);
     connect(savebox,&SaveBox::loadExper,this,&PreviewTool::loadExper);
     connect(focusbox,&FocusBox::directionMove,this,&PreviewTool::directionMove);

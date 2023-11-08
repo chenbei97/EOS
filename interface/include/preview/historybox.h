@@ -23,6 +23,7 @@ private:
     void onBtn();
     void onCheckBox(bool isChecked);
 signals:
+    void importFilePath(const QString& path);
 };
 
 #endif //EOSI_HISTORYBOX_H

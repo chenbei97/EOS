@@ -52,11 +52,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 void MainWindow::navigbarSelect(int id)
 {
     stack->setCurrentIndex(id);
-//#ifdef notusetoupcamera
-//    if (id == 1) preview->openCamera();
-//        else  preview->closeCamera();
-//#else
-//    if (id == 1) ToupCameraPointer->openCamera();
-//    else  ToupCameraPointer->closeCamera();
-//#endif
+#ifdef notusetoupcamera
+    if (id == 1) preview->openCamera();
+        else  preview->closeCamera();
+#else
+    if (id == 1) ToupCameraPointer->openCamera();
+    else  ToupCameraPointer->closeCamera();
+#endif
 }

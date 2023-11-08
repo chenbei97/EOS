@@ -26,16 +26,21 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
         painter.setPen(pen);
     }
 
+    /*高频率绘图的注意事项:
+     * 1. 不要在paintEvent内做QVariantMap到QImage的变换,会卡死
+     * 2. 不要在paintEvent内做QImage的scaled变换
+     * 3. QPixmap::fromImage到QPixmap的变换好像没有影响,不过端到端都是QImage,也不要做此类变换耗时
+     * 4. 所以现在最好就是调用setImage直接传递数据,没有QVariantMap到QImage
+     * 5. 使用定时器定时的刷新减少重绘频率也可以降低cpu占用
+     * */
     switch (strategy) {
         case NoStrategy:
             break;
         case SinglePixmap:
-            auto image = mStrategyInfo[ImageField].value<QImage>();
-            if(image.isNull()) return;
-            auto img = image.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
-            auto targetRect = QRectF(0,0,width(),height());
-            auto sourceRect = targetRect;
-            painter.drawImage(targetRect,image,sourceRect);
+            if(mimage.isNull()) return;
+            auto targetRect = QRect(0,0,width(),height());
+            painter.drawImage(targetRect,mimage);
+            //painter.drawPixmap(targetRect,QPixmap::fromImage(mimage));
             break;
     }
     event->accept();
@@ -81,13 +86,22 @@ void PhotoCanvas::setStrategy(PhotoCanvas::DrawStrategy s, const QVariantMap& m)
 
     // 2. 初始化xx策略需要的信息
     mStrategyInfo = m;
-
     update();
 }
 
 void PhotoCanvas::setData(const QVariantMap &m)
 {
     mStrategyInfo = m;
+    // paintEvent避免做QVariantMap=>QImage转换,提前转换好
+    mimage = m[ImageField].value<QImage>()
+        .scaled(width(),height(),
+        Qt::KeepAspectRatio,Qt::FastTransformation);
+    update();
+}
+
+void PhotoCanvas::setImage(const QImage &img)
+{
+    mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
     update();
 }
 
@@ -98,4 +112,7 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
     mLastPos = {-1,-1};
     mMouseClickColor.setAlpha(DefaultColorAlpha);
     setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    connect(&timer,&QTimer::timeout,[this]{update();});
+    //timer.start(50);// 绘制太快导致出问题
 }

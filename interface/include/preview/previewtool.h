@@ -46,7 +46,8 @@ signals:
     void cameraInfoChanged(const MultiCameraInfo&m);// 通道配置改变
     void zstackChanged(bool isChecked);// 是否勾选zstack和stitch
     void stitchChanged(bool isChecked);
-    void exportFilePath(const QString&path); // 保存文件配置的路径
+    void exportFilePath(const QString&path); // 导出文件配置的路径
+    void importFilePath(const QString&path); // 导入文件配置的路径
     void photoTaking();// 只有camerabox的拍照会触发该信号
     void directionMove(int option); // 移动镜头
     void cameraAdjusted(int exp,int gain,int br);// 调整相机实时更改

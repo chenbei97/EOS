@@ -96,6 +96,7 @@ void Preview::initAttributes()
 
     livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
     photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
+    //livecanvas->setMaximumWidth(MainWindowWidth-PreviewToolBarMaxWidth);
 
     //previewinfo[PreviewToolField] = toolbar->toolInfo();
     //previewinfo[PreviewPatternField] = pattern->patternInfo();
@@ -105,6 +106,7 @@ void Preview::initObjects()
 {
     cameramode = new CameraMode;
     livecanvas = new PhotoCanvas;
+    //livecanvas = new Label;
     photocanvas = new PhotoCanvas;
     stack = new QStackedWidget;
     pattern = new WellPattern(2,3);
@@ -115,7 +117,6 @@ void Preview::initObjects()
     dockcanvas = new QMainWindow;
     scrollarea = new QScrollArea;
     Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持
-
 }
 
 void Preview::initConnections()
@@ -127,7 +128,8 @@ void Preview::initConnections()
     connect(toolbar,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
     connect(toolbar,&PreviewTool::directionMove,this,&Preview::adjustLens);
     connect(toolbar,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
-    connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::saveExperConfig);
+    connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
+    connect(toolbar,&PreviewTool::importFilePath,this,&Preview::importExperConfig);
     connect(toolbar,&PreviewTool::loadExper,this,&Preview::loadExper);
 
     connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);

@@ -37,6 +37,7 @@ private:
     PreviewInfo previewinfo;
     CameraMode * cameramode;
     PhotoCanvas * livecanvas;
+    //Label * livecanvas;
     PhotoCanvas * photocanvas;
     ViewPattern * viewpattern;
     QStackedWidget * stack;
@@ -89,7 +90,8 @@ private:
     void toggleChannel(int option);
     void previewViewByClickView(const QPoint& viewpoint);
     void previewViewByClickHole(const QPoint& holepoint);
-    void saveExperConfig(const QString& path);
+    void exportExperConfig(const QString& path);
+    void importExperConfig(const QString& path);
     void loadExper();
 #ifndef notusetoupcamera
     void showCapturedImage(const QImage& image);

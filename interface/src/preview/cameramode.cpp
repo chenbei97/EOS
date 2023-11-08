@@ -16,6 +16,7 @@ CameraMode::CameraMode(QWidget *parent) : QWidget(parent)
 void CameraMode::changeMode(CameraMode::cameraMode mode)
 {
     mode == LiveMode? isLive=true: isLive= false;
+    emit cameraModeChanged(!isLive);
     update();
 }
 

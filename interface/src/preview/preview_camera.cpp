@@ -52,6 +52,7 @@ void Preview::closeCamera()
 
         if (imgdata.get()) {
             //delete imgdata.get(); // 不需要手动去删除,智能指针会在需要的时候删除的
+            imgdata.clear();
             imgdata = nullptr;
         }
     }
@@ -79,7 +80,6 @@ QImage Preview::capture()
         if (imgdata) {
             auto image = QImage(imgdata.get(), cameraResolution.width(), cameraResolution.height(), QImage::Format_RGB888);
             img = image.scaled(photocanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
-//            photocanvas->setStrategy(PreviewPhotoCanvas::SinglePixmap,)
         }
     }
     return img;
@@ -99,6 +99,7 @@ void Preview::captureLiveImage()
                                       bStill, bits, rowPitch, &info))){
         auto image = QImage(imgdata.get(), info.width, info.height, QImage::Format_RGB888);
         //auto img = image.scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
+        // 在这做图像缩放会卡,应该转移出去
         auto img = image.scaled(QSize(400,400),Qt::KeepAspectRatio,Qt::FastTransformation);
         livecanvas->setPixmap(QPixmap::fromImage(img));
     }

@@ -28,7 +28,11 @@ HistoryBox::HistoryBox(QWidget *parent) : GroupBox(parent)
 
 void HistoryBox::onBtn()
 {
+    auto path = QFileDialog::getOpenFileName(this,tr("选择配置文件"),"",
+                                            "config (*.eos)");
+    if (path.isEmpty()) return;
 
+    emit importFilePath(path);
 }
 
 void HistoryBox::onCheckBox(bool isChecked)

@@ -88,10 +88,10 @@ void Preview::onAdjustCamera(const QString & f,const QVariant & d)
 
 void Preview::showCapturedImage(const QImage& image)
 {
-    auto img = image.scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
-    QVariantMap m;
-    m[ImageField] = QPixmap::fromImage(img);
-    livecanvas->setData(m);
+//    QVariantMap m;
+//    m[ImageField] = image;
+//    livecanvas->setData(m);
+    livecanvas->setImage(image);
 }
 
 void Preview::takingPhoto()
@@ -140,11 +140,8 @@ void Preview::takingPhoto()
 #endif
         LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
         <<" 曝光和增益为 "<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
-
-        QVariantMap m;
-        m[ImageField] = pix;
-        photocanvas->setData(m);
-
+        photocanvas->setImage(pix);
+        cameramode->changeMode(CameraMode::PhotoMode);
     }
 }
 
@@ -242,8 +239,8 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     }
 }
 
-void Preview::saveExperConfig(const QString& path)
-{ // 保存实验配置
+void Preview::exportExperConfig(const QString& path)
+{ // 导出实验配置
     previewinfo[PreviewPatternField] = pattern->patternInfo();
     previewinfo[PreviewToolField] = toolbar->toolInfo();
 
@@ -254,6 +251,25 @@ void Preview::saveExperConfig(const QString& path)
 
     JsonReadWrite m; // 借助工具类写到文件内
     m.writeJson(path,json);
+}
+
+void Preview::importExperConfig(const QString& path)
+{// 导入实验配置,对于camera_channel和group字段要特殊解析,camera_loc会影响硬件配置
+
+    JsonReadWrite m; // 借助工具类读取文件内
+    auto json = m.readJson(path);
+
+    m.parseJson(json);
+    auto result = m.map();
+
+    auto camera_loc = result[CameraLocationField].toUInt();
+    auto brand = result[BrandField].toUInt();
+    auto manufacturer = result[ManufacturerField].toUInt();
+    auto objective = result[ObjectiveField].toString();
+    auto focus = result[FocusField].toDouble();
+    auto step = result[FocusStepField].toDouble();
+    auto is_schedule = result[IsScheduleField].toBool();
+
 }
 
 void Preview::loadExper()

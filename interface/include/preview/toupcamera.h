@@ -30,7 +30,7 @@ public:
 
     QImage capture();
 
-    QSize resolution() const;
+    //QSize resolution() const;
 
     double frameRate() const;
 
@@ -53,10 +53,10 @@ public:
     ushort gain() const;
 private:
     HToupcam toupcam = nullptr;
-    ToupcamDeviceV2 * camera = nullptr;
-    ToupcamDeviceV2 * devicelist = nullptr;
-    unsigned devicecount = 0;
+    ToupcamDeviceV2 camera;
     QSharedPointer<uchar> imgdata = nullptr;
+    //uchar* imgdata = nullptr;
+    QSize resolution;
 private:
     explicit ToupCamera(QObject*parent= nullptr);
     static void __stdcall eventCallBack(unsigned nEvent, void* ctxEvent);
