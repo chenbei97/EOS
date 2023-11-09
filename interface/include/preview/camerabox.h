@@ -19,6 +19,7 @@ class INTERFACE_IMEXPORT CameraBox : public GroupBox
 public:
     explicit CameraBox(QWidget*parent= nullptr);
     void importExperConfig(const QVariantMap& m,const QString&objective);
+    void captureImage(const QImage&img,const QString& channel);
     void setEnabled(bool enabled);
     void setChannel(int option);
     MultiCameraInfo cameraInfo() const;
@@ -30,10 +31,10 @@ private:
     PushButton * capturebtn;
     PushButton * combinebtn;
     MultiCameraInfo camerainfo;
+    ChannelImageInfo imageinfo;
 private slots:
     void onSaveBtn();
     void onCombineBtn();
-    void onCaptureBtn();
     void adjustCamera();
 signals:
     void cameraInfoChanged(const MultiCameraInfo &);

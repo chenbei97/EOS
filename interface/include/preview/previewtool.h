@@ -55,6 +55,7 @@ signals:
     void loadExper(); // 启动实验
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
+    void captureImage(const QImage& img,const QString& channel);
 };
 
 #endif //EOSI_PREVIEWTOOL_H

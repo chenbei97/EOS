@@ -32,7 +32,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
 
     connect(savebtn,&PushButton::clicked,this,&CameraBox::onSaveBtn);
     connect(combinebtn,&PushButton::clicked,this,&CameraBox::onCombineBtn);
-    connect(capturebtn,&PushButton::clicked,this,&CameraBox::onCaptureBtn);
+    connect(capturebtn,&PushButton::clicked,this,&CameraBox::photoTaking);
     connect(cameratool,&CameraTool::exposureChanged,this,&CameraBox::adjustCamera);
     connect(cameratool,&CameraTool::gainChanged,this,&CameraBox::adjustCamera);
     connect(cameratool,&CameraTool::brightChanged,this,&CameraBox::adjustCamera);
@@ -79,14 +79,18 @@ void CameraBox::onSaveBtn()
     emit cameraInfoChanged(camerainfo);
 }
 
-void CameraBox::onCaptureBtn()
-{
-    emit photoTaking();
-}
-
 void CameraBox::onCombineBtn()
 {
 
+}
+
+void CameraBox::captureImage(const QImage &img, const QString &channel)
+{ // 拍照返回来的图像和通道
+    //LOG<<channel;
+    if (channel.isEmpty()) return; // 都没开灯拍的黑图不存储
+
+    imageinfo[channel] = img;
+    LOG<<imageinfo;
 }
 
 void CameraBox::setEnabled(bool enabled)

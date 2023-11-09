@@ -102,7 +102,7 @@ void PhotoCanvas::setData(const QVariantMap &m)
 void PhotoCanvas::setImage(const QImage &img)
 {
     mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
-    update();
+    //update();
 }
 
 PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
@@ -114,5 +114,5 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
     connect(&timer,&QTimer::timeout,[this]{update();});
-    //timer.start(50);// 绘制太快导致出问题
+    timer.start(50);// 绘制太快导致出问题
 }

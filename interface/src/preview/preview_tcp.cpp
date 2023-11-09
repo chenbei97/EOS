@@ -97,16 +97,9 @@ void Preview::showCapturedImage(const QImage& image)
 void Preview::takingPhoto()
 {
     auto toolinfo = toolbar->toolInfo();
-//    auto patterninfo = pattern->patternInfo();
-//    previewinfo[PreviewToolField] = toolinfo;
-//    previewinfo[PreviewPatternField] = patterninfo;
 
-    //auto current_channel = toolinfo[CurrentChannelField].toString();
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
-
     QVariantMap m;
-
-    //m[CurrentChannelField] = getIndexFromFields(current_channel);
     m[BrightField] = current_info[BrightField];
     int exp = current_info[ExposureField].toUInt();
     int ga = current_info[GainField].toUInt();
@@ -133,6 +126,8 @@ void Preview::takingPhoto()
         ToupCameraPointer->setExposure(exp);
         ToupCameraPointer->setGain(ga);
         auto pix = ToupCameraPointer->capture();
+        auto current_channel = toolinfo[CurrentChannelField].toString();
+        toolbar->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
 #else
         setExposure(exp);
         setGain(ga);
@@ -273,7 +268,7 @@ void Preview::importExperConfig(const QString& path)
         auto groupinfo = info[group].value<QVariantMap>();
         foreach(auto hole,groupinfo.keys()) {
             auto holeinfo = groupinfo[hole].value<QVariantMap>();
-                    LOG<<holeinfo;
+            //LOG<<holeinfo;
             auto holepoint = holeinfo[HoleCoordinateField].toPoint();
             auto viewpoints = holeinfo[PointsField].value<QPointVector>();
 

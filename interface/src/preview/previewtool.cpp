@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-18 15:53:52
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-02 17:36:35
+ * @LastEditTime: 2023-11-09 11:58:08
  * @FilePath: \EOS\interface\src\preview\previewtool.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -52,6 +52,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(objectivebox,&ObjectiveBox::objectiveChanged,timebox,&TimeBox::disableChannel);
     // 3.外部信号
     connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
+    connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage);
 }
 
 PreviewToolInfo PreviewTool::toolInfo() const
@@ -75,7 +76,7 @@ PreviewToolInfo PreviewTool::toolInfo() const
 
     // 3. channel
     auto channelinfo = channelbox->channelInfo();//这个属于临时信息,其实没用(拍照这里有用,当前拍的通道)
-    info[CurrentChannelField] = channelinfo[CurrentChannelField]; // 实际字符串 PH
+    info[CurrentChannelField] = channelinfo[CurrentChannelField]; // 实际字符串 PH,如果都没开灯是空字符串
 
     // 4. camerainfo,分不同通道,保存了gain,exposure,bright
     auto camerainfo = camerabox->cameraInfo();
