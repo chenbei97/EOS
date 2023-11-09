@@ -58,13 +58,10 @@ void Preview::updateViewPatternUi()
     else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
-    // 2. 孔的信息不需要改变,仅仅需要更新视野窗口去更新视野窗口绘制和临时保存信息
-    auto currentViewInfo = viewpattern->currentViewInfo();//拿到之前的设置,其它不用改
-    currentViewInfo[HoleViewSizeField] = QSize(size,size);
-    viewpattern->setStrategy(ViewPattern::InnerCircleRect,currentViewInfo); // 重新更新下尺寸信息,其他的不用改
+    // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
+    viewpattern->clearAllViewWindowCache(size);
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
-    //viewpattern->updatePatternUi(); // 重新刷新下分组信息更新孔图案,如果内部注释掉了pattern的更新代码,其余部分setStrategy-initSelectPoints其实操作过了
     dock->setWindowTitle(tr("选择孔内视野"));
 
     // 4. 视野尺寸/孔板尺寸 变的话所有信息都重新初始化

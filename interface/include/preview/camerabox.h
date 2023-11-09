@@ -18,6 +18,7 @@ class INTERFACE_IMEXPORT CameraBox : public GroupBox
     Q_OBJECT
 public:
     explicit CameraBox(QWidget*parent= nullptr);
+    void importExperConfig(const QVariantMap& m,const QString&objective);
     void setEnabled(bool enabled);
     void setChannel(int option);
     MultiCameraInfo cameraInfo() const;

@@ -261,12 +261,29 @@ void Preview::importExperConfig(const QString& path)
 
     m.parseJson(json);
     auto result = m.map();
+    toolbar->importExperConfig(result);
 
-    foreach(auto key,result.keys()){
-        LOG<<key<<result[key];
+    auto brand = result[BrandField].toUInt();
+    auto manufacturer = result[ManufacturerField].toUInt();
+    auto objective = result[ObjectiveMagnificationField].toUInt();
+    auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];
+
+    auto info = result[GroupField].value<QVariantMap>();
+    foreach(auto group,info.keys()){
+        auto groupinfo = info[group].value<QVariantMap>();
+        foreach(auto hole,groupinfo.keys()) {
+            auto holeinfo = groupinfo[hole].value<QVariantMap>();
+                    LOG<<holeinfo;
+            auto holepoint = holeinfo[HoleCoordinateField].toPoint();
+            auto viewpoints = holeinfo[PointsField].value<QPointVector>();
+
+            // 把holepoint这个孔的信息更改(和wellsize有关,所以需要先更新toolbar的信息就不会越界了)
+            pattern->updateHoleInfo(holepoint,group,viewpoints,viewsize);
+            viewpattern->updateViewWindowCache(holepoint,viewpoints,viewsize);
+        }
+
     }
 
-    toolbar->importExperConfig(result);
 }
 
 void Preview::loadExper()

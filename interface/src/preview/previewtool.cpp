@@ -124,10 +124,6 @@ PreviewToolInfo PreviewTool::toolInfo() const
 
 void PreviewTool::importExperConfig(const QVariantMap &m)
 {
-    { // 0. 相机通道参数的导入
-        auto camerainfo = m[CameraChannelField];
-    }
-
     { // 1.wellbox
         auto brand = m[BrandField].toUInt();
         auto manufacturer = m[ManufacturerField].toUInt();
@@ -158,4 +154,12 @@ void PreviewTool::importExperConfig(const QVariantMap &m)
         auto channels = m[ChannelField].toString().split(",",QString::SkipEmptyParts);
         timebox->importExperConfig(is_schedule,total,duration,channels,objective);
     }
+
+    { // 6. 相机通道参数的导入
+        auto camerainfo = m[CameraChannelField].value<QVariantMap>();
+        if (!camerainfo.isEmpty()) { // 可能没保存过参数
+            camerabox->importExperConfig(camerainfo,objective);
+        }
+    }
+
 }

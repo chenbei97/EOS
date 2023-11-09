@@ -182,3 +182,18 @@ void WellPattern::initHoleInfo()
     }
     update();
 }
+
+void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointVector viewpoints,int viewsize)
+{ // 更新指定孔的信息
+
+    Q_ASSERT(mHoleInfo[point.x()][point.y()].coordinate == point);
+    mHoleInfo[point.x()][point.y()].group = group;
+    mHoleInfo[point.x()][point.y()].viewpoints = viewpoints;
+    mHoleInfo[point.x()][point.y()].viewsize = QSize(viewsize,viewsize);
+    mHoleInfo[point.x()][point.y()].isselected = true;
+
+    mHoleInfo[point.x()][point.y()].allgroup = getAllWellGroupNames();
+    mHoleInfo[point.x()][point.y()].allcoordinate = getAllWellHoleCoordinates();
+    // 不能借助onOpenViewAct更新,因为不传递viewpoints给视野窗口,而且更新仅仅更新1个孔的
+    update();
+}

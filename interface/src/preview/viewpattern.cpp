@@ -77,6 +77,39 @@ void ViewPattern::clearViewWindowCache(const QPoint &holepoint)
     update();
 }
 
+void ViewPattern::clearAllViewWindowCache(int viewsize)
+{ // 切换厂家或者物镜倍数时把所有的信息都要清空,不仅是当前孔,所有的孔信息都要清除
+    mViewSelectPoints.clear();
+    mTmpViewSelectPoints.clear();
+
+    auto holepoint = mCurrentViewInfo[HoleCoordinateField].toPoint();
+    mCurrentViewInfo.clear();
+    mCurrentViewInfo[HoleCoordinateField] = holepoint;//这个要保留,initSelections需要用
+
+    mrows = viewsize;
+    mcols = viewsize;
+    initDrapPoints();
+    initSelectPoints();
+    update();
+}
+
+void ViewPattern::updateViewWindowCache(QCPoint holepoint, QCPointVector viewpoints,int viewsize)
+{ // 导入实验配置时去更新view的ui信息
+    mCurrentViewInfo[HoleCoordinateField] = holepoint;
+    mrows = viewsize;
+    mcols = viewsize;
+    initDrapPoints();
+    initSelectPoints();
+
+    auto coordinate = mCurrentViewInfo[HoleCoordinateField].toPoint();
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
+    foreach(auto viewpoint,viewpoints) {
+        mViewSelectPoints[idx][viewpoint.x()][viewpoint.y()] = true;
+    }
+    mTmpViewSelectPoints[idx] = mViewSelectPoints[idx];
+    update();
+}
+
 void ViewPattern::onSaveViewAct()
 { // 保存选择的视野到当前孔id对应的视野数据区并保存到临时信息用于initSelectPoints重新初始化
 
@@ -346,8 +379,7 @@ int ViewPattern::drapPointCount() const
 }
 
 ViewInfo ViewPattern::currentViewInfo() const
-{ // 目的是为了切换brand,objective时外部拿到当前的视野孔信息,然后更新其中尺寸字段即可
-    // 然后再次调用setStrategy->initSelectPoints()->更新视野信息/临时信息(不匹配时临时信息就被清除了)
+{
     return mCurrentViewInfo;
 }
 

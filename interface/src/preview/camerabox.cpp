@@ -38,6 +38,30 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     connect(cameratool,&CameraTool::brightChanged,this,&CameraBox::adjustCamera);
 }
 
+void CameraBox::importExperConfig(const QVariantMap &m,const QString& objective)
+{
+    foreach(auto channel,m.keys()) {
+        auto config = m[channel].value<QVariantMap>();
+        CameraInfo info;
+        info[ExposureField] = config[ExposureField].toString();
+        info[GainField] = config[GainField].toString();
+        info[BrightField] = config[BrightField].toString();
+        camerainfo[channel] = info;
+    }
+
+    // br和phase的通道参数应当根据物镜的硬件参数清除
+    if (objective.contains(BRField,Qt::CaseInsensitive)) {
+        camerainfo[PHField].clear();
+        setChannel(0); // 切到br通道更新ui设置
+    }
+    else if (objective.contains(PHField,Qt::CaseInsensitive)){
+        camerainfo[BRField].clear();
+        setChannel(1); // 切到ph通道更新ui设置
+    }
+
+    emit cameraInfoChanged(camerainfo);
+}
+
 void CameraBox::adjustCamera()
 { // cameratool's ui调节时更改相机的2个参数和bright
     auto exp = cameratool->exposure().toUInt();
@@ -47,13 +71,12 @@ void CameraBox::adjustCamera()
 }
 
 void CameraBox::onSaveBtn()
-{ // 保存参数也不需要
+{ // 保存通道参数
     auto channel = currentchannel->text().remove(ChannelFieldLabel);
     if (channel == NoneField) return;
 
     camerainfo[channel] = saveInfo();
     emit cameraInfoChanged(camerainfo);
-    //LOG<<"camera info = "<<camerainfo;
 }
 
 void CameraBox::onCaptureBtn()
@@ -74,7 +97,7 @@ void CameraBox::setEnabled(bool enabled)
 }
 
 void CameraBox::setChannel(int option)
-{
+{ // channelbox切换通道时要更新当前的通道
     if (option < 0) {
         currentchannel->setText(QString("%1%2").arg(ChannelFieldLabel).arg(NoneField));
         setEnabled(false);
