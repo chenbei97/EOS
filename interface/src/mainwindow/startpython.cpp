@@ -46,8 +46,8 @@ void StartPython::quit()
         thread->setFlag();
 //        thread->quit(); // 这样不能退出线程,只能通过setflag退出
 //        thread->wait();
-        delete thread;
-        thread = nullptr;
+//        delete thread;
+//        thread = nullptr;
     }
 }
 
@@ -57,7 +57,7 @@ StartPython::~StartPython() noexcept
     {
         LOG<<"delete python thread";
         thread->setFlag();
-        delete thread;
-        thread = nullptr;
+//        delete thread;
+//        thread = nullptr;
     }
 }

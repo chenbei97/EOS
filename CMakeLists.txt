@@ -43,6 +43,7 @@ set(OPENCV_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/opencv2)
 set(SQLDRIVERS_PATH "${CMAKE_PREFIX_PATH}/plugins/sqldrivers")
 set(IMAGEFORMATS_PATH "${CMAKE_PREFIX_PATH}/plugins/imageformats")
 set(MEDIA_PATH "${CMAKE_PREFIX_PATH}/plugins/mediaservice")
+set(ICONENGINE_PATH "${CMAKE_PREFIX_PATH}/plugins/iconengines")
 
 set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
 set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
@@ -50,6 +51,13 @@ set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
 
 set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
 set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
+
+set(OPENGL32_PATH ${CMAKE_PREFIX_PATH}/bin/opengl32sw.dll)
+set(D3DCOMPILER_PATH ${CMAKE_PREFIX_PATH}/bin/d3dcompiler_47.dll)
+set(LIBEGL_PATH ${CMAKE_PREFIX_PATH}/bin/libEGL.dll)
+set(LIBGLESV2_PATH ${CMAKE_PREFIX_PATH}/bin/libGLESv2.dll)
+set(LIBEGLD_PATH ${CMAKE_PREFIX_PATH}/bin/libEGLd.dll)
+set(LIBGLESV2D_PATH ${CMAKE_PREFIX_PATH}/bin/libGLESv2d.dll)
 
 set(COMPONENT_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/component/include
@@ -112,6 +120,16 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         "${MEDIA_PATH}"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/mediaservice"
         )
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${ICONENGINE_PATH}"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/iconengines"
+        )
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${ICONENGINE_PATH}"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/iconengines"
+        )
 # 3. mysql软件的2个文件必须复制
 if (EXISTS "${MYSQL_LIB_PATH}")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -144,6 +162,43 @@ foreach(opencv_dll ${OPENCV_DLLs_PATH}) # 必须复制dll不然无法单独运�
     endif ()
 endforeach(opencv_dll)
 
+# 5. 其它依赖dll
+if (EXISTS "${OPENGL32_PATH}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${OPENGL32_PATH}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+endif ()
+if (EXISTS "${D3DCOMPILER_PATH}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${D3DCOMPILER_PATH}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+endif ()
+if (EXISTS "${LIBEGL_PATH}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "${LIBEGL_PATH}"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+endif ()
+if (EXISTS "${LIBEGLD_PATH}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${LIBEGLD_PATH}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+endif ()
+if (EXISTS "${LIBGLESV2_PATH}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${LIBGLESV2_PATH}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+endif ()
+if (EXISTS "${LIBGLESV2D_PATH}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${LIBGLESV2D_PATH}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+endif ()
 # （8）清理lib、bin不必要的上次编译生成的文件
 #file(GLOB lastFiles
 #        "bin/*.dll"

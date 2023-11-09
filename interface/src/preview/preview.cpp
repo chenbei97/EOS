@@ -23,7 +23,6 @@ void Preview::onManufacturerChanged(int option)
 
 void Preview::onWellbrandChanged(int option)
 {
-    updateViewPatternUi();
     switch (option) {
         case 0: pattern->setPatternSize(2,3);
             break;
@@ -34,13 +33,13 @@ void Preview::onWellbrandChanged(int option)
         case 3: pattern->setPatternSize(16,24);
             break;
     }
-
+    updateViewPatternUi();
 }
 
 void Preview::onObjectiveChanged(const QString& obj)
 {
-    //LOG<<"objective option = "<<option;
-    updateViewPatternUi();
+    LOG<<"objective option = "<<obj;
+    //updateViewPatternUi();
 }
 
 void Preview::setAppInfo(int app)

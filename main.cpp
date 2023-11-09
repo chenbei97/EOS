@@ -15,6 +15,7 @@ void initApp(QApplication& a);
 
 int main(int argc, char *argv[]) {
     LogInit;
+
     QApplication a(argc, argv);
     initApp(a);
     //StartPythonPointer->start("../test","test_socket","test_server");
@@ -28,8 +29,10 @@ int main(int argc, char *argv[]) {
     test_tcp();
 #else
     MainWindow w;
+    //StartPythonxPointer->start("../test","test_socket","test_server");
     setWindowAlignCenter(&w);
     w.show();
+
 #endif
     return QApplication::exec();
 }

@@ -51,3 +51,21 @@ void Sliderx::setMouseEvent(bool enabled)
 {
     enableMouse = enabled;
 }
+
+void Sliderx::wheelEvent(QWheelEvent *event)
+{
+    QPoint angle = event->angleDelta();
+    //LOG<<angle<<event->delta();
+    if (angle.y() > 0) { // 鼠标前转,数值增加
+        if (sliderPosition()+singleStep() <= maximum())
+            setValue(sliderPosition()+singleStep());
+        else setValue(maximum());
+    }
+    else { // 鼠标后转,数值减少
+        if (sliderPosition() - singleStep() >= minimum())
+            setValue(sliderPosition()-singleStep()); // 0还可以设置
+        else setValue(minimum());
+    }
+    emit sliderMoved(sliderPosition()); // 这个信号也要发送
+    QSlider::wheelEvent(event);
+}

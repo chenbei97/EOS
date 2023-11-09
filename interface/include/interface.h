@@ -13,6 +13,7 @@
 #include "appselect.h"
 #include "mainwindow.h"
 #include "pythonthread.h"
+#include "pythonprocess.h"
 #include "startpython.h"
 #include "toupcamera.h"
 

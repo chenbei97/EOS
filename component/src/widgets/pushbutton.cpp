@@ -33,17 +33,19 @@ bool PushButton::isChecked() const
 
 void PushButton::setBackGroundColor(QCColor color)
 {
-    auto pal = palette();
-    pal.setColor(QPalette::Button,color);
-    setPalette(pal);
+//    auto pal = palette();
+//    pal.setColor(QPalette::Button,color);
+//    setPalette(pal);
+    setStyleSheet("background-color:#FFF200");
     checked = true;
 }
 
 void PushButton::resetBackGroundColor()
 {
-    auto pal = palette();
-    pal.setColor(QPalette::Button,"#F0F0F0");
-    setPalette(pal);
+//    auto pal = palette();
+//    pal.setColor(QPalette::Button,"#F0F0F0");
+//    setPalette(pal);
+    setStyleSheet("background-color:#F0F0F0");
     checked = false;
 }
 

@@ -59,14 +59,13 @@ void Preview::updateViewPatternUi()
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
     // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
+    LOG<<manufacturer<<brand<<objective;
     viewpattern->clearAllViewWindowCache(size);
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
     dock->setWindowTitle(tr("选择孔内视野"));
-
     // 4. 视野尺寸/孔板尺寸 变的话所有信息都重新初始化
-    pattern->initHoleInfo();
-
+    //pattern->initHoleInfo();
 }
 
 void Preview::updateSetGroupWindow(const QVariantMap& m)

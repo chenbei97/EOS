@@ -20,10 +20,17 @@ void PythonThread::run()
     Py_Initialize();
     if (!Py_IsInitialized()){LOG << "inital python failed!";
     }else LOG << "inital python successful!";
+    QString python_path = (CURRENT_PATH+"/python310/");
+    auto path = reinterpret_cast<const wchar_t *>(python_path.toStdString().c_str());
+    Py_SetPythonHome(path);
+    Py_SetPath(path);
+    LOG<<"python home: "<<Py_GetPythonHome();
+    LOG<<"python path: "<<Py_GetPath();
     PyRun_SimpleString("import os,sys");
     PyRun_SimpleString("print(os.getcwd())");
     QString appendPath = QString("sys.path.append('%1')").arg(prefixPath);
     PyRun_SimpleString(appendPath.toStdString().c_str());// "sys.path.append('bin')"
+    PyRun_SimpleString("sys.path.append('./python310')");
 
     PyObject* pModule = PyImport_ImportModule(fileName.toStdString().c_str()); // "test_socket"
 

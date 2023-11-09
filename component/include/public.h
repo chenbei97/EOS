@@ -62,6 +62,7 @@
 
 #include "qtimer.h"
 #include "qtextcodec.h"
+#include "qprocess.h"
 
 // (2) 常量定义
 

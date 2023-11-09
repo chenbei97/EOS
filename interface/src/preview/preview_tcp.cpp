@@ -66,6 +66,8 @@ void Preview::adjustCamera(int exp,int gain,int br)
         return; // 如果通道无效,没有开灯,调节参数没有意义,不发给下位机
     }
 
+    ToupCameraPointer->setExposure(exp);
+    ToupCameraPointer->setGain(gain);
     // 滑动条速度很快,这里组装不再通过Assembler来组装,可能同步会出问题,直接组装
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0005;
@@ -99,10 +101,11 @@ void Preview::takingPhoto()
     auto toolinfo = toolbar->toolInfo();
 
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
-    QVariantMap m;
-    m[BrightField] = current_info[BrightField];
     int exp = current_info[ExposureField].toUInt();
     int ga = current_info[GainField].toUInt();
+//    QVariantMap m;
+//    m[BrightField] = current_info[BrightField];
+
 
 //auto save_channels = toolinfo[CaptureChannelField].toStringList();//保存过设置的所有通道
 // 不从保存过的参数去拿,而是从UI的信息直接去拿
@@ -115,12 +118,11 @@ void Preview::takingPhoto()
 //        m[BrightField] = camera_info[BrightField];
 //    }
 
-    AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
-    auto msg = AssemblerPointer->message();
-
-    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
-    // 等待回复后调用相机拍照
-    if (ParserResult.toBool()) {
+//    AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
+//    auto msg = AssemblerPointer->message();
+//    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
+//    // 等待回复后调用相机拍照
+//    if (ParserResult.toBool()) {
 
 #ifndef usetoupcamera
         ToupCameraPointer->setExposure(exp);
@@ -135,9 +137,9 @@ void Preview::takingPhoto()
 #endif
         LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
         <<" 曝光和增益为 "<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
-        photocanvas->setImage(pix);
         cameramode->changeMode(CameraMode::PhotoMode);
-    }
+        photocanvas->setImage(pix);
+//    }
 }
 
 void Preview::previewViewByClickView(const QPoint &viewpoint)
@@ -299,5 +301,8 @@ void Preview::loadExper()
     SocketPointer->exec(TcpFramePool.frame0x0001,json);
     if (ParserResult.toBool()) {
         QMessageBox::information(this,InformationChinese,tr("启动实验成功!"));
+        livecanvas->setImage(QImage());
+        photocanvas->setImage(QImage());
+        ToupCameraPointer->closeCamera();
     }
 }

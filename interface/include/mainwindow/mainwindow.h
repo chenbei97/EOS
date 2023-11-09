@@ -17,8 +17,8 @@
 #include "Python.h"
 #include "toupcam.h"
 #include "startpython.h"
-
-//#define StartPythonPointer (&StartPython::instance());
+#include "startpythonx.h"
+#include "pythonprocess.h"
 
 class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 {
@@ -31,6 +31,7 @@ private:
     Preview * preview;
     Setting * setting;
     QStackedWidget * stack;
+    PythonProcess * process;
 private:
     void navigbarSelect(int id);
 };
