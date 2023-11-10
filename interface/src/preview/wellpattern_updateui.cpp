@@ -194,7 +194,8 @@ void WellPattern::updateHoleInfoByViewInfoApplyGroup(QCVariantMap m)
 
 // (6) 被视野对话框的应用所有组信息反过来更新孔信息
 void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
-{ // 组颜色+视野尺寸+视野坐标 3个关键信息足够 + 孔板所有孔坐标
+{ // 组名+组颜色+视野尺寸+视野坐标 4个关键信息足够 + 孔板所有孔坐标
+    auto groupName = m[HoleGroupNameField].toString();
     auto groupColor = m[HoleGroupColorField].toString();
     auto viewsize = m[HoleViewSizeField].toSize();
     auto viewpoints = m[HoleViewPointsField].value<QPointVector>();
@@ -208,7 +209,8 @@ void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
         foreach(auto hole, holes) {
             auto holeinfo = mHoleInfo[hole.x()][hole.y()];
             holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
-            holeinfo.color = groupColor; // 本组应用的组颜色(有可能同组不同孔的颜色不同,帮助统一化)
+            if (holeinfo.group == groupName) // 本组应用的组颜色,不同组的颜色不需要统一
+                holeinfo.color = groupColor;
             holeinfo.viewpoints = viewpoints; // 应用的视野数量和位置信息
             holeinfo.viewsize = viewsize; // 本组应用的视野尺寸
             mHoleInfo[hole.x()][hole.y()] = holeinfo;

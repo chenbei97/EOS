@@ -25,7 +25,7 @@ void Preview::updateViewWindow(const QVariantMap& m)
 
     // 3.根据当前brand/objective更新视野的尺寸
     auto toolinfo = toolbar->toolInfo();
-    auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
@@ -49,7 +49,7 @@ void Preview::updateViewPatternUi()
 {
     // 1.更新视野的尺寸
     auto toolinfo = toolbar->toolInfo();
-    auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
@@ -59,7 +59,7 @@ void Preview::updateViewPatternUi()
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
     // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
-    LOG<<manufacturer<<brand<<objective<<size;
+    //LOG<<manufacturer<<brand<<objective<<size;
     viewpattern->clearAllViewWindowCache(size);
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了

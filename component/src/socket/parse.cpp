@@ -31,6 +31,13 @@ void Parse::parse(const QString&f,const QByteArray &msg)
 
     auto frame = map[FrameField].toString(); // 返回消息的帧
 
+    // 可能没这个帧头导致函数指针越界
+    if (!TcpUsedFrameList.contains(frame)) { // 返回的检测一下就可,组装的是我控制的一定不出现
+        LOG<<frame<<" 不存在";
+        emit parseResult(f,QVariant());
+        return;
+    }
+
     if (f != frame ) {// 返回和发送帧不等(有可能是多条命令的混合返回另一条命令的结果)
         auto result = TcpParseFunctions[frame](map); //这个结果也要反馈出去
         if (result.isNull()) { // 以实际帧frame为准

@@ -6,6 +6,7 @@ LastEditTime: 2023-10-19 15:52:48
 FilePath: \EOS\test\test_socket.py
 Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
 '''
+import os,sys
 import threading
 from socket import socket
 import json
@@ -20,6 +21,7 @@ class ParseManager:
         self.repeat = "repeat"
         self.separate = "@@@"
         self.x = "x"
+        self.stop = "stop"
         self.y = "y"
         self.brand = "brand"
         self.equip = "equip"
@@ -56,6 +58,7 @@ class ParseManager:
             "0x0007": self.__parse0x0007,
             "0x0008": self.__parse0x0008,
             "0x0009": self.__parse0x0009,
+            "0x0010": self.__parse0x0010,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -211,6 +214,17 @@ class ParseManager:
         print("0x0009回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
+    def __parse0x0010(self,msg:dict): # 移动电机
+        frame = msg[self.frame]
+        stop = msg[self.stop]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.state] = "ok"
+        response = json.dumps(reponse)
+        response+=self.separate
+        print("0x0010回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
+
 class SocketServerManger:
     def __init__(self, port=3000):  # 测试本地链接,只需要提供端口
         self.__port = port
@@ -274,4 +288,6 @@ def test_server():
     m.waitForConnected()
 
 if __name__ == '__main__':
+    print('os.getcwd(): ',os.getcwd())
+    print('sys.executable: ',sys.executable)
     test_server()

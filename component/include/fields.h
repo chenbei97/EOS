@@ -119,7 +119,7 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
 
 // objective涉及的数据类型
 static const char* ObjectiveField = "objective";
-static const char* ObjectiveMagnificationField = "objective_magnification";
+static const char* ObjectiveDescripField = "objective_descrip";
 static const char* ObjectiveTypeField = "objective_type";
 static const char* ObjectiveFieldLabel = "objective: ";
 static const char* ObjectivePH = "ph";

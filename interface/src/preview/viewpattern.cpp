@@ -290,7 +290,7 @@ void ViewPattern::onApplyAllAct()
     QVariantMap m;
     m[HoleViewSizeField] = mCurrentViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
     m[HoleGroupColorField] = mCurrentViewInfo[HoleGroupColorField]; // 组装组颜色,可以把所有组颜色统一(可能没分过组默认颜色红色,无所谓)
-    //m[HoleGroupNameField] = mCurrentViewInfo[HoleGroupNameField];// 组名信息顺带组装(应用到所有组时组名信息不重要了)
+    m[HoleGroupNameField] = mCurrentViewInfo[HoleGroupNameField];// 组名信息顺带组装(应用到所有组时只有同组的组颜色需要覆盖)
     //m[HoleCoordinateField] = mCurrentViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
     //m[WellAllGroupsField] = mCurrentViewInfo[WellAllGroupsField]; // 所有组名信息顺带组装
     m[WellAllHolesField] = mCurrentViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装

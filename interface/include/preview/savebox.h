@@ -19,6 +19,7 @@ public:
     explicit SaveBox(QWidget*parent= nullptr);
 private:
     PushButton * loadbtn;
+    PushButton * stopbtn;
     PushButton * exportallbtn;
     CheckBox * exportToFile;
     LineEdit * filenameedit;

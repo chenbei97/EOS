@@ -14,6 +14,7 @@ SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
     exportToFile = new CheckBox(tr("保存设置到文件?"));
     exportallbtn = new PushButton(tr("导出"));
     loadbtn = new PushButton(tr("启动实验"));
+    stopbtn = new PushButton(tr("停止实验"));
     filenameedit->hide();
     exportallbtn->hide();
 
@@ -22,6 +23,7 @@ SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
     lay->addWidget(filenameedit);
     lay->addWidget(exportallbtn);
     lay->addWidget(exportToFile);
+    lay->addWidget(stopbtn);
     lay->addWidget(loadbtn);
 
     setLayout(lay);
@@ -30,6 +32,16 @@ SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
     connect(exportToFile,&CheckBox::checkedChanged,this,&SaveBox::showExport);
     connect(exportallbtn,&PushButton::clicked,this,&SaveBox::exportFile);
     connect(loadbtn,&PushButton::clicked,this,&SaveBox::loadExper);
+    connect(stopbtn,&PushButton::clicked,[this]{
+        QJsonObject object;
+        object[FrameField] = "0x0010";
+        object["stop"] = 1;
+        TcpAssemblerDoc.setObject(object);
+        auto json = TcpAssemblerDoc.toJson();
+        json = AppendSeparateField(json);
+        SocketPointer->exec("0x0010",json, false);
+        //LOG<<ParserResult;
+    });
 }
 
 void SaveBox::exportFile()

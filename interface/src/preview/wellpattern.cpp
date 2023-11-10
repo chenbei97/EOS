@@ -185,6 +185,17 @@ void WellPattern::initHoleInfo()
     update();
 }
 
+void WellPattern::clearAllHoleViewPoints()
+{
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            mHoleInfo[row][col].viewpoints = QPointVector();
+            mHoleInfo[row][col].viewsize = QSize(-1,-1);
+        }
+    }
+    update();
+}
+
 void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointVector viewpoints,int viewsize)
 { // 更新指定孔的信息,用于导入实验配置时逐孔更新
 

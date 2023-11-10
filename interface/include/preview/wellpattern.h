@@ -23,6 +23,7 @@ public:
     void initDrapPoints(); // 清除拖拽区域
     int drapPointCount() const; // 计算拖拽区域包含的点个数
     void initHoleInfo(); // 初始化孔信息
+    void clearAllHoleViewPoints();
     void updateHoleInfo(QCPoint point,QCString group,QCPointVector viewpoints,int viewsize);
 
     void paintEvent(QPaintEvent *event) override;
@@ -36,7 +37,7 @@ public:
 
     QSet<QString> getAllWellGroupNames() const;// 返回所有分过的组,不重复
     void updateHoleInfoByGroupInfo(QCVariantMap m);// 右击打开分组窗口的信息(color+name)拿去更新孔数据
-    void updateHoleInfoByViewInfoApplyHole(QCVariantMap m);
+    void updateHoleInfoByViewInfoApplyHole(QCVariantMap m); // 删点保存点的映射
     void updateHoleInfoByViewInfoApplyGroup(QCVariantMap m); // 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
     void updateHoleInfoByViewInfoApplyAll(QCVariantMap m);
 private:

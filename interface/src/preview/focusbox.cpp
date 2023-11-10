@@ -17,11 +17,14 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     slider->setDirection(Qt::Vertical);
     slider->setRange(0,FocusToolFocusMaxVal);
     slider->setPrefix("");
-    slider->setMouseEvent(false);
+    slider->setMouseEvent(true);
 
     step = new SpinBox(true);
     step->setMaximumWidth(FocusToolStepSpinMaxWidth);
     step->setMaximum(FocusToolStepMaxVal);
+    auto steplay = new QHBoxLayout;
+    steplay->addWidget(new Label(tr("step: ")));
+    steplay->addWidget(step);
 
     topbtn = new RoundButton;
     bottombtn = new RoundButton;
@@ -34,15 +37,17 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     lay1->addWidget(bottombtn);
 
     auto lay2 = new QVBoxLayout;
-    lay2->addWidget(step);
+    lay2->addLayout(steplay);
     lay2->addStretch();
     lay2->addWidget(autofocusbtn);
+    lay2->setSpacing(0);
 
     auto lay = new QHBoxLayout;
     lay->addWidget(pattern);
     lay->addWidget(slider);
     lay->addLayout(lay1);
     lay->addLayout(lay2);
+
     lay->addStretch();
     lay->setSpacing(FocusBoxSpacing);
 

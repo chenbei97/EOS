@@ -60,6 +60,7 @@ void CameraBox::importExperConfig(const QVariantMap &m,const QString& objective)
         setChannel(1); // 切到ph通道更新ui设置
     }
 
+    setEnabled(false); // 导入配置时默认都不可滑动,上述代码之后
     emit cameraInfoChanged(camerainfo);
 }
 

@@ -13,6 +13,7 @@ PushButton::PushButton(QWidget*parent):QPushButton(parent)
     checked = false;
     setAutoFillBackground(true);
     //setFlat(true);
+    resetBackGroundColor();
 }
 
 
@@ -22,8 +23,7 @@ PushButton::PushButton(const QString&text,QWidget*parent):QPushButton(parent)
     setAutoFillBackground(true);
     //setFlat(true);
     setText(text);
-    //setStyleSheet("background-color:#F0F0F0");
-    //resetBackGroundColor();
+    resetBackGroundColor();
 }
 
 bool PushButton::isChecked() const

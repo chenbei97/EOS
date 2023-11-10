@@ -82,40 +82,39 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
     ObjectiveInfo m;
 
     if (rbtn_loc1->isChecked()) {
-        m[ObjectiveField] = rbtn_loc1->text(); // 传递实际字符串
+        m[ObjectiveDescripField] = rbtn_loc1->text(); // 传递实际字符串 br4x
         m[CameraLocationField] = QString::number(CameraLocationField1Index);
 
     }
     else if (rbtn_loc2->isChecked()) {
-        m[ObjectiveField] = rbtn_loc2->text();
+        m[ObjectiveDescripField] = rbtn_loc2->text();
         m[CameraLocationField] = QString::number(CameraLocationField2Index);
     }
     else if (rbtn_loc3->isChecked()) {
-        m[ObjectiveField] = rbtn_loc3->text();
+        m[ObjectiveDescripField] = rbtn_loc3->text();
         m[CameraLocationField] = QString::number(CameraLocationField3Index);
     }
     else if (rbtn_loc4->isChecked()) {
-        m[ObjectiveField] = rbtn_loc4->text();
+        m[ObjectiveDescripField] = rbtn_loc4->text();
         m[CameraLocationField] = QString::number(CameraLocationField4Index);
     }
 
     //LOG<<m; // 注意! : 由于objectivesetting信号是异步的,此时rbtn_loc1其实并未赋值,所以构造函数初始化时要保持一致
 
-    // 为了方便增加ObjectiveMagnificationField字段只放物镜的倍数,方便更新view窗口的尺寸
-    // objective=br4x,ObjectiveMagnification=4x,ObjectiveType=br;
-    if (m[ObjectiveField].contains(Objective4x)) 
-        m[ObjectiveMagnificationField]=Objective4x;
-    else if (m[ObjectiveField].contains(Objective10x)) 
-        m[ObjectiveMagnificationField]=Objective10x;
-    else if (m[ObjectiveField].contains(Objective20x)) 
-        m[ObjectiveMagnificationField]=Objective20x;
-    else if (m[ObjectiveField].contains(Objective40x)) 
-        m[ObjectiveMagnificationField]=Objective40x;
+    // objective存放原字符串
+    if (m[ObjectiveDescripField].contains(Objective4x))
+        m[ObjectiveField]=Objective4x;
+    else if (m[ObjectiveDescripField].contains(Objective10x))
+        m[ObjectiveField]=Objective10x;
+    else if (m[ObjectiveDescripField].contains(Objective20x))
+        m[ObjectiveField]=Objective20x;
+    else if (m[ObjectiveDescripField].contains(Objective40x))
+        m[ObjectiveField]=Objective40x;
 
     // 同理增加,ObjectiveTypeField
-    if (m[ObjectiveField].contains(ObjectivePH)) 
+    if (m[ObjectiveDescripField].contains(ObjectivePH))
         m[ObjectiveTypeField]=getIndexFromFields(ObjectivePH);
-    else if (m[ObjectiveField].contains(ObjectiveBR)) 
+    else if (m[ObjectiveDescripField].contains(ObjectiveBR))
         m[ObjectiveTypeField]=getIndexFromFields(ObjectiveBR);
 
     return m;

@@ -152,7 +152,7 @@ void Preview::previewViewByClickView(const QPoint &viewpoint)
 //    previewinfo[PreviewPatternField] = patterninfo;
 
     // 预览事件需要的参数
-    auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto wellsize = toolinfo[WellsizeField].toUInt();
@@ -199,7 +199,7 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
 //    previewinfo[PreviewPatternField] = patterninfo;
 
     // 预览事件需要的参数
-    auto objective = getIndexFromFields(toolinfo[ObjectiveMagnificationField].toString()).toUInt();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto wellsize = toolinfo[WellsizeField].toUInt();
@@ -262,7 +262,7 @@ void Preview::importExperConfig(const QString& path)
 
     auto brand = result[BrandField].toUInt();
     auto manufacturer = result[ManufacturerField].toUInt();
-    auto objective = result[ObjectiveMagnificationField].toUInt();
+    auto objective = result[ObjectiveField].toUInt();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];
 
     auto info = result[GroupField].value<QVariantMap>();

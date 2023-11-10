@@ -54,7 +54,14 @@ typedef struct { // 注册过的帧头命令
     const QString frame0x0007 = "0x0007";
     const QString frame0x0008 = "0x0008";
     const QString frame0x0009 = "0x0009";
+    const QString frame0x0010 = "0x0010";
 } TcpFrameList;
+
+const QFieldList TcpUsedFrameList {
+        "0x0000","0x0001","0x0002","0x0003","0x0004",
+        "0x0005","0x0006","0x0007","0x0008","0x0009",
+        "0x0010",
+};
 
 struct Field0x0000 {
     //const QString viewpoint = ViewCoordinateField;
@@ -86,7 +93,7 @@ struct Field0x0001{
     // objective
     const QString camera_location = CameraLocationField;
     const QString objective = ObjectiveField;
-    const QString objective_magnification = ObjectiveMagnificationField;
+    const QString objective_descrip = ObjectiveDescripField;
     const QString objective_type = ObjectiveTypeField;
     // channel
     const QString ph = PHField;
@@ -161,6 +168,11 @@ struct Field0x0009 { // 移动电机
     const QString state = StateField;
 };
 
+struct Field0x0010 { // 停止实验
+    const QString  stop = StopField;
+    const QString state = StateField;
+};
+
 typedef struct {
     Field0x0000 field0x0000;
     Field0x0001 field0x0001;
@@ -172,6 +184,7 @@ typedef struct {
     Field0x0007 field0x0007;
     Field0x0008 field0x0008;
     Field0x0009 field0x0009;
+    Field0x0010 field0x0010;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
@@ -188,6 +201,7 @@ static const TcpFieldList TcpFieldPool;
 #define Field0x0007 TcpFieldPool.field0x0007
 #define Field0x0008 TcpFieldPool.field0x0008
 #define Field0x0009 TcpFieldPool.field0x0009
+#define Field0x0010 TcpFieldPool.field0x0010
 
 static QVariant parse0x0000(QCVariantMap m)
 { // 预览事件
@@ -242,8 +256,8 @@ static QByteArray assemble0x0001(QCVariantMap m)
 
     // objectivebox
     object[Field0x0001.camera_location] = toolinfo[Field0x0001.camera_location].toString();
-    object[Field0x0001.objective] = toolinfo[Field0x0001.objective].toString();//就是传递原字符串不需要改
-    object[Field0x0001.objective_magnification] = getIndexFromFields(toolinfo[Field0x0001.objective_magnification].toString());
+    object[Field0x0001.objective_descrip] = toolinfo[Field0x0001.objective_descrip].toString();//就是传递原字符串不需要改
+    object[Field0x0001.objective] = getIndexFromFields(toolinfo[Field0x0001.objective].toString());
     object[Field0x0001.objective_type] = toolinfo[Field0x0001.objective_type].toString();
 
     // camerabox
@@ -498,6 +512,24 @@ static QVariant parse0x0009(QCVariantMap m)
     return ret == "ok";
 }
 
+static QByteArray assemble0x0010(QCVariantMap m)
+{ // 停止实验
+    QJsonObject object;
+    object[FrameField] = TcpFramePool.frame0x0010;
+    object[Field0x0010.stop] = m[StopField].toString();
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parse0x0010(QCVariantMap m)
+{// 停止实验
+    if (!m.keys().contains(FrameField)) return false;
+    if (!m.keys().contains(Field0x0010.state)) return false;
+    auto ret = m[StateField].toString();
+    return ret == "ok";
+}
+
 /*---------以下都是临时测试函数,以后可以注释掉-----------------*/
 static QByteArray assemble_test0x0(QCVariantMap m)
 { // test0x0会传来x,y,frame字段
@@ -552,6 +584,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.frame0x0007,parse0x0007},
         {TcpFramePool.frame0x0008,parse0x0008},
         {TcpFramePool.frame0x0009,parse0x0009},
+        {TcpFramePool.frame0x0010,parse0x0010},
         {"test0x0",parse_test0x0},
         {"test0x1",parse_test0x1},
 };
@@ -566,6 +599,7 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
         {TcpFramePool.frame0x0006,assemble0x0006},
         {TcpFramePool.frame0x0007,assemble0x0007},
         {TcpFramePool.frame0x0009,assemble0x0009},
+        {TcpFramePool.frame0x0010,assemble0x0010},
         {"test0x0",assemble_test0x0},
         {"test0x1",assemble_test0x1},
 };

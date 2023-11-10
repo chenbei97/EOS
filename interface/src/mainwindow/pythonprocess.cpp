@@ -13,35 +13,44 @@ PythonProcess::PythonProcess(QObject*parent): QObject(parent)
 {
     SocketInit;
     process = new QProcess;
+    process->setWorkingDirectory(CURRENT_PATH);
+    LOG<<"python process's workdir is "<<process->workingDirectory();
+//    foreach(auto env,QProcess::systemEnvironment()) {
+//        LOG<<"["<<env<<"]";
+//    }
     QObject::connect(qApp, &QCoreApplication::aboutToQuit, [this]() {
         process->close();
         process->waitForFinished();
         LOG<<"python process is kill? "<<!process->isOpen();
-//        Py_Finalize();
+        Py_Finalize();
     });
-    Py_Initialize();
-    if (!Py_IsInitialized()){LOG << "inital python failed!";
-    }else LOG << "inital python successful!";
-    QString python_path = (CURRENT_PATH+"/python310/");
+    QString python_path = (CURRENT_PATH+"/python310");
     wchar_t path[128] = {0};
     charTowchar(python_path,path,128);
     Py_SetPythonHome(path);
-    Py_SetPath(path);
+    //Py_SetPath(path);
+    Py_Initialize();
+    if (!Py_IsInitialized()){LOG << "inital python failed!";
+    }else LOG << "inital python successful!";
+
     char buf1[128] = {0};
     wcharTochar(Py_GetPythonHome(),buf1,128);
-    char buf2[128] = {0};
-    wcharTochar(Py_GetPath(),buf2,128);
+    char buf2[256] = {0};
+    wcharTochar(Py_GetPath(),buf2,256);
     LOG<<"python home: "<<buf1;
     LOG<<"python path: "<<buf2;
     PyRun_SimpleString("import os,sys");
-    PyRun_SimpleString("print(os.getcwd())");
     PyRun_SimpleString("sys.path.append('./python310')");
+    PyRun_SimpleString("print('os.getcwd(): ',os.getcwd())");
+    PyRun_SimpleString("print('sys.executable: ',sys.executable)");
+
 }
 
 void PythonProcess::start(const QString& path)
 {
     process->start("python",QStringList()<<path);
     process->waitForStarted();
+
     SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
     if (ParserResult.toBool()) LOG<<"socket is connect successful!";
     else LOG<<"socket is connect failed!";

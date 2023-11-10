@@ -70,8 +70,8 @@ PreviewToolInfo PreviewTool::toolInfo() const
     // 2. objective
     auto objectiveinfo = objectivebox->objectiveInfo();
     info[CameraLocationField] = objectiveinfo[CameraLocationField];// 用了哪个位置的镜头
-    info[ObjectiveField] = objectiveinfo[ObjectiveField]; // br4x
-    info[ObjectiveMagnificationField] = objectiveinfo[ObjectiveMagnificationField]; // 4x,只放物镜的倍数,方便更新view窗口的尺寸
+    info[ObjectiveField] = objectiveinfo[ObjectiveField]; // 4x
+    info[ObjectiveDescripField] = objectiveinfo[ObjectiveDescripField]; // br4x
     info[ObjectiveTypeField] = objectiveinfo[ObjectiveTypeField];
 
     // 3. channel
@@ -132,7 +132,7 @@ void PreviewTool::importExperConfig(const QVariantMap &m)
     }
 
     // 2. objectivebox
-    auto objective = m[ObjectiveField].toString(); // br4x
+    auto objective = m[ObjectiveDescripField].toString(); // br4x
     objectivebox->importExperConfig(objective);
     // camera_loc自动跟随objective的设置,无需导入
 

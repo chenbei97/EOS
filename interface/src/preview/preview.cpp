@@ -33,13 +33,53 @@ void Preview::onWellbrandChanged(int option)
         case 3: pattern->setPatternSize(16,24);
             break;
     }
-    updateViewPatternUi();
+
+    // 1.更新视野的尺寸
+    auto toolinfo = toolbar->toolInfo();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
+    auto brand = toolinfo[BrandField].toUInt();
+    auto manufacturer = toolinfo[ManufacturerField].toUInt();
+    auto size = ViewCircleMapFields[manufacturer][brand][objective];
+    if (size > view_well_6_4x*10)
+        dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
+    else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
+    else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
+
+    // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
+    //LOG<<manufacturer<<brand<<objective<<size;
+    viewpattern->clearAllViewWindowCache(size);
+
+    // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
+    dock->setWindowTitle(tr("选择孔内视野"));
 }
 
 void Preview::onObjectiveChanged(const QString& obj)
 {
     LOG<<"objective option = "<<obj;
-    updateViewPatternUi();
+    // 1.更新视野的尺寸
+    auto toolinfo = toolbar->toolInfo();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
+    auto brand = toolinfo[BrandField].toUInt();
+    auto manufacturer = toolinfo[ManufacturerField].toUInt();
+    auto size = ViewCircleMapFields[manufacturer][brand][objective];
+    if (size > view_well_6_4x*10)
+        dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
+    else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
+    else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
+
+    // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
+
+    auto current_size = viewpattern->currentViewInfo()[HoleViewSizeField].toSize().width();
+
+    if (current_size != size) {
+        LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 需要清理";
+        viewpattern->clearAllViewWindowCache(size);
+        // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
+        dock->setWindowTitle(tr("选择孔内视野"));
+        pattern->clearAllHoleViewPoints();// 只需要清理视野信息,其它保留
+    } else {
+        LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 无需清理";
+    }
 }
 
 void Preview::setAppInfo(int app)
