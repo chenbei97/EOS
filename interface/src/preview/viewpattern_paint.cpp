@@ -17,10 +17,9 @@ void ViewPattern::drawSelectRect(QPainter &painter)
     auto groupcolor = mCurrentViewInfo[HoleGroupColorField].toString();
     auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
 
+
     if (mViewSelectPoints[idx].isEmpty()) return; // 删孔后清除缓存信息这里是空直接返回否则遍历越界
-
     auto  rects = getInnerRects();
-
     // 绘制框选的所有孔
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
@@ -77,7 +76,7 @@ void ViewPattern::drawInnerLine(QPainter &painter)
 //    auto bottoms = getInnerVerticalLineBottomPoints();
 //    auto lefts = getInnerHorizonalLineLeftPoints();
 //    auto rights = getInnerHorizonalLineRightPoints();
-//
+
 //    Q_ASSERT(tops.count() == bottoms.count());
 //    Q_ASSERT(lefts.count() == rights.count());
 //    for(int i = 0; i < tops.count(); i++) {
@@ -103,6 +102,8 @@ void ViewPattern::drawInnerLine(QPainter &painter)
     // 高亮鼠标区域
     auto rects = getInnerRects();
     //LOG<<"rects.size = "<<rects.size()<<" mouse = "<<mMousePoint;
+    // rects.size =  4  mouse =  QPoint(7,6)
+    // 原来10x10,鼠标可能点的(7,6),现在切换尺寸4x4,导致绘制鼠标的高亮越界! 所以初始化时必须重置鼠标
     if (mMousePoint != QPoint(-1,-1)) // 尚未点击
         painter.fillRect(rects[mMousePoint.x()][mMousePoint.y()],mMouseClickColor);
 }
@@ -132,6 +133,5 @@ void ViewPattern::paintEvent(QPaintEvent *event)
     drawCircle(painter);
     drawInnerLine(painter);
     drawDrapRect(painter);
-
     event->accept();
 }

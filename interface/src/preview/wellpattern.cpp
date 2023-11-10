@@ -82,6 +82,8 @@ void WellPattern::setPatternSize(int rows, int cols)
 
 void WellPattern::initDrapPoints()
 { // 清除拖拽区域
+    mDrapRect = QRectF();
+    mMousePos = {-1,-1};
     mDrapPoints.clear();
     for(int row = 0 ; row < mrows; ++ row) {
         QBoolVector var;
@@ -184,7 +186,7 @@ void WellPattern::initHoleInfo()
 }
 
 void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointVector viewpoints,int viewsize)
-{ // 更新指定孔的信息
+{ // 更新指定孔的信息,用于导入实验配置时逐孔更新
 
     Q_ASSERT(mHoleInfo[point.x()][point.y()].coordinate == point);
     mHoleInfo[point.x()][point.y()].group = group;
@@ -194,6 +196,6 @@ void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointVector view
 
     mHoleInfo[point.x()][point.y()].allgroup = getAllWellGroupNames();
     mHoleInfo[point.x()][point.y()].allcoordinate = getAllWellHoleCoordinates();
-    // 不能借助onOpenViewAct更新,因为不传递viewpoints给视野窗口,而且更新仅仅更新1个孔的
+    // 不能借助onOpenViewAct打开视野窗口更新,因为不传递viewpoints给视野窗口,而且更新仅仅更新1个孔的
     update();
 }

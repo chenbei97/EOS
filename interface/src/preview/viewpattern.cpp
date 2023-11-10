@@ -73,12 +73,14 @@ void ViewPattern::clearViewWindowCache(const QPoint &holepoint)
     }
     mViewSelectPoints[idx] = vec;
     mTmpViewSelectPoints[idx] = vec;
-
+    LOG<<"is clear "<<holepoint<<" 's cache";
     update();
 }
 
 void ViewPattern::clearAllViewWindowCache(int viewsize)
 { // 切换厂家或者物镜倍数时把所有的信息都要清空,不仅是当前孔,所有的孔信息都要清除
+    mMousePoint = {-1,-1}; // 必须重置,否则可能之前遗留的鼠标坐标超过现在的size范围导致绘图越界
+    mDrapRect = QRectF();
     mViewSelectPoints.clear();
     mTmpViewSelectPoints.clear();
 
@@ -328,7 +330,6 @@ void ViewPattern::initSelectPoints()
             mViewSelectPoints[idx] = mTmpViewSelectPoints[idx];
         }
     } else mTmpViewSelectPoints[idx].clear(); // 说明view形状变了无需重现上次的设置
-
     update();
 }
 
@@ -355,6 +356,7 @@ int ViewPattern::viewPointCount() const
 
 void ViewPattern::initDrapPoints()
 { // 拖拽结束后清除这些点
+    mDrapRect = QRectF();
     mDrapPoints.clear();
     for(int row = 0 ; row < mrows; ++ row) {
         QBoolVector var;

@@ -26,12 +26,12 @@ double ViewPattern::getInnerRectHeight() const
 
 QPointF ViewPattern::getInnerRectTopLeftPoint() const
 {// 外接正方形左上角顶点
-    return QPointF(width()/2.0-getCircleRadius(),0);
+    return QPointF(width()/2.0-getCircleRadius(),0.0);
 }
 
 QPointF ViewPattern::getInnerRectTopRightPoint() const
 {// 外接正方形右上角顶点
-    return QPointF(width()/2.0+getCircleRadius(),0);
+    return QPointF(width()/2.0+getCircleRadius(),0.0);
 }
 
 QPointF ViewPattern::getInnerRectBottomLeftPoint() const
@@ -91,7 +91,6 @@ QRectF2DVector ViewPattern::getInnerRects() const
     QRectF2DVector m;
     auto hoffset = getInnerRectWidth();
     auto voffset = getInnerRectHeight();
-
     auto start = getInnerRectTopLeftPoint();
     for(int i = 0 ; i < mrows; ++i) {
         QRectFVector vec;
