@@ -17,6 +17,7 @@
 #include "qpropertyanimation.h"
 #include "qscrollarea.h"
 #include "qdatetimeedit.h"
+#include "qprocess.h"
 #include <cmath>
 using std::modf;
 

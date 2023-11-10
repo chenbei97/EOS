@@ -40,6 +40,7 @@ void ToupCamera::processCallback(unsigned int nEvent)
             captureStillImage();
             break;
         case TOUPCAM_EVENT_EXPOSURE:
+            exposureEvent();
             break;
         case TOUPCAM_EVENT_TEMPTINT:
             break;
@@ -104,6 +105,16 @@ void ToupCamera::captureStillImage()
 //    }
 }
 
+void ToupCamera::exposureEvent()
+{
+    unsigned time = 0;
+    unsigned short gain = 0;
+    Toupcam_get_ExpoTime(toupcam, &time);
+    Toupcam_get_ExpoAGain(toupcam, &gain);
+
+    emit exposureGainCaptured(time,gain);
+}
+
 void ToupCamera::print_imageInfo(ToupcamFrameInfoV3* info)
 {
     LOG<<"w = "<<info->width<<" h = "<<info->height
@@ -134,7 +145,7 @@ void ToupCamera::openCamera()
                                camera.model->res[resolutionIndex].height);
             setRgbBit(0); // 24bit
             setByteOrder(0); // rgb
-            setExposureOption(1); // auto continuity exposure
+            setExposureOption(0); // auto continuity exposure
             setExposure(244);
             setGain(120);
 //            if (imgdata) {

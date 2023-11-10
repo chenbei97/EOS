@@ -51,6 +51,8 @@ void Preview::onWellbrandChanged(int option)
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
     dock->setWindowTitle(tr("选择孔内视野"));
+
+    // 4.切换厂家setPattenSize已经都清理完了,无需再调用
 }
 
 void Preview::onObjectiveChanged(const QString& obj)
@@ -77,6 +79,32 @@ void Preview::onObjectiveChanged(const QString& obj)
         // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
         dock->setWindowTitle(tr("选择孔内视野"));
         pattern->clearAllHoleViewPoints();// 只需要清理视野信息,其它保留
+    } else {
+        LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 无需清理";
+    }
+}
+
+void Preview::updateViewPatternUi()
+{// 弃用,切换厂家和切换物镜分开写
+    // 1.更新视野的尺寸
+    auto toolinfo = toolbar->toolInfo();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
+    auto brand = toolinfo[BrandField].toUInt();
+    auto manufacturer = toolinfo[ManufacturerField].toUInt();
+    auto size = ViewCircleMapFields[manufacturer][brand][objective];
+    if (size > view_well_6_4x*10)
+        dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
+    else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
+    else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
+
+    // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
+    auto current_size = viewpattern->currentViewInfo()[HoleViewSizeField].toSize().width();
+    if (current_size != size) {
+        LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 需要清理";
+        viewpattern->clearAllViewWindowCache(size);
+        // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
+        dock->setWindowTitle(tr("选择孔内视野"));
+        pattern->clearAllHoleViewPoints();// 只需要清理视野信息,其它保留,切换厂家setPattenSize已经都清理完了
     } else {
         LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 无需清理";
     }
@@ -133,9 +161,10 @@ void Preview::initAttributes()
 
     pattern->setMinimumHeight(PreviewPatternMinHeight);
 
-    livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
+    //livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
     photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
-    //livecanvas->setMaximumWidth(MainWindowWidth-PreviewToolBarMaxWidth);
+    livecanvas->setMaximumWidth(1000);
+    livecanvas->setMaximumHeight(800);
 
     //previewinfo[PreviewToolField] = toolbar->toolInfo();
     //previewinfo[PreviewPatternField] = pattern->patternInfo();
@@ -144,8 +173,8 @@ void Preview::initAttributes()
 void Preview::initObjects()
 {
     cameramode = new CameraMode;
-    livecanvas = new PhotoCanvas;
-    //livecanvas = new Label;
+    //livecanvas = new PhotoCanvas;
+    livecanvas = new Label;
     photocanvas = new PhotoCanvas;
     stack = new QStackedWidget;
     pattern = new WellPattern(2,3);
@@ -176,6 +205,7 @@ void Preview::initConnections()
     connect(this, &Preview::evtCallback, this, &Preview::processCallback);
 #else
     connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::showCapturedImage);
+    connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,toolbar,&PreviewTool::exposureGainCaptured);
 #endif
 
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});

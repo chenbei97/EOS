@@ -45,29 +45,6 @@ void Preview::updateViewWindow(const QVariantMap& m)
     else viewpattern->setStrategy(ViewPattern::InnerCircleRect,nm);//⭐⭐⭐⭐ 把图案的信息传给视野窗口
 }
 
-void Preview::updateViewPatternUi()
-{
-    // 1.更新视野的尺寸
-    auto toolinfo = toolbar->toolInfo();
-    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
-    auto brand = toolinfo[BrandField].toUInt();
-    auto manufacturer = toolinfo[ManufacturerField].toUInt();
-    auto size = ViewCircleMapFields[manufacturer][brand][objective];
-    if (size > view_well_6_4x*10)
-        dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
-    else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
-    else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
-
-    // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
-    //LOG<<manufacturer<<brand<<objective<<size;
-    viewpattern->clearAllViewWindowCache(size);
-
-    // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
-    dock->setWindowTitle(tr("选择孔内视野"));
-    // 4. 视野尺寸/孔板尺寸 变的话所有信息都重新初始化
-    pattern->initHoleInfo();
-}
-
 void Preview::updateSetGroupWindow(const QVariantMap& m)
 { // 打开分组窗口事件 会把当前孔所属组颜色/组名称(可能设置过)
     // 1. 更新分组窗口的ui信息

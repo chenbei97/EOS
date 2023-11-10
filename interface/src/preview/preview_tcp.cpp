@@ -93,7 +93,8 @@ void Preview::showCapturedImage(const QImage& image)
 //    QVariantMap m;
 //    m[ImageField] = image;
 //    livecanvas->setData(m);
-    livecanvas->setImage(image);
+    //livecanvas->setImage(image);
+    livecanvas->setPixmap(QPixmap::fromImage(image));
 }
 
 void Preview::takingPhoto()
@@ -299,10 +300,11 @@ void Preview::loadExper()
     auto json = AssemblerPointer->message();
 
     SocketPointer->exec(TcpFramePool.frame0x0001,json);
+    ToupCameraPointer->closeCamera();
     if (ParserResult.toBool()) {
         QMessageBox::information(this,InformationChinese,tr("启动实验成功!"));
-        livecanvas->setImage(QImage());
+//        livecanvas->setImage(QImage());
+        livecanvas->setPixmap(QPixmap());
         photocanvas->setImage(QImage());
-        ToupCameraPointer->closeCamera();
     }
 }

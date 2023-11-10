@@ -28,29 +28,29 @@ Sliderx::Sliderx(Qt::Orientation orientation, QWidget *parent) : QSlider(parent)
 
 void Sliderx::mousePressEvent(QMouseEvent *event)
 {
-    if (!enableMouse)
-        event->ignore();
-    else {
-        double per = 0.0;
-        if (orientation() == Qt::Horizontal) {
-            int currentX = event->pos().x(); // 鼠标点击滑动条的位置
-            per = currentX * 1.0 / width();//获取当前点击的位置占整个slider的百分比
-        } else {
-            int currentY = event->pos().y(); // 鼠标点击滑动条的位置
-            per = 1.0 - currentY * 1.0 / height();//获取当前点击的位置占整个slider的百分比
-        }
-
-        // (val-min)/(max-min) = per => val = per*(max-min)+min
-        LOG<<per;
-        int value = per*(maximum() - minimum()) + minimum();
-
-        setValue(value);
-        setSliderPosition(value);
-        emit valueChanged(value);
-        emit sliderMoved(value); // 这个信号也要发送
+//    if (!enableMouse)
+//        event->ignore();
+//    else {
+//        double per = 0.0;
+//        if (orientation() == Qt::Horizontal) {
+//            int currentX = event->pos().x(); // 鼠标点击滑动条的位置
+//            per = currentX * 1.0 / width();//获取当前点击的位置占整个slider的百分比
+//        } else {
+//            int currentY = event->pos().y(); // 鼠标点击滑动条的位置
+//            per = 1.0 - currentY * 1.0 / height();//获取当前点击的位置占整个slider的百分比
+//        }
+//
+//        // (val-min)/(max-min) = per => val = per*(max-min)+min
+//        LOG<<per;
+//        int value = per*(maximum() - minimum()) + minimum();
+//
+//        setValue(value);
+//        setSliderPosition(value);
+//        emit valueChanged(value);
+//        emit sliderMoved(value); // 这个信号也要发送
 
         QSlider::mousePressEvent(event);
-    }
+//    }
 }
 
 void Sliderx::setMouseEvent(bool enabled)

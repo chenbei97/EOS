@@ -95,6 +95,13 @@ void CameraBox::captureImage(const QImage &img, const QString &channel)
     LOG<<imageinfo;
 }
 
+void CameraBox::captureExposureGain(unsigned int exp, unsigned int gain)
+{
+    LOG<<"回显值: "<<exp<<gain;
+    cameratool->setExposure(exp);
+    cameratool->setGain(gain);
+}
+
 void CameraBox::setEnabled(bool enabled)
 { // 除了br,phase,其它通道不需要调整相机参数
     cameratool->setEnabled(enabled);

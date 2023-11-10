@@ -20,6 +20,7 @@ public:
     explicit CameraBox(QWidget*parent= nullptr);
     void importExperConfig(const QVariantMap& m,const QString&objective);
     void captureImage(const QImage&img,const QString& channel);
+    void captureExposureGain(unsigned exp,unsigned gain);
     void setEnabled(bool enabled);
     void setChannel(int option);
     MultiCameraInfo cameraInfo() const;

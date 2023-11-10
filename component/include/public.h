@@ -59,10 +59,9 @@
 #include "doubleslider.h"
 #include "circle.h"
 #include "photocanvas.h"
+#include "windowinfo.h"
 
-#include "qtimer.h"
 #include "qtextcodec.h"
-#include "qprocess.h"
 
 // (2) 常量定义
 

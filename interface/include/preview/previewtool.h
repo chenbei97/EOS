@@ -56,6 +56,7 @@ signals:
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
     void captureImage(const QImage& img,const QString& channel);
+    void exposureGainCaptured(unsigned exp,unsigned gain);
 };
 
 #endif //EOSI_PREVIEWTOOL_H

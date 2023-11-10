@@ -64,10 +64,12 @@ private:
     void processCallback(unsigned nEvent);
     void captureLiveImage();
     void captureStillImage();
+    void exposureEvent();
     void print_imageInfo(ToupcamFrameInfoV3* info);
 signals:
     //void imageCaptured(const ImageInfo& info);
     void imageCaptured(const QImage& img);
+    void exposureGainCaptured(unsigned exp,unsigned gain);
 signals:
     void evtCallback(unsigned nEvent);
 };

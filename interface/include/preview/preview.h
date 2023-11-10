@@ -36,8 +36,8 @@ public:
 private:
     PreviewInfo previewinfo;
     CameraMode * cameramode;
-    PhotoCanvas * livecanvas;
-    //Label * livecanvas;
+    //PhotoCanvas * livecanvas;
+    Label * livecanvas;
     PhotoCanvas * photocanvas;
     ViewPattern * viewpattern;
     QStackedWidget * stack;

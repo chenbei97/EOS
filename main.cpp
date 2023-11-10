@@ -7,6 +7,7 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "test/test.h"
+//#include <windows.h>
 
 SQLType CurrentSqlType; // 必须定义
 
@@ -15,7 +16,6 @@ void initApp(QApplication& a);
 
 int main(int argc, char *argv[]) {
     LogInit;
-
     QApplication a(argc, argv);
     initApp(a);
     //StartPythonPointer->start("../test","test_socket","test_server");
@@ -29,8 +29,9 @@ int main(int argc, char *argv[]) {
     test_tcp();
 #else
     MainWindow w;
-    //StartPythonxPointer->start("../test","test_socket","test_server");
     setWindowAlignCenter(&w);
+//    Label w;
+//    w.setPixmap(QPixmap(CURRENT_PATH+"/images/cell.png"));
     w.show();
 
 #endif
@@ -52,6 +53,4 @@ void initApp(QApplication& a)
     a.setWindowIcon(QApplication::style()->standardIcon(QStyle::SP_DesktopIcon));
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     //QTimer::singleShot(0,qApp,SLOT(quit()));
-    QObject::connect(qApp,&QApplication::aboutToQuit, []{StartPythonPointer->quit();});
-    //connect(&a,&QApplication::aboutToQuit,)
 }
