@@ -22,10 +22,12 @@ private: // 动作菜单
     int mcols = 0;
     QAction * saveviewact;
     QAction * removeviewact;
+    QAction * applyholeact;
     QAction * applygroupact;
     QAction * applyallact;
     void onRemoveViewAct();
     void onSaveViewAct();// 保存选择的视野到当前孔id对应的视野数据区并保存到临时信息用于initSelectPoints重新初始化
+    void onApplyHoleAct(); // 选点和删点时都会触发,应用到当前孔
     void onApplyGroupAct();//传递视野窗口的组名+组颜色+视野尺寸+当前孔坐标+所有视野坐标信息+更新同组其它孔的视野信息和临时信息
     void onApplyAllAct();
     /*鼠标右击,鼠标释放,构造函数,setStrategy,onSaveViewAct,onRemoveViewAct控制使能*/
@@ -73,6 +75,7 @@ private: // 绘制视野正方形区域所有需要计算的东西,定义在view
 signals:
     void mouseClicked(const QPoint& point);
     void previewEvent(const QPoint& point); // 单击非框选时是预览
+    void applyHoleEvent(const QVariantMap&m);
     void applyGroupEvent(const QVariantMap&m);
     void applyAllEvent(const QVariantMap&m);
 };

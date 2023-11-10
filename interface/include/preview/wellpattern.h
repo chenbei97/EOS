@@ -36,6 +36,7 @@ public:
 
     QSet<QString> getAllWellGroupNames() const;// 返回所有分过的组,不重复
     void updateHoleInfoByGroupInfo(QCVariantMap m);// 右击打开分组窗口的信息(color+name)拿去更新孔数据
+    void updateHoleInfoByViewInfoApplyHole(QCVariantMap m);
     void updateHoleInfoByViewInfoApplyGroup(QCVariantMap m); // 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
     void updateHoleInfoByViewInfoApplyAll(QCVariantMap m);
 private:

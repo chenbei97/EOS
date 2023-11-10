@@ -65,7 +65,7 @@ void Preview::updateViewPatternUi()
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
     dock->setWindowTitle(tr("选择孔内视野"));
     // 4. 视野尺寸/孔板尺寸 变的话所有信息都重新初始化
-    //pattern->initHoleInfo();
+    pattern->initHoleInfo();
 }
 
 void Preview::updateSetGroupWindow(const QVariantMap& m)

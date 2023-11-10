@@ -11,6 +11,7 @@
 #define EOS_MAIN_CORE_PY_PYTHONPROCESS_H
 
 #include "window.h"
+#include "Python.h"
 
 class INTERFACE_IMEXPORT PythonProcess: public QObject
 {

@@ -39,7 +39,7 @@ void Preview::onWellbrandChanged(int option)
 void Preview::onObjectiveChanged(const QString& obj)
 {
     LOG<<"objective option = "<<obj;
-    //updateViewPatternUi();
+    updateViewPatternUi();
 }
 
 void Preview::setAppInfo(int app)
@@ -145,6 +145,7 @@ void Preview::initConnections()
     connect(pattern,&WellPattern::mouseClicked,this,&Preview::previewViewByClickHole); // 点击孔也触发预览
     connect(pattern,&WellPattern::clearViewWindowCache,viewpattern,&ViewPattern::clearViewWindowCache);
 
+    connect(viewpattern,&ViewPattern::applyHoleEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyHole);
     connect(viewpattern,&ViewPattern::applyGroupEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyGroup); // 按组更新孔窗口的信息
     connect(viewpattern,&ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不安组更新孔窗口的信息
     connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览

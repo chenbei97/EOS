@@ -15,6 +15,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     savebtn = new PushButton(tr("保存当前通道设置"));
     combinebtn = new PushButton(tr("组合通道"));
     capturebtn = new PushButton(tr("拍照"));
+    setEnabled(false); // 初始没开灯不能使用
 
     auto blay = new QHBoxLayout;
     blay->addStretch();
@@ -98,6 +99,7 @@ void CameraBox::setEnabled(bool enabled)
     cameratool->setEnabled(enabled);
     savebtn->setEnabled(enabled);
     currentchannel->setEnabled(enabled);
+    capturebtn->setEnabled(enabled);
 }
 
 void CameraBox::setChannel(int option)

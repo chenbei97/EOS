@@ -81,9 +81,9 @@ void WellPattern::setPatternSize(int rows, int cols)
 }
 
 void WellPattern::initDrapPoints()
-{ // 清除拖拽区域
+{ // 清除拖拽区域,pressEvent会调用1次
     mDrapRect = QRectF();
-    mMousePos = {-1,-1};
+    //mMousePos = {-1,-1};
     mDrapPoints.clear();
     for(int row = 0 ; row < mrows; ++ row) {
         QBoolVector var;

@@ -62,7 +62,7 @@ void Preview::adjustCamera(int exp,int gain,int br)
     auto current_channel = toolinfo[CurrentChannelField].toString();
 
     if (current_channel.isEmpty()) {
-        LOG<<"have no channel";
+        LOG<<"没有通道的灯被打开,不执行滑动条的参数调整!";
         return; // 如果通道无效,没有开灯,调节参数没有意义,不发给下位机
     }
 

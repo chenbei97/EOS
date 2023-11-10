@@ -127,7 +127,34 @@ void WellPattern::onOpenViewAct()
     }
 }
 
-// (4) 被视野对话框的应用组信息反过来更新孔信息
+// (4) 被视野对话框的应用孔信息反过来更新孔信息
+void WellPattern::updateHoleInfoByViewInfoApplyHole(QCVariantMap m)
+{ // 删点或者保存点就应用到本孔
+    // 1. 拿到应用到组视野窗口传递来的6个信息(ViewPattern::onApplyGroupAct) 关键信息4个
+    auto groupName = m[HoleGroupNameField].toString();
+    auto groupColor = m[HoleGroupColorField].toString();
+    auto coordinate = m[HoleCoordinateField].toPoint();
+    auto viewsize = m[HoleViewSizeField].toSize();
+    auto viewpoints = m[HoleViewPointsField].value<QPointVector>();
+    auto allgroup = m[WellAllGroupsField].value<QSet<QString>>();
+    auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
+
+    //LOG<<coordinate<<viewpoints;
+    // 2. 把信息更新到本孔
+    auto holeinfo = mHoleInfo[coordinate.x()][coordinate.y()];
+    Q_ASSERT(holeinfo.coordinate == coordinate); // 孔坐标和当前传递的孔坐标相同
+    Q_ASSERT(holeinfo.color == groupColor); // 孔颜色相同
+    //Q_ASSERT(holeinfo.isselected == true); // 不肯定是被选中的孔,切换objective时会更新mrows,此时isselected可能false
+    Q_ASSERT(holeinfo.allgroup == allgroup);// 这个是一定相等
+    Q_ASSERT(holeinfo.allcoordinate == allcoordinates); // 同理
+    holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
+    holeinfo.viewpoints = viewpoints; // 本组应用的视野数量和位置信息
+    holeinfo.viewsize = viewsize; // 本组应用的视野尺寸
+    mHoleInfo[coordinate.x()][coordinate.y()] = holeinfo;
+    update();
+}
+
+// (5) 被视野对话框的应用组信息反过来更新孔信息
 void WellPattern::updateHoleInfoByViewInfoApplyGroup(QCVariantMap m)
 {// 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
     // 数据包括视野窗口的组名+组颜色+视野尺寸+当前孔坐标+所有组名+所有视野坐标信息
@@ -165,7 +192,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyGroup(QCVariantMap m)
     update();
 }
 
-// (4) 被视野对话框的应用所有组信息反过来更新孔信息
+// (6) 被视野对话框的应用所有组信息反过来更新孔信息
 void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
 { // 组颜色+视野尺寸+视野坐标 3个关键信息足够 + 孔板所有孔坐标
     auto groupColor = m[HoleGroupColorField].toString();
@@ -190,7 +217,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
     update();
 }
 
-// (5) 删孔逻辑
+// (7) 删孔逻辑
 void WellPattern::onRemoveHoleAct()
 { // 删孔就是清除当前鼠标的孔信息为默认即可
   // 双击该孔出现视野对话框或者打开分组对话框都是以这个孔信息为准的

@@ -20,6 +20,18 @@
 #include "qdesktopwidget.h"
 #include "qmainwindow.h"
 
+/*w_chart*,char* 互转*/
+static void charTowchar(const QString& src,wchar_t * dest, int size)
+{
+    swprintf(dest,size,L"%S",src.toStdString().c_str());
+}
+
+static void wcharTochar(wchar_t * src,char * dest, int size)
+{
+    //wcstombs(dest,src,size);
+    sprintf(dest,"%S",src);
+}
+
 /*居中对齐窗口*/
 #define UserScreenWidth (QApplication::desktop()->screenGeometry().width())
 #define UserScreenHeight (QApplication::desktop()->screenGeometry().height())

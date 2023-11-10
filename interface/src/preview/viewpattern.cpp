@@ -148,6 +148,9 @@ void ViewPattern::onSaveViewAct()
 
     // 5. 每次保存视野的数量位置信息都保存到临时信息,用于更新下次的重新保存的初始化(initSelectPoints内更新)
     mTmpViewSelectPoints[idx] = mViewSelectPoints[idx]; // 临时保存这次设置
+
+    applyholeact->trigger();
+
     update();
 }
 
@@ -184,7 +187,40 @@ void ViewPattern::onRemoveViewAct()
         removeviewact->setEnabled(false);
     }
 
+    applyholeact->trigger();
     update();
+}
+
+void ViewPattern::onApplyHoleAct()
+{
+    // 1. 当前孔没有分过组或者没有保存过点不允许触发应用到孔事件
+    if (mCurrentViewInfo[HoleGroupNameField].toString().isEmpty() || !viewPointCount())
+        return; // 多加一层保护总没坏处
+
+    // 2. 组装组名+组颜色+视野尺寸+当前孔坐标+已有的所有组+本孔选择的所有视野坐标 6个信息 4个关键信息
+    QVariantMap m;
+    m[HoleGroupNameField] = mCurrentViewInfo[HoleGroupNameField];// 组装组名称,方便pattern依据组名查找所有孔
+    m[HoleGroupColorField] = mCurrentViewInfo[HoleGroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
+    m[HoleViewSizeField] = mCurrentViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
+    m[HoleCoordinateField] = mCurrentViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
+    m[WellAllGroupsField] = mCurrentViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
+    m[WellAllHolesField] = mCurrentViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
+
+    // 3. 组装当前孔选择的所有视野坐标信息
+    auto coordinate = mCurrentViewInfo[HoleCoordinateField].toPoint();// 当前孔坐标
+    auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
+    QPointVector viewpoints;
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            if (mViewSelectPoints[idx][row][col]) {
+                viewpoints.append(QPoint(row,col)); // 当前孔选择的全部视野坐标
+            }
+        }
+    }
+    m[HoleViewPointsField].setValue(viewpoints);
+    emit applyHoleEvent(m);
+
+    // 4. 本组或其他组的其他孔不需要更新缓存信息
 }
 
 void ViewPattern::onApplyGroupAct()
@@ -397,10 +433,12 @@ ViewPattern::ViewPattern(QWidget *parent) : QWidget(parent)
     //initSelectPoints();//无需调用,因为当前孔未知
     saveviewact = new QAction(tr("选点"));
     removeviewact = new QAction(tr("删点"));
+    applyholeact = new QAction(tr("应用到本孔"));
     applygroupact = new QAction(tr("应用到本组"));
     applyallact = new QAction(tr("应用到所有组"));
     addAction(saveviewact);
     addAction(removeviewact);
+    //addAction(applyholeact); // 不显式添加
     addAction(applygroupact);
     addAction(applyallact);
     setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -412,6 +450,7 @@ ViewPattern::ViewPattern(QWidget *parent) : QWidget(parent)
 
     connect(saveviewact,&QAction::triggered,this,&ViewPattern::onSaveViewAct);
     connect(removeviewact,&QAction::triggered,this,&ViewPattern::onRemoveViewAct);
+    connect(applyholeact,&QAction::triggered,this,&ViewPattern::onApplyHoleAct);
     connect(applygroupact,&QAction::triggered,this,&ViewPattern::onApplyGroupAct);
     connect(applyallact,&QAction::triggered,this,&ViewPattern::onApplyAllAct);
 }

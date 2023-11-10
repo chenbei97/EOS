@@ -17,7 +17,25 @@ PythonProcess::PythonProcess(QObject*parent): QObject(parent)
         process->close();
         process->waitForFinished();
         LOG<<"python process is kill? "<<!process->isOpen();
+//        Py_Finalize();
     });
+    Py_Initialize();
+    if (!Py_IsInitialized()){LOG << "inital python failed!";
+    }else LOG << "inital python successful!";
+    QString python_path = (CURRENT_PATH+"/python310/");
+    wchar_t path[128] = {0};
+    charTowchar(python_path,path,128);
+    Py_SetPythonHome(path);
+    Py_SetPath(path);
+    char buf1[128] = {0};
+    wcharTochar(Py_GetPythonHome(),buf1,128);
+    char buf2[128] = {0};
+    wcharTochar(Py_GetPath(),buf2,128);
+    LOG<<"python home: "<<buf1;
+    LOG<<"python path: "<<buf2;
+    PyRun_SimpleString("import os,sys");
+    PyRun_SimpleString("print(os.getcwd())");
+    PyRun_SimpleString("sys.path.append('./python310')");
 }
 
 void PythonProcess::start(const QString& path)
