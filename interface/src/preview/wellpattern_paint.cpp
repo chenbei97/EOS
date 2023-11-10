@@ -56,7 +56,7 @@ QRectF2DVector WellPattern::getHoleRectsOnViewSize(int x,int y) const
 
 void WellPattern::paintEvent(QPaintEvent *event)
 {
-    LOG<<mrows<<mcols<<mHoleInfo.count()<<mHoleInfo[0].count()<<mMousePos;
+    //LOG<<mrows<<mcols<<mHoleInfo.count()<<mHoleInfo[0].count()<<mMousePos;
     Pattern::paintEvent(event);
 
     auto cell_size = getChildSize();
@@ -149,6 +149,5 @@ void WellPattern::paintEvent(QPaintEvent *event)
         pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
         painter.setPen(pen);
     }
-    LOG<<789;
     event->accept();
 }

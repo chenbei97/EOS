@@ -59,7 +59,7 @@ void Preview::updateViewPatternUi()
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
     // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
-    LOG<<manufacturer<<brand<<objective;
+    LOG<<manufacturer<<brand<<objective<<size;
     viewpattern->clearAllViewWindowCache(size);
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
