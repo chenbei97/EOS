@@ -46,24 +46,22 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
 
     process = new PythonProcess;
-    //process->start("Eos_I/Eos_main.py");
-    process->start("../test/test_socket.py");
-
+#ifndef  use_testSocket
+    process->start("Eos_I/Eos_main.py");
     //StartPythonPointer->start("Eos_I","Eos_main","main");
+#else
+    process->start("../test/test_socket.py");
     //StartPythonPointer->start("../test","test_socket","test_server");
-
+#endif
 }
 
 void MainWindow::navigbarSelect(int id)
 {
     stack->setCurrentIndex(id);
 #ifdef notusetoupcamera
-    if (id == 1) preview->openCamera();
-        else  preview->closeCamera();
+    if (preview->isCameraOpen()) return;
+    else  preview->openCamera();
 #else
-//    if (id == 1)
-//        ToupCameraPointer->openCamera();
-//    else  ToupCameraPointer->closeCamera();
     if (ToupCameraPointer->isOpen()) return;
     ToupCameraPointer->openCamera();
 #endif

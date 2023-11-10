@@ -20,6 +20,8 @@
 #include "startpythonx.h"
 #include "pythonprocess.h"
 
+#define use_testSocket 0
+
 class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 {
     Q_OBJECT

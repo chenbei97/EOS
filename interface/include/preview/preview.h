@@ -17,6 +17,9 @@
 #include "viewpattern.h"
 #include "summarydialog.h"
 
+#define notusetoupcamera 0
+//#define uselabelcanvas 0
+
 #ifdef notusetoupcamera
 #include "toupcam.h"
 #else
@@ -30,14 +33,21 @@ public:
     explicit Preview(QWidget*parent= nullptr);
     void setAppInfo(int app);// 用于appselect传递当前app信息
 #ifdef notusetoupcamera
+    bool isCameraOpen() const;
     void openCamera();
     void closeCamera();
+    bool haveCamera() const;
+    unsigned cameraCount() const;
 #endif
 private:
     PreviewInfo previewinfo;
     CameraMode * cameramode;
-    //PhotoCanvas * livecanvas;
+    QTimer timer;
+#ifdef uselabelcanvas
     Label * livecanvas;
+#else
+    PhotoCanvas * livecanvas;
+#endif
     PhotoCanvas * photocanvas;
     ViewPattern * viewpattern;
     QStackedWidget * stack;
@@ -50,14 +60,14 @@ private:
 private:
 #ifdef notusetoupcamera
     HToupcam toupcam = nullptr;
-    ToupcamDeviceV2 * camera = nullptr;
+    ToupcamDeviceV2  camera ;
     QSharedPointer<uchar> imgdata = nullptr;
     QSize cameraResolution;
     static void __stdcall eventCallBack(unsigned nEvent, void* ctxEvent);
     void processCallback(unsigned nEvent);
     void captureLiveImage();
+    void exposureEvent();
     QImage capture();
-    QSize resolution() const;
     void setByteOrder(int option);
     int byteOrder() const;
     void setRgbBit(int option);

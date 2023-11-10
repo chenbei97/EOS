@@ -101,8 +101,12 @@ void PhotoCanvas::setData(const QVariantMap &m)
 
 void PhotoCanvas::setImage(const QImage &img)
 {
-    mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
-    //update();
+    if (!img.isNull())
+        mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+    else
+        mimage = QImage();
+    repaint();
+
 }
 
 PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
@@ -113,6 +117,8 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
     mMouseClickColor.setAlpha(DefaultColorAlpha);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    connect(&timer,&QTimer::timeout,[this]{update();});
+    static bool flag = false;
+    connect(&timer,&QTimer::timeout,[this]{setUpdatesEnabled(flag);flag=!flag;});
     timer.start(50);// 绘制太快导致出问题
+
 }

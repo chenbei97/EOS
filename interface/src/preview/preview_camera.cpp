@@ -10,81 +10,6 @@
 
 #ifdef notusetoupcamera
 
-void Preview::openCamera()
-{
-    if (toupcam){
-        closeCamera();
-    }
-    ToupcamDeviceV2 devicelist[TOUPCAM_MAX] ={0};
-    auto devicecount = Toupcam_EnumV2(devicelist);
-    if (devicecount > 0) {
-        camera = &devicelist[0];
-        LOG<<"open camera id = "<<camera->id;
-        toupcam = Toupcam_Open(camera->id); // id是w_char类型
-        if (toupcam) {
-            cameraResolution = resolution();
-            setRgbBit(0); // 24bit
-            setByteOrder(0); // rgb
-            setExposureOption(1); // auto continuity exposure
-            setExposure(244);
-            setGain(120);
-            allocateImageBuffer();
-            if (SUCCEEDED(Toupcam_StartPullModeWithCallback(toupcam,eventCallBack,this))){
-                LOG<<"start camera successful!";
-            } else {
-                LOG<<"start camera failed!";
-                closeCamera();
-            }
-        }
-    }
-}
-
-void Preview::closeCamera()
-{
-    LOG<<"close camera";
-    if (toupcam)
-    {
-        Toupcam_Close(toupcam);
-        //delete toupcam; // close时已经释放了无需手动释放
-        toupcam = nullptr;
-    }
-    if (imgdata) {
-
-        if (imgdata.get()) {
-            //delete imgdata.get(); // 不需要手动去删除,智能指针会在需要的时候删除的
-            imgdata.clear();
-            imgdata = nullptr;
-        }
-    }
-}
-
-void Preview::eventCallBack(unsigned int nEvent, void *ctxEvent)
-{ // 事件回调函数
-    //Q_ASSERT(ctxEvent == ToupCameraPointer);
-    Preview* pThis = reinterpret_cast<Preview*>(ctxEvent);
-    emit pThis->evtCallback(nEvent);
-    //ToupCameraPointer->evtCallback(nEvent);//必须强转不能用这个
-}
-
-void Preview::processCallback(unsigned int nEvent)
-{
-    if (!toupcam) return;
-    if (nEvent == TOUPCAM_EVENT_IMAGE)
-        captureLiveImage();
-}
-
-QImage Preview::capture()
-{
-    QImage img;
-    if (toupcam) {
-        if (imgdata) {
-            auto image = QImage(imgdata.get(), cameraResolution.width(), cameraResolution.height(), QImage::Format_RGB888);
-            img = image.scaled(photocanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
-        }
-    }
-    return img;
-}
-
 void Preview::captureLiveImage()
 {
     if (!toupcam) return;
@@ -100,9 +25,34 @@ void Preview::captureLiveImage()
         auto image = QImage(imgdata.get(), info.width, info.height, QImage::Format_RGB888);
         //auto img = image.scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
         // 在这做图像缩放会卡,应该转移出去
-        auto img = image.scaled(QSize(400,400),Qt::KeepAspectRatio,Qt::FastTransformation);
-        livecanvas->setPixmap(QPixmap::fromImage(img));
+#ifdef uselabelcanvas
+        livecanvas->setPixmap(QPixmap::fromImage(image));
+#else
+        livecanvas->setImage(image);
+#endif
     }
+}
+
+QImage Preview::capture()
+{ // 拍照时获取一帧图像
+    QImage img;
+    if (toupcam) {
+        if (imgdata) {
+            auto image = QImage(imgdata.get(), cameraResolution.width(), cameraResolution.height(), QImage::Format_RGB888);
+            img = image.scaled(photocanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
+        }
+    }
+    return img;
+}
+
+void Preview::exposureEvent()
+{
+    unsigned time = 0;
+    unsigned short gain = 0;
+    Toupcam_get_ExpoTime(toupcam, &time);
+    Toupcam_get_ExpoAGain(toupcam, &gain);
+
+    toolbar->exposureGainCaptured(time,gain);
 }
 
 void Preview::setRgbBit(int option)
@@ -197,23 +147,6 @@ void Preview::allocateImageBuffer()
 
 }
 
-QSize Preview::resolution() const
-{
-    if (!toupcam) return QSize(-1,-1);
-
-    // 有相机的话,camera/toupcam不是nullptr
-    //获取视频分辨率的索引,0=(2048,1536),1=(1024,768),2=(680,510)
-    unsigned resolutionIndex = 0;
-    Toupcam_get_eSize(toupcam, &resolutionIndex);
-    //LOG<<"resolutionIndex"<<resolutionIndex;
-
-    // ToupcamResolution存了该相机的分辨率
-    unsigned imgWidth = camera->model->res[resolutionIndex].width;
-    unsigned imgHeight = camera->model->res[resolutionIndex].height;
-
-    return QSize(imgWidth,imgHeight);
-}
-
 void Preview::setByteOrder(int option)
 { // 0-RGB 1-BGR
     if (option != 0 || option != 1 || !toupcam) return;
@@ -276,4 +209,87 @@ ushort Preview::gain() const
     return g;
 }
 
+bool Preview::isCameraOpen() const
+{
+    LOG<<"camera is open? "<<(toupcam!= nullptr);
+    return toupcam != nullptr;
+}
+
+void Preview::openCamera()
+{
+    if (toupcam){
+        closeCamera();
+    }
+    ToupcamDeviceV2 devicelist[TOUPCAM_MAX] ={0};
+    auto devicecount = Toupcam_EnumV2(devicelist);
+    if (devicecount == 1) {
+        camera = devicelist[0];
+        LOG<<"open camera id = "<<camera.id;
+        toupcam = Toupcam_Open(camera.id); // id是w_char类型
+        if (toupcam) {
+            unsigned resolutionIndex;
+            Toupcam_get_eSize(toupcam, &resolutionIndex);
+            cameraResolution = QSize(camera.model->res[resolutionIndex].width,
+                                     camera.model->res[resolutionIndex].height);
+            setRgbBit(0); // 24bit
+            setByteOrder(0); // rgb
+            setExposureOption(0); // 初始设置是不使用自动曝光
+            setExposure(244);
+            setGain(120);
+            allocateImageBuffer();
+            if (SUCCEEDED(Toupcam_StartPullModeWithCallback(toupcam,eventCallBack,this))){
+                LOG<<"start camera successful!";
+            } else {
+                LOG<<"start camera failed!";
+                closeCamera();
+            }
+        }
+    }
+}
+
+void Preview::closeCamera()
+{
+    LOG<<"close camera";
+    if (toupcam)
+    {
+        Toupcam_Close(toupcam);
+        //delete toupcam; // close时已经释放了无需手动释放
+        toupcam = nullptr;
+    }
+    if (imgdata) {
+
+        if (imgdata.get()) {
+            //delete imgdata.get(); // 不需要手动去删除,智能指针会在需要的时候删除的
+            imgdata.clear();
+            imgdata = nullptr;
+        }
+    }
+}
+
+unsigned Preview::cameraCount() const
+{
+    ToupcamDeviceV2 devicelist[TOUPCAM_MAX] ={0};
+    auto devicecount = Toupcam_EnumV2(devicelist);
+    return devicecount;
+}
+
+bool Preview::haveCamera() const
+{
+    return cameraCount() != 0;
+}
+
+void Preview::eventCallBack(unsigned int nEvent, void *ctxEvent)
+{ // 事件回调函数
+    //Q_ASSERT(ctxEvent == ToupCameraPointer);
+    Preview* pThis = reinterpret_cast<Preview*>(ctxEvent);
+    emit pThis->evtCallback(nEvent);
+    //ToupCameraPointer->evtCallback(nEvent);//必须强转不能用这个
+}
+
+void Preview::processCallback(unsigned int nEvent)
+{
+    if (!toupcam) return;
+    if (nEvent == TOUPCAM_EVENT_IMAGE)
+        captureLiveImage();
+}
 #endif

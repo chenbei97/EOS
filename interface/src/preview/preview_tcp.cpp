@@ -65,9 +65,13 @@ void Preview::adjustCamera(int exp,int gain,int br)
         LOG<<"没有通道的灯被打开,不执行滑动条的参数调整!";
         return; // 如果通道无效,没有开灯,调节参数没有意义,不发给下位机
     }
-
+#ifndef notusetoupcamera
     ToupCameraPointer->setExposure(exp);
     ToupCameraPointer->setGain(gain);
+#else
+    setExposure(exp);
+    setGain(gain);
+#endif
     // 滑动条速度很快,这里组装不再通过Assembler来组装,可能同步会出问题,直接组装
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0005;
@@ -88,14 +92,21 @@ void Preview::onAdjustCamera(const QString & f,const QVariant & d)
     }
 }
 
+#ifndef notusetoupcamera
 void Preview::showCapturedImage(const QImage& image)
 {
-//    QVariantMap m;
-//    m[ImageField] = image;
-//    livecanvas->setData(m);
-    //livecanvas->setImage(image);
-    livecanvas->setPixmap(QPixmap::fromImage(image));
+#ifdef uselabelcanvas
+    auto pix = QPixmap::fromImage(image).scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
+    livecanvas->setPixmap(pix);
+    livecanvas->repaint();
+#else
+    // QVariantMap m;
+    // m[ImageField] = image;
+    // livecanvas->setData(m);
+    livecanvas->setImage(image);
+#endif
 }
+#endif
 
 void Preview::takingPhoto()
 {
@@ -125,19 +136,24 @@ void Preview::takingPhoto()
 //    // 等待回复后调用相机拍照
 //    if (ParserResult.toBool()) {
 
-#ifndef usetoupcamera
+#ifndef notusetoupcamera
         ToupCameraPointer->setExposure(exp);
         ToupCameraPointer->setGain(ga);
         auto pix = ToupCameraPointer->capture();
         auto current_channel = toolinfo[CurrentChannelField].toString();
         toolbar->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
+        LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
+        <<" 曝光和增益为 "<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
 #else
         setExposure(exp);
         setGain(ga);
         auto pix = capture();
-#endif
+        auto current_channel = toolinfo[CurrentChannelField].toString();
+        toolbar->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
         LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
-        <<" 曝光和增益为 "<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
+       <<" 曝光和增益为 "<<exposure()<<gain();
+#endif
+
         cameramode->changeMode(CameraMode::PhotoMode);
         photocanvas->setImage(pix);
 //    }
@@ -164,12 +180,16 @@ void Preview::previewViewByClickView(const QPoint &viewpoint)
     auto bright = current_info[BrightField];
 
     // 自己需要的相机参数
-    int exposure = current_info[ExposureField].toUInt();
-    int gain = current_info[GainField].toUInt();
+    int exp = current_info[ExposureField].toUInt();
+    int ga = current_info[GainField].toUInt();
     //LOG<<wellsize<<viewpoint<<holecoordinate<<bright<<current_channel;
-    ToupCameraPointer->setExposure(exposure);
-    ToupCameraPointer->setGain(gain);
-
+#ifndef notusetoupcamera
+    ToupCameraPointer->setExposure(exp);
+    ToupCameraPointer->setGain(ga);
+#else
+    setExposure(exp);
+    setGain(ga);
+#endif
     QVariantMap m;
     m[ObjectiveField] = objective;
     m[BrandField] = brand;
@@ -212,11 +232,15 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     auto bright = current_info[BrightField];
 
     // 自己需要的相机参数
-    int exposure = current_info[ExposureField].toUInt();
-    int gain = current_info[GainField].toUInt();
-    ToupCameraPointer->setExposure(exposure);
-    ToupCameraPointer->setGain(gain);
-
+    int exp = current_info[ExposureField].toUInt();
+    int ga = current_info[GainField].toUInt();
+#ifndef notusetoupcamera
+    ToupCameraPointer->setExposure(exp);
+    ToupCameraPointer->setGain(ga);
+#else
+    setExposure(exp);
+    setGain(ga);
+#endif
     QVariantMap m;
     m[ObjectiveField] = objective;
     m[BrandField] = brand;
@@ -300,11 +324,19 @@ void Preview::loadExper()
     auto json = AssemblerPointer->message();
 
     SocketPointer->exec(TcpFramePool.frame0x0001,json);
+#ifndef notusetoupcamera
     ToupCameraPointer->closeCamera();
+#else
+    closeCamera();
+#endif
     if (ParserResult.toBool()) {
         QMessageBox::information(this,InformationChinese,tr("启动实验成功!"));
-//        livecanvas->setImage(QImage());
+
+#ifdef uselabelcanvas
         livecanvas->setPixmap(QPixmap());
+#else
+        livecanvas->setImage(QImage());
+#endif
         photocanvas->setImage(QImage());
     }
 }

@@ -161,10 +161,12 @@ void Preview::initAttributes()
 
     pattern->setMinimumHeight(PreviewPatternMinHeight);
 
-    //livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
     photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
-    livecanvas->setMaximumWidth(1000);
-    livecanvas->setMaximumHeight(800);
+#ifdef uselabelcanvas
+    livecanvas->setAlignment(Qt::AlignCenter);
+#else
+    livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
+#endif
 
     //previewinfo[PreviewToolField] = toolbar->toolInfo();
     //previewinfo[PreviewPatternField] = pattern->patternInfo();
@@ -173,8 +175,11 @@ void Preview::initAttributes()
 void Preview::initObjects()
 {
     cameramode = new CameraMode;
-    //livecanvas = new PhotoCanvas;
+#ifdef uselabelcanvas
     livecanvas = new Label;
+#else
+    livecanvas = new PhotoCanvas;
+#endif
     photocanvas = new PhotoCanvas;
     stack = new QStackedWidget;
     pattern = new WellPattern(2,3);
@@ -221,4 +226,15 @@ void Preview::initConnections()
     connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
 
     connect(this,&Preview::objectiveSettingChanged,toolbar,&PreviewTool::objectiveSettingChanged);
+
+#ifndef notusetoupcamera
+    connect(&timer,&QTimer::timeout,this,[=]{
+        QImage img1(CURRENT_PATH+"/images/cell.png");
+        QImage img2(CURRENT_PATH+"/images/test.jpeg");
+        static long count = 0;
+        count %2 ? showCapturedImage(img1):showCapturedImage(img2);
+        count ++;
+    });
+    timer.start(10);
+#endif
 }

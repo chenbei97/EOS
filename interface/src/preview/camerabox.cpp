@@ -97,9 +97,12 @@ void CameraBox::captureImage(const QImage &img, const QString &channel)
 
 void CameraBox::captureExposureGain(unsigned int exp, unsigned int gain)
 {
-    LOG<<"回显值: "<<exp<<gain;
-    cameratool->setExposure(exp);
-    cameratool->setGain(gain);
+    {
+        LOG<<"回显值: "<<exp<<gain;
+        const QSignalBlocker blocker(cameratool);
+        cameratool->setExposure(exp);
+        cameratool->setGain(gain);
+    }
 }
 
 void CameraBox::setEnabled(bool enabled)

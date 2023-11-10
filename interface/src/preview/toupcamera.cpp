@@ -9,59 +9,6 @@
 
 #include "toupcamera.h"
 
-ToupCamera& ToupCamera::instance()
-{
-    static ToupCamera instance;
-    return instance;
-}
-
-ToupCamera::ToupCamera(QObject*parent):QObject(parent)
-{
-    Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持
-    connect(this, &ToupCamera::evtCallback, this, &ToupCamera::processCallback);
-}
-
-void ToupCamera::eventCallBack(unsigned int nEvent, void *ctxEvent)
-{ // 事件回调函数
-    //Q_ASSERT(ctxEvent == ToupCameraPointer);
-    ToupCamera* pThis = reinterpret_cast<ToupCamera*>(ctxEvent);
-    emit pThis->evtCallback(nEvent);
-    //ToupCameraPointer->evtCallback(nEvent);//必须强转不能用这个
-}
-
-void ToupCamera::processCallback(unsigned int nEvent)
-{
-    if (!toupcam) return;
-    switch (nEvent) {
-        case TOUPCAM_EVENT_IMAGE:
-            captureLiveImage();
-            break;
-        case TOUPCAM_EVENT_STILLIMAGE:
-            captureStillImage();
-            break;
-        case TOUPCAM_EVENT_EXPOSURE:
-            exposureEvent();
-            break;
-        case TOUPCAM_EVENT_TEMPTINT:
-            break;
-        case TOUPCAM_EVENT_DISCONNECTED:
-            break;
-        case TOUPCAM_EVENT_ERROR:
-            break;
-    }
-}
-
-QImage ToupCamera::capture()
-{
-    QImage img;
-    if (toupcam) {
-        if (imgdata) {
-            img = QImage(imgdata.get(), resolution.width(), resolution.height(), QImage::Format_RGB888);
-        }
-    }
-    return img;
-}
-
 void ToupCamera::captureLiveImage()
 {
     if (!toupcam) return;
@@ -94,15 +41,15 @@ void ToupCamera::captureLiveImage()
 //    }
 }
 
-void ToupCamera::captureStillImage()
-{
-//    if (!toupcam) return;
-//    int bits = rgbBit(); // 默认就是24bit
-//    ToupcamFrameInfoV2 info;
-//    if (SUCCEEDED(Toupcam_PullStillImageV2(toupcam,imgdata.get(),bits,&info))) {
-//        QImage image(imgdata.get(), info.width, info.height, QImage::Format_RGB888);
-//        //
-//    }
+QImage ToupCamera::capture()
+{// 拍照时获取一帧图像
+    QImage img;
+    if (toupcam) {
+        if (imgdata) {
+            img = QImage(imgdata.get(), resolution.width(), resolution.height(), QImage::Format_RGB888);
+        }
+    }
+    return img;
 }
 
 void ToupCamera::exposureEvent()
@@ -113,6 +60,17 @@ void ToupCamera::exposureEvent()
     Toupcam_get_ExpoAGain(toupcam, &gain);
 
     emit exposureGainCaptured(time,gain);
+}
+
+void ToupCamera::captureStillImage()
+{
+//    if (!toupcam) return;
+//    int bits = rgbBit(); // 默认就是24bit
+//    ToupcamFrameInfoV2 info;
+//    if (SUCCEEDED(Toupcam_PullStillImageV2(toupcam,imgdata.get(),bits,&info))) {
+//        QImage image(imgdata.get(), info.width, info.height, QImage::Format_RGB888);
+//        //
+//    }
 }
 
 void ToupCamera::print_imageInfo(ToupcamFrameInfoV3* info)
@@ -145,7 +103,7 @@ void ToupCamera::openCamera()
                                camera.model->res[resolutionIndex].height);
             setRgbBit(0); // 24bit
             setByteOrder(0); // rgb
-            setExposureOption(0); // auto continuity exposure
+            setExposureOption(0); // 初始设置是不使用自动曝光
             setExposure(244);
             setGain(120);
 //            if (imgdata) {
@@ -407,4 +365,46 @@ ValueRangeUShort ToupCamera::getGainRange() const
                                &s.def);
     LOG<<"gain range: "<<s;
     return s;
+}
+
+void ToupCamera::processCallback(unsigned int nEvent)
+{
+    if (!toupcam) return;
+    switch (nEvent) {
+        case TOUPCAM_EVENT_IMAGE:
+            captureLiveImage();
+            break;
+        case TOUPCAM_EVENT_STILLIMAGE:
+            captureStillImage();
+            break;
+        case TOUPCAM_EVENT_EXPOSURE:
+            exposureEvent();
+            break;
+        case TOUPCAM_EVENT_TEMPTINT:
+            break;
+        case TOUPCAM_EVENT_DISCONNECTED:
+            break;
+        case TOUPCAM_EVENT_ERROR:
+            break;
+    }
+}
+
+void ToupCamera::eventCallBack(unsigned int nEvent, void *ctxEvent)
+{ // 事件回调函数
+    //Q_ASSERT(ctxEvent == ToupCameraPointer);
+    ToupCamera* pThis = reinterpret_cast<ToupCamera*>(ctxEvent);
+    emit pThis->evtCallback(nEvent);
+    //ToupCameraPointer->evtCallback(nEvent);//必须强转不能用这个
+}
+
+ToupCamera& ToupCamera::instance()
+{
+    static ToupCamera instance;
+    return instance;
+}
+
+ToupCamera::ToupCamera(QObject*parent):QObject(parent)
+{
+    Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持
+    connect(this, &ToupCamera::evtCallback, this, &ToupCamera::processCallback);
 }
