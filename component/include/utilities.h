@@ -37,6 +37,19 @@ struct WindowsMemoryInfo
 
 extern WindowsMemoryInfo getWindowsMemoryInfo();
 
+/*获取环境列表*/
+static auto getEnvironmentVariables(const QString& key = "Path")
+{
+    return  QString(qgetenv(key.toStdString().c_str()))
+        .split(";",QString::SkipEmptyParts);
+}
+
+static auto addEnvironmentVariable(const QString& val,const QString& key = "Path")
+{
+    QString vals = val + ";" + qgetenv(key.toStdString().c_str());
+    return qputenv(key.toStdString().c_str(), vals.toStdString().c_str());
+}
+
 /*w_chart*,char* 互转*/
 static void charTowchar(const QString& src,wchar_t * dest, int size)
 {

@@ -53,30 +53,12 @@ PythonProcess::PythonProcess(QObject*parent): QObject(parent)
 
 void PythonProcess::start(const QString& path)
 {
-//    auto env = QProcessEnvironment::systemEnvironment();
+//    auto env = QProcessEnviro nment::systemEnvironment();
 //    env.insert("PYTHON310", CURRENT_PATH+"/python310");
 //    process->setProcessEnvironment(env);
 //    foreach(auto env,QProcess::systemEnvironment()) {
 //        LOG<<"["<<env<<"]";
 //    }
-
-//    QString originalPath = qgetenv("Path");
-//    QString pythonPath = CURRENT_PATH+"/python310";
-//    if(!originalPath.contains(pythonPath))
-//    {
-//        qDebug()<<"当前程序不存在python程序运行所需Path环境变量";
-//        QString path = pythonPath + ";" + qgetenv("Path");
-//        bool putenvFlag = qputenv("Path", path.toStdString().c_str());
-//        if(putenvFlag)
-//        {
-//            LOG<<"Path环境变量"<<pythonPath<<"添加成功";
-//        }
-//    }
-//
-//    QString currentPath = qgetenv("Path");
-//    QStringList pathList = currentPath.split(";");
-//    for(int i=0 ;i<pathList.size();i++)
-//        LOG<<"环境变量"<<i<<"为："<<pathList.at(i);
 
     process->start(CURRENT_PATH+"/python310/python.exe",QStringList()<<path);
     process->waitForStarted();
