@@ -15,21 +15,26 @@ PythonProcess::PythonProcess(QObject*parent): QObject(parent)
     process = new QProcess;
     process->setWorkingDirectory(CURRENT_PATH);
     LOG<<"python process's workdir is "<<process->workingDirectory();
-//    foreach(auto env,QProcess::systemEnvironment()) {
-//        LOG<<"["<<env<<"]";
-//    }
+
+
+
     QObject::connect(qApp, &QCoreApplication::aboutToQuit, [this]() {
         process->close();
         process->waitForFinished();
         LOG<<"python process is kill? "<<!process->isOpen();
         Py_Finalize();
     });
-    QString python_path = (CURRENT_PATH+"/python310");
-    wchar_t path[128] = {0};
-    charTowchar(python_path,path,128);
-    Py_SetPythonHome(path);
-    //Py_SetPath(path);
     Py_Initialize();
+    //QString pythonHome = "C:\\Users\\Lenovo\\AppData\\Local\\Programs\\Python\\Python310";
+    QString pythonHome = (CURRENT_PATH+"/python310");
+    wchar_t path[128] = {0};
+    charTowchar(pythonHome,path,128);
+    Py_SetPythonHome(path);
+//    Py_SetPath(L"C:\\Users\\Lenovo\\Desktop\\EOS\\bin\\python310;" // 不需要显式指定,自动获取目录
+//               "C:\\Users\\Lenovo\\Desktop\\EOS\\bin\\python310\\Lib;"
+//               "C:\\\\Users\\\\Lenovo\\\\Desktop\\\\EOS\\\\bin\\\\python310\\\\DLLs;"
+//               "C:\\\\Users\\\\Lenovo\\\\Desktop\\\\EOS\\\\bin\\\\python310\\\\libs;"
+//               "C:\\\\Users\\\\Lenovo\\\\Desktop\\\\EOS\\\\bin\\\\python310\\\\include;");
     if (!Py_IsInitialized()){LOG << "inital python failed!";
     }else LOG << "inital python successful!";
 
@@ -39,17 +44,48 @@ PythonProcess::PythonProcess(QObject*parent): QObject(parent)
     wcharTochar(Py_GetPath(),buf2,256);
     LOG<<"python home: "<<buf1;
     LOG<<"python path: "<<buf2;
-    PyRun_SimpleString("import os,sys");
-    PyRun_SimpleString("sys.path.append('./python310')");
-    PyRun_SimpleString("print('os.getcwd(): ',os.getcwd())");
-    PyRun_SimpleString("print('sys.executable: ',sys.executable)");
+    //PyRun_SimpleString("import os,sys");
+    //PyRun_SimpleString("sys.path.append('./python310')"); // 也可以不显示添加,因为目录已经指定过了
+    //PyRun_SimpleString("print('os.getcwd(): ',os.getcwd())");
+    //PyRun_SimpleString("print('sys.executable: ',sys.executable)");
 
 }
 
 void PythonProcess::start(const QString& path)
 {
-    process->start("python",QStringList()<<path);
+//    auto env = QProcessEnvironment::systemEnvironment();
+//    env.insert("PYTHON310", CURRENT_PATH+"/python310");
+//    process->setProcessEnvironment(env);
+//    foreach(auto env,QProcess::systemEnvironment()) {
+//        LOG<<"["<<env<<"]";
+//    }
+
+//    QString originalPath = qgetenv("Path");
+//    QString pythonPath = CURRENT_PATH+"/python310";
+//    if(!originalPath.contains(pythonPath))
+//    {
+//        qDebug()<<"当前程序不存在python程序运行所需Path环境变量";
+//        QString path = pythonPath + ";" + qgetenv("Path");
+//        bool putenvFlag = qputenv("Path", path.toStdString().c_str());
+//        if(putenvFlag)
+//        {
+//            LOG<<"Path环境变量"<<pythonPath<<"添加成功";
+//        }
+//    }
+//
+//    QString currentPath = qgetenv("Path");
+//    QStringList pathList = currentPath.split(";");
+//    for(int i=0 ;i<pathList.size();i++)
+//        LOG<<"环境变量"<<i<<"为："<<pathList.at(i);
+
+    process->start(CURRENT_PATH+"/python310/python.exe",QStringList()<<path);
     process->waitForStarted();
+
+//    PyObject* pModule = PyImport_ImportModule("test_socket"); // "test_socket"
+//    PyObject* pFunc= PyObject_GetAttrString(pModule,"test_server"); // 调用函数 "test_server"
+//    //QTimer::singleShot(800,[=]{SocketInit.connectToHost();});
+//    //QTimer::singleShot(100,this,[=]{PyObject_CallFunction(pFunc,Q_NULLPTR);});
+//    PyObject_CallFunction(pFunc,Q_NULLPTR); // 这种方式python程序会阻塞客户端
 
     SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
     if (ParserResult.toBool()) LOG<<"socket is connect successful!";

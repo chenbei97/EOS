@@ -14,6 +14,8 @@ import time
 from collections import defaultdict
 from random import randint
 from queue import Queue
+import numpy as np
+import  cv2
 
 class ParseManager:
     def __init__(self):
@@ -138,7 +140,7 @@ class ParseManager:
         frame = msg[self.frame]
         reponse = defaultdict()
         reponse[self.frame] = frame
-        reponse[self.activate_code] = "89732kjdcjkwa"
+        reponse[self.activate_code] = "89732kjdcjkwa"+str(np.random.randint(0,100))
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0003回复: ", reponse)
@@ -287,7 +289,9 @@ def test_server():
     m = SocketServerManger()
     m.waitForConnected()
 
+
 if __name__ == '__main__':
+    print("random = ",np.random.randint(0,100));
     print('os.getcwd(): ',os.getcwd())
     print('sys.executable: ',sys.executable)
     test_server()
