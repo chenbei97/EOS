@@ -30,11 +30,11 @@ PythonProcess::PythonProcess(QObject*parent): QObject(parent)
     wchar_t path[128] = {0};
     charTowchar(pythonHome,path,128);
     Py_SetPythonHome(path);
-//    Py_SetPath(L"C:\\Users\\Lenovo\\Desktop\\EOS\\bin\\python310;" // 不需要显式指定,自动获取目录
-//               "C:\\Users\\Lenovo\\Desktop\\EOS\\bin\\python310\\Lib;"
-//               "C:\\Users\\\\Lenovo\\Desktop\\EOS\\bin\\python310\\DLLs;"
-//               "C:\\Users\\Lenovo\\Desktop\\EOS\\\\bin\\python310\\libs;"
-//               "C:\\Users\\Lenovo\\Desktop\\\\EOS\\bin\\python310\\include;");
+    Py_SetPath(L"C:\\Users\\Lenovo\\Desktop\\EOS\\bin\\python310;" // 不需要显式指定,自动获取目录
+               "C:\\Users\\Lenovo\\Desktop\\EOS\\bin\\python310\\Lib;"
+               "C:\\Users\\\\Lenovo\\Desktop\\EOS\\bin\\python310\\DLLs;"
+               "C:\\Users\\Lenovo\\Desktop\\EOS\\\\bin\\python310\\libs;"
+               "C:\\Users\\Lenovo\\Desktop\\\\EOS\\bin\\python310\\include;");
     if (!Py_IsInitialized()){LOG << "inital python failed!";
     }else LOG << "inital python successful!";
 
