@@ -11,9 +11,6 @@
 
 #include "interface.h"
 #include "socketpanel.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/xfeatures2d.hpp>
 #include <toupcam.h>
 #include <thread>
 using std::async;
@@ -103,10 +100,15 @@ static void test_camera()
 static void test_opencv()
 {
     auto path = CURRENT_PATH+"/images/cell.png";
-    cv::Mat src = cv::imread(path.toStdString().c_str(),cv::IMREAD_GRAYSCALE);
+    cv::Mat src = cv::imread(path.toStdString().c_str());
     if (!src.empty())
     {
-        LOG << "src.depth()=" << src.depth();
+        LOG<<"images' size = "<<src.rows<<src.cols; // 576,1038
+        LOG<<"images' channels = "<<src.channels(); // 3
+        LOG<<"images' dims = "<<src.dims;// 2
+        LOG<<"images' depth = "<<src.depth(); // 0
+        LOG<<"images' type = "<<src.type();// 16
+        LOG<<"images is 8UC3? = "<<(src.type()==CV_8UC3); // true
         cv::namedWindow("input", cv::WINDOW_FREERATIO);//可调的自由比例
         cv::imshow("input", src);
         cv::waitKey(0);

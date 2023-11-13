@@ -83,7 +83,18 @@ void CameraBox::onSaveBtn()
 
 void CameraBox::onCombineBtn()
 {
-
+    QImage img(CURRENT_PATH+"/images/cell.png");
+    auto mat = qimageToMat(img);
+    //auto img_ = matToqimage(mat);
+    std::vector<cv::Mat> channels;
+    cv::split(mat,channels);
+    std::vector<cv::Mat> new_channels = {cv::Mat::zeros(mat.size(),CV_8UC1),
+                           channels[1],
+                           cv::Mat::zeros(mat.size(),CV_8UC1)};
+    cv::Mat res2;
+    cv::merge(new_channels,res2);
+    cv::imshow("111",res2);
+    cv::waitKey(0);
 }
 
 void CameraBox::captureImage(const QImage &img, const QString &channel)

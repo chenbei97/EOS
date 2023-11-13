@@ -164,6 +164,7 @@ void Preview::initAttributes()
     photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
 #ifdef uselabelcanvas
     livecanvas->setAlignment(Qt::AlignCenter);
+    livecanvas->setScaledContents(true);
 #else
     livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
 #endif

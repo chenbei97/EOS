@@ -19,6 +19,9 @@
 #include "qdatetimeedit.h"
 #include "qprocess.h"
 #include <cmath>
+//#include <opencv2/opencv.hpp>
+//#include <opencv2/highgui.hpp>
+//#include <opencv2/xfeatures2d.hpp>
 using std::modf;
 
 // (2) 导出定义

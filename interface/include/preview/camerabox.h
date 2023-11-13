@@ -12,6 +12,27 @@
 #include "window.h"
 #include "cameratool.h"
 #include "focusbox.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/xfeatures2d.hpp>
+
+static cv::Mat qimageToMat(const QImage& img)
+{
+    auto image = img.convertToFormat(QImage::Format_BGR888); // 只能是RGB888或者BGR888
+    cv::Mat mat(image.height(), image.width(), // 只能转为CV_8UC3
+                          CV_8UC3,(void*)image.constBits(),image.bytesPerLine());
+    return mat.clone();// 需要深拷贝,临时变量会没
+}
+
+static QImage matToqimage(const cv::Mat& mat)
+{
+    QImage img((const unsigned char*)mat.data, mat.cols, mat.rows,
+            mat.step,QImage::Format_BGR888);
+//    auto lab = new Label;
+//    lab->setPixmap(QPixmap::fromImage(img));
+//    lab->show();
+     return img;
+}
 
 class INTERFACE_IMEXPORT CameraBox : public GroupBox
 {

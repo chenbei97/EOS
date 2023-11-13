@@ -20,12 +20,16 @@ set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
 set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
 set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
 
+set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
+set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
+
 add_definitions(-DINTERFACE_LIBRARY=0) # 添加预定义宏,=号不能有空格,用于指定类导出或导入
 
 file(GLOB_RECURSE INTERFACE_HEADERS  "include/*.h")
 file(GLOB_RECURSE INTERFACE_SOURCES "src/*.cpp")
 
-link_directories(${PYTHON310_LIB_PATH}) # python引入lib只能在这里
+link_directories(${PYTHON310_LIB_PATH}# python引入lib只能在这里
+        ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH}) # opencv 2个都需要指定
 
 find_package(Qt5 COMPONENTS
         Core
@@ -40,7 +44,7 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 add_library(${DLLNAME} SHARED
         ${INTERFACE_SOURCES}
-        ${INTERFACE_HEADERS} include/mainwindow/startpython.h src/mainwindow/startpython.cpp)
+        ${INTERFACE_HEADERS})
 set_target_properties(${DLLNAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${DLLNAME}
@@ -49,6 +53,7 @@ target_include_directories(${DLLNAME}
         ${PROJECT_SOURCE_DIR}/interface/include/preview
         ${PROJECT_SOURCE_DIR}/interface/include/setting
         ${PROJECT_SOURCE_DIR}/interface/include/mainwindow
+        ${PROJECT_SOURCE_DIR}/interface/include/opencv2
         ${PROJECT_SOURCE_DIR}/interface/include
         ${TOUPCAM_INCLUDE_PATH}
         ${PYTHON310_INCLUDE_PATH}
@@ -67,4 +72,6 @@ target_link_libraries(${DLLNAME}
         component
         ${TOUPCAM_LIB_PATH}
         python310  # mingw必须显示指定python310,msvc指定与否都可
+        ${OPENCV_opencv_world_LIB_PATH}
+        ${OPENCV_img_hash_LIB_PATH}
         )

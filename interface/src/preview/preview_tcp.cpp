@@ -317,7 +317,8 @@ void Preview::importExperConfig(const QString& path)
 
 void Preview::loadExper()
 {
-    previewinfo[PreviewPatternField] = pattern->patternInfo();
+    auto patterninfo = pattern->patternInfo();
+    previewinfo[PreviewPatternField] = patterninfo;
     previewinfo[PreviewToolField] = toolbar->toolInfo();
 
     auto dlg = new SummaryDialog(previewinfo);
@@ -345,5 +346,26 @@ void Preview::loadExper()
         livecanvas->setImage(QImage());
 #endif
         photocanvas->setImage(QImage());
+    }
+
+
+        foreach(auto group, patterninfo.keys())
+        {
+            auto groupinfo = patterninfo[group].value<QVariantMap>();
+            foreach(auto holename,groupinfo.keys())
+            {
+                auto holeinfo = groupinfo[holename].value<QVariantMap>();
+
+                auto grouppoints = holeinfo[HoleGroupCoordinatesField].value<QPointVector>();
+
+                auto coordinate = holeinfo[HoleCoordinateField].toPoint();
+                auto viewsize = holeinfo[HoleViewSizeField].toSize();
+                auto viewpoints = holeinfo[HoleViewPointsField].value<QPointVector>();
+
+                auto expertype = holeinfo[HoleExperTypeField].toString();
+                auto medicine = holeinfo[HoleMedicineField].toString();
+                auto dose = holeinfo[HoleDoseField].toString();
+                auto unit = holeinfo[HoleDoseUnitField].toString();
+        }
     }
 }
