@@ -31,11 +31,11 @@ void Log::messageToFile(QtMsgType type, const QMessageLogContext &context, const
     static QMutex mutex;
     mutex.lock();
     QByteArray localMsg = msg.toUtf8();
-    auto name = QDir::currentPath()+"/log/"+QDateTime::currentDateTime()
-            .toString("yyyy_MM_dd") + ".log";
+//    auto name = QDir::currentPath()+"/log/"+QDateTime::currentDateTime()
+//            .toString("yyyy_MM_dd") + ".log";
     //if (name != filename) name = filename;
     //QFile logfile(filename);
-    QFile logfile(name);
+    QFile logfile(filename);
     logfile.open(QIODevice::ReadWrite | QIODevice::Append);
     QTextStream stream(&logfile);
     stream.setCodec("utf-8");

@@ -11,12 +11,11 @@
 
 PythonProcess::PythonProcess(QObject*parent): QObject(parent)
 {
+    LOG<<"here";
     SocketInit;
     process = new QProcess;
     process->setWorkingDirectory(CURRENT_PATH);
     LOG<<"python process's workdir is "<<process->workingDirectory();
-
-
 
     QObject::connect(qApp, &QCoreApplication::aboutToQuit, [this]() {
         process->close();
@@ -60,6 +59,7 @@ void PythonProcess::start(const QString& path)
 //        LOG<<"["<<env<<"]";
 //    }
 
+    LOG<<"python.exe path = "<<CURRENT_PATH+"/python310/python.exe"<<" exec path = "<<path;
     process->start(CURRENT_PATH+"/python310/python.exe",QStringList()<<path);
     process->waitForStarted();
 
