@@ -228,13 +228,13 @@ void Preview::initConnections()
     connect(this,&Preview::objectiveSettingChanged,toolbar,&PreviewTool::objectiveSettingChanged);
 
 #ifndef notusetoupcamera
-    connect(&timer,&QTimer::timeout,this,[=]{
-        QImage img1(CURRENT_PATH+"/images/cell.png");
-        QImage img2(CURRENT_PATH+"/images/test.jpeg");
-        static long count = 0;
-        count %2 ? showCapturedImage(img1):showCapturedImage(img2);
-        count ++;
-    });
-    timer.start(10);
+//    connect(&timer,&QTimer::timeout,this,[=]{
+//        QImage img1(CURRENT_PATH+"/images/cell.png");
+//        QImage img2(CURRENT_PATH+"/images/test.jpeg");
+//        static long count = 0;
+//        count %2 ? showCapturedImage(img1):showCapturedImage(img2);
+//        count ++;
+//    });
+//    timer.start(10);
 #endif
 }

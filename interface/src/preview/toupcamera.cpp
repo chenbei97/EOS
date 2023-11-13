@@ -58,7 +58,7 @@ void ToupCamera::exposureEvent()
     unsigned short gain = 0;
     Toupcam_get_ExpoTime(toupcam, &time);
     Toupcam_get_ExpoAGain(toupcam, &gain);
-
+    LOG<<"exposure event: "<<time<<gain;
     emit exposureGainCaptured(time,gain);
 }
 
@@ -293,7 +293,7 @@ int ToupCamera::byteOrder() const
 
 void ToupCamera::setExposureOption(int option)
 {// 0-禁止曝光 1-自动连续曝光 2-只曝光1次
-    if (option != 0 || option != 1 || option != 2 || !toupcam) return;
+    if (option != 0 && option != 1 && option != 2 || !toupcam) return;
 
     Toupcam_put_AutoExpoEnable(toupcam, option);
 }

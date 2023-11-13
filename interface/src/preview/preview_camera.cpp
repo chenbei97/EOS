@@ -26,7 +26,8 @@ void Preview::captureLiveImage()
         //auto img = image.scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
         // 在这做图像缩放会卡,应该转移出去
 #ifdef uselabelcanvas
-        livecanvas->setPixmap(QPixmap::fromImage(image));
+        livecanvas->setPixmap(QPixmap::fromImage(image).scaled(livecanvas->size(),Qt::KeepAspectRatio,
+                                                               Qt::FastTransformation));
 #else
         livecanvas->setImage(image);
 #endif
@@ -51,7 +52,6 @@ void Preview::exposureEvent()
     unsigned short gain = 0;
     Toupcam_get_ExpoTime(toupcam, &time);
     Toupcam_get_ExpoAGain(toupcam, &gain);
-
     toolbar->exposureGainCaptured(time,gain);
 }
 
@@ -164,7 +164,7 @@ int Preview::byteOrder() const
 
 void Preview::setExposureOption(int option)
 {// 0-禁止曝光 1-自动连续曝光 2-只曝光1次
-    if (option != 0 || option != 1 || option != 2 || !toupcam) return;
+    if (option != 0 && option != 1 && option != 2 || !toupcam) return;
 
     Toupcam_put_AutoExpoEnable(toupcam, option);
 }
@@ -175,6 +175,7 @@ int Preview::exposureOption() const
 
     int expoenable = 0;
     Toupcam_get_AutoExpoEnable(toupcam,&expoenable);
+    return expoenable;
 }
 
 void Preview::setExposure(unsigned exp)
@@ -233,7 +234,7 @@ void Preview::openCamera()
                                      camera.model->res[resolutionIndex].height);
             setRgbBit(0); // 24bit
             setByteOrder(0); // rgb
-            setExposureOption(0); // 初始设置是不使用自动曝光
+            setExposureOption(0); // 0不使用自动曝光,1自动连续曝光; 手动调整曝光值设为0
             setExposure(244);
             setGain(120);
             allocateImageBuffer();
@@ -291,5 +292,7 @@ void Preview::processCallback(unsigned int nEvent)
     if (!toupcam) return;
     if (nEvent == TOUPCAM_EVENT_IMAGE)
         captureLiveImage();
+    else if (nEvent == TOUPCAM_EVENT_EXPOSURE)
+        exposureEvent();
 }
 #endif

@@ -119,6 +119,6 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
 
     static bool flag = false;
     connect(&timer,&QTimer::timeout,[this]{setUpdatesEnabled(flag);flag=!flag;});
-    timer.start(50);// 绘制太快导致出问题
+    timer.start(200);// 绘制太快导致出问题
 
 }

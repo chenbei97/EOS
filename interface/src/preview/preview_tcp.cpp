@@ -66,11 +66,18 @@ void Preview::adjustCamera(int exp,int gain,int br)
         return; // 如果通道无效,没有开灯,调节参数没有意义,不发给下位机
     }
 #ifndef notusetoupcamera
-    ToupCameraPointer->setExposure(exp);
-    ToupCameraPointer->setGain(gain);
+    LOG<<"exposureOption = "<<ToupCameraPointer->exposureOption();
+    if (!ToupCameraPointer->exposureOption()) {
+        ToupCameraPointer->setExposure(exp);
+        ToupCameraPointer->setGain(gain);
+    }
+;
 #else
-    setExposure(exp);
-    setGain(gain);
+    LOG<<"exposureOption = "<<exposureOption();
+    if (!exposureOption()) { // 设置手动曝光,exp option = 0
+        setExposure(exp);
+        setGain(gain);
+    }
 #endif
     // 滑动条速度很快,这里组装不再通过Assembler来组装,可能同步会出问题,直接组装
     QJsonObject object;
