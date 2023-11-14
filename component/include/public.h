@@ -59,6 +59,8 @@
 #include "doubleslider.h"
 #include "circle.h"
 #include "photocanvas.h"
+#include "photocanvastriangle.h"
+#include "labeltriangle.h"
 #include "windowinfo.h"
 
 #include "qtextcodec.h"

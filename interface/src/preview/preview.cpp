@@ -177,9 +177,9 @@ void Preview::initObjects()
 {
     cameramode = new CameraMode;
 #ifdef uselabelcanvas
-    livecanvas = new Label;
+    livecanvas = new LabelTriangle;
 #else
-    livecanvas = new PhotoCanvas;
+    livecanvas = new PhotoCanvasTriangle;
 #endif
     photocanvas = new PhotoCanvas;
     stack = new QStackedWidget;
@@ -200,7 +200,12 @@ void Preview::initConnections()
     connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(toolbar,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
     connect(toolbar,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
-    connect(toolbar,&PreviewTool::directionMove,this,&Preview::adjustLens);
+    //connect(toolbar,&PreviewTool::directionMove,this,&Preview::adjustLens);
+#ifdef uselabelcanvas
+    connect(livecanvas,&LabelTriangle::triangleClicked,this,&Preview::adjustLens);
+#else
+    connect(livecanvas,&PhotoCanvasTriangle::triangleClicked,this,&Preview::adjustLens);
+#endif
     connect(toolbar,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
     connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
     connect(toolbar,&PreviewTool::importFilePath,this,&Preview::importExperConfig);

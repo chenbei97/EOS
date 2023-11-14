@@ -25,7 +25,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event) override;// 绘制拖拽框
     void mouseReleaseEvent(QMouseEvent *event) override;// 拖拽区域点个数为0才是预览事件
     void paintEvent(QPaintEvent *event) override;
-private:
+protected:
     DrawStrategy strategy = NoStrategy;
     QVariantMap mStrategyInfo;
     QImage mimage;

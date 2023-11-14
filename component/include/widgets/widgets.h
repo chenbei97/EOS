@@ -70,9 +70,10 @@
 #define InscribedRectDefaultCols 3
 #define InscribedRectSize 40
 #define InscribedRectColor QColor("#00A2E8")
-#define TriangleLength 30
-#define TriangleGap 10
+#define TriangleLength 30 // 绘制三角形的长度
+#define TriangleGap 10 // 三角到边缘的距离
 #define TriangleMinHeight 160
 #define TriangleMinWidth (TriangleMinHeight/0.618)
-
+#define PhotoCanvasTriangleLength 100
+#define PhotoCanvasTriangleGap 10
 #endif //EOSI_WIDGETS_H

@@ -11,6 +11,7 @@
 FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
 {
     pattern = new TriangleMove;
+    pattern->hide(); // 不在这里调镜头位置了,懒得去掉代码直接隐藏就行了
     autofocusbtn = new PushButton(tr("auto focus"));
 
     slider = new DoubleSlider;
@@ -43,7 +44,7 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     lay2->setSpacing(0);
 
     auto lay = new QHBoxLayout;
-    lay->addWidget(pattern);
+    //lay->addWidget(pattern);
     lay->addWidget(slider);
     lay->addLayout(lay1);
     lay->addLayout(lay2);

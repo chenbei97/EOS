@@ -12,7 +12,7 @@
 #include "window.h"
 #include "previewtool.h"
 #include "cameramode.h"
-#include "photocanvas.h"
+#include "photocanvastriangle.h"
 #include "wellpattern.h"
 #include "viewpattern.h"
 #include "summarydialog.h"
@@ -44,9 +44,9 @@ private:
     CameraMode * cameramode;
     QTimer timer;
 #ifdef uselabelcanvas
-    Label * livecanvas;
+    LabelTriangle * livecanvas;
 #else
-    PhotoCanvas * livecanvas;
+    PhotoCanvasTriangle * livecanvas;
 #endif
     PhotoCanvas * photocanvas;
     ViewPattern * viewpattern;

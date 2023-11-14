@@ -8,6 +8,7 @@
  */
 #ifndef EOSI_LABEL_H
 #define EOSI_LABEL_H
+
 #include "widgets.h"
 
 class COMPONENT_IMEXPORT Label : public QLabel
@@ -16,6 +17,7 @@ class COMPONENT_IMEXPORT Label : public QLabel
 public:
     explicit Label(QWidget*parent=nullptr);
     explicit Label(const QString&text,QWidget*parent=nullptr);
+    //void paintEvent(QPaintEvent*event) override;
 
 };
 #endif //EOSI_LABEL_H
