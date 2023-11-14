@@ -88,7 +88,7 @@ void TimeBox::refreshInfo()
         datetime = datetimeedit->dateTime();
     else datetime = QDateTime::currentDateTime(); // 立即扫描是基于当前时间进行计算
     auto end = datetime.addSecs(totalTime()).toString(DefaultDateTimeFormat);
-    tipinfo->setText(tr("end time: %1  total count: %2").arg(end).arg(count));
+    tipinfo->setText(tr("forcast end time: %1  total count: %2").arg(end).arg(count));
 }
 
 void TimeBox::toggleScanType(bool isSchedule)
@@ -121,7 +121,7 @@ void TimeBox::initObjects()
 {
     scantype = new CheckBox(tr("is_schedule?"),true);
     datetimeedit = new QDateTimeEdit(QDateTime::currentDateTime());
-    tipinfo = new Label(tr("end time: %1  total count: %2").arg(0).arg(0));
+    tipinfo = new Label(tr("forecast end time: %1  total count: %2").arg(0).arg(0));
 
     totaltime = new SpinBox;
     durationtime = new SpinBox;
