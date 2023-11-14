@@ -43,6 +43,8 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
     auto unit = m[HoleDoseUnitField].toString();
     //LOG<<"well accept info from groupwin is "<<gtype<<gname<<gcolor<<medicine<<dose<<unit;
 
+    static QBool2DVector lastDrapPoints;
+
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){
             auto pt = mDrapPoints[row][col]; // 右击分组时当前拖拽区域内的点是一组
@@ -52,9 +54,10 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
                 mHoleInfo[row][col].color = gcolor; // 颜色跟随分组窗口设置的颜色
                 mHoleInfo[row][col].coordinate = QPoint(row,col); // 孔坐标
 
-                mHoleInfo[row][col].viewpoints = QPointVector(); //每次分组就把视野坐标信息要清除掉
-                // 否则重新分组后视野坐标点的绘制还在继续
-                emit clearViewWindowCache(QPoint(row,col));//重新分组后清除缓存信息
+//                mHoleInfo[row][col].viewpoints = QPointVector(); //每次分组就把视野坐标信息要清除掉
+//                mHoleInfo[row][col].viewsize = QSize(-1,-1); // 可能仅仅是改个颜色或者某个信息不希望把之前的信息清除,因为viewsize又没变
+//                // 否则重新分组后视野坐标点的绘制还在继续
+//                emit clearViewWindowCache(QPoint(row,col));//重新分组后清除缓存信息
 
                 mHoleInfo[row][col].type = gtype; // 本孔分配的实验类型
                 mHoleInfo[row][col].medicine = medicine; // 本孔分配的样品
@@ -71,13 +74,14 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
         mHoleInfo[mMousePos.x()][mMousePos.y()].color = gcolor;
         mHoleInfo[mMousePos.x()][mMousePos.y()].group = gname;
         mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
-        mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointVector();
         mHoleInfo[mMousePos.x()][mMousePos.y()].type = gtype; // 本孔分配的实验类型
         mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = medicine; // 本孔分配的样品
         mHoleInfo[mMousePos.x()][mMousePos.y()].dose = dose; // 本孔分配的剂量
         mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = unit; // 本孔分配的剂量单位
         mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
-        emit clearViewWindowCache(mMousePos);
+//        mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointVector();
+//        mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = QSize(-1,-1);
+//        emit clearViewWindowCache(mMousePos);
     }
 
     // 3. 更新已有的组信息(要在上边的group更新过以后再重新计算)

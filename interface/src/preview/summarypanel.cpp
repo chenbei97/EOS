@@ -24,13 +24,16 @@ void SummaryPanel::setData(const QVariantMap &m)
 {
     auto toolinfo = m[PreviewToolField].value<QVariantMap>();
     auto patterninfo = m[PreviewPatternField].value<QVariantMap>();
+#ifdef usetab
+    auto experinfo = m[ExperToolField].value<QVariantMap>();
+#endif
     edit->clear();
     QString indent = "      ";
     QString indent2x = indent+indent;
     int moveLength = 100;
     {
 
-        edit->append(tr("<strong><font color = #20A848>[1]基本信息:</font></strong>"));
+        edit->append(tr("<strong><font color = #20A848>[1]Basic Info:</font></strong>"));
         // 1.wellbox
         {
             auto manufacturer = ManufacturerFields[toolinfo[Field0x0001.manufacturer].toInt()];
@@ -51,13 +54,13 @@ void SummaryPanel::setData(const QVariantMap &m)
             }
             auto wellsize = WellsizeFields[toolinfo[Field0x0001.wellsize].toInt()];
             edit->append("");
-            edit->append(tr("<strong><font color = #00A2E8>(1)孔板信息:</font></strong>"));
+            edit->append(tr("<strong><font color = #00A2E8>(1)WellInfo:</font></strong>"));
             //edit->setIndent(8,indent);
-            edit->append(tr("<strong><font color = #00A2E8>1.孔板厂家: %1</font></strong>").arg(manufacturer));
+            edit->append(tr("<strong><font color = #00A2E8>1.manufacturer: %1</font></strong>").arg(manufacturer));
             //edit->setIndent(21,indent2x);
-            edit->append(tr("<strong><font color = #00A2E8>2.孔板品牌: %1</font></strong>").arg(brand));
+            edit->append(tr("<strong><font color = #00A2E8>2.brand: %1</font></strong>").arg(brand));
             //edit->setIndent(moveLength,indent2x);
-            edit->append(tr("<strong><font color = #00A2E8>3.孔板尺寸: %1</font></strong>").arg(wellsize));
+            edit->append(tr("<strong><font color = #00A2E8>3.wellsize: %1</font></strong>").arg(wellsize));
             //edit->setIndent(moveLength,indent2x);
         }
 
@@ -66,10 +69,10 @@ void SummaryPanel::setData(const QVariantMap &m)
             auto cameraloc = CameraLocationFieldFields[toolinfo[Field0x0001.camera_location].toInt()];
             auto objective = toolinfo[Field0x0001.objective].toString();//就是传递原字符串不需要改
             edit->append("");
-            edit->append(tr("<strong><font color = #00A2E8>(2)物镜信息:</font></strong>"));
+            edit->append(tr("<strong><font color = #00A2E8>(2)Objective Info:</font></strong>"));
             //edit->setIndent(moveLength,indent);
-            edit->append(tr("<strong><font color = #00A2E8>1.物镜位置: %1</font></strong>").arg(cameraloc));
-            edit->append(tr("<strong><font color = #00A2E8>2.物镜类型: %1</font></strong>").arg(objective));
+            edit->append(tr("<strong><font color = #00A2E8>1.location: %1</font></strong>").arg(cameraloc));
+            edit->append(tr("<strong><font color = #00A2E8>2.objective: %1</font></strong>").arg(objective));
         }
 
         // 3. camerabox
@@ -77,7 +80,7 @@ void SummaryPanel::setData(const QVariantMap &m)
             auto capture_channels = toolinfo[Field0x0001.capture_channel].toStringList(); // 设置过相机参数的所有通道
             edit->append("");
             if (!capture_channels.isEmpty()) {
-                edit->append(tr("<strong><font color = #00A2E8>(3)通道参数:</font></strong>"));
+                edit->append(tr("<strong><font color = #00A2E8>(3)Channel Info:</font></strong>"));
                 int count = 0;
                 foreach(auto currentChannel, capture_channels) {
                     count++;
@@ -91,7 +94,7 @@ void SummaryPanel::setData(const QVariantMap &m)
                     edit->append(tr("<strong><font color = #00A2E8>3.bright: %1</font></strong>").arg(bright));
                 }
             } else {
-                edit->append(tr("<strong><font color = #00A2E8>(3)通道参数:无</font></strong>"));
+                edit->append(tr("<strong><font color = #00A2E8>(3)Channel Info:none</font></strong>"));
             }
         }
 
@@ -100,18 +103,23 @@ void SummaryPanel::setData(const QVariantMap &m)
             auto focus = toolinfo[Field0x0001.focus].toString();
             auto step = toolinfo[Field0x0001.focus_step].toString();
             edit->append("");
-            edit->append(tr("<strong><font color = #00A2E8>(4)焦距参数:</font></strong>"));
-            edit->append(tr("<strong><font color = #00A2E8>1.焦距: %1</font></strong>").arg(focus));
-            edit->append(tr("<strong><font color = #00A2E8>2.步进: %1</font></strong>").arg(step));
+            edit->append(tr("<strong><font color = #00A2E8>(4)Focus Info:</font></strong>"));
+            edit->append(tr("<strong><font color = #00A2E8>1.focus: %1</font></strong>").arg(focus));
+            edit->append(tr("<strong><font color = #00A2E8>2.step: %1</font></strong>").arg(step));
         }
 
         // 5. zstackbox
         {
+#ifdef usetab
+            auto zstack = experinfo[Field0x0001.zstack].toBool();
+            auto stitch = experinfo[Field0x0001.stitch].toBool();
+#else
             auto zstack = toolinfo[Field0x0001.zstack].toBool();
             auto stitch = toolinfo[Field0x0001.stitch].toBool();
+#endif
             auto app = AppFields[m[Field0x0001.app].toInt()];
             edit->append("");
-            edit->append(tr("<strong><font color = #00A2E8>(5)其它信息:</font></strong>"));
+            edit->append(tr("<strong><font color = #00A2E8>(5)Other Info:</font></strong>"));
             edit->append(tr("<strong><font color = #00A2E8>1.zstack: %1</font></strong>").arg(zstack));
             edit->append(tr("<strong><font color = #00A2E8>2.stitch: %1</font></strong>").arg(stitch));
             edit->append(tr("<strong><font color = #00A2E8>3.app: %1</font></strong>").arg(app));
@@ -119,19 +127,27 @@ void SummaryPanel::setData(const QVariantMap &m)
 
         // 6. experbox
         {
+#ifdef usetab
+            auto is_schedule = experinfo[Field0x0001.is_schedule].toBool();
+            auto duration = experinfo[Field0x0001.duration_time].toLongLong()*1.0;
+            auto total = experinfo[Field0x0001.total_time].toLongLong()*1.0;
+            auto start_time = experinfo[Field0x0001.start_time].toString();
+            auto channels = experinfo[Field0x0001.channel].toString().split(",",QString::SkipEmptyParts);
+#else
             auto is_schedule = toolinfo[Field0x0001.is_schedule].toBool();
             auto duration = toolinfo[Field0x0001.duration_time].toLongLong()*1.0;
             auto total = toolinfo[Field0x0001.total_time].toLongLong()*1.0;
             auto start_time = toolinfo[Field0x0001.start_time].toString();
             auto channels = toolinfo[Field0x0001.channel].toString().split(",",QString::SkipEmptyParts);
+#endif
             edit->append("");
-            edit->append(tr("<strong><font color = #00A2E8>(6)实验信息:</font></strong>"));
-            edit->append(tr("<strong><font color = #00A2E8>1.计划执行?: %1</font></strong>").arg(is_schedule));
+            edit->append(tr("<strong><font color = #00A2E8>(6)Exper Info:</font></strong>"));
+            edit->append(tr("<strong><font color = #00A2E8>1.is_schedule?: %1</font></strong>").arg(is_schedule));
             is_schedule?
-            edit->append(tr("<strong><font color = #00A2E8>2.开始时间: %1</font></strong>").arg(start_time)):
-            edit->append(tr("<strong><font color = #00A2E8>2.开始时间: 立即执行</font></strong>"));
-            edit->append(tr("<strong><font color = #00A2E8>3.实验时长: %1 s - %2 min - %3 hour</font></strong>").arg(total).arg(total/60.0).arg(total/3600.0));
-            edit->append(tr("<strong><font color = #00A2E8>4.实验间隔: %1 s - %2 min - %3 hour</font></strong>").arg(duration).arg(duration/60.0).arg(duration/3600.0));
+            edit->append(tr("<strong><font color = #00A2E8>2.start time: %1</font></strong>").arg(start_time)):
+            edit->append(tr("<strong><font color = #00A2E8>2.start time: 立即执行</font></strong>"));
+            edit->append(tr("<strong><font color = #00A2E8>3.total time: %1 s - %2 min - %3 hour</font></strong>").arg(total).arg(total/60.0).arg(total/3600.0));
+            edit->append(tr("<strong><font color = #00A2E8>4.duration time: %1 s - %2 min - %3 hour</font></strong>").arg(duration).arg(duration/60.0).arg(duration/3600.0));
             QString channel = "";
             for(int idx = 0; idx < channels.count(); ++idx) {
                 if(channels[idx].toUInt()) {
@@ -140,21 +156,23 @@ void SummaryPanel::setData(const QVariantMap &m)
             }
             channel.chop(1);
             if (!channel.isEmpty())
-            edit->append(tr("<strong><font color = #00A2E8>5.勾选通道: %1</font></strong>").arg(channel));
-            else edit->append(tr("<strong><font color = #00A2E8>5.勾选通道: 未勾选任何通道</font></strong>"));
+            edit->append(tr("<strong><font color = #00A2E8>5.channels: %1</font></strong>").arg(channel));
+            else edit->append(tr("<strong><font color = #00A2E8>5.channels: no channel selected</font></strong>"));
 
             // 做些提示,已经勾选的通道是否保存过参数
             auto capture_channels = toolinfo[Field0x0001.capture_channel].toStringList();
             if (!channel.isEmpty()) {
                 if (capture_channels.isEmpty()) {
-                    edit->append(tr("<strong><font color = #FF1E27>注: 您勾选的通道[%1]都没有保存过相机参数,将以默认参数执行!</font></strong>").arg(channel));
+                    edit->append(tr("<strong><font color = #FF1E27>Warning: the channel you have checked [%1] none of the camera parameters have been saved, "
+                                    "and will be executed with default parameters!</font></strong>").arg(channel));
                 } else {
                     for(int idx = 0; idx < channels.count(); ++idx) {
                         if(channels[idx].toUInt()) {
                             auto c =  ChannelFields[idx];
                             if (!capture_channels.contains(c)) {
                                 // 勾选的这个实验通道没在保存过的通道里
-                                edit->append(tr("<strong><font color = #FF1E27>警告: 您勾选的通道[%1]没有保存过相机参数,将以默认参数执行!</font></strong>").arg(c));
+                                edit->append(tr("<strong><font color = #FF1E27>Warning: the channel you have checked [%1] none of the camera parameters have been saved,"
+                                                "and will be executed with default parameters!</font></strong>").arg(c));
                             }
                         }
                     }

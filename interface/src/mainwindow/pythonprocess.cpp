@@ -11,7 +11,6 @@
 
 PythonProcess::PythonProcess(QObject*parent): QObject(parent)
 {
-    LOG<<"here";
     SocketInit;
     process = new QProcess;
     process->setWorkingDirectory(CURRENT_PATH);

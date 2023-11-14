@@ -26,6 +26,10 @@
 #include "toupcamera.h"
 #endif
 
+#ifdef usetab
+#include "expertool.h"
+#endif
+
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
     Q_OBJECT
@@ -48,10 +52,14 @@ private:
 #else
     PhotoCanvasTriangle * livecanvas;
 #endif
+#ifdef usetab
+    QTabWidget * tab;
+    ExperTool * expertool;
+#endif
     PhotoCanvas * photocanvas;
     ViewPattern * viewpattern;
     QStackedWidget * stack;
-    PreviewTool * toolbar;
+    PreviewTool * previewtool;
     WellPattern * pattern;
     DockWidget * dock;
     QMainWindow * dockcanvas;

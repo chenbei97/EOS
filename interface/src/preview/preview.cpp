@@ -35,7 +35,7 @@ void Preview::onWellbrandChanged(int option)
     }
 
     // 1.更新视野的尺寸
-    auto toolinfo = toolbar->toolInfo();
+    auto toolinfo = previewtool->toolInfo();
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
@@ -59,7 +59,7 @@ void Preview::onObjectiveChanged(const QString& obj)
 {
     LOG<<"objective option = "<<obj;
     // 1.更新视野的尺寸
-    auto toolinfo = toolbar->toolInfo();
+    auto toolinfo = previewtool->toolInfo();
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
@@ -87,7 +87,7 @@ void Preview::onObjectiveChanged(const QString& obj)
 void Preview::updateViewPatternUi()
 {// 弃用,切换厂家和切换物镜分开写
     // 1.更新视野的尺寸
-    auto toolinfo = toolbar->toolInfo();
+    auto toolinfo = previewtool->toolInfo();
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
@@ -118,16 +118,16 @@ void Preview::setAppInfo(int app)
 void Preview::initLayout()
 {
     // 1.右侧布局
-    auto pbox = new GroupBox(tr("Hole selection"));
+    auto pbox = new GroupBox(tr("Hole Selection"));
     auto play = new QVBoxLayout;
     play->addWidget(pattern);
-    //play->addWidget(dockcanvas); // 不加了通过点击孔来触发
     pbox->setLayout(play);
 
     auto rlay = new QVBoxLayout;
     rlay->addWidget(pbox);
-    rlay->addWidget(scrollarea); // 添加滚动区域后(不是添加toolbar)再设置
-    scrollarea->setWidget(toolbar);
+    rlay->addWidget(scrollarea); // 添加滚动区域后(不是添加previewtool)再设置
+    scrollarea->setWidget(previewtool);
+
     auto rbox = new GroupBox;
     rbox->setLayout(rlay);
     rbox->setMaximumWidth(PreviewToolBarMaxWidth);
@@ -144,7 +144,13 @@ void Preview::initLayout()
     // 3.总布局
     auto lay = new QHBoxLayout;
     lay->addWidget(lbox);
+#ifdef usetab
+    tab->addTab(rbox,tr("Preview"));
+    tab->addTab(expertool,tr("Experiment"));
+    lay->addWidget(tab);
+#else
     lay->addWidget(rbox);
+#endif
     setLayout(lay);
 }
 
@@ -169,8 +175,9 @@ void Preview::initAttributes()
     livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
 #endif
 
-    //previewinfo[PreviewToolField] = toolbar->toolInfo();
-    //previewinfo[PreviewPatternField] = pattern->patternInfo();
+#ifdef usetab
+    tab->setMaximumWidth(PreviewToolBarMaxWidth);
+#endif
 }
 
 void Preview::initObjects()
@@ -181,11 +188,15 @@ void Preview::initObjects()
 #else
     livecanvas = new PhotoCanvasTriangle;
 #endif
+#ifdef usetab
+    tab = new QTabWidget;
+    expertool = new ExperTool;
+#endif
     photocanvas = new PhotoCanvas;
     stack = new QStackedWidget;
     pattern = new WellPattern(2,3);
     groupinfo = new GroupInfo;
-    toolbar = new PreviewTool;
+    previewtool = new PreviewTool;
     viewpattern = new ViewPattern;// 视野窗口
     dock = new DockWidget(tr("Select Hole Inside View"));
     dockcanvas = new QMainWindow;
@@ -195,31 +206,31 @@ void Preview::initObjects()
 
 void Preview::initConnections()
 {
-    connect(toolbar,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);
-    connect(toolbar,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
-    connect(toolbar,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
-    connect(toolbar,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
-    connect(toolbar,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
-    //connect(toolbar,&PreviewTool::directionMove,this,&Preview::adjustLens);
-#ifdef uselabelcanvas
-    connect(livecanvas,&LabelTriangle::triangleClicked,this,&Preview::adjustLens);
-#else
-    connect(livecanvas,&PhotoCanvasTriangle::triangleClicked,this,&Preview::adjustLens);
-#endif
-    connect(toolbar,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
-    connect(toolbar,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
-    connect(toolbar,&PreviewTool::importFilePath,this,&Preview::importExperConfig);
-    connect(toolbar,&PreviewTool::loadExper,this,&Preview::loadExper);
+    connect(previewtool,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);
+    connect(previewtool,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
+    connect(previewtool,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
+    connect(previewtool,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
+    connect(previewtool,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
+    connect(previewtool,&PreviewTool::directionMove,this,&Preview::adjustLens);
+    connect(previewtool,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
+    connect(previewtool,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
+    connect(previewtool,&PreviewTool::importFilePath,this,&Preview::importExperConfig);
+    connect(previewtool,&PreviewTool::loadExper,this,&Preview::loadExper);
 
     connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);
 #ifdef notusetoupcamera
     connect(this, &Preview::evtCallback, this, &Preview::processCallback);
 #else
     connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::showCapturedImage);
-    connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,toolbar,&PreviewTool::exposureGainCaptured);
+    connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,previewtool,&PreviewTool::exposureGainCaptured);
 #endif
 
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
+#ifdef uselabelcanvas
+    connect(livecanvas,&LabelTriangle::triangleClicked,this,&Preview::adjustLens);
+#else
+    connect(livecanvas,&PhotoCanvasTriangle::triangleClicked,this,&Preview::adjustLens);
+#endif
 
     connect(pattern,&WellPattern::openViewWindow,this,&Preview::updateViewWindow); // 打开和更新视野窗口
     connect(pattern,&WellPattern::openSetGroupWindow,this,&Preview::updateSetGroupWindow);// 打开分组窗口
@@ -231,8 +242,12 @@ void Preview::initConnections()
     connect(viewpattern,&ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不安组更新孔窗口的信息
     connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
 
-    connect(this,&Preview::objectiveSettingChanged,toolbar,&PreviewTool::objectiveSettingChanged);
-
+    connect(this,&Preview::objectiveSettingChanged,previewtool,&PreviewTool::objectiveSettingChanged);
+#ifdef usetab
+    connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
+    connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);
+    connect(expertool,&ExperTool::loadExper,this,&Preview::loadExper);
+#endif
 #ifndef notusetoupcamera
 //    connect(&timer,&QTimer::timeout,this,[=]{
 //        QImage img1(CURRENT_PATH+"/images/cell.png");

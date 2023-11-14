@@ -10,7 +10,7 @@
 
 void Preview::toggleChannel(int option)
 {
-    auto toolinfo = toolbar->toolInfo();
+    auto toolinfo = previewtool->toolInfo();
     auto current_channel = toolinfo[CurrentChannelField].toString();
 
     if (current_channel.isEmpty()) {
@@ -57,7 +57,7 @@ void Preview::adjustLens(int option)
 
 void Preview::adjustCamera(int exp,int gain,int br)
 {
-    auto toolinfo = toolbar->toolInfo();
+    auto toolinfo = previewtool->toolInfo();
 
     auto current_channel = toolinfo[CurrentChannelField].toString();
 
@@ -117,7 +117,7 @@ void Preview::showCapturedImage(const QImage& image)
 
 void Preview::takingPhoto()
 {
-    auto toolinfo = toolbar->toolInfo();
+    auto toolinfo = previewtool->toolInfo();
 
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     int exp = current_info[ExposureField].toUInt();
@@ -148,7 +148,7 @@ void Preview::takingPhoto()
         ToupCameraPointer->setGain(ga);
         auto pix = ToupCameraPointer->capture();
         auto current_channel = toolinfo[CurrentChannelField].toString();
-        toolbar->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
+        previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
         LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
         <<" 曝光和增益为 "<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
 #else
@@ -156,7 +156,7 @@ void Preview::takingPhoto()
         setGain(ga);
         auto pix = capture();
         auto current_channel = toolinfo[CurrentChannelField].toString();
-        toolbar->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
+        previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
         LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
        <<" 曝光和增益为 "<<exposure()<<gain();
 #endif
@@ -170,7 +170,7 @@ void Preview::previewViewByClickView(const QPoint &viewpoint)
 {
     if (viewpoint == QPoint(-1,-1)) return;
 
-    auto toolinfo = toolbar->toolInfo();
+    auto toolinfo = previewtool->toolInfo();
 //    auto patterninfo = pattern->patternInfo();
 //    previewinfo[PreviewToolField] = toolinfo;
 //    previewinfo[PreviewPatternField] = patterninfo;
@@ -221,7 +221,7 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
 {
     if (holepoint == QPoint(-1,-1)) return;
 
-    auto toolinfo = toolbar->toolInfo();
+    auto toolinfo = previewtool->toolInfo();
 //    auto patterninfo = pattern->patternInfo();
 //    previewinfo[PreviewToolField] = toolinfo;
 //    previewinfo[PreviewPatternField] = patterninfo;
@@ -271,8 +271,10 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
 void Preview::exportExperConfig(const QString& path)
 { // 导出实验配置
     previewinfo[PreviewPatternField] = pattern->patternInfo();
-    previewinfo[PreviewToolField] = toolbar->toolInfo();
-
+    previewinfo[PreviewToolField] = previewtool->toolInfo();
+#ifdef usetab
+    previewinfo[ExperToolField] = expertool->toolInfo();
+#endif
     AssemblerPointer->assemble(TcpFramePool.frame0x0001,previewinfo);
     auto json = AssemblerPointer->message();
 
@@ -290,7 +292,10 @@ void Preview::importExperConfig(const QString& path)
 
     m.parseJson(json);
     auto result = m.map();
-    toolbar->importExperConfig(result);
+    previewtool->importExperConfig(result);
+#ifdef usetab
+    expertool->importExperConfig(result);
+#endif
 
     auto brand = result[BrandField].toUInt();
     auto manufacturer = result[ManufacturerField].toUInt();
@@ -306,7 +311,7 @@ void Preview::importExperConfig(const QString& path)
             auto holepoint = holeinfo[HoleCoordinateField].toPoint();
             auto viewpoints = holeinfo[PointsField].value<QPointVector>();
 
-            // 把holepoint这个孔的信息更改(和wellsize有关,所以需要先更新toolbar的信息就不会越界了)
+            // 把holepoint这个孔的信息更改(和wellsize有关,所以需要先更新previewtool的信息就不会越界了)
             pattern->updateHoleInfo(holepoint,group,viewpoints,viewsize);
             viewpattern->updateViewWindowCache(holepoint,viewpoints,viewsize);
         }
@@ -319,7 +324,10 @@ void Preview::loadExper()
 {
     auto patterninfo = pattern->patternInfo();
     previewinfo[PreviewPatternField] = patterninfo;
-    previewinfo[PreviewToolField] = toolbar->toolInfo();
+    previewinfo[PreviewToolField] = previewtool->toolInfo();
+#ifdef usetab
+    previewinfo[ExperToolField] = expertool->toolInfo();
+#endif
 
     auto dlg = new SummaryDialog(previewinfo);
     setWindowAlignCenter(dlg);
@@ -338,7 +346,7 @@ void Preview::loadExper()
     closeCamera();
 #endif
     if (ParserResult.toBool()) {
-        QMessageBox::information(this,InformationChinese,tr("启动实验成功!"));
+        QMessageBox::information(this,InformationChinese,tr("Successfully launched the experiment!"));
 
 #ifdef uselabelcanvas
         livecanvas->setPixmap(QPixmap());

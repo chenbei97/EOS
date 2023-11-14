@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-16 13:27:27
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-03 10:33:05
+ * @LastEditTime: 2023-11-14 13:28:14
  * @FilePath: \EOS\component\include\alias.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -200,6 +200,7 @@ typedef QMap<QString,QString> CameraInfo;
 typedef QMap<QString,CameraInfo> MultiCameraInfo;
 typedef QMap<QString,QImage> ChannelImageInfo;
 typedef QVariantMap PreviewToolInfo;
+typedef QVariantMap ExperToolInfo;
 typedef QVariantMap PreviewPatternInfo;
 typedef QVariantMap PreviewInfo;
 typedef QVariantMap ViewInfo;

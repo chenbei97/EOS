@@ -10,10 +10,10 @@
 
 SummaryDialog::SummaryDialog(const QVariantMap &m,QWidget*parent):QDialog(parent)
 {
-    btn = new PushButton(tr("启动实验"));
+    btn = new PushButton(tr("start exper"));
     panel = new SummaryPanel(m);
     setData(m);
-    setWindowTitle(tr("实验信息面板"));
+    setWindowTitle(tr("exper information panel"));
     resize(MainWindowWidth/2,MainWindowHeight/2);
 
     auto blay = new QHBoxLayout;
@@ -35,7 +35,8 @@ void SummaryDialog::setData(const QVariantMap &m)
 void SummaryDialog::load()
 {
     int ret = QMessageBox::information(this,InformationChinese,
-                                       tr("请检查所有实验信息是否无误,是否启动实验?"),
+                                       tr("Please check if all experimental information is correct "
+                                          "and whether to start the experiment?"),
                                        QMessageBox::Yes|QMessageBox::Cancel);
     if (ret == QMessageBox::Cancel) {
         return;

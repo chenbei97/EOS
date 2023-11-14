@@ -245,7 +245,9 @@ static QByteArray assemble0x0001(QCVariantMap m)
 {// 启动实验
     auto toolinfo = m[PreviewToolField].value<QVariantMap>();
     auto patterninfo = m[PreviewPatternField].value<QVariantMap>();
-
+#ifdef usetab
+    auto experinfo = m[ExperToolField].value<QVariantMap>();
+#endif
     QJsonObject object;
     object[FrameField] = TcpFramePool.frame0x0001;
 
@@ -289,13 +291,25 @@ static QByteArray assemble0x0001(QCVariantMap m)
         object[CameraChannelField] = channelInfoArr; // camera_channel字段,存储了所有通道的配置信息
     }
 
-    // zstackbox
-    object[Field0x0001.zstack] = toolinfo[Field0x0001.zstack].toString();
-    object[Field0x0001.stitch] = toolinfo[Field0x0001.stitch].toString();
-
     // focusbox
     object[Field0x0001.focus] = toolinfo[Field0x0001.focus].toString();
     object[Field0x0001.focus_step] = toolinfo[Field0x0001.focus_step].toString();
+
+#ifdef usetab
+    // zstackbox
+    object[Field0x0001.zstack] = experinfo[Field0x0001.zstack].toString();
+    object[Field0x0001.stitch] = experinfo[Field0x0001.stitch].toString();
+
+    // experbox
+    object[Field0x0001.total_time] = experinfo[Field0x0001.total_time].toString();
+    object[Field0x0001.duration_time] = experinfo[Field0x0001.duration_time].toString();
+    object[Field0x0001.start_time] = experinfo[Field0x0001.start_time].toString();
+    object[Field0x0001.channel] = experinfo[Field0x0001.channel].toString();
+    object[Field0x0001.is_schedule] = experinfo[Field0x0001.is_schedule].toString();
+#else
+    // zstackbox
+    object[Field0x0001.zstack] = toolinfo[Field0x0001.zstack].toString();
+    object[Field0x0001.stitch] = toolinfo[Field0x0001.stitch].toString();
 
     // experbox
     object[Field0x0001.total_time] = toolinfo[Field0x0001.total_time].toString();
@@ -303,6 +317,7 @@ static QByteArray assemble0x0001(QCVariantMap m)
     object[Field0x0001.start_time] = toolinfo[Field0x0001.start_time].toString();
     object[Field0x0001.channel] = toolinfo[Field0x0001.channel].toString();
     object[Field0x0001.is_schedule] = toolinfo[Field0x0001.is_schedule].toString();
+#endif
 
     // 其它全局信息
     object[Field0x0001.app] = m[Field0x0001.app].toString();

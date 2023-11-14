@@ -11,7 +11,9 @@
 
 #include "alias.h"
 
+#define usetab 0
 static const char* PreviewToolField = "previewtool";
+static const char* ExperToolField = "expertool";
 static const char* PreviewPatternField = "previewpattern";
 
 // wellbox涉及的数据类型

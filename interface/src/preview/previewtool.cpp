@@ -54,6 +54,12 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
     connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage);
     connect(this,&PreviewTool::exposureGainCaptured,camerabox,&CameraBox::captureExposureGain);
+
+#ifdef usetab
+    savebox->hide(); // 懒得删代码直接隐藏
+    zstackbox->hide();
+    timebox->hide();
+#endif
 }
 
 PreviewToolInfo PreviewTool::toolInfo() const

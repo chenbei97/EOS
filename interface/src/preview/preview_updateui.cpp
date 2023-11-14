@@ -24,7 +24,7 @@ void Preview::updateViewWindow(const QVariantMap& m)
     dock->setFloating(true);
 
     // 3.根据当前brand/objective更新视野的尺寸
-    auto toolinfo = toolbar->toolInfo();
+    auto toolinfo = previewtool->toolInfo();
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
