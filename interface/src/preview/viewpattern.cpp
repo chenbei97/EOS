@@ -431,11 +431,11 @@ ViewPattern::ViewPattern(QWidget *parent) : QWidget(parent)
     mMouseClickColor.setAlpha(DefaultColorAlpha);
     //initDrapPoints();// 无需调用,构造出来默认不会有拖拽框
     //initSelectPoints();//无需调用,因为当前孔未知
-    saveviewact = new QAction(tr("选点"));
-    removeviewact = new QAction(tr("删点"));
-    applyholeact = new QAction(tr("应用到本孔"));
-    applygroupact = new QAction(tr("应用到本组"));
-    applyallact = new QAction(tr("应用到所有组"));
+    saveviewact = new QAction(tr("Selecting Points"));
+    removeviewact = new QAction(tr("Remove Points"));
+    applyholeact = new QAction(tr("Apply To Hole"));
+    applygroupact = new QAction(tr("Apply To Group"));
+    applyallact = new QAction(tr("Apply To All"));
     addAction(saveviewact);
     addAction(removeviewact);
     //addAction(applyholeact); // 不显式添加

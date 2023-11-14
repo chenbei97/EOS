@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-27 08:53:17
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-02 14:29:25
+ * @LastEditTime: 2023-11-14 10:16:25
  * @FilePath: \EOS\interface\src\preview\wellpattern.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -58,9 +58,9 @@ PreviewPatternInfo WellPattern::patternInfo() const
 WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,cols,parent)
 {
     mMouseEvent = true;
-    setgroupact = new QAction(tr("分组"));
-    openviewact = new QAction(tr("选点"));
-    removeholeact = new QAction(tr("删孔"));
+    setgroupact = new QAction(tr("Grouping"));
+    openviewact = new QAction(tr("Select Holes"));
+    removeholeact = new QAction(tr("Remove Hole"));
     addAction(setgroupact);
     addAction(openviewact);
     addAction(removeholeact);

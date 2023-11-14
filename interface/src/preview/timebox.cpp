@@ -14,7 +14,7 @@ TimeBox::TimeBox(QWidget *parent) : GroupBox(parent)
     initAttributes();
     initConnections();
     initLayout();
-    setTitle(tr("实验"));
+    setTitle(tr("Experiment"));
 }
 
 void TimeBox::importExperConfig(bool is_schedule,long long total,long long duration,
@@ -88,7 +88,7 @@ void TimeBox::refreshInfo()
         datetime = datetimeedit->dateTime();
     else datetime = QDateTime::currentDateTime(); // 立即扫描是基于当前时间进行计算
     auto end = datetime.addSecs(totalTime()).toString(DefaultDateTimeFormat);
-    tipinfo->setText(tr("预计结束时间: %1  总扫描次数: %2").arg(end).arg(count));
+    tipinfo->setText(tr("end time: %1  total count: %2").arg(end).arg(count));
 }
 
 void TimeBox::toggleScanType(bool isSchedule)
@@ -119,9 +119,9 @@ void TimeBox::updateDurationTimeUnit(const QString& unit)
 
 void TimeBox::initObjects()
 {
-    scantype = new CheckBox(tr("计划执行?"),true);
+    scantype = new CheckBox(tr("is_schedule?"),true);
     datetimeedit = new QDateTimeEdit(QDateTime::currentDateTime());
-    tipinfo = new Label(tr("预计结束时间: %1  总扫描次数: %2").arg(0).arg(0));
+    tipinfo = new Label(tr("end time: %1  total count: %2").arg(0).arg(0));
 
     totaltime = new SpinBox;
     durationtime = new SpinBox;
@@ -167,19 +167,19 @@ void TimeBox::initConnections()
 void TimeBox::initLayout()
 {
     auto totallay = new QHBoxLayout;
-    totallay->addWidget(new Label(tr("实验时长: ")));
+    totallay->addWidget(new Label(tr("total time: ")));
     totallay->addWidget(totaltime);
     totallay->addWidget(totalunit);
     totallay->addStretch();
 
     auto durlay = new QHBoxLayout;
-    durlay->addWidget(new Label(tr("实验间隔: ")));
+    durlay->addWidget(new Label(tr("duration time: ")));
     durlay->addWidget(durationtime);
     durlay->addWidget(durationunit);
     durlay->addStretch();
 
     auto boxlay = new QHBoxLayout;
-    boxlay->addWidget(new Label(tr("实验通道: ")));
+    boxlay->addWidget(new Label(tr("channel option: ")));
     boxlay->addWidget(brbox);
     boxlay->addWidget(phbox);
     boxlay->addWidget(gfpbox);

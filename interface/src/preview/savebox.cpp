@@ -11,10 +11,10 @@
 SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
 {
     filenameedit = new LineEdit("please input filename");
-    exportToFile = new CheckBox(tr("保存设置到文件?"));
-    exportallbtn = new PushButton(tr("导出"));
-    loadbtn = new PushButton(tr("启动实验"));
-    stopbtn = new PushButton(tr("停止实验"));
+    exportToFile = new CheckBox(tr("save settings to file?"));
+    exportallbtn = new PushButton(tr("export"));
+    loadbtn = new PushButton(tr("start exper"));
+    stopbtn = new PushButton(tr("stop exper"));
     filenameedit->hide();
     exportallbtn->hide();
 
@@ -27,7 +27,7 @@ SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
     lay->addWidget(loadbtn);
 
     setLayout(lay);
-    setTitle(tr("保存"));
+    setTitle(tr("Save"));
 
     connect(exportToFile,&CheckBox::checkedChanged,this,&SaveBox::showExport);
     connect(exportallbtn,&PushButton::clicked,this,&SaveBox::exportFile);
@@ -49,15 +49,17 @@ void SaveBox::exportFile()
     auto filename = filenameedit->text().simplified();
     filename.remove(" ");//防止有空格,remove(QRegExp("\\s"));
     if (filename.isEmpty()) {
-        QMessageBox::information(this,InformationChinese,tr("请先指定保存文件名称!"));
+        QMessageBox::information(this,InformationChinese,
+                                 tr("Please specify the name of the saved file first!"));
         return;
     }
-    auto dir = QFileDialog::getExistingDirectory(this,tr("选择保存路径"));
+    auto dir = QFileDialog::getExistingDirectory(this,tr("Select Save Path"));
     if (dir.isEmpty()) return;
 
     auto path = dir + +"/" + filename + ConfigFileSuffix;
     if (pathExisted(path)) {
-        int ret = QMessageBox::warning(this,WarningChinese,tr("已有同名的设置,是否覆盖?"),
+        int ret = QMessageBox::warning(this,WarningChinese,
+                                       tr("There is already a setting with the same name. Do you want to overwrite it?"),
                                        QMessageBox::Yes|QMessageBox::No);
         if (ret == QMessageBox::No)
             return;

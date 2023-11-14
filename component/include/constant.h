@@ -24,10 +24,10 @@ Q_ENUMS(SQLType)
     <<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] sql exec failed! error is ")
 #define UserScreenWidth (QApplication::desktop()->screenGeometry().width())
 #define UserScreenHeight (QApplication::desktop()->screenGeometry().height())
-#define WarningChinese tr("警告")
-#define InformationChinese tr("消息")
-#define CriticalChinese tr("错误")
-#define DefaultDateTimeFormat "yyyy_MM_dd hh:mm"
+#define WarningChinese tr("Warning")
+#define InformationChinese tr("Information")
+#define CriticalChinese tr("Critical")
+#define DefaultDateTimeFormat "yyyy-MM-dd hh:mm"
 #define CURRENT_PATH (QDir::currentPath())
 #define CURRENT_THREAD (QThread::currentThread())
 #define DefaultFontSize 10

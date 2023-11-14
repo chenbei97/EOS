@@ -12,9 +12,9 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
 {
     cameratool = new CameraTool;
     currentchannel = new Label(QString("%1%2").arg(ChannelFieldLabel).arg(BRField));
-    savebtn = new PushButton(tr("保存当前通道设置"));
-    combinebtn = new PushButton(tr("组合通道"));
-    capturebtn = new PushButton(tr("拍照"));
+    savebtn = new PushButton(tr("save current channel settings"));
+    combinebtn = new PushButton(tr("merge"));
+    capturebtn = new PushButton(tr("capture"));
     setEnabled(false); // 初始没开灯不能使用
 
     auto blay = new QHBoxLayout;
@@ -29,7 +29,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     lay->addLayout(blay);
 
     setLayout(lay);
-    setTitle(tr("亮度"));
+    setTitle(tr("Camera"));
 
     connect(savebtn,&PushButton::clicked,this,&CameraBox::onSaveBtn);
     connect(combinebtn,&PushButton::clicked,this,&CameraBox::onCombineBtn);

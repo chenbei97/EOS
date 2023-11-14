@@ -120,7 +120,7 @@ void GroupInfo::initObjects()
     medicine = new LineEdit;
     dose = new LineEdit;
     doseunit = new ComboBox;
-    btn = new PushButton(tr("确定"));
+    btn = new PushButton(tr("Confirm"));
     cbtn = new ColorButton;
 
     grouptype->addItems(GroupTypeFields);
@@ -129,11 +129,11 @@ void GroupInfo::initObjects()
 
     auto lay = new QVBoxLayout;
     auto formlay = new QFormLayout;
-    formlay->addRow(tr("实验类型: "),grouptype);
-    formlay->addRow(tr("实验组名: "),groupname);
-    formlay->addRow(tr("实验药品: "),medicine);
-    formlay->addRow(tr("剂量数值: "),dose);
-    formlay->addRow(tr("剂量单位: "),doseunit);
+    formlay->addRow(tr("Experiment Type: "),grouptype);
+    formlay->addRow(tr("Experiment Group: "),groupname);
+    formlay->addRow(tr("Experiment Medicine: "),medicine);
+    formlay->addRow(tr("Experiment Dose: "),dose);
+    formlay->addRow(tr("Dose Unit: "),doseunit);
 
     auto blay = new QHBoxLayout;
     blay->addStretch();

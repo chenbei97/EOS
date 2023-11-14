@@ -10,8 +10,8 @@
 
 HistoryBox::HistoryBox(QWidget *parent) : GroupBox(parent)
 {
-    checkbox = new CheckBox(tr("是否应用历史配置?"));
-    btn = new PushButton(tr("选择历史配置"));
+    checkbox = new CheckBox(tr("apply historical config?"));
+    btn = new PushButton(tr("select config file"));
     btn->hide();
 
     auto lay = new QHBoxLayout;
@@ -21,14 +21,14 @@ HistoryBox::HistoryBox(QWidget *parent) : GroupBox(parent)
     lay->setSpacing(10);
 
     setLayout(lay);
-    setTitle(tr("配置"));
+    setTitle(tr("Config"));
     connect(checkbox,&CheckBox::checkedChanged,this,&HistoryBox::onCheckBox);
     connect(btn,&PushButton::clicked,this,&HistoryBox::onBtn);
 }
 
 void HistoryBox::onBtn()
 {
-    auto path = QFileDialog::getOpenFileName(this,tr("选择配置文件"),"",
+    auto path = QFileDialog::getOpenFileName(this,tr("Select Configuration File"),"",
                                             "config (*.eos)");
     if (path.isEmpty()) return;
 

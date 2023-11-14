@@ -20,7 +20,7 @@ ZStackBox::ZStackBox(QWidget *parent) : GroupBox(parent)
     hlay->addStretch();
 
     setLayout(hlay);
-    setTitle(tr("其它"));
+    setTitle(tr("More"));
 
     connect(zstack,&CheckBox::checkedChanged,this,&ZStackBox::zstackChanged);
     connect(stitchimage,&CheckBox::checkedChanged,this,&ZStackBox::stitchChanged);

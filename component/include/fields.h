@@ -237,7 +237,7 @@ static const QStringList GroupDoseUnitFields =  {
         "mg/mL","mg/L","g/mL","g/L",
 };
 static const QStringList GroupTypeFields = {
-        QObject::tr("控制组"),QObject::tr("对照组"),QObject::tr("对照3"),
+        QObject::tr("Control"),QObject::tr("Contrast"),QObject::tr("Other"),
 };
 
 // stackbox
@@ -256,8 +256,8 @@ static const char* AppSelectField = "appselect";
 #define AppSelectColor QColor("#2F7CAD")
 #define NavigBarFieldsCount  (NavigBarFields.count())
 static const QFieldList AppFields = {
-        QObject::tr("增殖"),QObject::tr("划痕"),QObject::tr("侵袭"),QObject::tr("转染"),
-        QObject::tr("形态学"),QObject::tr("类器官"),QObject::tr("药效和毒理"),QObject::tr("自定义")
+        QObject::tr("Proliferation"),QObject::tr("Scratch"),QObject::tr("Invasion"),QObject::tr("Transfection"),
+        QObject::tr("Morphology"),QObject::tr("Organoid"),QObject::tr("Pharmacodynamics"),QObject::tr("Custom")
 };
 static const QFieldList NavigBarFields = {
         "Logo","Main","Preview","Data","Analysis","Settings"

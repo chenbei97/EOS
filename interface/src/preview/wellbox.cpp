@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-19 11:16:44
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 16:24:18
+ * @LastEditTime: 2023-11-14 10:05:25
  * @FilePath: \EOS\interface\src\preview\wellbox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -18,7 +18,7 @@ WellBox::WellBox(QWidget*parent): GroupBox(parent)
     lay->addWidget(wellbrandCombo);
 
     setLayout(lay);
-    setTitle(tr("孔板"));
+    setTitle(tr("Wellsize"));
 
     connect(wellbrandCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellbrandChanged);
     connect(manufacturerCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::manufacturerChanged);

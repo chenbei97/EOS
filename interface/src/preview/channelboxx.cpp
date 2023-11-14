@@ -21,7 +21,7 @@ ChannelBoxx::ChannelBoxx(QWidget*parent): GroupBox(parent)
     lay->addWidget(dapibtn);
 
     setLayout(lay);
-    setTitle(tr("通道"));
+    setTitle(tr("Channel"));
 
 //    QButtonGroup * group = new QButtonGroup;
 //    group->addButton(brbtn,0);

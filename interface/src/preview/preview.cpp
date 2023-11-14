@@ -50,7 +50,7 @@ void Preview::onWellbrandChanged(int option)
     viewpattern->clearAllViewWindowCache(size);
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
-    dock->setWindowTitle(tr("选择孔内视野"));
+    dock->setWindowTitle(tr("Select Hole Inside View"));
 
     // 4.切换厂家setPattenSize已经都清理完了,无需再调用
 }
@@ -77,7 +77,7 @@ void Preview::onObjectiveChanged(const QString& obj)
         LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 需要清理";
         viewpattern->clearAllViewWindowCache(size);
         // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
-        dock->setWindowTitle(tr("选择孔内视野"));
+        dock->setWindowTitle(tr("Select Hole Inside View"));
         pattern->clearAllHoleViewPoints();// 只需要清理视野信息,其它保留
     } else {
         LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 无需清理";
@@ -103,7 +103,7 @@ void Preview::updateViewPatternUi()
         LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 需要清理";
         viewpattern->clearAllViewWindowCache(size);
         // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
-        dock->setWindowTitle(tr("选择孔内视野"));
+        dock->setWindowTitle(tr("Select Hole Inside View"));
         pattern->clearAllHoleViewPoints();// 只需要清理视野信息,其它保留,切换厂家setPattenSize已经都清理完了
     } else {
         LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 无需清理";
@@ -118,7 +118,7 @@ void Preview::setAppInfo(int app)
 void Preview::initLayout()
 {
     // 1.右侧布局
-    auto pbox = new GroupBox(tr("选孔"));
+    auto pbox = new GroupBox(tr("Hole selection"));
     auto play = new QVBoxLayout;
     play->addWidget(pattern);
     //play->addWidget(dockcanvas); // 不加了通过点击孔来触发
@@ -187,7 +187,7 @@ void Preview::initObjects()
     groupinfo = new GroupInfo;
     toolbar = new PreviewTool;
     viewpattern = new ViewPattern;// 视野窗口
-    dock = new DockWidget(tr("选择孔内视野"));
+    dock = new DockWidget(tr("Select Hole Inside View"));
     dockcanvas = new QMainWindow;
     scrollarea = new QScrollArea;
     Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持

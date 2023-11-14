@@ -11,7 +11,7 @@
 FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
 {
     pattern = new TriangleMove;
-    autofocusbtn = new PushButton(tr("自动聚焦"));
+    autofocusbtn = new PushButton(tr("auto focus"));
 
     slider = new DoubleSlider;
     slider->setDirection(Qt::Vertical);
@@ -23,7 +23,7 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     step->setMaximumWidth(FocusToolStepSpinMaxWidth);
     step->setMaximum(FocusToolStepMaxVal);
     auto steplay = new QHBoxLayout;
-    steplay->addWidget(new Label(tr("step: ")));
+    steplay->addWidget(new Label(FocusToolStepLabel));
     steplay->addWidget(step);
 
     topbtn = new RoundButton;
@@ -61,7 +61,7 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     connect(pattern,&TriangleMove::topTriangleClicked,this,&FocusBox::topMove);
     connect(pattern,&TriangleMove::bottomTriangleClicked,this,&FocusBox::bottomMove);
     connect(pattern,&TriangleMove::triangleClicked,this,&FocusBox::directionMove);
-    setTitle(tr("焦距"));
+    setTitle(tr("Focus"));
 }
 
 void FocusBox::onAutoFocus()

@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-31 10:43:52
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-31 10:45:37
+ * @LastEditTime: 2023-11-14 10:13:28
  * @FilePath: \EOS\interface\src\preview\preview_updateui.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -18,8 +18,8 @@ void Preview::updateViewWindow(const QVariantMap& m)
     // 2. 更新视野窗口的标题
     auto point = m[HoleCoordinateField].toPoint(); //双击或者右键打开视野窗口带来的孔信息
     auto groupname = m[HoleGroupNameField].toString();
-    if (groupname.isEmpty()) groupname = tr("未设置组");
-    dock->setWindowTitle(tr("选择孔内视野(%1,%2)-组别(%3)")
+    if (groupname.isEmpty()) groupname = tr("Group not set");
+    dock->setWindowTitle(tr("Select Hole Inside View(%1,%2)-Group(%3)")
                                  .arg(QChar(point.x()+65)).arg(point.y()+1).arg(groupname));
     dock->setFloating(true);
 
