@@ -16,7 +16,7 @@ class INTERFACE_IMEXPORT ObjectiveBox: public GroupBox
     Q_OBJECT
 public:
     explicit ObjectiveBox(QWidget*parent= nullptr);
-    void importExperConfig(const QString&objective);
+    void importExperConfig(const QString&objectiveDescrip);
     ObjectiveInfo objectiveInfo() const;
 public slots:
     void onObjectiveSettingChanged(const LocationObjectiveInfo& m);
@@ -27,6 +27,8 @@ private:
     QRadioButton *  rbtn_loc4;
     QMap<QString,QRadioButton*> location_button;
     void onClicked();
+    QString convertTo(const QString& text) const;
+    QString convertFrom(const QString& text) const;
 signals:
     void objectiveChanged(const QString& obj);
 };

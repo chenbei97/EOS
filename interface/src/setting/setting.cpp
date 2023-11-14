@@ -66,9 +66,9 @@ void Setting::initAttributes()
 
 void Setting::initObjects()
 {
-    loginbtn = new QRadioButton(tr("登录设置"));
-    databasebtn = new QRadioButton(tr("数据库设置"));
-    objectivebtn = new QRadioButton(tr("物镜设置"));
+    loginbtn = new QRadioButton(tr("Login Setting"));
+    databasebtn = new QRadioButton(tr("Database Setting"));
+    objectivebtn = new QRadioButton(tr("Objective Setting"));
     buttongroup = new QButtonGroup;
 
     b1 = new GroupBox;

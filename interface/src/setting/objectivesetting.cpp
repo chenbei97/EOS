@@ -45,7 +45,8 @@ void ObjectiveSetting::saveSetting()
     // 4. 遍历其它位置选过的镜头,如果有选过,提示占用
     foreach(auto other_objective,info.values()) {
         if (current_objective == other_objective) {
-            int ret = QMessageBox::warning(this,WarningChinese,tr("该镜头已被占用,是否更换?")
+            int ret = QMessageBox::warning(this,WarningChinese,
+                                           tr("The lens is already occupied, do you want to replace it?")
                                            ,QMessageBox::Yes|QMessageBox::No);
             if (ret == QMessageBox::No) {
                 emit objectiveSettingChanged(info);
@@ -93,7 +94,6 @@ void ObjectiveSetting::onMoveMachine(const QString& f,const QVariant& d)
     }
 }
 
-
 void ObjectiveSetting::updateCheckedState()
 {
     // 根据当前位置找到选择的镜头信息
@@ -120,30 +120,30 @@ void ObjectiveSetting::initAttributes()
     buttongroup1->buttonClicked(0);
     buttongroup2->buttonClicked(0);
 
-    info[CameraLocationField1] = Bright4xField;
-    info[CameraLocationField2] = PH4xField;
-    info[CameraLocationField3] = Bright10xField;
-    info[CameraLocationField4] = PH10xField;
+    info[CameraLocationField1] = Objective4x;
+    info[CameraLocationField2] = Objective10x;
+    info[CameraLocationField3] = Objective20x;
+    info[CameraLocationField4] = Objective40x;
 
     tip = tr("配置信息:    %1 [%2]    %3 [%4]    %5 [%6]    %7 [%8]");
     //emit objectiveSettingChanged(info);
     updateTipInfo();
 
-    objective_button[Bright4xField] = br4x;
-    objective_button[Bright10xField] = br10x;
-    objective_button[Bright20xField] = br20x;
-    objective_button[Bright40xField] = br40x;
-    objective_button[PH4xField] = ph4x;
-    objective_button[PH10xField] = ph10x;
-    objective_button[PH20xField] = ph20x;
-    objective_button[PH40xField] = ph40x;
+    objective_button[Objective4x] = br4x;
+    objective_button[Objective10x] = br10x;
+    objective_button[Objective20x] = br20x;
+    objective_button[Objective40x] = br40x;
+    objective_button[_4xPHField] = ph4x;
+    objective_button[_20xPHField] = ph10x;
+    objective_button[_10xPHField] = ph20x;
+    objective_button[_40xPHField] = ph40x;
     objective_button[NoneField] = none;
 }
 
 void ObjectiveSetting::initLayout()
 {
     auto lay1 = new QHBoxLayout;
-    lay1->addWidget(new Label(tr("相机位置: ")));
+    lay1->addWidget(new Label("Objective Location: "));
     lay1->addWidget(location_one);
     lay1->addWidget(location_two);
     lay1->addWidget(location_three);
@@ -155,7 +155,7 @@ void ObjectiveSetting::initLayout()
     box1->setLayout(lay1);
 
     auto lay2 = new QHBoxLayout;
-    lay2->addWidget(new Label(tr("镜头设置: ")));
+    lay2->addWidget(new Label(tr("Objective Option: ")));
     lay2->addWidget(br4x);
     lay2->addWidget(ph4x);
     lay2->addWidget(br10x);
@@ -196,18 +196,18 @@ void ObjectiveSetting::initObjects()
     location_two = new QRadioButton(CameraLocationField2);
     location_three = new QRadioButton(CameraLocationField3);
     location_four = new QRadioButton(CameraLocationField4);
-    locationbtn = new PushButton(tr("移动电机到该位置"));
+    locationbtn = new PushButton(tr("move machine to this"));
 
-    br4x = new QRadioButton(Bright4xField);
-    ph4x = new QRadioButton(PH4xField);
-    br10x = new QRadioButton(Bright10xField);
-    ph10x = new QRadioButton(PH10xField);
-    br20x = new QRadioButton(Bright20xField);
-    ph20x = new QRadioButton(PH20xField);
-    br40x = new QRadioButton(Bright40xField);
-    ph40x = new QRadioButton(PH40xField);
+    br4x = new QRadioButton(Objective4x);
+    ph4x = new QRadioButton(_4xPHField);
+    br10x = new QRadioButton(Objective10x);
+    ph10x = new QRadioButton(_10xPHField);
+    br20x = new QRadioButton(Objective20x);
+    ph20x = new QRadioButton(_20xPHField);
+    br40x = new QRadioButton(Objective40x);
+    ph40x = new QRadioButton(_40xPHField);
     none = new QRadioButton(NoneField);
-    savebtn = new PushButton(tr("保存当前镜头设置"));
+    savebtn = new PushButton(tr("save current objective option"));
 
     buttongroup1->addButton(location_one,0);
     buttongroup1->addButton(location_two,1);

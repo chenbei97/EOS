@@ -146,10 +146,12 @@ void ChannelBoxx::disableChannel(const QString &obj)
 { // obj = br4x,ph4x
     if (obj.contains(ObjectiveBR)) {
         phbtn->setEnabled(false);
+        phbtn->resetBackGroundColor();
         brbtn->setEnabled(true);
     } else if (obj.contains(ObjectivePH)) {
         phbtn->setEnabled(true);
         brbtn->setEnabled(false);
+        brbtn->resetBackGroundColor();
     } else {
         // 可能是无镜头 none 对通道的勾选没有影响
     }

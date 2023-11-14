@@ -11,10 +11,10 @@
 ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
 {
     // 这里初始化文字时需要跟objectivesetting.cpp初始化的4个镜头选项保持一致
-    rbtn_loc1 = new QRadioButton(Bright4xField);
-    rbtn_loc2 = new QRadioButton(PH4xField);
-    rbtn_loc3 = new QRadioButton(Bright10xField);
-    rbtn_loc4 = new QRadioButton(PH10xField);
+    rbtn_loc1 = new QRadioButton(Objective4x);
+    rbtn_loc2 = new QRadioButton(Objective10x);
+    rbtn_loc3 = new QRadioButton(Objective20x);
+    rbtn_loc4 = new QRadioButton(Objective40x);
 
     location_button[CameraLocationField1] = rbtn_loc1;
     location_button[CameraLocationField2] = rbtn_loc2;
@@ -30,7 +30,7 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
     rbtn_loc1->setChecked(true);
 
     setLayout(lay);
-    setTitle(tr("物镜"));
+    setTitle(tr("Objective"));
 
     connect(rbtn_loc1,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
     connect(rbtn_loc2,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
@@ -51,54 +51,105 @@ void ObjectiveBox::onObjectiveSettingChanged(const LocationObjectiveInfo &m)
         location_button[loc]->setEnabled(false); // none不能选
         foreach(auto cloc, m.keys()) {
             if (cloc != loc) {
-                location_button[cloc]->setEnabled(true); // 其它的要恢复
+                location_button[cloc]->setEnabled(true); // 其它的要恢复使能
             }
             location_button[cloc]->setChecked(true);//从none移开,选择个有效的就可触发更新ui信息即可
             location_button[cloc]->click();// click才能触发
         }
     } else { // 没包含none
         foreach(auto cloc, m.keys()) {
-               location_button[cloc]->setEnabled(true); // 可能第1次有none,第2次没有none要全部恢复
+               location_button[cloc]->setEnabled(true); // 可能第1次有none,第2次没有none要全部恢复使能
         }
         rbtn_loc1->setChecked(true); // 希望切换物镜硬件配置时能够确保UI界面信息的更新,手动触发
         rbtn_loc1->click(); // click才能触发
     }
 }
 
+QString ObjectiveBox::convertTo(const QString &text) const
+{ // 兼容老代码的字段 需要字段转换
+    QString field;
+    if (text == Objective4x)
+        field = Bright4xField;
+    else if (text == Objective10x)
+        field = Bright10xField;
+    else if (text == Objective20x)
+        field = Bright20xField;
+    else if (text == Objective40x)
+        field = Bright40xField;
+    else if (text == _4xPHField)
+        field = PH4xField;
+    else if (text == _10xPHField)
+        field = PH10xField;
+    else if (text == _20xPHField)
+        field = PH20xField;
+    else if (text == _40xPHField)
+        field = PH40xField;
+    return field;
+}
+
+QString ObjectiveBox::convertFrom(const QString &text) const
+{ // 兼容老代码的字段 需要字段转换,反向转换用于导入实验配置
+    QString field;
+    if (text == Bright4xField)
+        field = Objective4x;
+    else if (text == Bright10xField)
+        field = Objective10x;
+    else if (text == Bright20xField)
+        field = Objective20x;
+    else if (text == Bright40xField)
+        field = Objective40x;
+    else if (text == PH4xField)
+        field = _4xPHField;
+    else if (text == PH10xField)
+        field = _10xPHField;
+    else if (text == PH20xField)
+        field = _20xPHField;
+    else if (text == PH40xField)
+        field = _40xPHField;
+    return field;
+}
+
 void ObjectiveBox::onClicked()
 {
+    QString text;
     if (rbtn_loc1->isChecked())
-       emit objectiveChanged(rbtn_loc1->text());
+        text = rbtn_loc1->text();
     else if (rbtn_loc2->isChecked())
-       emit objectiveChanged(rbtn_loc2->text());
+        text = rbtn_loc2->text();
     else if (rbtn_loc3->isChecked())
-       emit objectiveChanged(rbtn_loc3->text());
+        text = rbtn_loc3->text();
     else if (rbtn_loc4->isChecked())
-       emit objectiveChanged(rbtn_loc4->text());
+        text = rbtn_loc4->text();
+
+    // 原来br4x,改为4x,为了方便禁用channelbox的使能,要修正回来br4x
+    text = convertTo(text);
+    emit objectiveChanged(text);
 }
 
 ObjectiveInfo ObjectiveBox::objectiveInfo() const
 {
     ObjectiveInfo m;
-
+    QString text;
     if (rbtn_loc1->isChecked()) {
-        m[ObjectiveDescripField] = rbtn_loc1->text(); // 传递实际字符串 br4x
+        text = rbtn_loc1->text(); // 传递实际字符串 br4x
         m[CameraLocationField] = QString::number(CameraLocationField1Index);
 
     }
     else if (rbtn_loc2->isChecked()) {
-        m[ObjectiveDescripField] = rbtn_loc2->text();
+        text = rbtn_loc2->text();
         m[CameraLocationField] = QString::number(CameraLocationField2Index);
     }
     else if (rbtn_loc3->isChecked()) {
-        m[ObjectiveDescripField] = rbtn_loc3->text();
+        text = rbtn_loc3->text();
         m[CameraLocationField] = QString::number(CameraLocationField3Index);
     }
     else if (rbtn_loc4->isChecked()) {
-        m[ObjectiveDescripField] = rbtn_loc4->text();
+        text = rbtn_loc4->text();
         m[CameraLocationField] = QString::number(CameraLocationField4Index);
     }
 
+    text = convertTo(text); // 兼容老代码,字段转换
+    m[ObjectiveDescripField] = text;
     //LOG<<m; // 注意! : 由于objectivesetting信号是异步的,此时rbtn_loc1其实并未赋值,所以构造函数初始化时要保持一致
 
     // objective存放原字符串
@@ -120,20 +171,24 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
     return m;
 }
 
-void ObjectiveBox::importExperConfig(const QString &objective)
-{
+void ObjectiveBox::importExperConfig(const QString &objectiveDescrip)
+{ // objectiveDescrip = br4x
     QStringList objectives = {rbtn_loc1->text(),rbtn_loc2->text(),
             rbtn_loc3->text(),rbtn_loc4->text()};
-    if (!objectives.contains(objective)) {
+
+    auto objectiveDes = convertFrom(objectiveDescrip); // br4x转4x,ph4x转4xPH
+    LOG<<objectives<<objectiveDes; // ("4x", "4xPH", "10xPH", "40x") "4x"
+    if (!objectives.contains(objectiveDes)) {
         // 可能没有这个硬件配置,就默认第1个
         rbtn_loc1->setChecked(true);
         return;
     }
     // 相等的那个为true
-    rbtn_loc1->setChecked(rbtn_loc1->text() == objective);
-    rbtn_loc2->setChecked(rbtn_loc2->text() == objective);
-    rbtn_loc3->setChecked(rbtn_loc3->text() == objective);
-    rbtn_loc4->setChecked(rbtn_loc4->text() == objective);
+
+    rbtn_loc1->setChecked(rbtn_loc1->text() == objectiveDes);
+    rbtn_loc2->setChecked(rbtn_loc2->text() == objectiveDes);
+    rbtn_loc3->setChecked(rbtn_loc3->text() == objectiveDes);
+    rbtn_loc4->setChecked(rbtn_loc4->text() == objectiveDes);
 
     // 手动触发下信号,去更新channelbox和timebox的选项是否可以勾选br或者ph
     onClicked();

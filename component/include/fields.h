@@ -148,16 +148,20 @@ static const char* RFPField = "RFP";
 static const char* DAPIField = "DAPI";
 static const char* Bright4xField = "br4x";
 static const char* PH4xField = "ph4x";
+static const char* _4xPHField = "4xPH";
 static const char* Bright10xField = "br10x";
 static const char* PH10xField = "ph10x";
+static const char* _10xPHField = "10xPH";
 static const char* Bright20xField = "br20x";
 static const char* PH20xField = "ph20x";
+static const char* _20xPHField = "20xPH";
 static const char* Bright40xField = "br40x";
 static const char* PH40xField = "ph40x";
+static const char* _40xPHField = "40xPH";
 static const char* NoneField = "none";
 static const QFieldList ObjectiveSettingFields = {
-        Bright4xField,PH4xField,Bright10xField,PH10xField,
-        Bright20xField,PH20xField,Bright40xField,PH40xField,
+        Objective4x,_4xPHField,Objective10x,_10xPHField,
+        Objective20x,_20xPHField,Objective40x,_40xPHField,
         NoneField
 };
 static const QFieldList ChannelFields = {
@@ -187,10 +191,10 @@ static const char* FocusToolFocusLabel = "focus: ";
 static const char* FocusToolStepLabel = "step: ";
 static const char* FocusField = "focus";
 static const char* FocusStepField = "focus_step";
-static const char* CameraLocationField1 = "loc_1";
-static const char* CameraLocationField2 = "loc_2";
-static const char* CameraLocationField3 = "loc_3";
-static const char* CameraLocationField4 = "loc_4";
+static const char* CameraLocationField1 = "objective1";
+static const char* CameraLocationField2 = "objective2";
+static const char* CameraLocationField3 = "objective3";
+static const char* CameraLocationField4 = "objective4";
 static const QFieldList CameraLocationFieldFields = {
         CameraLocationField1,CameraLocationField2,CameraLocationField3,CameraLocationField4
 };
