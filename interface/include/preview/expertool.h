@@ -1,3 +1,11 @@
+/*** 
+ * @Author: chenbei97 chenbei_electric@163.com
+ * @Date: 2023-11-14 13:26:28
+ * @LastEditors: chenbei97 chenbei_electric@163.com
+ * @LastEditTime: 2023-11-14 14:51:58
+ * @FilePath: \EOS\interface\include\preview\expertool.h
+ * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
+ */
 
 #ifndef EOS_MAIN_CORE_PY_EXPERTOOL_H
 #define EOS_MAIN_CORE_PY_EXPERTOOL_H

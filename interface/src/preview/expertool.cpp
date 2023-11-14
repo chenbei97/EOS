@@ -1,3 +1,11 @@
+/*** 
+ * @Author: chenbei97 chenbei_electric@163.com
+ * @Date: 2023-11-14 13:28:55
+ * @LastEditors: chenbei97 chenbei_electric@163.com
+ * @LastEditTime: 2023-11-14 14:51:50
+ * @FilePath: \EOS\interface\src\preview\expertool.cpp
+ * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
+ */
 
 #include "expertool.h"
 
