@@ -11,6 +11,7 @@
 
 #include "window.h"
 #include "objectivesetting.h"
+#include "wellsetting.h"
 
 class INTERFACE_IMEXPORT Setting : public QWidget
 {
@@ -29,7 +30,10 @@ private:
     QRadioButton * databasebtn;
     GroupBox * b2;
     QRadioButton * objectivebtn;
+    QRadioButton * wellbtn;
+private:
     ObjectiveSetting * objectivesetting;
+    WellSetting * wellsetting;
     QButtonGroup * buttongroup;
 private:
     void toggleSetting(int option);

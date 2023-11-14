@@ -43,6 +43,7 @@ void DoubleSlider::onSliderChanged(int val)
     QString s = QString("%1").arg(val);
     if (!s.contains(".")) s+=".0";
     auto text = QString("%1 %2").arg(s).arg(suffixtext);
+    accumulateval = val;
     suffix->setText(text);
 }
 

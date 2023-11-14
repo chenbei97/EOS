@@ -36,5 +36,6 @@
 
 #include "setting.h"
 #include "objectivesetting.h"
+#include "wellsetting.h"
 
 #endif //EOSI_INTERFACE_H

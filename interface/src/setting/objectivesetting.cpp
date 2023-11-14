@@ -125,7 +125,7 @@ void ObjectiveSetting::initAttributes()
     info[CameraLocationField3] = Objective20x;
     info[CameraLocationField4] = Objective40x;
 
-    tip = tr("配置信息:    %1 [%2]    %3 [%4]    %5 [%6]    %7 [%8]");
+    tip = tr("Objective Info:    %1 [%2]    %3 [%4]    %5 [%6]    %7 [%8]");
     //emit objectiveSettingChanged(info);
     updateTipInfo();
 

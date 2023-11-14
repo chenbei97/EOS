@@ -139,6 +139,10 @@ void TimeBox::initAttributes()
 {
     datetimeedit->setMinimumDateTime(QDateTime::currentDateTime());
 
+    durationtime->setMaximumWidth(100);
+    totaltime->setMaximumWidth(100);
+    datetimeedit->setMaximumWidth(200);
+
     totaltime->setRange(1,LONG_MAX);
     totaltime->setSuffix(HoursFieldSuffix);
     totaltime->setValue(1.0);
@@ -167,19 +171,19 @@ void TimeBox::initConnections()
 void TimeBox::initLayout()
 {
     auto totallay = new QHBoxLayout;
-    totallay->addWidget(new Label(tr("total time: ")));
+    totallay->addWidget(new Label(tr("total time:        ")));// 对齐
     totallay->addWidget(totaltime);
     totallay->addWidget(totalunit);
     totallay->addStretch();
 
     auto durlay = new QHBoxLayout;
-    durlay->addWidget(new Label(tr("duration time: ")));
+    durlay->addWidget(new Label(tr("duration time:  ")));
     durlay->addWidget(durationtime);
     durlay->addWidget(durationunit);
     durlay->addStretch();
 
     auto boxlay = new QHBoxLayout;
-    boxlay->addWidget(new Label(tr("channel option: ")));
+    boxlay->addWidget(new Label(tr("channel option:")));
     boxlay->addWidget(brbox);
     boxlay->addWidget(phbox);
     boxlay->addWidget(gfpbox);

@@ -14,7 +14,7 @@ Setting::Setting(QWidget *parent) : QWidget(parent)
     initAttributes();
     initConnections();
     initLayout();
-    toggleSetting(2);
+    toggleSetting(3);
 }
 
 void Setting::emitSignals()
@@ -28,14 +28,22 @@ void Setting::toggleSetting(int option)
         b1->show();
         b2->hide();
         objectivesetting->hide();
+        wellsetting->hide();
     } else if (option == 1) {
         b1->hide();
         b2->show();
         objectivesetting->hide();
+        wellsetting->hide();
     } else if (option == 2) {
         b1->hide();
         b2->hide();
         objectivesetting->show();
+        wellsetting->hide();
+    } else if (option == 3) {
+        b1->hide();
+        b2->hide();
+        objectivesetting->hide();
+        wellsetting->show();
     }
 }
 
@@ -48,6 +56,8 @@ void Setting::initLayout()
     lay->addWidget(b2);
     lay->addWidget(objectivebtn);
     lay->addWidget(objectivesetting);
+    lay->addWidget(wellbtn);
+    lay->addWidget(wellsetting);
     //lay->addStretch();
     setLayout(lay);
 }
@@ -57,11 +67,12 @@ void Setting::initAttributes()
     b1->hide();
     b2->hide();
     objectivesetting->hide();
+    wellsetting->hide();
 
     buttongroup->addButton(loginbtn,0);
     buttongroup->addButton(databasebtn,1);
     buttongroup->addButton(objectivebtn,2);
-
+    buttongroup->addButton(wellbtn,3);
 }
 
 void Setting::initObjects()
@@ -69,11 +80,13 @@ void Setting::initObjects()
     loginbtn = new QRadioButton(tr("Login Setting"));
     databasebtn = new QRadioButton(tr("Database Setting"));
     objectivebtn = new QRadioButton(tr("Objective Setting"));
+    wellbtn = new QRadioButton(tr("Well Setting"));
     buttongroup = new QButtonGroup;
 
     b1 = new GroupBox;
     b2 = new GroupBox;
     objectivesetting = new ObjectiveSetting;
+    wellsetting = new WellSetting;
 }
 
 void Setting::initConnections()
