@@ -21,16 +21,21 @@ public:
     double focus() const;
     double focusStep() const;
 private:
+    void initObjects();
+    void initAttributes();
+    void initLayout();
+private:
     TriangleMove * pattern;
     DoubleSlider * slider;
     RoundButton * topbtn;
     RoundButton * bottombtn;
     SpinBox * step;
     PushButton * autofocusbtn;
+    SpinBox * skipholes;
+    SpinBox * skipviews;
     void addFocus();
     void subtractFocus();
     void onAutoFocus();
-
 signals:
     void leftMove();
     void rightMove();

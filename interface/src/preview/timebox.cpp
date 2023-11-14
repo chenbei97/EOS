@@ -139,15 +139,15 @@ void TimeBox::initAttributes()
 {
     datetimeedit->setMinimumDateTime(QDateTime::currentDateTime());
 
-    durationtime->setMaximumWidth(100);
-    totaltime->setMaximumWidth(100);
-    datetimeedit->setMaximumWidth(200);
+    durationtime->setMaximumWidth(TimeBoxSpinBoxMaxWidth);
+    totaltime->setMaximumWidth(TimeBoxSpinBoxMaxWidth);
+    datetimeedit->setMaximumWidth(TimeBoxDateTimeEditMaxWidth);
 
-    totaltime->setRange(1,LONG_MAX);
+    totaltime->setRange(1.0,LONG_MAX);
     totaltime->setSuffix(HoursFieldSuffix);
     totaltime->setValue(1.0);
 
-    durationtime->setRange(1,LONG_MAX);
+    durationtime->setRange(1.0,LONG_MAX);
     durationtime->setSuffix(HoursFieldSuffix);
     durationtime->setValue(1.0);
 

@@ -10,49 +10,9 @@
 
 FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
 {
-    pattern = new TriangleMove;
-    pattern->hide(); // 不在这里调镜头位置了,懒得去掉代码直接隐藏就行了
-    autofocusbtn = new PushButton(tr("auto focus"));
-
-    slider = new DoubleSlider;
-    slider->setDirection(Qt::Vertical);
-    slider->setRange(0,FocusToolFocusMaxVal);
-    slider->setPrefix("");
-    slider->setMouseEvent(true);
-
-    step = new SpinBox(true);
-    step->setMaximumWidth(FocusToolStepSpinMaxWidth);
-    step->setMaximum(FocusToolStepMaxVal);
-    auto steplay = new QHBoxLayout;
-    steplay->addWidget(new Label(FocusToolStepLabel));
-    steplay->addWidget(step);
-
-    topbtn = new RoundButton;
-    bottombtn = new RoundButton;
-    topbtn->setStrategy(RoundButton::TopTriangle);
-    bottombtn->setStrategy(RoundButton::BottomTriangle);
-
-    auto lay1 = new QVBoxLayout;
-    lay1->addWidget(topbtn);
-    lay1->addStretch();
-    lay1->addWidget(bottombtn);
-
-    auto lay2 = new QVBoxLayout;
-    lay2->addLayout(steplay);
-    lay2->addStretch();
-    lay2->addWidget(autofocusbtn);
-    lay2->setSpacing(0);
-
-    auto lay = new QHBoxLayout;
-    //lay->addWidget(pattern);
-    lay->addWidget(slider);
-    lay->addLayout(lay1);
-    lay->addLayout(lay2);
-
-    lay->addStretch();
-    lay->setSpacing(FocusBoxSpacing);
-
-    setLayout(lay);
+    initObjects();
+    initAttributes();
+    initLayout();
 
     connect(topbtn,&PushButton::clicked,this,&FocusBox::addFocus);
     connect(bottombtn,&PushButton::clicked,this,&FocusBox::subtractFocus);
@@ -103,4 +63,79 @@ double FocusBox::focus() const
 double FocusBox::focusStep() const
 {
     return step->value();
+}
+
+void FocusBox::initLayout()
+{
+    // "step" [spinbox]
+    auto steplay = new QHBoxLayout;
+    steplay->addWidget(new Label(FocusToolStepLabel));
+    steplay->addWidget(step);
+    steplay->addStretch();
+
+    // 2. focus的2个按钮细调
+    auto lay1 = new QVBoxLayout;
+    lay1->addWidget(topbtn);
+    lay1->addStretch();
+    lay1->addWidget(bottombtn);
+
+    // 3. 自动聚焦按钮
+    auto holelay = new QHBoxLayout;//自动聚焦跳过的孔数和视野数
+    holelay->addWidget(new Label(FocusSkipHolesLabelField));
+    holelay->addWidget(skipholes);
+    holelay->addStretch();
+
+    auto viewlay = new QHBoxLayout;
+    viewlay->addWidget(new Label(FocusSkipViewsLabelField));
+    viewlay->addWidget(skipviews);
+    viewlay->addStretch();
+
+    auto lay2 = new QVBoxLayout;
+    lay2->addStretch();
+    lay2->addLayout(holelay);
+    lay2->addLayout(viewlay);
+    lay2->addWidget(autofocusbtn);
+
+    auto lay = new QHBoxLayout;
+    lay->addWidget(pattern);
+    lay->addWidget(slider);
+    lay->addLayout(lay1);
+    lay->addLayout(steplay);
+    lay->addLayout(lay2);
+
+    lay->addStretch();
+    lay->setSpacing(FocusBoxSpacing);
+
+    setLayout(lay);
+}
+
+void FocusBox::initObjects()
+{
+    pattern = new TriangleMove;
+    autofocusbtn = new PushButton(tr("auto focus"));
+
+    slider = new DoubleSlider;
+    step = new SpinBox(true);
+
+    topbtn = new RoundButton;
+    bottombtn = new RoundButton;
+
+    skipholes = new SpinBox;
+    skipviews = new SpinBox;
+}
+
+void FocusBox::initAttributes()
+{
+    pattern->hide(); // 不需要在这里调镜头位置了,但是懒得去掉代码直接隐藏就行了
+
+    slider->setDirection(Qt::Vertical);
+    slider->setRange(0,FocusToolFocusMaxVal);
+    slider->setPrefix("");
+    slider->setMouseEvent(true);
+
+    step->setMaximumWidth(FocusToolStepSpinMaxWidth);
+    step->setMaximum(FocusToolStepMaxVal);
+
+    topbtn->setStrategy(RoundButton::TopTriangle);
+    bottombtn->setStrategy(RoundButton::BottomTriangle);
 }

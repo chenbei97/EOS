@@ -59,7 +59,7 @@ using std::modf;
     #define AppSelectButtonCountPerCol 4 // 每行4个按钮
     #define AppSelectButtonCountPerRow 2 // 共2行
     #define AppSelectButtonWidth 350 // 按钮的宽度
-    #define AppSelectButtonHeight 155 // 按钮高度
+    #define AppSelectButtonHeight 185 // 按钮高度
     #define AppSelectButtonHorGap 150 // 按钮之间水平间隔
     #define AppSelectButtonVerGap 150 // 按钮垂直水平间隔
     #define AppSelectHorGap (MainWindowWidth-AppSelectButtonCountPerCol*AppSelectButtonWidth- \
@@ -71,7 +71,7 @@ using std::modf;
     #define AppSelectMoveVerDistance (AppSelectButtonVerGap+AppSelectButtonHeight) // 垂直方向下一个按钮相对移动距离=verbtngap+btnheight
     #define AppSelectButtonRoundRadius 25 // 圆角半径
 
-    #define FocusBoxSpacing 40 // 水平布局间隔
+    #define FocusBoxSpacing 20 // 水平布局间隔
     #define PreviewToolBarMaxWidth 800 // 预览界面工具栏的宽度
     #define FocusToolStepSpinMaxWidth 100 // 设置焦距中间的step步进spibox设置的宽度不能太宽
 
@@ -79,6 +79,9 @@ using std::modf;
     #define PreviewPhotoCanvasViewDefaultSize 400 // 视野圆窗口的默认尺寸
 
     #define CameraModeHeight 40 // 切换相机模式部件的高度
+
+    #define TimeBoxSpinBoxMaxWidth 100 // timebox不想让spinbox太长
+    #define TimeBoxDateTimeEditMaxWidth 200
 
 #endif
 
