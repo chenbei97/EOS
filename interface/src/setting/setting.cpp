@@ -29,21 +29,25 @@ void Setting::toggleSetting(int option)
         b2->hide();
         objectivesetting->hide();
         wellsetting->hide();
+        loginbtn->setChecked(true);
     } else if (option == 1) {
         b1->hide();
         b2->show();
         objectivesetting->hide();
         wellsetting->hide();
+        databasebtn->setChecked(true);
     } else if (option == 2) {
         b1->hide();
         b2->hide();
         objectivesetting->show();
         wellsetting->hide();
+        objectivebtn->setChecked(true);
     } else if (option == 3) {
         b1->hide();
         b2->hide();
         objectivesetting->hide();
         wellsetting->show();
+        wellbtn->setChecked(true);
     }
 }
 
