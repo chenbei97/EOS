@@ -183,9 +183,9 @@ void SummaryPanel::setData(const QVariantMap &m)
         // 7.孔组视野信息
         edit->append("");
         if (patterninfo.keys().isEmpty()) {
-            edit->append(tr("<strong><font color = #20A848>[2]孔组信息:无任何分组</font></strong>"));
+            edit->append(tr("<strong><font color = #20A848>[2]Hole Info:No grouping</font></strong>"));
         }else {
-            edit->append(tr("<strong><font color = #20A848>[2]孔组信息:</font></strong>"));
+            edit->append(tr("<strong><font color = #20A848>[2]Hole Info:</font></strong>"));
 
             int count = 0;
             foreach(auto group, patterninfo.keys()) {
