@@ -107,6 +107,10 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E remove_directory
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/mediaservice"
         )
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove_directory
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/iconengines"
+        )
 # 2. copy_directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -122,11 +126,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${MEDIA_PATH}"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/mediaservice"
-        )
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${ICONENGINE_PATH}"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/iconengines"
         )
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
