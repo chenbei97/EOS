@@ -78,6 +78,7 @@ void FocusBox::initLayout()
     steplay->addWidget(new Label(FocusToolStepLabel));
     steplay->addWidget(step);
     steplay->addStretch();
+    steplay->setSpacing(0);
 
     auto lay = new QHBoxLayout;
     lay->addWidget(autofocusbtn);
