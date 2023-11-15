@@ -11,7 +11,7 @@
 
 void PythonThread::run()
 {
-    //LOG<<"python thread is running";
+#ifdef use_python
     if (!flag) {
         quit();
         wait();
@@ -48,6 +48,7 @@ void PythonThread::run()
     } else LOG<<"load tcp load func successful";
 
     PyObject_CallFunction(pFunc,Q_NULLPTR);
+#endif
 }
 
 PythonThread::PythonThread(const QString &path, const QString &file, const QString &func, QObject *parent)
@@ -64,5 +65,7 @@ void PythonThread::setFlag(bool enable)
 
 PythonThread::~ PythonThread()
 {
+#ifdef use_python
     Py_Finalize();
+#endif
 }

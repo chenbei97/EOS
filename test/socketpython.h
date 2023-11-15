@@ -10,7 +10,10 @@
 #define EOSI_SOCKETPYTHON_H
 
 #include "public.h"
+
+#ifdef use_python
 #include "Python.h"
+#endif
 
 class SocketPython : public QThread
 {

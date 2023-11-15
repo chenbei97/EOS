@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(setting,&Setting::objectiveSettingChanged,preview,&Preview::objectiveSettingChanged);
     setting->emitSignals(); // 把objectivesetting的初始配置触发一下去更新previewtool
 
-
+#ifdef use_python
     process = new PythonProcess;
 #ifndef  use_testSocket
     process->start("Eos_I/Eos_main.py");
@@ -52,6 +52,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 #else
     process->start("../test/test_socket.py");
     //StartPythonPointer->start("../test","test_socket","test_server");
+#endif
+#else
+    SocketInit.connectToHost(); // 改成直接连接
 #endif
 }
 

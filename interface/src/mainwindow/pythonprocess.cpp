@@ -20,8 +20,11 @@ PythonProcess::PythonProcess(QObject*parent): QObject(parent)
         process->close();
         process->waitForFinished();
         LOG<<"python process is kill? "<<!process->isOpen();
+#ifdef use_python
         Py_Finalize();
+#endif
     });
+#ifdef use_python
     Py_Initialize();
     //QString pythonHome = "C:\\Users\\Lenovo\\AppData\\Local\\Programs\\Python\\Python310";
     QString pythonHome = (CURRENT_PATH+"/python310");
@@ -46,7 +49,7 @@ PythonProcess::PythonProcess(QObject*parent): QObject(parent)
     //PyRun_SimpleString("sys.path.append('./python310')"); // 也可以不显示添加,因为目录已经指定过了
     //PyRun_SimpleString("print('os.getcwd(): ',os.getcwd())");
     //PyRun_SimpleString("print('sys.executable: ',sys.executable)");
-
+#endif
 }
 
 void PythonProcess::start(const QString& path)
@@ -57,11 +60,11 @@ void PythonProcess::start(const QString& path)
 //    foreach(auto env,QProcess::systemEnvironment()) {
 //        LOG<<"["<<env<<"]";
 //    }
-
+#ifdef use_python
     LOG<<"python.exe path = "<<CURRENT_PATH+"/python310/python.exe"<<" exec path = "<<path;
     process->start(CURRENT_PATH+"/python310/python.exe",QStringList()<<path);
     process->waitForStarted();
-
+#endif
 //    PyObject* pModule = PyImport_ImportModule("test_socket"); // "test_socket"
 //    PyObject* pFunc= PyObject_GetAttrString(pModule,"test_server"); // 调用函数 "test_server"
 //    //QTimer::singleShot(800,[=]{SocketInit.connectToHost();});

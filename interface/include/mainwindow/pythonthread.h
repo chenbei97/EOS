@@ -11,7 +11,10 @@
 #define EOSI_PYTHONTHREAD_H
 
 #include "window.h"
+
+#ifdef use_python
 #include "Python.h"
+#endif
 
 class INTERFACE_IMEXPORT PythonThread : public QThread
 {

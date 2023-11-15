@@ -14,7 +14,6 @@
 #include "appselect.h"
 #include "preview.h"
 #include "setting.h"
-#include "Python.h"
 #include "toupcam.h"
 #include "startpython.h"
 #include "startpythonx.h"

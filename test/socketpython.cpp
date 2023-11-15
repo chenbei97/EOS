@@ -10,6 +10,7 @@
 
 void SocketPython::run()
 {
+#ifdef use_python
     Py_Initialize();
     if (!Py_IsInitialized()){LOG << "inital python failed!";
     }else LOG << "inital python successful!";
@@ -28,6 +29,7 @@ void SocketPython::run()
     } else LOG<<"load tcp load func successful";
 
     PyObject_CallFunction(pFunc,Q_NULLPTR);
+#endif
 }
 
 SocketPython::SocketPython(QObject*parent):QThread (parent)
@@ -37,6 +39,8 @@ SocketPython::SocketPython(QObject*parent):QThread (parent)
 
 SocketPython :: ~SocketPython()
 {
+#ifdef use_python
     Py_Finalize();
+#endif
 }
 

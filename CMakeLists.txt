@@ -28,9 +28,12 @@ endif ()
 set(QRC_PATH bin/images.qrc bin/app.rc)
 #set(THEME_PATH ${PROJECT_SOURCE_DIR}/bin/theme/dark/darkstyle.qrc)
 
+set(USE_MYSQL 0)
+if (${USE_MYSQL})
 set(MYSQL_INSTALL_PATH "C:/Program Files/MySQL/MySQL Server 8.0")
 set(MYSQL_LIB_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.lib") # dll必须复制到bin下,lib可以不用
 set(MYSQL_DLL_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.dll")
+endif ()
 
 set(USE_OPENCV 0) # interface的cmakelist设置是否引用opencv不影响main.cpp,这里单独去控制
 if (${USE_OPENCV})
@@ -46,9 +49,14 @@ set(IMAGEFORMATS_PATH "${CMAKE_PREFIX_PATH}/plugins/imageformats")
 set(MEDIA_PATH "${CMAKE_PREFIX_PATH}/plugins/mediaservice")
 set(ICONENGINE_PATH "${CMAKE_PREFIX_PATH}/plugins/iconengines")
 
+set(USE_PYTHON 0)
+if (${USE_PYTHON})
 set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
 set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
+set(PYTHON310_LIB_PATH_python310 ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310.lib)
+set(PYTHON310_LIB_PATH_python310d ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310_d.lib)
 set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
+endif ()
 
 set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
 set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
@@ -81,7 +89,11 @@ add_subdirectory(component)
 add_subdirectory(interface)
 
 #（4）链接的库目录 必须add_executable之前
-link_directories(${PYTHON310_LIB_PATH} ${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib) # ${PYTHON310_LIB_PATH}只能在这里,不能在target_link_libraries
+link_directories(${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib)
+if (${USE_PYTHON})
+    link_directories(${PYTHON310_LIB_PATH})
+endif ()
+# ${PYTHON310_LIB_PATH}只能在这里,不能在target_link_libraries
 # ${OPENCV_LIBs_PATH}不能放link_directories 只能在target_link_libraries, ${TOUPCAM_LIB_PATH}测试是2个都可以放
 
 # （5）查找包 // C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\include
@@ -92,7 +104,13 @@ add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES}) # ${THEME
 
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
-        ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH} ${OPENCV_INCLUDE_PATH} ${TOUPCAM_INCLUDE_PATH})
+          ${TOUPCAM_INCLUDE_PATH})
+if (${USE_PYTHON})
+target_include_directories(${PROJECT_NAME} PUBLIC ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
+endif ()
+if (${USE_OPENCV})
+target_include_directories(${PROJECT_NAME} PUBLIC ${OPENCV_INCLUDE_PATH})
+endif ()
 # （7）清理4个文件夹并重新复制
 # 1. remove_directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -133,6 +151,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/iconengines"
         )
 # 3. mysql软件的2个文件必须复制
+if (${USE_MYSQL})
 if (EXISTS "${MYSQL_LIB_PATH}")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
@@ -144,6 +163,7 @@ if (EXISTS "${MYSQL_DLL_PATH}")
             COMMAND ${CMAKE_COMMAND} -E copy
             "${MYSQL_DLL_PATH}"
             "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+endif ()
 endif ()
 # 4. 同理opencv的进行复制 OPENCV_DLL_PATH
 if (${USE_OPENCV})
@@ -222,9 +242,11 @@ endif ()
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Sql Qt5::Network Qt5::Concurrent
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
-        component interface python310  # mingw必须显示指定python310,msvc指定与否都可
+        component interface  # mingw必须显示指定python310,msvc指定与否都可
         ${TOUPCAM_LIB_PATH}) # opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
-
+if (${USE_PYTHON})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PYTHON310_LIB_PATH_python310} ${PYTHON310_LIB_PATH_python310d})
+endif ()
 if (${USE_OPENCV})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH})
  # bin下已经放好了2个文件 ${OPENCV_LIBs_PATH},所以可以不使用OPENCV_LIBs_PATH

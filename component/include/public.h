@@ -66,5 +66,5 @@
 #include "qtextcodec.h"
 
 // (2) 常量定义
-
+//#define use_python 0
 #endif //EOSI_PUBLIC_H
