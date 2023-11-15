@@ -12,6 +12,8 @@
 #include "window.h"
 #include "cameratool.h"
 #include "focusbox.h"
+
+#ifdef use_opencv2
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/xfeatures2d.hpp>
@@ -33,6 +35,7 @@ static QImage matToqimage(const cv::Mat& mat)
 //    lab->show();
      return img;
 }
+#endif
 
 class INTERFACE_IMEXPORT CameraBox : public GroupBox
 {

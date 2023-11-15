@@ -20,16 +20,21 @@ set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
 set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
 set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
 
-set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
-set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
+set(USE_OPENCV 0) # 要和window.h的use_opencv2一致,如果引入这里要设置1
+if (${USE_OPENCV})
+    set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
+    set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
+endif ()
 
 add_definitions(-DINTERFACE_LIBRARY=0) # 添加预定义宏,=号不能有空格,用于指定类导出或导入
 
 file(GLOB_RECURSE INTERFACE_HEADERS  "include/*.h")
 file(GLOB_RECURSE INTERFACE_SOURCES "src/*.cpp")
 
-link_directories(${PYTHON310_LIB_PATH}# python引入lib只能在这里
-        ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH}) # opencv 2个都需要指定
+link_directories(${PYTHON310_LIB_PATH})# python引入lib只能在这里
+if (${USE_OPENCV})
+link_directories(${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH})
+endif ()# opencv 2个都需要指定
 
 find_package(Qt5 COMPONENTS
         Core
@@ -50,14 +55,16 @@ set_target_properties(${DLLNAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(${DLLNAME}
         PUBLIC
         ${PROJECT_SOURCE_DIR}/component/include
+        ${PROJECT_SOURCE_DIR}/interface/include
         ${PROJECT_SOURCE_DIR}/interface/include/preview
         ${PROJECT_SOURCE_DIR}/interface/include/setting
         ${PROJECT_SOURCE_DIR}/interface/include/mainwindow
-        ${PROJECT_SOURCE_DIR}/interface/include/opencv2
-        ${PROJECT_SOURCE_DIR}/interface/include
         ${TOUPCAM_INCLUDE_PATH}
         ${PYTHON310_INCLUDE_PATH}
         )
+if (${USE_OPENCV})
+target_include_directories(${DLLNAME} PUBLIC ${PROJECT_SOURCE_DIR}/interface/include/opencv2)
+endif()
 
 target_link_libraries(${DLLNAME}
         Qt5::Core
@@ -72,6 +79,11 @@ target_link_libraries(${DLLNAME}
         component
         ${TOUPCAM_LIB_PATH}
         python310  # mingw必须显示指定python310,msvc指定与否都可
-        ${OPENCV_opencv_world_LIB_PATH}
-        ${OPENCV_img_hash_LIB_PATH}
         )
+
+if (${USE_OPENCV})
+target_link_libraries(${DLLNAME}
+    ${OPENCV_opencv_world_LIB_PATH}
+    ${OPENCV_img_hash_LIB_PATH}
+)
+endif()

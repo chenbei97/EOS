@@ -33,6 +33,7 @@ using std::modf;
 
 // (3) 常量
 // navigbar
+//#define use_opencv2 0 // 要和interface-cmakelist的USE_OPNECV一致
 #define NavigPainterFontSize 20
 #define NavigPainterFont (QFont(DefaultFontFamily,NavigPainterFontSize,QFont::Bold))
 #define NavigPainterMetric (QFontMetrics(NavigPainterFont))
@@ -71,7 +72,7 @@ using std::modf;
     #define AppSelectMoveVerDistance (AppSelectButtonVerGap+AppSelectButtonHeight) // 垂直方向下一个按钮相对移动距离=verbtngap+btnheight
     #define AppSelectButtonRoundRadius 25 // 圆角半径
 
-    #define FocusBoxSpacing 20 // 水平布局间隔
+    #define FocusBoxSpacing 50 // 水平布局间隔
     #define PreviewToolBarMaxWidth 800 // 预览界面工具栏的宽度
     #define FocusToolStepSpinMaxWidth 100 // 设置焦距中间的step步进spibox设置的宽度不能太宽
 

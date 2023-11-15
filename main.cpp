@@ -7,9 +7,8 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "test/test.h"
-//#include <windows.h>
 
-SQLType CurrentSqlType; // 必须定义
+SQLType CurrentSqlType; // 必须外部定义
 
 void initApp(QApplication& a);
 //#define usetesttcp 0
@@ -18,20 +17,11 @@ int main(int argc, char *argv[]) {
     LogInit;
     QApplication a(argc, argv);
     initApp(a);
-    //StartPythonPointer->start("../test","test_socket","test_server");
-    //test_sharepointer();
-    //test_camera();
-    //test_assemble_parse();
-    //test_async();
-    //test_opencv();
-
 #ifdef usetesttcp
     test_tcp();
 #else
     MainWindow w;
     setWindowAlignCenter(&w);
-//    Label w;
-//    w.setPixmap(QPixmap(CURRENT_PATH+"/images/cell.png"));
     w.show();
 
 #endif

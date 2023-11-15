@@ -16,7 +16,6 @@
 using std::async;
 using std::promise;
 using std::future;
-//using namespace cv;
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 
 static void test_sharepointer()
@@ -99,6 +98,7 @@ static void test_camera()
 
 static void test_opencv()
 {
+#ifdef use_opencv2
     auto path = CURRENT_PATH+"/images/cell.png";
     cv::Mat src = cv::imread(path.toStdString().c_str());
     if (!src.empty())
@@ -116,7 +116,7 @@ static void test_opencv()
     }
     else
         LOG <<"could not load image...";
-
+#endif
 }
 
 static void test_async()

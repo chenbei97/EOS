@@ -32,13 +32,14 @@ set(MYSQL_INSTALL_PATH "C:/Program Files/MySQL/MySQL Server 8.0")
 set(MYSQL_LIB_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.lib") # dll必须复制到bin下,lib可以不用
 set(MYSQL_DLL_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.dll")
 
-#set(OpenCV_DIR "C:/opencv-4.6.0")
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set(USE_OPENCV 0) # interface的cmakelist设置是否引用opencv不影响main.cpp,这里单独去控制
+if (${USE_OPENCV})
 file(GLOB OPENCV_DLLs_PATH  "C:/opencv-4.6.0/x64/vc17/bin/*.dll")
 file(GLOB OPENCV_LIBs_PATH  "C:/opencv-4.6.0/x64/vc17/lib/*.lib")
 set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
 set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
 set(OPENCV_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/interface/opencv2)
+endif ()
 
 set(SQLDRIVERS_PATH "${CMAKE_PREFIX_PATH}/plugins/sqldrivers")
 set(IMAGEFORMATS_PATH "${CMAKE_PREFIX_PATH}/plugins/imageformats")
@@ -74,12 +75,14 @@ set(INTERFACE_INCLUDE_PATH
 
 file(GLOB MAIN_FILES  "${PROJECT_SOURCE_DIR}/*.h" "${PROJECT_SOURCE_DIR}/*.cpp")
 file(GLOB TESTFILES  "${PROJECT_SOURCE_DIR}/test/*.h" "${PROJECT_SOURCE_DIR}/test/*.cpp")
+
 # （3）2个子目录
 add_subdirectory(component)
 add_subdirectory(interface)
+
 #（4）链接的库目录 必须add_executable之前
 link_directories(${PYTHON310_LIB_PATH} ${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib) # ${PYTHON310_LIB_PATH}只能在这里,不能在target_link_libraries
-# ${OPENCV_LIBs_PATH},相反 不能放link_directories 只能在target_link_libraries, ${TOUPCAM_LIB_PATH}测试是2个都可以放
+# ${OPENCV_LIBs_PATH}不能放link_directories 只能在target_link_libraries, ${TOUPCAM_LIB_PATH}测试是2个都可以放
 
 # （5）查找包 // C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\include
 find_package(Qt5 COMPONENTS Core Gui Widgets Sql Network
@@ -144,6 +147,7 @@ if (EXISTS "${MYSQL_DLL_PATH}")
             "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
 endif ()
 # 4. 同理opencv的进行复制 OPENCV_DLL_PATH
+if (${USE_OPENCV})
 foreach(opencv_lib ${OPENCV_LIBs_PATH})
     if (EXISTS "${opencv_lib}")
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -161,6 +165,7 @@ foreach(opencv_dll ${OPENCV_DLLs_PATH}) # 必须复制dll不然无法单独运�
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
     endif ()
 endforeach(opencv_dll)
+endif ()
 
 # 5. 其它依赖dll
 if (EXISTS "${OPENGL32_PATH}")
@@ -219,9 +224,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Sql Qt5::Network Qt5::Concurrent
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
         component interface python310  # mingw必须显示指定python310,msvc指定与否都可
-        ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH} # bin下已经放好了2个文件 ${OPENCV_LIBs_PATH}
         ${TOUPCAM_LIB_PATH}) # opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
 
+if (${USE_OPENCV})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH})
+ # bin下已经放好了2个文件 ${OPENCV_LIBs_PATH},所以可以不使用OPENCV_LIBs_PATH
+endif ()
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)

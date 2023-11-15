@@ -67,45 +67,28 @@ double FocusBox::focusStep() const
 
 void FocusBox::initLayout()
 {
-    // "step" [spinbox]
-    auto steplay = new QHBoxLayout;
-    steplay->addWidget(new Label(FocusToolStepLabel));
-    steplay->addWidget(step);
-    steplay->addStretch();
-
-    // 2. focus的2个按钮细调
+    // 1. focus的2个按钮细调
     auto lay1 = new QVBoxLayout;
     lay1->addWidget(topbtn);
     lay1->addStretch();
     lay1->addWidget(bottombtn);
 
-    // 3. 自动聚焦按钮
-    auto holelay = new QHBoxLayout;//自动聚焦跳过的孔数和视野数
-    holelay->addWidget(new Label(FocusSkipHolesLabelField));
-    holelay->addWidget(skipholes);
-    holelay->addStretch();
-
-    auto viewlay = new QHBoxLayout;
-    viewlay->addWidget(new Label(FocusSkipViewsLabelField));
-    viewlay->addWidget(skipviews);
-    viewlay->addStretch();
-
-    auto lay2 = new QVBoxLayout;
-    lay2->addStretch();
-    lay2->addLayout(holelay);
-    lay2->addLayout(viewlay);
-    lay2->addWidget(autofocusbtn);
+    // 2. "step: " [spinbox]
+    auto steplay = new QHBoxLayout;
+    steplay->addWidget(new Label(FocusToolStepLabel));
+    steplay->addWidget(step);
+    steplay->addStretch();
 
     auto lay = new QHBoxLayout;
+    lay->addWidget(autofocusbtn);
     lay->addWidget(pattern);
     lay->addWidget(slider);
     lay->addLayout(lay1);
     lay->addLayout(steplay);
-    lay->addLayout(lay2);
 
-    lay->addStretch();
+
+    //lay->addStretch();
     lay->setSpacing(FocusBoxSpacing);
-
     setLayout(lay);
 }
 
@@ -119,9 +102,6 @@ void FocusBox::initObjects()
 
     topbtn = new RoundButton;
     bottombtn = new RoundButton;
-
-    skipholes = new SpinBox;
-    skipviews = new SpinBox;
 }
 
 void FocusBox::initAttributes()

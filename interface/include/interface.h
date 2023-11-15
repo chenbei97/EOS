@@ -31,6 +31,7 @@
 #include "camerabox.h"
 #include "zstackbox.h"
 #include "savebox.h"
+#include "skipbox.h"
 #include "summarypanel.h"
 #include "summarydialog.h"
 

@@ -31,8 +31,6 @@ private:
     RoundButton * bottombtn;
     SpinBox * step;
     PushButton * autofocusbtn;
-    SpinBox * skipholes;
-    SpinBox * skipviews;
     void addFocus();
     void subtractFocus();
     void onAutoFocus();

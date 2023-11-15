@@ -192,6 +192,7 @@ static const char* BrightFieldLabel = "bright: ";
 static const char* FocusToolFocusLabel = "focus: ";
 static const char* FocusToolStepLabel = "step: ";
 static const char* FocusField = "focus";
+static const char* FocusxField = "Focus";
 static const char* FocusSkipHolesField = "skip holes";
 static const char* FocusSkipViewsField = "skip views";
 static const char* FocusSkipHolesLabelField = "skip holes: ";

@@ -83,6 +83,7 @@ void CameraBox::onSaveBtn()
 
 void CameraBox::onCombineBtn()
 {
+#ifdef use_opencv2
     QImage img(CURRENT_PATH+"/images/cell.png");
     auto mat = qimageToMat(img);
     //auto img_ = matToqimage(mat);
@@ -95,6 +96,9 @@ void CameraBox::onCombineBtn()
     cv::merge(new_channels,res2);
     cv::imshow("111",res2);
     cv::waitKey(0);
+#endif
+    // 决定不引入opencv2,所以这里通过Socket让服务端来做
+
 }
 
 void CameraBox::captureImage(const QImage &img, const QString &channel)
