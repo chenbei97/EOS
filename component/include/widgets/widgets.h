@@ -52,6 +52,8 @@
 #include "qevent.h"
 #include "qaction.h"
 #include "qmath.h"
+#include "qpropertyanimation.h"
+#include "qgraphicseffect.h"
 
 #include "fields.h"
 #include "constant.h"

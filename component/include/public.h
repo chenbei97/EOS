@@ -26,6 +26,7 @@
 #include "sqlquerymodel.h"
 #include "sqltablemodel.h"
 #include "standarditemmodel.h"
+#include "gradienthiddenanimation.h"
 
 #include "sqlreadwrite.h"
 #include "mysqlreadwrite.h"
@@ -62,6 +63,7 @@
 #include "photocanvastriangle.h"
 #include "labeltriangle.h"
 #include "windowinfo.h"
+#include "gradienthiddenwidget.h"
 
 #include "qtextcodec.h"
 

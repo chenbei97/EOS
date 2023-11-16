@@ -15,11 +15,18 @@
 #include "qeventloop.h"
 #include "qdatetime.h"
 #include "qdebug.h"
+#include "qpropertyanimation.h"
+#include "qgraphicseffect.h"
 
 // (2) 定义常量
 #define CURRENT_PATH (QDir::currentPath())
 #define CURRENT_THREAD (QThread::currentThread())
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
+#define DafaultEffectDuration 1000
+#define DefaultEasingCurve (QEasingCurve::Linear)
+#define DefaultOpacityValue 1.0
+#define DoubleZeroValue 0.0
+static const char* OpacityField = "opacity";
 
 
 // (3) 导出定义
