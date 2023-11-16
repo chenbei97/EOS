@@ -19,7 +19,7 @@
 #include "startpythonx.h"
 #include "pythonprocess.h"
 
-#define use_testSocket 0
+//#define use_testSocket 0
 
 class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 {
@@ -32,7 +32,9 @@ private:
     Preview * preview;
     Setting * setting;
     QStackedWidget * stack;
-    PythonProcess * process;
+//#ifdef use_python
+//    PythonProcess * process;
+//#endif
 private:
     void navigbarSelect(int id);
 };

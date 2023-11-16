@@ -11,9 +11,9 @@
 
 #include "public.h"
 
-#ifdef use_python
-#include "Python.h"
-#endif
+//#ifdef use_python
+//#include "Python.h"
+//#endif
 
 class SocketPython : public QThread
 {

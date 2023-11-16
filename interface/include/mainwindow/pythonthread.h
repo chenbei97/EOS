@@ -12,9 +12,9 @@
 
 #include "window.h"
 
-#ifdef use_python
-#include "Python.h"
-#endif
+//#ifdef use_python
+//#include "Python.h"
+//#endif
 
 class INTERFACE_IMEXPORT PythonThread : public QThread
 {

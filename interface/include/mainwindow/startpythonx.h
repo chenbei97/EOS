@@ -3,9 +3,9 @@
 #define EOS_MAIN_CORE_PY_STARTPYTHONX_H
 
 #include "window.h"
-#ifdef use_python
-#include "Python.h"
-#endif
+//#ifdef use_python
+//#include "Python.h"
+//#endif
 
 class INTERFACE_IMEXPORT StartPythonx: public QObject
 {

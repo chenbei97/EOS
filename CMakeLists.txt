@@ -28,35 +28,35 @@ endif ()
 set(QRC_PATH bin/images.qrc bin/app.rc)
 #set(THEME_PATH ${PROJECT_SOURCE_DIR}/bin/theme/dark/darkstyle.qrc)
 
-set(USE_MYSQL 0)
-if (${USE_MYSQL})
-set(MYSQL_INSTALL_PATH "C:/Program Files/MySQL/MySQL Server 8.0")
-set(MYSQL_LIB_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.lib") # dll必须复制到bin下,lib可以不用
-set(MYSQL_DLL_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.dll")
-endif ()
+#set(USE_MYSQL 0)
+#if (${USE_MYSQL})
+#set(MYSQL_INSTALL_PATH "C:/Program Files/MySQL/MySQL Server 8.0")
+#set(MYSQL_LIB_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.lib") # dll必须复制到bin下,lib可以不用
+#set(MYSQL_DLL_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.dll")
+#endif ()
 
-set(USE_OPENCV 0) # interface的cmakelist设置是否引用opencv不影响main.cpp,这里单独去控制
-if (${USE_OPENCV})
-file(GLOB OPENCV_DLLs_PATH  "C:/opencv-4.6.0/x64/vc17/bin/*.dll")
-file(GLOB OPENCV_LIBs_PATH  "C:/opencv-4.6.0/x64/vc17/lib/*.lib")
-set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
-set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
-set(OPENCV_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/interface/opencv2)
-endif ()
+#set(USE_OPENCV 0) # interface的cmakelist设置是否引用opencv不影响main.cpp,这里单独去控制
+#if (${USE_OPENCV})
+#file(GLOB OPENCV_DLLs_PATH  "C:/opencv-4.6.0/x64/vc17/bin/*.dll")
+#file(GLOB OPENCV_LIBs_PATH  "C:/opencv-4.6.0/x64/vc17/lib/*.lib")
+#set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
+#set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
+#set(OPENCV_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/interface/opencv2)
+#endif ()
 
 set(SQLDRIVERS_PATH "${CMAKE_PREFIX_PATH}/plugins/sqldrivers")
 set(IMAGEFORMATS_PATH "${CMAKE_PREFIX_PATH}/plugins/imageformats")
 set(MEDIA_PATH "${CMAKE_PREFIX_PATH}/plugins/mediaservice")
 set(ICONENGINE_PATH "${CMAKE_PREFIX_PATH}/plugins/iconengines")
 
-set(USE_PYTHON 0)
-if (${USE_PYTHON})
-set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
-set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
-set(PYTHON310_LIB_PATH_python310 ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310.lib)
-set(PYTHON310_LIB_PATH_python310d ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310_d.lib)
-set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
-endif ()
+#set(USE_PYTHON 0)
+#if (${USE_PYTHON})
+#set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
+#set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
+#set(PYTHON310_LIB_PATH_python310 ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310.lib)
+#set(PYTHON310_LIB_PATH_python310d ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310_d.lib)
+#set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
+#endif ()
 
 set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
 set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
@@ -90,9 +90,9 @@ add_subdirectory(interface)
 
 #（4）链接的库目录 必须add_executable之前
 link_directories(${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib)
-if (${USE_PYTHON})
-    link_directories(${PYTHON310_LIB_PATH})
-endif ()
+#if (${USE_PYTHON})
+#    link_directories(${PYTHON310_LIB_PATH})
+#endif ()
 # ${PYTHON310_LIB_PATH}只能在这里,不能在target_link_libraries
 # ${OPENCV_LIBs_PATH}不能放link_directories 只能在target_link_libraries, ${TOUPCAM_LIB_PATH}测试是2个都可以放
 
@@ -105,12 +105,12 @@ add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES}) # ${THEME
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
           ${TOUPCAM_INCLUDE_PATH})
-if (${USE_PYTHON})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
-endif ()
-if (${USE_OPENCV})
-target_include_directories(${PROJECT_NAME} PUBLIC ${OPENCV_INCLUDE_PATH})
-endif ()
+#if (${USE_PYTHON})
+#target_include_directories(${PROJECT_NAME} PUBLIC ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
+#endif ()
+#if (${USE_OPENCV})
+#target_include_directories(${PROJECT_NAME} PUBLIC ${OPENCV_INCLUDE_PATH})
+#endif ()
 # （7）清理4个文件夹并重新复制
 # 1. remove_directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -151,40 +151,40 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/iconengines"
         )
 # 3. mysql软件的2个文件必须复制
-if (${USE_MYSQL})
-if (EXISTS "${MYSQL_LIB_PATH}")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${MYSQL_LIB_PATH}"
-            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
-endif ()
-if (EXISTS "${MYSQL_DLL_PATH}")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${MYSQL_DLL_PATH}"
-            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
-endif ()
-endif ()
+#if (${USE_MYSQL})
+#if (EXISTS "${MYSQL_LIB_PATH}")
+#    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+#            COMMAND ${CMAKE_COMMAND} -E copy
+#            "${MYSQL_LIB_PATH}"
+#            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+#endif ()
+#if (EXISTS "${MYSQL_DLL_PATH}")
+#    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+#            COMMAND ${CMAKE_COMMAND} -E copy
+#            "${MYSQL_DLL_PATH}"
+#            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+#endif ()
+#endif ()
 # 4. 同理opencv的进行复制 OPENCV_DLL_PATH
-if (${USE_OPENCV})
-foreach(opencv_lib ${OPENCV_LIBs_PATH})
-    if (EXISTS "${opencv_lib}")
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy
-                "${opencv_lib}"
-                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
-    endif ()
-endforeach(opencv_lib)
-
-foreach(opencv_dll ${OPENCV_DLLs_PATH}) # 必须复制dll不然无法单独运行
-    if (EXISTS "${opencv_dll}")
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy
-                "${opencv_dll}"
-                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
-    endif ()
-endforeach(opencv_dll)
-endif ()
+#if (${USE_OPENCV})
+#foreach(opencv_lib ${OPENCV_LIBs_PATH})
+#    if (EXISTS "${opencv_lib}")
+#        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+#                COMMAND ${CMAKE_COMMAND} -E copy
+#                "${opencv_lib}"
+#                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+#    endif ()
+#endforeach(opencv_lib)
+#
+#foreach(opencv_dll ${OPENCV_DLLs_PATH}) # 必须复制dll不然无法单独运行
+#    if (EXISTS "${opencv_dll}")
+#        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+#                COMMAND ${CMAKE_COMMAND} -E copy
+#                "${opencv_dll}"
+#                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/")
+#    endif ()
+#endforeach(opencv_dll)
+#endif ()
 
 # 5. 其它依赖dll
 if (EXISTS "${OPENGL32_PATH}")
@@ -244,13 +244,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
         component interface  # mingw必须显示指定python310,msvc指定与否都可
         ${TOUPCAM_LIB_PATH}) # opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
-if (${USE_PYTHON})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PYTHON310_LIB_PATH_python310} ${PYTHON310_LIB_PATH_python310d})
-endif ()
-if (${USE_OPENCV})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH})
- # bin下已经放好了2个文件 ${OPENCV_LIBs_PATH},所以可以不使用OPENCV_LIBs_PATH
-endif ()
+#if (${USE_PYTHON})
+#target_link_libraries(${PROJECT_NAME} PRIVATE ${PYTHON310_LIB_PATH_python310} ${PYTHON310_LIB_PATH_python310d})
+#endif ()
+#if (${USE_OPENCV})
+#target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH})
+# # bin下已经放好了2个文件 ${OPENCV_LIBs_PATH},所以可以不使用OPENCV_LIBs_PATH
+#endif ()
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)
