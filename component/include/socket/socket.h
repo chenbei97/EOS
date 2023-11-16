@@ -207,7 +207,7 @@ static QVariant parse0x0000(QCVariantMap m)
 { // 预览事件
     if (!m.keys().contains(Field0x0000.state)) return false;
     if (!m.keys().contains(FrameField)) return false;
-    return m[StateField].toString() == "ok";
+    return m[StateField].toString() == OkField;
 }
 
 static QByteArray assemble0x0000(QCVariantMap m)
@@ -238,7 +238,7 @@ static QVariant parse0x0001(QCVariantMap m)
 {// 启动实验
     if (!m.keys().contains(Field0x0001.state)) return false;
     if (!m.keys().contains(FrameField)) return false;
-    return m[StateField].toString() == "ok";
+    return m[StateField].toString() == OkField;
 }
 
 static QByteArray assemble0x0001(QCVariantMap m)
@@ -382,7 +382,7 @@ static QVariant parse0x0002(QCVariantMap m)
     if (!m.keys().contains(Field0x0002.state)) return false;
     if (!m.keys().contains(FrameField)) return false;
     auto text = m[Field0x0002.state].toString(); // 只要有回复就可
-    return text=="ok";
+    return text==OkField;
 }
 
 static QByteArray assemble0x0002(QCVariantMap m)
@@ -431,7 +431,7 @@ static QVariant parse0x0004(QCVariantMap m)
     if (!m.keys().contains(FrameField)) return false;
     if (!m.keys().contains(Field0x0004.state)) return false;
     auto ret = m[Field0x0004.state].toString();
-    return ret == "ok";
+    return ret == OkField;
 }
 
 static QByteArray assemble0x0005(QCVariantMap m)
@@ -449,7 +449,7 @@ static QVariant parse0x0005(QCVariantMap m)
 { // 调节相机参数
     if (!m.keys().contains(Field0x0005.state)) return false;
     if (!m.keys().contains(FrameField)) return false;
-    return m[StateField].toString() == "ok";
+    return m[StateField].toString() == OkField;
 }
 
 static QByteArray assemble0x0006(QCVariantMap m)
@@ -469,7 +469,7 @@ static QVariant parse0x0006(QCVariantMap m)
     if (!m.keys().contains(FrameField)) return false;
     if (!m.keys().contains(Field0x0006.state)) return false;
     auto ret = m[StateField].toString();
-    return ret == "ok";
+    return ret == OkField;
 }
 
 static QByteArray assemble0x0007(QCVariantMap m)
@@ -488,7 +488,7 @@ static QVariant parse0x0007(QCVariantMap m)
     if (!m.keys().contains(FrameField)) return false;
     if (!m.keys().contains(Field0x0007.state)) return false;
     auto ret = m[StateField].toString();
-    return ret == "ok";
+    return ret == OkField;
 }
 
 static QByteArray assemble0x0008(QCVariantMap m)
@@ -506,7 +506,7 @@ static QVariant parse0x0008(QCVariantMap m)
     if (!m.keys().contains(FrameField)) return false;
     if (!m.keys().contains(Field0x0008.state)) return false;
     auto ret = m[StateField].toString();
-    return ret == "ok";
+    return ret == OkField;
 }
 
 static QByteArray assemble0x0009(QCVariantMap m)
@@ -524,7 +524,7 @@ static QVariant parse0x0009(QCVariantMap m)
     if (!m.keys().contains(FrameField)) return false;
     if (!m.keys().contains(Field0x0009.state)) return false;
     auto ret = m[StateField].toString();
-    return ret == "ok";
+    return ret == OkField;
 }
 
 static QByteArray assemble0x0010(QCVariantMap m)
@@ -542,7 +542,7 @@ static QVariant parse0x0010(QCVariantMap m)
     if (!m.keys().contains(FrameField)) return false;
     if (!m.keys().contains(Field0x0010.state)) return false;
     auto ret = m[StateField].toString();
-    return ret == "ok";
+    return ret == OkField;
 }
 
 /*---------以下都是临时测试函数,以后可以注释掉-----------------*/

@@ -11,6 +11,14 @@
 CameraMode::CameraMode(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum); // 代替setFixedSize
+//    auto lay = new QHBoxLayout;
+//    auto b1 = new QPushButton("livecanvas");
+//    auto b2 = new QPushButton("photocanvas");
+//    lay->addStretch();
+//    lay->addWidget(b1);
+//    lay->addWidget(b2);
+//    lay->addStretch();
+//    setLayout(lay);
 }
 
 void CameraMode::changeMode(CameraMode::cameraMode mode)

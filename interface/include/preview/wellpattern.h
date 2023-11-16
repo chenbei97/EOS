@@ -10,7 +10,7 @@
 #define EOSI_WELLPATTERN_H
 
 #include "window.h"
-// 结合previewpattern的预览功能和protocolpattern分组功能
+
 class INTERFACE_IMEXPORT WellPattern: public Pattern
 {
     Q_OBJECT
@@ -27,7 +27,7 @@ public:
     void updateHoleInfo(QCPoint point,QCString group,QCPointVector viewpoints,int viewsize);
 
     void paintEvent(QPaintEvent *event) override;
-    QRectF2DVector getHoleRectsOnViewSize(const QPoint& coordinate) const; // 拿到某个孔基于视野窗口尺寸来划分的所有小矩形区域
+    QRectF2DVector getHoleRectsOnViewSize(QCPoint coordinate) const; // 拿到某个孔基于视野窗口尺寸来划分的所有小矩形区域
     QRectF2DVector getHoleRectsOnViewSize(int x,int y) const;
 
     void mouseMoveEvent(QMouseEvent *event) override;// 得到框选孔的区域

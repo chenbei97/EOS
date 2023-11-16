@@ -28,10 +28,12 @@ Q_ENUMS(SQLType)
 #define InformationChinese tr("Information")
 #define CriticalChinese tr("Critical")
 #define DefaultDateTimeFormat "yyyy-MM-dd hh:mm"
+#define DefaultImageDateTimeFormat "yyyy-MM-dd-hh-mm-ss"
 #define CURRENT_PATH (QDir::currentPath())
 #define CURRENT_THREAD (QThread::currentThread())
 #define DefaultFontSize 10
 #define DefaultFontFamily ("Times New Roman")
+#define DefaultWindowSize QSize(400,300)
 #define DefaultPainterFont QFont(DefaultFontFamily,DefaultFontSize,QFont::Bold)
 #define DefaultPainterMetric (QFontMetrics(DefaultPainterFont))
 #define DefaultPainterPixelHeight (DefaultPainterMetric.height()) //指定font下文字像素的高度
@@ -41,6 +43,8 @@ Q_ENUMS(SQLType)
 #define SocketWaitTime 3000
 //#define UseSqlcipher true
 
+static const char* OriginalField = "original";
+static const char* ExportField = "export";
 static const char* SqliteDriver = "sqlite";
 static const char* QSqliteDriver = "QSLITE";
 static const char* SqlcipherDriver = "sqlcipher";
@@ -64,10 +68,12 @@ static const char*  SqliteDataBaseConnectionsAgain =
         "SQLCIPHER_LEGACY_PAGE_SIZE=4096";
 static const char* FrameField = "frame";
 static const char* SeparateField = "@@@";
+static const char* OkField = "ok";
 static const char* HourField = "hour";
 static const char* MinuteField = "minute";
 static const char* HoursFieldSuffix = " hours";
 static const char* MinutesFieldSuffix = " minutes";
+static const char* JPGSuffix = ".jpg";
 static const char* StateField = "state";
 static const char* ImageField = "image";
 static const char* StopField = "stop";

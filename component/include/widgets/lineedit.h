@@ -17,7 +17,11 @@ class COMPONENT_IMEXPORT LineEdit : public QLineEdit
 public:
     explicit LineEdit(QWidget*parent = nullptr);
     explicit LineEdit(const QString&text,QWidget*parent = nullptr);
+    void setIntRange(int min,int max);
+    void setRegExp(const QRegExp &rx);
 private:
+    QIntValidator * validator = nullptr;
+    QRegExpValidator *regexValidator = nullptr;
 };
 
 #endif //EOSI_LINEEDIT_H

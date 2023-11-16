@@ -190,6 +190,7 @@ typedef const QVector<HoleInfo>& QCHoleInfoVector;
 typedef QVector<QVector<HoleInfo>> QHoleInfo2DVector;
 typedef const QVector<QVector<HoleInfo>>& QCHoleInfo2DVector;
 
+typedef QMap<QString,QString> LocationObjectiveInfo;
 typedef QMap<QString,QString> TimeInfo;
 typedef QMap<QString,QString> LensInfo;
 typedef QMap<QString,QString> ZStackInfo;
@@ -204,5 +205,5 @@ typedef QVariantMap ExperToolInfo;
 typedef QVariantMap PreviewPatternInfo;
 typedef QVariantMap PreviewInfo;
 typedef QVariantMap ViewInfo;
-typedef QMap<QString,QString> LocationObjectiveInfo;
+typedef QVariantMap IniVariable;
 #endif //EOSI_ALIAS_H

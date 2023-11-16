@@ -18,7 +18,7 @@
 #include "summarydialog.h"
 
 //#define notusetoupcamera 0
-#define uselabelcanvas 0
+//#define uselabelcanvas 0
 
 #ifdef notusetoupcamera
 #include "toupcam.h"

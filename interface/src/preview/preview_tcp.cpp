@@ -92,7 +92,7 @@ void Preview::adjustCamera(int exp,int gain,int br)
 }
 
 void Preview::onAdjustCamera(const QString & f,const QVariant & d)
-{
+{ // 这个是异步获取ParsePointer的parseResult,上方不使用同步,连接本函数
     static int count = 0;
     if (d.toBool() && f == TcpFramePool.frame0x0005) {
         LOG<<"调整相机参数"<<++count<<"次"; // 做这些事
@@ -140,7 +140,7 @@ void Preview::takingPhoto()
 //    AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
 //    auto msg = AssemblerPointer->message();
 //    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
-//    // 等待回复后调用相机拍照
+//    // 等待回复后调用相机拍照(现在没有拍照事件了,无需发送0x0004命令直接拍就行)
 //    if (ParserResult.toBool()) {
 
 #ifndef notusetoupcamera

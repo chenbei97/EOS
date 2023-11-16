@@ -29,6 +29,7 @@
 #include "qdatetime.h"
 #include "qmutex.h"
 #include "qthread.h"
+#include "qsettings.h"
 
 #include "sqlstatements.h"
 

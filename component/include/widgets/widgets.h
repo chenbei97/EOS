@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-16 14:17:22
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-16 15:09:26
+ * @LastEditTime: 2023-11-16 16:23:37
  * @FilePath: \EOS\component\include\widgets\widgets.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -51,6 +51,7 @@
 #include "qpainter.h"
 #include "qevent.h"
 #include "qaction.h"
+#include "qmenu.h"
 #include "qmath.h"
 #include "qpropertyanimation.h"
 #include "qgraphicseffect.h"
@@ -66,7 +67,7 @@
 #define ColorButtonStyle QString("border:2px solid black;border-radius:20px;background-color:%1;")
 #define ProgressBarMinHeight 40
 #define ColorButtonSize 40
-#define GroupInfoSize QSize(400,250)
+#define GroupInfoSize DefaultWindowSize
 #define RoundButtonSize 20
 #define InscribedRectDefaultRows 3
 #define InscribedRectDefaultCols 3
@@ -78,4 +79,5 @@
 #define TriangleMinWidth (TriangleMinHeight/0.618)
 #define PhotoCanvasTriangleLength 100
 #define PhotoCanvasTriangleGap 10
+#define PictureDescriptionMaxHeight 30
 #endif //EOSI_WIDGETS_H

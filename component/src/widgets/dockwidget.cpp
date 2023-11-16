@@ -1,8 +1,16 @@
+/*** 
+ * @Author: chenbei97 chenbei_electric@163.com
+ * @Date: 2023-10-26 10:06:06
+ * @LastEditors: chenbei97 chenbei_electric@163.com
+ * @LastEditTime: 2023-11-16 16:24:04
+ * @FilePath: \EOS\component\src\widgets\dockwidget.cpp
+ * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
+ */
 #include "dockwidget.h"
 
 DockWidget::DockWidget(QWidget*parent): QDockWidget(parent)
 {
-    mWinSize = QSize(400,400);
+    mWinSize = DefaultWindowSize;
     auto x = (UserScreenWidth-mWinSize.width())/2;
     auto y = (UserScreenHeight-mWinSize.height())/2;
     mWinPos = {x,y};
@@ -11,7 +19,7 @@ DockWidget::DockWidget(QWidget*parent): QDockWidget(parent)
 
 DockWidget::DockWidget(const QString&title,QWidget *parent) : QDockWidget(title,parent)
 {
-    mWinSize = QSize(400,300);
+    mWinSize = DefaultWindowSize;
     auto x = (UserScreenWidth-mWinSize.width())/2;
     auto y = (UserScreenHeight-mWinSize.height())/2;
     mWinPos = {x,y};

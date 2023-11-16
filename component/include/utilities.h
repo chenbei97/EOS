@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-16 16:00:56
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-16 16:35:52
+ * @LastEditTime: 2023-11-16 16:24:21
  * @FilePath: \EOS\component\include\utilities.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -85,7 +85,7 @@ static QMessageBox* getWaitDialog(QWidget*parent = nullptr)
     dlg->setWindowModality(Qt::WindowModal);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     dlg->setStandardButtons(QMessageBox::NoButton);
-    //dlg->setFixedSize(400,300);
+    //dlg->setFixedSize(DefaultWindowSize);
     return dlg;
 }
 

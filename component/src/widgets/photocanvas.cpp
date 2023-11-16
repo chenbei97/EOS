@@ -16,16 +16,6 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
     pen.setWidth(2);
     painter.setPen(pen);
 
-    // 绘制框
-    if (!mDrapRect.isNull()) {
-        auto pen = painter.pen();
-        pen.setColor(Qt::blue);
-        painter.setPen(pen);
-        painter.drawRect(mDrapRect);
-        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
-        painter.setPen(pen);
-    }
-
     /*高频率绘图的注意事项:
      * 1. 不要在paintEvent内做QVariantMap到QImage的变换,会卡死
      * 2. 不要在paintEvent内做QImage的scaled变换
@@ -43,6 +33,17 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
             //painter.drawPixmap(targetRect,QPixmap::fromImage(mimage));
             break;
     }
+
+    // 绘制框
+    if (!mDrapRect.isNull()) {
+        auto pen = painter.pen();
+        pen.setColor(Qt::blue);
+        painter.setPen(pen);
+        painter.drawRect(mDrapRect);
+        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
+        painter.setPen(pen);
+    }
+
     event->accept();
 }
 
@@ -57,8 +58,14 @@ void PhotoCanvas::mousePressEvent(QMouseEvent *event)
     mLastPos = event->pos();
     //mMousePoint = {-1,-1};
     //emit mouseClicked(mMousePoint);
+    emit mouseClicked();
     event->accept();
     update();
+}
+
+void PhotoCanvas::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    emit doubleMouseClicked();
 }
 
 void PhotoCanvas::mouseMoveEvent(QMouseEvent *event)
@@ -106,12 +113,27 @@ void PhotoCanvas::setImage(const QImage &img)
     else
         mimage = QImage();
     repaint();
+}
 
+void PhotoCanvas::setPixmap(const QPixmap &pix)
+{
+    setImage(pix.toImage());
+}
+
+QImage PhotoCanvas::image() const
+{
+    return mimage;
+}
+
+QPixmap PhotoCanvas::pixmap() const
+{
+    return QPixmap::fromImage(mimage);
 }
 
 PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
 {
     strategy = NoStrategy;
+    mDrapRect = QRect();
     mMousePoint = QPoint(-1,-1);
     mLastPos = {-1,-1};
     mMouseClickColor.setAlpha(DefaultColorAlpha);
@@ -119,6 +141,9 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
 
     static bool flag = false;
     connect(&timer,&QTimer::timeout,[this]{setUpdatesEnabled(flag);flag=!flag;});
-    timer.start(200);// 绘制太快导致出问题
+}
 
+void PhotoCanvas::optimizePaint(int ms)
+{
+    timer.start(ms);
 }

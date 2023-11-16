@@ -10,12 +10,25 @@
 
 TextEdit::TextEdit(QWidget*parent):QTextEdit(parent)
 {
-
+    setFontPointSize(DefaultFontSize);
+    setFontFamily(DefaultFontFamily);
+    setUndoRedoEnabled(false);
+    setCurrentFont(QFont(DefaultFontFamily,DefaultFontSize));
+    setReadOnly(true);
 }
 
 TextEdit::TextEdit(const QString& text,QWidget*parent): QTextEdit(text,parent)
 {
+    setFontPointSize(DefaultFontSize);
+    setFontFamily(DefaultFontFamily);
+    setUndoRedoEnabled(false);
+    setCurrentFont(QFont(DefaultFontFamily,DefaultFontSize));
+    setReadOnly(true);
+}
 
+QString TextEdit::text() const
+{
+    return toPlainText();
 }
 
 void TextEdit::setIndent(int moveLength,const QString& indent)
