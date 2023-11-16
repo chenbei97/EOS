@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-17 16:21:42
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-17 16:25:27
+ * @LastEditTime: 2023-11-16 11:54:11
  * @FilePath: \EOS\component\src\socket\tcpsocket.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -14,8 +14,8 @@ void TcpSocket::onReadyReadSlot()
         QByteArray msg = socket->readAll();
         auto msgs = QString::fromUtf8(msg).split(SeparateField,QString::SkipEmptyParts);
         //LOG<<"response msg  = "<<msgs;
-                foreach(auto m ,msgs)
-                msgQueue.enqueue(m.toUtf8()); // 将消息添加到队列中
+        foreach(auto m ,msgs)
+            msgQueue.enqueue(m.toUtf8()); // 将消息添加到队列中
         /*
         Tcp粘包问题，粘包问题参考网站解释,比较清楚明白，并不是发送方发5次就会触发readyRead5次
             1). https://blog.csdn.net/dengdew/article/details/79065608

@@ -127,9 +127,7 @@ void ViewPattern::updatePatternUi()
     m[HoleViewSizeField] = mCurrentViewInfo[HoleViewSizeField]; // 这是为了pattern画点使用
     m[HoleCoordinateField] = mCurrentViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
     m[WellAllGroupsField] = mCurrentViewInfo[WellAllGroupsField]; // 所有组名信息顺带组装
-    QVariant v;
-    v.setValue(QPointVector());//去更新mViewInfo[row][col].viewpoints就是空的
-    m[HoleViewPointsField] = v;
+    m[HoleViewPointsField].setValue(QPointVector());//去更新mViewInfo[row][col].viewpoints就是空的
     emit applyGroupEvent(m);
 
     // 4. 还应该把其它组的所有孔信息也清除,不仅仅是本组的孔(触发应用到所有组的孔)

@@ -278,7 +278,7 @@ void Preview::exportExperConfig(const QString& path)
     AssemblerPointer->assemble(TcpFramePool.frame0x0001,previewinfo);
     auto json = AssemblerPointer->message();
 
-    json.chop(3);//删掉尾缀@@@
+    json.chop(QString(SeparateField).count());//删掉尾缀@@@
 
     JsonReadWrite m; // 借助工具类写到文件内
     m.writeJson(path,json);

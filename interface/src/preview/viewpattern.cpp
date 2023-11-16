@@ -253,9 +253,8 @@ void ViewPattern::onApplyGroupAct()
             }
         }
     }
-    QVariant v;
-    v.setValue(viewpoints);
-    m[HoleViewPointsField] = v;
+
+    m[HoleViewPointsField].setValue(viewpoints);
     //LOG<<"view send viewpoins info to well is 【"<<viewpoints<<"】";//WellPattern::updateGroupByViewInfo接收
     emit applyGroupEvent(m);
 
@@ -309,9 +308,7 @@ void ViewPattern::onApplyAllAct()
             }
         }
     }
-    QVariant v;
-    v.setValue(viewpoints);
-    m[HoleViewPointsField] = v;
+    m[HoleViewPointsField].setValue(viewpoints);
     emit applyAllEvent(m);// 3个信息足够
 
     // 4.更新其它所有孔的视野信息和临时信息,不区分组

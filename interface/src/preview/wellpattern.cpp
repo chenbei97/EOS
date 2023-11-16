@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-27 08:53:17
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-14 10:16:25
+ * @LastEditTime: 2023-11-16 11:51:17
  * @FilePath: \EOS\interface\src\preview\wellpattern.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -23,9 +23,7 @@ PreviewPatternInfo WellPattern::patternInfo() const
         {
             QVariantMap holeInfo; // 这个孔存储的所有信息都在这里保存
 
-            QVariant v1;
-            v1.setValue(holes);
-            holeInfo[HoleGroupCoordinatesField] = v1; // 0. 每个孔都会存储本组所有的孔坐标信息
+            holeInfo[HoleGroupCoordinatesField].setValue(holes); // 0. 每个孔都会存储本组所有的孔坐标信息
 
             auto currentholeinfo = mHoleInfo[hole.x()][hole.y()];
             Q_ASSERT(currentholeinfo.group == group); // group,color,isselected,allgroup,allcoordinate不用装
@@ -36,9 +34,7 @@ PreviewPatternInfo WellPattern::patternInfo() const
 
             holeInfo[HoleCoordinateField] = hole; // 1. 坐标信息
             holeInfo[HoleViewSizeField] = currentholeinfo.viewsize; // 2. 视野信息
-            QVariant v2;
-            v2.setValue(currentholeinfo.viewpoints);
-            holeInfo[HoleViewPointsField] = v2;
+            holeInfo[HoleViewPointsField].setValue(currentholeinfo.viewpoints);
             holeInfo[HoleExperTypeField] = currentholeinfo.type; // 3.备忘录信息
             holeInfo[HoleMedicineField] = currentholeinfo.medicine;
             holeInfo[HoleDoseField] = currentholeinfo.dose;
@@ -167,7 +163,7 @@ void WellPattern::initHoleInfo()
             info.group = QString();
             info.coordinate = QPoint(row,col);
             info.color = Qt::red;
-            info.viewsize = QSize(0,0);
+            info.viewsize = QSize(-1,-1);
             info.viewpoints = QPointVector();
 
             info.isselected = false;

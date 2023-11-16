@@ -87,9 +87,7 @@ PreviewToolInfo PreviewTool::toolInfo() const
 
     // 4. camerainfo,分不同通道,保存了gain,exposure,bright
     auto camerainfo = camerabox->cameraInfo();
-    QVariant v;
-    v.setValue(camerabox->saveInfo());
-    info[CurrentInfoField] = v;
+    info[CurrentInfoField].setValue(camerabox->saveInfo());
 
     QStringList channels;//所有保存过相机配置的通道
     if (!camerainfo.isEmpty()) { // 有保存过的通道参数

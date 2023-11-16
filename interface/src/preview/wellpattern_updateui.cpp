@@ -119,13 +119,9 @@ void WellPattern::onOpenViewAct()
         auto allgroups = mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup;
         auto allcoordinates = mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate;
         auto groupcoordinates = getHoleGroupCoordinates(mHoleInfo[mMousePos.x()][mMousePos.y()].group);
-        QVariant v1,v2,v3;
-        v1.setValue(allgroups);
-        m[WellAllGroupsField] = v1; // 已有的所有组(每次设置分组信息时会更新)
-        v2.setValue(groupcoordinates);
-        m[HoleGroupCoordinatesField] = v2;
-        v3.setValue(allcoordinates);
-        m[WellAllHolesField] = v3;
+        m[WellAllGroupsField].setValue(allgroups); // 已有的所有组(每次设置分组信息时会更新)
+        m[HoleGroupCoordinatesField].setValue(groupcoordinates);
+        m[WellAllHolesField].setValue(allcoordinates);
         //LOG<<"well send info to view is "<<m[HoleGroupNameField].toString()<<m[HoleGroupColorField].toString();//ViewPattern::setStrategy接收
         emit openViewWindow(m);
     }
