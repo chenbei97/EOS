@@ -206,6 +206,8 @@ void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
 
     auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
     auto allholes = getAllWellHoleCoordinates();
+    //LOG<<allcoordinates;
+    //LOG<<allholes;
     Q_ASSERT(allcoordinates == allholes);
 
     //LOG<<"all holes = " << allholes;

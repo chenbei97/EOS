@@ -30,7 +30,7 @@ QColorDialog* ColorButton::colorDialog(const QColor&initColor)
 {
     QColorDialog * dlg = new QColorDialog(initColor);
     dlg->setOptions(QColorDialog::ShowAlphaChannel|QColorDialog::DontUseNativeDialog);
-    dlg->setWindowTitle(tr("设置组的标记颜色"));
+    dlg->setWindowTitle(tr("Set Color"));
     dlg->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(dlg,static_cast<void (QColorDialog::*) (const QColor&)>(&QColorDialog::colorSelected)

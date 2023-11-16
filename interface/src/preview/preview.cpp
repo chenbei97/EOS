@@ -56,7 +56,7 @@ void Preview::onWellbrandChanged(int option)
 }
 
 void Preview::onObjectiveChanged(const QString& obj)
-{
+{ // 切换物镜的尺寸,视野尺寸发生变化
     LOG<<"objective option = "<<obj;
     // 1.更新视野的尺寸
     auto toolinfo = previewtool->toolInfo();
@@ -70,10 +70,9 @@ void Preview::onObjectiveChanged(const QString& obj)
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
     // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
-
     auto current_size = viewpattern->currentViewInfo()[HoleViewSizeField].toSize().width();
 
-    if (current_size != size) {
+    if (current_size != size) { // 如果视野尺寸前后没发生变化,不需要清理
         LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 需要清理";
         viewpattern->clearAllViewWindowCache(size);
         // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
@@ -235,11 +234,11 @@ void Preview::initConnections()
     connect(pattern,&WellPattern::openViewWindow,this,&Preview::updateViewWindow); // 打开和更新视野窗口
     connect(pattern,&WellPattern::openSetGroupWindow,this,&Preview::updateSetGroupWindow);// 打开分组窗口
     connect(pattern,&WellPattern::mouseClicked,this,&Preview::previewViewByClickHole); // 点击孔也触发预览
-    connect(pattern,&WellPattern::clearViewWindowCache,viewpattern,&ViewPattern::clearViewWindowCache);
+    connect(pattern,&WellPattern::clearViewWindowCache,viewpattern,&ViewPattern::clearViewWindowCache);//删孔时清除该孔的缓存信息
 
-    connect(viewpattern,&ViewPattern::applyHoleEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyHole);
+    connect(viewpattern,&ViewPattern::applyHoleEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyHole);//删点或者保存点就应用到本孔
     connect(viewpattern,&ViewPattern::applyGroupEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyGroup); // 按组更新孔窗口的信息
-    connect(viewpattern,&ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不安组更新孔窗口的信息
+    connect(viewpattern,&ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不按组更新孔窗口的信息
     connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
 
     connect(this,&Preview::objectiveSettingChanged,previewtool,&PreviewTool::objectiveSettingChanged);

@@ -84,9 +84,12 @@ void ViewPattern::clearAllViewWindowCache(int viewsize)
     mViewSelectPoints.clear();
     mTmpViewSelectPoints.clear();
 
-    auto holepoint = mCurrentViewInfo[HoleCoordinateField].toPoint();
-    mCurrentViewInfo.clear();
-    mCurrentViewInfo[HoleCoordinateField] = holepoint;//这个要保留,initSelections需要用
+    auto currentviewsize = mCurrentViewInfo[HoleViewSizeField].toSize();
+    Q_ASSERT(currentviewsize.width() == currentviewsize.height());
+    if (currentviewsize.width() != viewsize) {// 视野尺寸相同就不需要清除
+        mCurrentViewInfo[HoleViewSizeField] = QSize(viewsize,viewsize); // 更新viewsize
+        mCurrentViewInfo[HoleViewPointsField].setValue(QPointVector()); // 清除原有的视野点数
+    } // 其它不要清除,否则WellPattern::updateHoleInfoByViewInfoApplyAll这里的交互和QAssert可能设定失败
 
     mrows = viewsize;
     mcols = viewsize;

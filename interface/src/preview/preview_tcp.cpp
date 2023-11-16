@@ -356,7 +356,7 @@ void Preview::loadExper()
         photocanvas->setImage(QImage());
     }
 
-
+        // 组孔的信息要写到数据库,待写
         foreach(auto group, patterninfo.keys())
         {
             auto groupinfo = patterninfo[group].value<QVariantMap>();
