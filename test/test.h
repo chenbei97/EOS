@@ -11,12 +11,11 @@
 
 #include "interface.h"
 #include "socketpanel.h"
-#include <toupcam.h>
 #include <thread>
+using std::thread;
 using std::async;
 using std::promise;
 using std::future;
-#define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 
 static void test_sharepointer()
 {
