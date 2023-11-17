@@ -147,3 +147,8 @@ void PhotoCanvas::optimizePaint(int ms)
 {
     timer.start(ms);
 }
+
+void PhotoCanvas::stopOptimizePaint()
+{
+    timer.stop();
+}

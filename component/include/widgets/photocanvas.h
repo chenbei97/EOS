@@ -25,6 +25,7 @@ public:
     QPixmap pixmap() const;
     QImage image() const;
     void optimizePaint(int ms = 100);
+    void stopOptimizePaint();
     void mouseDoubleClickEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent *event) override;// 左键点击清除框选,计算鼠标点击的小矩形区域坐标
     void mouseMoveEvent(QMouseEvent *event) override;// 绘制拖拽框
