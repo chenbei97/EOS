@@ -14,7 +14,6 @@
 
 // （1）表信息，表架构等
 // （1.1）数据源固定名称
-static const char*  DataBaseName = "eos";
 // （1.2）表的名称
 static const char * LoginInfoTableName = "logininfo";
 static const char* ExperGeneralConfigTableName = "experconfig";
@@ -123,6 +122,7 @@ static const GroupPointTableField GroupPointTableFields;
 static const char* SelectUserAndPwd = "select user,pwd from logininfo";
 static const char* RollBack = "rollback";
 static const char* FilterAdmin = "user = 'admin' ";
+static const char* FilterID = "id = '%1' "; // 查询指定行是否
 static const char* FilterUser = "user = '%1' "; // QSqlTableModel中filter函数使用
 static const char* FilterFlag = "flag = '%1' "; // rollback函数使用
 static const char* CreateTable = "create table if not exists %1(%2) ";

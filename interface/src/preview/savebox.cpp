@@ -56,7 +56,7 @@ void SaveBox::exportFile()
     auto dir = QFileDialog::getExistingDirectory(this,tr("Select Save Path"));
     if (dir.isEmpty()) return;
 
-    auto path = dir + +"/" + filename + ConfigFileSuffix;
+    auto path = dir + +"/" + filename + EOSSuffix;
     if (pathExisted(path)) {
         int ret = QMessageBox::warning(this,WarningChinese,
                                        tr("There is already a setting with the same name. Do you want to overwrite it?"),

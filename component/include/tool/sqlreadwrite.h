@@ -60,7 +60,7 @@ public:
     int fieldIndex(QCString table,QCString field);
 
     QString fieldValue(QCString table,int row, int col);
-    QString fieldValue(QCString table,int row, const QString&field);
+    QString fieldValue(QCString table,int row, QCString field);
 
     bool query(QCString q);
     QString dbError() const;
@@ -79,10 +79,10 @@ public:
 
     bool removeRecord(QCString table, QCString condition);
     bool removeRecord(QCString table, int row);
-    bool rollback(QCString flag);
+    bool rollback(QCString table,QCString flag);
 
-    bool updateRecord(QCString table,QCString dict, QCString condition);
-    bool updateRecord(QCString table,QCString dict, int row);
+    bool updateRecord(QCString table,QCString values, QCString condition);
+    bool updateRecord(QCString table,QCString values, int row);
     bool updateRecord(QCString table,QCString key, QCString value,QCString condition);
     bool updateRecord(QCString table,QCString key, QCString value,int row);
     bool updateRecord(QCString table,QFieldList keys, QValueList values,QCString condition);

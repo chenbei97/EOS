@@ -45,20 +45,23 @@ Q_ENUMS(SQLType)
 
 static const char* OriginalField = "original";
 static const char* ExportField = "export";
-static const char* SqliteDriver = "sqlite";
-static const char* QSqliteDriver = "QSLITE";
-static const char* SqlcipherDriver = "sqlcipher";
-static const char* QSqlcipherDriver = "SQLITECIPHER";
-static const char* MysqlDriver = "mysql";
-static const char* QMysqlDriver = "QMYSQL";
-static const char* SqliteFileSuffix = ".db3";
-static const char* ConfigFileSuffix = ".eos";
-static const char* MatchConfigFileSuffix = "*.eos";
-static const char * LoginInfoUserField = "user";
-static const char * LoginInfoPwdField = "pwd";
-static const char * LoginInfoDefaultUser = "admin";
-static const char * LoginInfoDefaultPwd = "123456";
-static const char*  SqliteDataBasePassword = "cb199791";
+static const char* SqliteField = "sqlite";
+static const char* QSQLITEField = "QSQLITE";
+static const char* SqlcipherField = "sqlcipher";
+static const char* SQLITECIPHERField = "SQLITECIPHER";
+static const char* MysqlField = "mysql";
+static const char* QMYSQLField = "QMYSQL";
+static const char* DB3Suffix = ".db3";
+static const char* DBSuffix = ".db";
+static const char* IBDSuffix = ".ibd";
+static const char* EOSField = "eos";
+static const char* EOSSuffix = ".eos";
+static const char* MatchEOSSuffix = "*.eos";
+static const char * UserField = "user";
+static const char * PwdField = "pwd";
+static const char * AdminField = "admin";
+static const char * DefalutPwdField = "123456";
+static const char*  SqliteDataBasePassword = "gaofenshengwu";
 static const char*  MysqlDataBaseConnections = "MYSQL_OPT_CONNECT_TIMEOUT=1;";
 static const char*  SqliteDataBaseConnectionsFirst =
         "QSQLITE_USE_CIPHER=sqlcipher; ""SQLCIPHER_LEGACY=1; "

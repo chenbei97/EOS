@@ -44,8 +44,8 @@ public:
     int tableColumns(QCString table) override;
 
     bool primaryKeyReorder(QCString table);
-    QString globaldir();
-    QString datadir();
+    QString dataDir();
+    QString sourcePath();
     QStringList tablePaths();
 
 private:
