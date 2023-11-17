@@ -9,6 +9,8 @@
 
 #include "sqlreadwrite.h"
 
+SQLType CurrentSqlType; // 必须外部定义
+
 SqlReadWrite::SqlReadWrite(QObject *parent) : QObject(parent)
 {
 }
@@ -86,7 +88,7 @@ bool SqlReadWrite::haveTable(QCString table)
 {
     QString statement;
     if (mType==SQLType::Sqlite)
-        statement = QString(SelectTableExistedFromSqliteMaster).arg(table);
+        statement = QString(SelectTableFromSqliteMasterWhere).arg(table);
     else if (mType == SQLType::Mysql)
         statement = QString(ShowTablesLike).arg(table);
     else return false;
@@ -161,9 +163,9 @@ QString SqlReadWrite::currentDataSource()
 {
     QString statement;
     if (mType == SQLType::Mysql)
-        statement = CurrentDataSourceMysql;
+        statement = SelectDataBaseMysql;
     else if ( mType == SQLType::Sqlite)
-        statement = CurrentDataSourceSqlite;
+        statement = SelectDataBaseSqlite;
     else return "";
 
     mQuery.exec(statement);
@@ -522,18 +524,27 @@ bool SqlReadWrite::removeRecord(QCString table, int row)
     return removeRecord(table,condition);
 }
 
-bool SqlReadWrite::rollback(QCString table,QCString flag)
+bool SqlReadWrite::rollback(QCString table,QCString flag,bool isRecovery)
 { /*
- * 本回滚函数只限于取消添加之前添加的记录,不能用于删除的记录恢复,这里flag是每条记录独有的值
- * 一般用于启动实验失败,那么这条记录应该回滚,取消储存之前的记录
- * 如果是删除的记录恢复,那就需要在addRecord时还要记录上次的操作,再把那次添加的记录删除
- * addRecord有个实现是把多组值拆成单组值循环添加,所以回滚比较麻烦,暂时不做这个功能
+ * 这里flag是每条记录独有的值
+ * 如果是删除已添加的记录,在addRecord之前已经指定了flag,如果需要回滚再把flag传回来即可,其实就是帮用户remove
+ * 例如启动实验失败,那么这条记录应该回滚,取消储存之前的记录
+ * 如果是恢复删除的记录,那就需要在removeRecord时指定或者拿到了flag,再把那次删除的记录恢复
+ * 恢复记录需要数据,也就是removeRecord之前还要把这个记录先保存一份,有些麻烦所以不做,但是代码逻辑先保留在这
  * */
 
-    removeRecord(table,QString(FilterFlag).arg(flag));
-    auto r = haveRecord(table,QString(FilterFlag).arg(flag));
+    bool r = false;
 
-    LOG<<"rollback table? "<<table<<!r; // 确实不存在这条记录回滚成功
+    if (isRecovery) { // 恢复删除的记录
+        // 拿到flag这条记录,和那条记录移除时保存起来的信息
+        // 调用addRecord恢复
+        // haveRecord检测是否恢复成功
+    } else { // 删除已添加的记录
+        removeRecord(table,QString(FilterFlag).arg(flag));
+        auto r = haveRecord(table,QString(FilterFlag).arg(flag));
+        LOG<<"rollback table? "<<table<<!r; // 确实不存在这条记录回滚成功
+    }
+
     return r;
 
     // 下方代码是特定业务的会耦合,都注释掉,在其他地方去写

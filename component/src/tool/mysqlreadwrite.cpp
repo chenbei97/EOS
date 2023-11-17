@@ -85,7 +85,7 @@ bool MySqlReadWrite::haveDataSource(QCString source)
  * 注意: 如果数据库存放的是加密值,那么查找条件也必须是加密过的
  * */
 
-    auto statement = QString(SelectDataSourceExistedFromInformationSchema).arg(source);
+    auto statement = QString(SelectCountFromInformationSchemaWhere).arg(source);
     //QSqlQueryModel model;
     //model.setQuery(statements);
     mQuery.exec(statement);
@@ -109,7 +109,7 @@ bool MySqlReadWrite::createDataSource(QCString source)
 { // 必须连接上mysql才能使用本函数
     if (haveDataSource(source)) return true;
 
-    auto statement = QString(CreateDataSource).arg(source);
+    auto statement = QString(CreateDataBaseUtf8).arg(source);
     mQuery.exec(statement);
     if (mQuery.isActive()) {
         LOG<<"create datasource successful! source is "<<source;
@@ -124,7 +124,7 @@ bool MySqlReadWrite::createDataSource(QCString source)
 
 bool MySqlReadWrite::dropDataSource(QCString source)
 {// 必须连接上mysql才能使用本函数
-    auto statement = QString(DropDataSource).arg(source);
+    auto statement = QString(DropDataBase).arg(source);
     mQuery.exec(statement);
     if (mQuery.isActive()) {
         LOG<<"drop datasource successful! source is "<<source;
@@ -209,7 +209,7 @@ QDateTime MySqlReadWrite::lastVisitTime(QCString table)
 
 QDateTime MySqlReadWrite::lastUpdateTime(QCString table)
 { // 上次更新时间可以通过查询来实现或者qfileinfo
-    auto statement = QString(UpdateTime)
+    auto statement = QString(SelectUpdateTime)
             .arg(dbName()).arg(table);
     mQuery.exec(statement);
 
@@ -229,7 +229,7 @@ QDateTime MySqlReadWrite::lastUpdateTime(QCString table)
 
 QDateTime MySqlReadWrite::createTime(QCString table)
 { // 表的创建时间
-    auto statement = QString(CreateTime).arg(dbName()).arg(table);
+    auto statement = QString(SelectCreateTime).arg(dbName()).arg(table);
     mQuery.exec(statement);
 
     if (!mQuery.isActive()) {

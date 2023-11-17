@@ -276,6 +276,17 @@ static const char* XField = "x";
 static const char* YField = "y";
 static const char* PointsField = "points";
 
+// sql数据库存储涉及的
+static const char * LoginTableName = "logininfo";
+static const char* ExperTableName = "experinfo";
+static const char* WellInfoField = "wellinfo"; // ManufacturerField,BrandField,WellsizeField
+static const char* ObjectiveInfoField = "wellinfo";// CameraLocationField,ObjectiveField
+static const char* ExperInfoField = "experinfo";// IsScheduleField,TotalTimeField,DurationTimeField,StartTimeField
+static const char* ChannelInfoField = "channelinfo";// BRField,PHField,RFPField,GFPField,DAPIField,ChannelField
+static const char* FocusInfoField = "focusinfo";//FocusField,FocusStepField
+static const char* GroupInfoField = "groupinfo"; // 1个组有哪些孔,选了哪些视野,孔信息等这些信息
+static const char* OtherInfoField = "otherinfo";//ZStackField,StitchField
+
 // 需要手动转换成idx的字段
 static const QList<QFieldList> SocketNeedMapFields{
         Brand1Fields,Brand2Fields,Brand3Fields,Brand4Fields,

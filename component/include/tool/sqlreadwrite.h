@@ -79,7 +79,7 @@ public:
 
     bool removeRecord(QCString table, QCString condition);
     bool removeRecord(QCString table, int row);
-    bool rollback(QCString table,QCString flag);
+    bool rollback(QCString table,QCString flag,bool isRecovery = false);
 
     bool updateRecord(QCString table,QCString values, QCString condition);
     bool updateRecord(QCString table,QCString values, int row);

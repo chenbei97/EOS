@@ -29,6 +29,7 @@ Q_ENUMS(SQLType)
 #define CriticalChinese tr("Critical")
 #define DefaultDateTimeFormat "yyyy-MM-dd hh:mm"
 #define DefaultImageDateTimeFormat "yyyy-MM-dd-hh-mm-ss"
+#define TableFlagDateTimeFormat "yyMMddhhmmss"
 #define CURRENT_PATH (QDir::currentPath())
 #define CURRENT_THREAD (QThread::currentThread())
 #define DefaultFontSize 10
@@ -43,6 +44,7 @@ Q_ENUMS(SQLType)
 #define SocketWaitTime 3000
 //#define UseSqlcipher true
 
+static const char* RollBackField = "rollback";
 static const char* OriginalField = "original";
 static const char* ExportField = "export";
 static const char* SqliteField = "sqlite";
@@ -59,6 +61,11 @@ static const char* EOSSuffix = ".eos";
 static const char* MatchEOSSuffix = "*.eos";
 static const char * UserField = "user";
 static const char * PwdField = "pwd";
+static const char * LastLoginField = "last_login";
+static const char * IDField = "id";
+static const char * DateTimeField = "datetime";
+static const char * FlagField = "flag";
+
 static const char * AdminField = "admin";
 static const char * DefalutPwdField = "123456";
 static const char*  SqliteDataBasePassword = "gaofenshengwu";

@@ -8,8 +8,6 @@
  */
 #include "test/test.h"
 
-SQLType CurrentSqlType; // 必须外部定义
-
 void initApp(QApplication& a);
 //#define usetesttcp 0
 
