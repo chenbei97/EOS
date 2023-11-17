@@ -19,6 +19,10 @@ public:
     explicit GroupBox(const QString&title,QWidget*parent=nullptr);
     explicit GroupBox(QLayout*lay,QWidget*parent=nullptr);
     explicit GroupBox(const QString&title,QLayout*lay,QWidget*parent=nullptr);
+    void setSettingID(int id);
+    int getSettingID() const;
+protected:
+    int id = -1;
 };
 
 

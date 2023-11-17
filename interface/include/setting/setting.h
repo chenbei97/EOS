@@ -12,6 +12,7 @@
 #include "window.h"
 #include "objectivesetting.h"
 #include "wellsetting.h"
+#include "settingnotifier.h"
 
 class INTERFACE_IMEXPORT Setting : public QWidget
 {
@@ -35,10 +36,10 @@ private:
     ObjectiveSetting * objectivesetting;
     WellSetting * wellsetting;
     QButtonGroup * buttongroup;
+    SettingNotifier * notifier;
 private:
     void toggleSetting(int option);
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
 };
-
 #endif //EOSI_SETTING_H

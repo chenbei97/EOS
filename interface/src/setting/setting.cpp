@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-31 14:13:03
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-31 14:14:01
+ * @LastEditTime: 2023-11-17 16:39:58
  * @FilePath: \EOS\interface\src\setting\setting.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -23,32 +23,47 @@ void Setting::emitSignals()
 }
 
 void Setting::toggleSetting(int option)
-{
-    if (option == 0) {
-        b1->show();
-        b2->hide();
-        objectivesetting->hide();
-        wellsetting->hide();
-        loginbtn->setChecked(true);
-    } else if (option == 1) {
-        b1->hide();
-        b2->show();
-        objectivesetting->hide();
-        wellsetting->hide();
-        databasebtn->setChecked(true);
-    } else if (option == 2) {
-        b1->hide();
-        b2->hide();
-        objectivesetting->show();
-        wellsetting->hide();
-        objectivebtn->setChecked(true);
-    } else if (option == 3) {
-        b1->hide();
-        b2->hide();
-        objectivesetting->hide();
-        wellsetting->show();
-        wellbtn->setChecked(true);
+{ // 这里用通知者模式比较好,避免大量的if_else判断
+    switch (option)
+    {
+        case 0:
+            notifier->notify(b1);
+            break;
+        case 1:
+            notifier->notify(b2);
+            break;
+        case 2:
+            notifier->notify(objectivesetting);
+            break;
+        case 3:
+            notifier->notify(wellsetting);
+            break;
     }
+//    if (option == 0) {
+//        b1->show();
+//        b2->hide();
+//        objectivesetting->hide();
+//        wellsetting->hide();
+//        loginbtn->setChecked(true);
+//    } else if (option == 1) {
+//        b1->hide();
+//        b2->show();
+//        objectivesetting->hide();
+//        wellsetting->hide();
+//        databasebtn->setChecked(true);
+//    } else if (option == 2) {
+//        b1->hide();
+//        b2->hide();
+//        objectivesetting->show();
+//        wellsetting->hide();
+//        objectivebtn->setChecked(true);
+//    } else if (option == 3) {
+//        b1->hide();
+//        b2->hide();
+//        objectivesetting->hide();
+//        wellsetting->show();
+//        wellbtn->setChecked(true);
+//    }
 }
 
 void Setting::initLayout()
@@ -77,6 +92,16 @@ void Setting::initAttributes()
     buttongroup->addButton(databasebtn,1);
     buttongroup->addButton(objectivebtn,2);
     buttongroup->addButton(wellbtn,3);
+
+    b1->setSettingID(0);
+    b2->setSettingID(1);
+    objectivesetting->setSettingID(2);
+    wellsetting->setSettingID(3);
+
+    notifier->addToList(b1,loginbtn);// 要在设置ID之后去添加
+    notifier->addToList(b2,databasebtn);
+    notifier->addToList(objectivesetting,objectivebtn);
+    notifier->addToList(wellsetting,wellbtn);
 }
 
 void Setting::initObjects()
@@ -91,6 +116,8 @@ void Setting::initObjects()
     b2 = new GroupBox;
     objectivesetting = new ObjectiveSetting;
     wellsetting = new WellSetting;
+
+    notifier = new SettingNotifier;
 }
 
 void Setting::initConnections()

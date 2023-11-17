@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-31 14:06:48
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-02 14:08:52
+ * @LastEditTime: 2023-11-17 16:16:08
  * @FilePath: \EOS\interface\src\preview\preview_tcp.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -122,11 +122,9 @@ void Preview::takingPhoto()
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     int exp = current_info[ExposureField].toUInt();
     int ga = current_info[GainField].toUInt();
-//    QVariantMap m;
-//    m[BrightField] = current_info[BrightField];
 
-
-//auto save_channels = toolinfo[CaptureChannelField].toStringList();//保存过设置的所有通道
+//  auto save_channels = toolinfo[CaptureChannelField].toStringList();//保存过设置的所有通道
+//  QVariantMap m;
 // 不从保存过的参数去拿,而是从UI的信息直接去拿
 //    if (save_channels.contains(current_channel)) {
 //        // 例如当前通道PH,设置过PH的相机参数
@@ -137,6 +135,8 @@ void Preview::takingPhoto()
 //        m[BrightField] = camera_info[BrightField];
 //    }
 
+//    QVariantMap m;
+//    m[BrightField] = current_info[BrightField];
 //    AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
 //    auto msg = AssemblerPointer->message();
 //    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
@@ -311,7 +311,7 @@ void Preview::importExperConfig(const QString& path)
             auto holepoint = holeinfo[HoleCoordinateField].toPoint();
             auto viewpoints = holeinfo[PointsField].value<QPointVector>();
 
-            // 把holepoint这个孔的信息更改(和wellsize有关,所以需要先更新previewtool的信息就不会越界了)
+            // 把holepoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
             pattern->updateHoleInfo(holepoint,group,viewpoints,viewsize);
             viewpattern->updateViewWindowCache(holepoint,viewpoints,viewsize);
         }

@@ -36,6 +36,7 @@
 #include "summarydialog.h"
 
 #include "setting.h"
+#include "settingnotifier.h"
 #include "objectivesetting.h"
 #include "wellsetting.h"
 

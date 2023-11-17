@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-11-01 15:46:10
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 15:46:36
+ * @LastEditTime: 2023-11-17 16:29:25
  * @FilePath: \EOS\interface\src\preview\wellpattern_updateui.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -42,8 +42,6 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
     auto dose = m[HoleDoseField].toString();
     auto unit = m[HoleDoseUnitField].toString();
     //LOG<<"well accept info from groupwin is "<<gtype<<gname<<gcolor<<medicine<<dose<<unit;
-
-    static QBool2DVector lastDrapPoints;
 
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){

@@ -120,7 +120,7 @@ void WellPattern::paintEvent(QPaintEvent *event)
                         auto viewpoint = points[i]; // 视野的坐标
                         auto viewrect = viewrects[viewpoint.x()][viewpoint.y()]; // 视野坐标对应的孔内小矩形区域
                         painter.fillRect(viewrect,Qt::black);
-                         计算量如下: 6孔板:116x116x6=80736; 24孔板: 24x45x45=48600; 96孔板:96x24x2455296; 384x12x12=55296
+                         计算量如下: 6孔板:116x116x6=80736; 24孔板: 24x45x45=48600; 96孔板:96x24x24=55296; 384x12x12=55296
                         */
                         // 4.此时就可以根据viewpoints的实际坐标拿到真实的点物理坐标
                         auto viewpoint = points[i]; // 视野的坐标
