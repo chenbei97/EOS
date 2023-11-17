@@ -38,8 +38,9 @@ static const QFieldList ExperTableFieldList = {
 };
 #define ExperTableFieldIndex(field) (ExperTableFieldList.indexOf(field))
 static const char * CreateExperTable_Common = // 公共部分,mysql/sqlite共用
+        "datetime datetime not null default '1899/12/30 00:00:00',"// now(),不支持.zzz
+        "flag varchar(100) not null default '', "
         "user varchar(100) not null default '', "
-        "flag varchar(100) not null default '',"
         "wellinfo varchar(100) not null default '', "
         "objectiveinfo varchar(100) not null default '', "
         "channelinfo varchar(100) not null default '', "
@@ -50,11 +51,9 @@ static const char * CreateExperTable_Common = // 公共部分,mysql/sqlite共用
         "xxx varchar(20) not null default '' ";
 static const char* CreateExperTableMysql = "create table if not exists experinfo ( "
                                            "id integer primary key auto_increment not null unique, "
-                                           "datetime datetime not null default '1899/12/30 00:00:00',"// now(),不支持.zzz
                                            "%1 );";
 static const char* CreateExperTableSqlite = "create table if not exists experinfo ( "
                                             "id integer primary key autoincrement not null unique, "
-                                            "datetime datetime not null default '1899/12/30 00:00:00',"
                                             "%1 );";
 
 struct ExperTableField {
@@ -103,10 +102,12 @@ static const ExperTableField ExperTableFieldName;
 static const char* CreateEmptyTableMySql = "create table if not exists %1( "
                                            "id integer primary key auto_increment not null unique, "
                                            "datetime datetime not null default '1899/12/30 00:00:00', "
+                                           "flag varchar(100) not null default '', "
                                            "user varchar(100) not null default '' );"; // 空表
 static const char* CreateEmptyTableSqlite = "create table if not exists %1( "
                                             "id integer primary key autoincrement not null unique, "
                                             "datetime datetime not null default '1899/12/30 00:00:00', "
+                                            "flag varchar(100) not null default '', "
                                             "user varchar(100) not null default '' );"; // 空表
 
 // （2）通用命令
