@@ -14,15 +14,18 @@
 class COMPONENT_IMEXPORT GroupBox : public QGroupBox
 {
     Q_OBJECT
+    Q_PROPERTY(int id READ getID WRITE setID MEMBER id NOTIFY idChanged)
 public:
     explicit GroupBox(QWidget*parent=nullptr);
     explicit GroupBox(const QString&title,QWidget*parent=nullptr);
     explicit GroupBox(QLayout*lay,QWidget*parent=nullptr);
     explicit GroupBox(const QString&title,QLayout*lay,QWidget*parent=nullptr);
-    void setSettingID(int id);
-    int getSettingID() const;
+    void setID(int id);
+    int getID() const;
 protected:
     int id = -1;
+signals:
+    void idChanged(int id);
 };
 
 

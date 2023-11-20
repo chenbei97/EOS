@@ -28,12 +28,12 @@ GroupBox::GroupBox(const QString&title,QLayout*lay,QWidget*parent):QGroupBox(par
     setLayout(lay);
 }
 
-void GroupBox::setSettingID(int id)
+void GroupBox::setID(int id)
 { // 用于通知者模式使用
     this->id = id;
 }
 
-int GroupBox::getSettingID() const
+int GroupBox::getID() const
 {// 用于通知者模式使用
     return id;
 }

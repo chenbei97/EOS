@@ -11,7 +11,7 @@
 
 void SettingNotifier::addToList(GroupBox*box,QRadioButton*radio)
 {
-    auto id = box->getSettingID();
+    auto id = box->getID();
     if (id != -1)
     {
         auto iter = notifiers.find(id);// 寻找这个通知者
@@ -22,7 +22,7 @@ void SettingNotifier::addToList(GroupBox*box,QRadioButton*radio)
 
 void SettingNotifier::removeFromList(GroupBox *box,QRadioButton*radio)
 {
-    auto id = box->getSettingID();
+    auto id = box->getID();
     if (id != -1)
     {
         auto iter = notifiers.find(id);// 寻找这个通知者
@@ -33,11 +33,11 @@ void SettingNotifier::removeFromList(GroupBox *box,QRadioButton*radio)
 
 void SettingNotifier::notify(GroupBox *box)
 { // 不通知自身,其它的所有box都要通知
-    auto id = box->getSettingID();
+    auto id = box->getID();
     if (id != -1)
     {
         for(auto pair: notifiers.values()) {
-            if (id != pair.first->getSettingID()) {
+            if (id != pair.first->getID()) {
                 pair.first->setHidden(true); // 通知结果是除了自身其它都隐藏
                 pair.second->setChecked(false);
             } else {

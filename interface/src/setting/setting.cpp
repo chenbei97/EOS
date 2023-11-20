@@ -93,10 +93,10 @@ void Setting::initAttributes()
     buttongroup->addButton(objectivebtn,2);
     buttongroup->addButton(wellbtn,3);
 
-    b1->setSettingID(0);
-    b2->setSettingID(1);
-    objectivesetting->setSettingID(2);
-    wellsetting->setSettingID(3);
+    b1->setID(0);
+    b2->setID(1);
+    objectivesetting->setID(2);
+    wellsetting->setID(3);
 
     notifier->addToList(b1,loginbtn);// 要在设置ID之后去添加
     notifier->addToList(b2,databasebtn);
