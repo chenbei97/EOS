@@ -27,6 +27,7 @@
 #include "focusbox.h"
 #include "channelbox.h"
 #include "channelboxx.h"
+#include "channelnotifier.h"
 #include "cameratool.h"
 #include "camerabox.h"
 #include "zstackbox.h"

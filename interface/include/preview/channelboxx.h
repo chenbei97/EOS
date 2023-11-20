@@ -4,6 +4,11 @@
 
 #include "window.h"
 
+#define use_channelnotifier 0
+#ifdef use_channelnotifier
+#include "channelnotifier.h"
+#endif
+
 class INTERFACE_IMEXPORT ChannelBoxx: public GroupBox
 {
     Q_OBJECT
@@ -17,6 +22,10 @@ private:
     PushButton * gfpbtn;
     PushButton * rfpbtn;
     PushButton * dapibtn;
+#ifdef use_channelnotifier
+    ChannelNotifier * notifier;
+    void toggleChannel(int option);
+#endif
 private:
     void clickBr();
     void clickPh();

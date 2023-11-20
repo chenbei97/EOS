@@ -49,3 +49,12 @@ void PushButton::resetBackGroundColor()
     checked = false;
 }
 
+void PushButton::setID(int id)
+{
+    this->id = id;
+}
+
+int PushButton::getID() const
+{
+    return id;
+}

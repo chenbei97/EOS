@@ -15,14 +15,20 @@
 class COMPONENT_IMEXPORT PushButton : public QPushButton
 {
     Q_OBJECT
+    Q_PROPERTY(int id READ getID WRITE setID MEMBER id NOTIFY idChanged)
 public:
     explicit PushButton(QWidget*parent=nullptr);
     explicit PushButton(const QString&text,QWidget*parent=nullptr);
     void setBackGroundColor(QCColor color);
     void resetBackGroundColor();
     bool isChecked() const;
-private:
+    void setID(int id);
+    int getID() const;
+protected:
+    int id = -1;
     bool checked = false;
+signals:
+    void idChanged(int id);
 };
 
 

@@ -7,6 +7,9 @@ ChannelBoxx::ChannelBoxx(QWidget*parent): GroupBox(parent)
     gfpbtn = new PushButton(GFPField);
     rfpbtn = new PushButton(RFPField);
     dapibtn = new PushButton(DAPIField);
+#ifdef use_channelnotifier
+    notifier = new ChannelNotifier;
+#endif
 
     // objectivesetting,默认是br4x,故objectivebox默认是br4x,故默认brbox是启用,phbox禁用
     brbtn->setEnabled(true);
@@ -23,21 +26,60 @@ ChannelBoxx::ChannelBoxx(QWidget*parent): GroupBox(parent)
     setLayout(lay);
     setTitle(tr("Channel"));
 
-//    QButtonGroup * group = new QButtonGroup;
-//    group->addButton(brbtn,0);
-//    group->addButton(phbtn,1);
-//    group->addButton(gfpbtn,2);
-//    group->addButton(rfpbtn,3);
-//    group->addButton(dapibtn,4);
-//    brbtn->setChecked(true);
+#ifdef use_channelnotifier
+    QButtonGroup * group = new QButtonGroup;
+    group->addButton(brbtn,0);
+    group->addButton(phbtn,1);
+    group->addButton(gfpbtn,2);
+    group->addButton(rfpbtn,3);
+    group->addButton(dapibtn,4);
+    brbtn->setChecked(true);
 
+    brbtn->setID(0);
+    phbtn->setID(1);
+    gfpbtn->setID(2);
+    rfpbtn->setID(3);
+    dapibtn->setID(4);
+
+    notifier->addToList(brbtn);
+    notifier->addToList(phbtn);
+    notifier->addToList(gfpbtn);
+    notifier->addToList(rfpbtn);
+    notifier->addToList(dapibtn);
+    connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&ChannelBoxx::toggleChannel);
+    connect(notifier,&ChannelNotifier::channelChanged,this,&ChannelBoxx::channelChanged);
+#else
     connect(brbtn,&PushButton::clicked,this,&ChannelBoxx::clickBr);
     connect(phbtn,&PushButton::clicked,this,&ChannelBoxx::clickPh);
     connect(rfpbtn,&PushButton::clicked,this,&ChannelBoxx::clickRfp);
     connect(gfpbtn,&PushButton::clicked,this,&ChannelBoxx::clickGfp);
     connect(dapibtn,&PushButton::clicked,this,&ChannelBoxx::clickDapi);
-    //connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&ChannelBoxx::channelChanged);
+#endif
 }
+
+#ifdef use_channelnotifier
+void ChannelBoxx::toggleChannel(int option)
+{ // 使用通知者模式减少大量的重复代码,把clickxxx函数的代码写在notify函数内
+    switch (option)
+    {
+        case 0:
+            notifier->notify(brbtn);
+            break;
+        case 1:
+            notifier->notify(phbtn);
+            break;
+        case 2:
+            notifier->notify(gfpbtn);
+            break;
+        case 3:
+            notifier->notify(rfpbtn);
+            break;
+        case 4:
+            notifier->notify(dapibtn);
+            break;
+    }
+}
+#endif
 
 void ChannelBoxx::clickBr()
 {
