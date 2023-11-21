@@ -101,9 +101,9 @@ add_subdirectory(interface)
 #set(A9 ${PROJECT_SOURCE_DIR}/bin/avcodec-lav-56.dll)
 
 
-#link_directories(${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib
-#        ${A1}${A2}${A3}${A4}${A5}${A6}${A7}${A8}${A9}
-#        )
+link_directories(${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib
+        #${A1}${A2}${A3}${A4}${A5}${A6}${A7}${A8}${A9}
+        )
 #if (${USE_PYTHON})
 #    link_directories(${PYTHON310_LIB_PATH})
 #endif ()
