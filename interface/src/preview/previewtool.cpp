@@ -53,6 +53,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     // 3.外部信号
     connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
     connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage);
+    connect(this,&PreviewTool::captureImage,channelbox,&ChannelBoxx::takePhoto);
     connect(this,&PreviewTool::exposureGainCaptured,camerabox,&CameraBox::captureExposureGain);
 
 #ifdef usetab

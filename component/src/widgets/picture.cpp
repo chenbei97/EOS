@@ -30,6 +30,7 @@ Picture::Picture(QWidget *parent) : QWidget(parent)
     lay->addWidget(pix);
     lay->addWidget(info);
     lay->setSpacing(0);
+    lay->setMargin(2); // 不要设为0边框就没了
 
     connect(experact,&QAction::triggered,this,&Picture::exportImage);
     connect(originact,&QAction::triggered,this,&Picture::showOriginalPixmap);
@@ -60,12 +61,12 @@ void Picture::exportImage()
 
 void Picture::showOriginalPixmap()
 {
-    if (pixpath.isEmpty()) return;
-
     PhotoCanvas * dlg = new PhotoCanvas;
     dlg->setStrategy(PhotoCanvas::SinglePixmap);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
-    dlg->setImage(QImage(pixpath));
+
+    if (pixpath.isEmpty()) dlg->setImage(pix->image()); // 没有指定真实原图路径就用现有的
+    else dlg->setImage(QImage(pixpath));
     dlg->show();
 }
 
@@ -113,4 +114,15 @@ void Picture::showDescribtion(bool show)
 void Picture::setDescriptionHeight(int height)
 {
     info->setMaximumHeight(height);
+}
+
+void Picture::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    auto pen = painter.pen();
+    pen.setWidth(4); // 设置宽度4和使用label的效果差不多
+    painter.setPen(pen);
+
+    painter.drawRect(0,0,width(),height());
 }

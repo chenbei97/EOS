@@ -183,6 +183,8 @@ static QString getAppStandardFilePath(QCString filename) noexcept
 
 static bool createPath(QCString path) noexcept
 {
+    if (pathExisted(path)) return true;
+
     QDir dir;
     dir.mkpath(path);
     return pathExisted(path);

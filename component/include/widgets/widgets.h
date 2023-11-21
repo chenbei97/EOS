@@ -47,6 +47,10 @@
 #include "qgridlayout.h"
 #include "qstackedlayout.h"
 
+#include "qmediaplayer.h"
+#include "qvideowidget.h"
+#include "qmediaplaylist.h"
+
 #include "qvalidator.h"
 #include "qpainter.h"
 #include "qevent.h"
@@ -80,4 +84,7 @@
 #define PhotoCanvasTriangleLength 100
 #define PhotoCanvasTriangleGap 10
 #define PictureDescriptionMaxHeight 30
+#define ChannelPictureLabelMinHeight 100
+#define ChannelPictureLabelMaxWidth 150
+#define ChannelPictureLabelDefaultWidth 400
 #endif //EOSI_WIDGETS_H

@@ -103,7 +103,29 @@ void PhotoCanvas::setData(const QVariantMap &m)
     mimage = m[ImageField].value<QImage>()
         .scaled(width(),height(),
         Qt::KeepAspectRatio,Qt::FastTransformation);
-    update();
+    //update();
+}
+
+void PhotoCanvas::setImage(const QImage &img, int duration)
+{
+    static long long count = 0;
+    static long c = 0;
+    if (count % duration == 0) { // 不能能用count % 10取非好像long会有问题
+        // 一种除了定时update辅助减少界面刷新的功能,10张图显示1次
+        if (!img.isNull())
+            mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+        else
+            mimage = QImage();
+        //LOG<<count<<c;
+        //update();// 这是定时器来帮助刷新
+        ++c;
+    }
+    count++;
+
+    if (count > 1000 ){
+        count = 0; // 防止一直累计溢出
+        c = 0;
+    }
 }
 
 void PhotoCanvas::setImage(const QImage &img)
@@ -112,7 +134,7 @@ void PhotoCanvas::setImage(const QImage &img)
         mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
     else
         mimage = QImage();
-    repaint();
+    update(); // 这里是立即刷新的
 }
 
 void PhotoCanvas::setPixmap(const QPixmap &pix)
@@ -139,8 +161,9 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
     mMouseClickColor.setAlpha(DefaultColorAlpha);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    static bool flag = false;
-    connect(&timer,&QTimer::timeout,[this]{setUpdatesEnabled(flag);flag=!flag;});
+//    static bool flag = false;
+//    connect(&timer,&QTimer::timeout,[this]{setUpdatesEnabled(flag);flag=!flag;});
+    connect(&timer,&QTimer::timeout,[this]{update();});
 }
 
 void PhotoCanvas::optimizePaint(int ms)

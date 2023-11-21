@@ -7,6 +7,7 @@ ChannelBoxx::ChannelBoxx(QWidget*parent): GroupBox(parent)
     gfpbtn = new PushButton(GFPField);
     rfpbtn = new PushButton(RFPField);
     dapibtn = new PushButton(DAPIField);
+    canvas = new ChannelPicture;
 #ifdef use_channelnotifier
     notifier = new ChannelNotifier;
 #endif
@@ -23,7 +24,10 @@ ChannelBoxx::ChannelBoxx(QWidget*parent): GroupBox(parent)
     lay->addWidget(rfpbtn);
     lay->addWidget(dapibtn);
 
-    setLayout(lay);
+    auto mainlay = new QVBoxLayout;
+    mainlay->addLayout(lay);
+    mainlay->addWidget(canvas);
+    setLayout(mainlay);
     setTitle(tr("Channel"));
 
 #ifdef use_channelnotifier
@@ -79,7 +83,7 @@ void ChannelBoxx::toggleChannel(int option)
             break;
     }
 }
-#endif
+#else
 
 void ChannelBoxx::clickBr()
 {
@@ -182,6 +186,13 @@ void ChannelBoxx::clickDapi()
     }
 
     //LOG<<channelInfo();
+}
+#endif
+
+void ChannelBoxx::takePhoto(const QImage &img, const QString &channel)
+{
+    LOG<<channel;
+    canvas->setImage(ChannelFields.indexOf(channel),img);
 }
 
 void ChannelBoxx::disableChannel(const QString &obj)

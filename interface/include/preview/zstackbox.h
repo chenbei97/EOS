@@ -21,6 +21,8 @@ public:
 private:
     CheckBox * zstack;
     CheckBox * stitchimage;
+    ComboBox * videoformat;
+    ComboBox * imageformat;
 signals:
     void zstackChanged(bool isChecked);
     void stitchChanged(bool isChecked);

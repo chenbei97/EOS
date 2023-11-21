@@ -110,7 +110,7 @@ void Preview::showCapturedImage(const QImage& image)
     // QVariantMap m;
     // m[ImageField] = image;
     // livecanvas->setData(m);
-    livecanvas->setImage(image);
+    livecanvas->setImage(image,10);
 #endif
 }
 #endif
@@ -141,14 +141,13 @@ void Preview::takingPhoto()
 //    auto msg = AssemblerPointer->message();
 //    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
 //    // 等待回复后调用相机拍照(现在没有拍照事件了,无需发送0x0004命令直接拍就行)
-//    if (ParserResult.toBool()) {
 
 #ifndef notusetoupcamera
         ToupCameraPointer->setExposure(exp);
         ToupCameraPointer->setGain(ga);
         auto pix = ToupCameraPointer->capture();
         auto current_channel = toolinfo[CurrentChannelField].toString();
-        previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
+        previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道,以及显示到缩略图
         LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
         <<" 曝光和增益为 "<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
 #else
@@ -163,7 +162,13 @@ void Preview::takingPhoto()
 
         cameramode->changeMode(CameraMode::PhotoMode);
         photocanvas->setImage(pix);
-//    }
+
+        // 存图功能,目前默认存到temp下,用户会更改前缀目录,或者需要按分不同通道文件夹归类等
+        createPath(CURRENT_PATH+"/temp");
+        auto path = CURRENT_PATH+"/temp/"
+                    +QDateTime::currentDateTime().toString(DefaultImageSaveDateTimeFormat)+JPGSuffix;
+        pix.save(path,JPGField,100);
+
 }
 
 void Preview::previewViewByClickView(const QPoint &viewpoint)
@@ -266,6 +271,10 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     if (ParserResult.toBool()) {
         LOG<<"已经移动电机到指定孔坐标 "<<holepoint;
     }
+
+    //
+
+
 }
 
 void Preview::exportExperConfig(const QString& path)

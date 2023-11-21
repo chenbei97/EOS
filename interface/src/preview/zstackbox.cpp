@@ -12,15 +12,29 @@ ZStackBox::ZStackBox(QWidget *parent) : GroupBox(parent)
 {
     zstack = new CheckBox("z_stack");
     stitchimage = new CheckBox("stitch_image");
+    videoformat = new ComboBox(VideoFormatFields);
+    imageformat = new ComboBox(ImageFormatFields);
 
-    auto hlay = new QHBoxLayout;
-    hlay->addWidget(zstack);
-    hlay->addWidget(stitchimage);
-    hlay->setSpacing(30);
-    hlay->addStretch();
+    auto hlay1 = new QHBoxLayout;
+    hlay1->addWidget(zstack);
+    hlay1->addWidget(stitchimage);
+    hlay1->setSpacing(30);
+    hlay1->addStretch();
 
-    setLayout(hlay);
-    setTitle(tr("More"));
+    auto hlay2 = new QHBoxLayout;
+    hlay2->addWidget(new Label(ImageFormatLabelField));
+    hlay2->addWidget(imageformat);
+    hlay2->addWidget(new Label(VideoFormatLabelField));
+    hlay2->addWidget(videoformat);
+    hlay1->setSpacing(30);
+    hlay2->addStretch();
+
+    auto vlay = new QVBoxLayout;
+    vlay->addLayout(hlay1);
+    vlay->addLayout(hlay2);
+
+    setLayout(vlay);
+    setTitle(tr("Other"));
 
     connect(zstack,&CheckBox::checkedChanged,this,&ZStackBox::zstackChanged);
     connect(stitchimage,&CheckBox::checkedChanged,this,&ZStackBox::stitchChanged);

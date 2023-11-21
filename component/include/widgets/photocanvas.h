@@ -21,6 +21,7 @@ public:
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());
     void setData(const QVariantMap& m);
     void setImage(const QImage&img);
+    void setImage(const QImage&img, int duration);
     void setPixmap(const QPixmap& pix);
     QPixmap pixmap() const;
     QImage image() const;

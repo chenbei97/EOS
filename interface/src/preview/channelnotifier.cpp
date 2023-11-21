@@ -38,12 +38,12 @@ void ChannelNotifier::notify(PushButton *btn)
     if (id != -1)
     {
         for(auto button: notifiers.values()) {
-            if (id != button->getID()) { // 其它的一定关灯
+            if (id != button->getID()) { // 其它的一定关灯,这里不额外下发命令,服务端收到某个通道开灯时它有义务关闭其它灯
                 button->setChecked(false);
                 button->resetBackGroundColor();
                 //emit channelChanged(-1);
             } else {
-                !button->isChecked()?button->setBackGroundColor(Qt::yellow)
+                !button->isChecked()?button->setBackGroundColor(Qt::yellow) // 设置背景颜色时内部切换了checked状态
                     :button->resetBackGroundColor();
                 button->isChecked()? emit channelChanged(button->getID())
                     : emit channelChanged(-1);

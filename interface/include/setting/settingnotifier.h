@@ -7,8 +7,8 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 
-#ifndef EOS_MAIN_CORE_PY_SETTINGNOTIFIER_H
-#define EOS_MAIN_CORE_PY_SETTINGNOTIFIER_H
+#ifndef EOS_SETTINGNOTIFIER_H
+#define EOS_SETTINGNOTIFIER_H
 
 #include "window.h"
 
@@ -23,4 +23,4 @@ private:
     QMap<int,QPair<GroupBox*,QRadioButton*>> notifiers;
 };
 
-#endif //EOS_MAIN_CORE_PY_SETTINGNOTIFIER_H
+#endif //EOS_SETTINGNOTIFIER_H

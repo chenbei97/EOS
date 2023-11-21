@@ -19,7 +19,7 @@ class COMPONENT_IMEXPORT Picture : public QWidget
     Q_OBJECT
 public:
     explicit Picture(QWidget *parent = nullptr);
-
+    void paintEvent(QPaintEvent*event) override;
     void setPixmap(const QPixmap& pix,const QString& path = QString());
     void setImage(const QImage& img,const QString& path = QString());
     QPixmap pixmap() const;

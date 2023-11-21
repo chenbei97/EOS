@@ -15,6 +15,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     savebtn = new PushButton(tr("save current channel settings"));
     combinebtn = new PushButton(tr("merge"));
     capturebtn = new PushButton(tr("capture"));
+    capturebtn->setBackGroundColor(Qt::yellow);
     setEnabled(false); // 初始没开灯不能使用
 
     auto blay = new QHBoxLayout;

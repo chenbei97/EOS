@@ -6,9 +6,8 @@
  * @FilePath: \EOS\interface\include\preview\channelnotifier.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-
-#ifndef EOS_MAIN_CORE_PY_CHANNELNOTIFIER_H
-#define EOS_MAIN_CORE_PY_CHANNELNOTIFIER_H
+#ifndef CHANNELNOTIFIER_H
+#define CHANNELNOTIFIER_H
 
 #include "window.h"
 
@@ -25,4 +24,4 @@ signals:
     void channelChanged(int option);
 };
 
-#endif //EOS_MAIN_CORE_PY_CHANNELNOTIFIER_H
+#endif //CHANNELNOTIFIER_H

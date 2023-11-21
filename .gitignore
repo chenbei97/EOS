@@ -8,6 +8,7 @@
 *.dll
 *.exe
 *.log
+*.ax
 
 cmake-build-debug
 python310
@@ -17,4 +18,5 @@ mediaservice
 sqldrivers
 imageformats
 theme
+temp
 *.eos

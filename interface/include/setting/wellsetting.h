@@ -7,8 +7,8 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 
-#ifndef EOS_MAIN_CORE_PY_WELLSETTING_H
-#define EOS_MAIN_CORE_PY_WELLSETTING_H
+#ifndef EOS_WELLSETTING_H
+#define EOS_WELLSETTING_H
 
 #include "window.h"
 
@@ -27,4 +27,4 @@ private:
     QRadioButton * multiboardbtn;
 };
 
-#endif //EOS_MAIN_CORE_PY_WELLSETTING_H
+#endif //EOS_WELLSETTING_H

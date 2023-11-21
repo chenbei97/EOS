@@ -89,7 +89,21 @@ add_subdirectory(component)
 add_subdirectory(interface)
 
 #（4）链接的库目录 必须add_executable之前
-link_directories(${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib)
+
+#set(A1 ${PROJECT_SOURCE_DIR}/bin/swscale-lav-3.dll)
+#set(A2 ${PROJECT_SOURCE_DIR}/bin/libbluray.dll)
+#set(A3 ${PROJECT_SOURCE_DIR}/bin/IntelQuickSyncDecoder.dll)
+#set(A4 ${PROJECT_SOURCE_DIR}/bin/swscale-lav-3.dll)
+#set(A5 ${PROJECT_SOURCE_DIR}/bin/avutil-lav-54.dll)
+#set(A6 ${PROJECT_SOURCE_DIR}/bin/avresample-lav-2.dll)
+#set(A7 ${PROJECT_SOURCE_DIR}/bin/avformat-lav-56.dll)
+#set(A8 ${PROJECT_SOURCE_DIR}/bin/avfilter-lav-5.dll)
+#set(A9 ${PROJECT_SOURCE_DIR}/bin/avcodec-lav-56.dll)
+
+
+#link_directories(${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib
+#        ${A1}${A2}${A3}${A4}${A5}${A6}${A7}${A8}${A9}
+#        )
 #if (${USE_PYTHON})
 #    link_directories(${PYTHON310_LIB_PATH})
 #endif ()
@@ -243,7 +257,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Sql Qt5::Network Qt5::Concurrent
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
         component interface  # mingw必须显示指定python310,msvc指定与否都可
-        ${TOUPCAM_LIB_PATH}) # opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
+        ${TOUPCAM_LIB_PATH}# opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
+
+        )
 #if (${USE_PYTHON})
 #target_link_libraries(${PROJECT_NAME} PRIVATE ${PYTHON310_LIB_PATH_python310} ${PYTHON310_LIB_PATH_python310d})
 #endif ()

@@ -172,7 +172,7 @@ void Preview::initAttributes()
     livecanvas->setScaledContents(true);
 #else
     livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
-    livecanvas->optimizePaint(200);
+    livecanvas->optimizePaint(50);
 #endif
 
 #ifdef usetab

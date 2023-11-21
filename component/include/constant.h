@@ -15,6 +15,7 @@
 #include "qscreen.h"
 #include "qapplication.h"
 #include "qdesktopwidget.h"
+#include "qtextcodec.h"
 
 enum class SQLType {Mysql,Sqlite};
 Q_ENUMS(SQLType)
@@ -29,6 +30,7 @@ Q_ENUMS(SQLType)
 #define CriticalChinese tr("Critical")
 #define DefaultDateTimeFormat "yyyy-MM-dd hh:mm"
 #define DefaultImageDateTimeFormat "yyyy-MM-dd-hh-mm-ss"
+#define DefaultImageSaveDateTimeFormat "yyyy_MM_dd_hh_mm_ss"
 #define TableFlagDateTimeFormat "yyMMddhhmmss"
 #define CURRENT_PATH (QDir::currentPath())
 #define CURRENT_THREAD (QThread::currentThread())
@@ -84,6 +86,7 @@ static const char* MinuteField = "minute";
 static const char* HoursFieldSuffix = " hours";
 static const char* MinutesFieldSuffix = " minutes";
 static const char* JPGSuffix = ".jpg";
+static const char* JPGField = "jpg";
 static const char* StateField = "state";
 static const char* ImageField = "image";
 static const char* StopField = "stop";
@@ -97,6 +100,10 @@ static const char* FlaskField = "flask";
 static const char* FlaskFieldLabel = "flask: ";
 static const char* SlideField = "slide";
 static const char* SlideFieldLabel = "slide: ";
+static const char* ImageFormatField = "imageFormat";
+static const char* VideoFormatField = "videoFormat";
+static const char* ImageFormatLabelField = "imageFormat: ";
+static const char* VideoFormatLabelField = "videoFormat: ";
 
 #define AppendSeparateField(s) (s+SeparateField)
 
