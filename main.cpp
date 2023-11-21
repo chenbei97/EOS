@@ -18,10 +18,7 @@ int main(int argc, char *argv[]) {
 #ifdef usetesttcp
     test_tcp();
 #else
-    //MainWindow w;
-    VideoWidget w;
-    w.setMedia("test.mp4");
-    w.play();
+    MainWindow w;
     setWindowAlignCenter(&w);
     w.show();
 

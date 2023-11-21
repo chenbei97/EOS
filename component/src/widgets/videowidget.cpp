@@ -9,7 +9,6 @@ VideoWidget::VideoWidget(QWidget *parent): QWidget(parent)
 
     player->setPlaylist(playlist);
     player->setVideoOutput(canvs);
-    //canvs->show();
 
     auto lay = new QVBoxLayout;
     lay->addWidget(canvs);
@@ -17,22 +16,26 @@ VideoWidget::VideoWidget(QWidget *parent): QWidget(parent)
     //lay->setSpacing(0);
     setLayout(lay);
     resize(DefaultWindowSize);
+
+    /*
+     * VideoWidget w;
+     * w.setMedia("test.wmv");
+     * w.play();
+     * */
 }
 
 void VideoWidget::setMedia(const QString &path)
 {
-//    playlist->clear();
-//    //playlist->load(QUrl(path));
-//    playlist->addMedia(QUrl::fromLocalFile(path));
-//    playlist->setCurrentIndex(0);
-//    LOG<<player->playlist()->media(0).isNull();
+    playlist->clear();
+    //playlist->load(QUrl::fromLocalFile(path));
+    //playlist->addMedia(QUrl::fromLocalFile(path));
+    //playlist->setCurrentIndex(0);
     player->setMedia(QUrl::fromLocalFile(path));
 }
 
 void VideoWidget::play()
 {
-    if (playlist->isEmpty()) return;
-
+    //if (playlist->isEmpty()) return;
     player->play();
 
 }
