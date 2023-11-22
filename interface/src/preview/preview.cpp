@@ -132,8 +132,6 @@ void Preview::initLayout()
     rbox->setMaximumWidth(PreviewToolBarMaxWidth);
 
     // 2.左侧布局
-    stack->addWidget(livecanvas);
-    stack->addWidget(photocanvas);
     auto llay = new QVBoxLayout;
     llay->addWidget(cameramode);
     llay->addWidget(stack);
@@ -178,6 +176,10 @@ void Preview::initAttributes()
 #ifdef usetab
     tab->setMaximumWidth(PreviewToolBarMaxWidth);
 #endif
+
+    stack->addWidget(livecanvas);
+    stack->addWidget(photocanvas);
+    stack->addWidget(videocanvas);
 }
 
 void Preview::initObjects()
@@ -193,6 +195,7 @@ void Preview::initObjects()
     expertool = new ExperTool;
 #endif
     photocanvas = new PhotoCanvas;
+    videocanvas = new VideoWidget;
     stack = new QStackedWidget;
     pattern = new WellPattern(2,3);
     groupinfo = new GroupInfo;

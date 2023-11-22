@@ -19,17 +19,17 @@ VideoWidget::VideoWidget(QWidget *parent): QWidget(parent)
 
     /*
      * VideoWidget w;
-     * w.setMedia("test.wmv");
+     * w.setMedia("test.mp4");
      * w.play();
      * */
 }
 
 void VideoWidget::setMedia(const QString &path)
 {
-    playlist->clear();
+    //playlist->clear();
     //playlist->load(QUrl::fromLocalFile(path));
     //playlist->addMedia(QUrl::fromLocalFile(path));
-    //playlist->setCurrentIndex(0);
+    //playlist->setCurrentIndex(0); // 比使用playlist直接
     player->setMedia(QUrl::fromLocalFile(path));
 }
 

@@ -16,6 +16,7 @@
 #include "wellpattern.h"
 #include "viewpattern.h"
 #include "summarydialog.h"
+#include "videowidget.h"
 
 //#define notusetoupcamera 0
 //#define uselabelcanvas 0
@@ -58,6 +59,7 @@ private:
 #endif
     PhotoCanvas * photocanvas;
     ViewPattern * viewpattern;
+    VideoWidget * videocanvas;
     QStackedWidget * stack;
     PreviewTool * previewtool;
     WellPattern * pattern;

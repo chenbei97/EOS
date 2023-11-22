@@ -15,14 +15,15 @@ class INTERFACE_IMEXPORT CameraMode: public QWidget
 {
     Q_OBJECT
 public:
-    enum cameraMode {LiveMode,PhotoMode};
+    enum cameraMode {LiveMode,PhotoMode,VideoMode};
     explicit CameraMode(QWidget*parent= nullptr);
     void changeMode(cameraMode mode);
     void paintEvent(QPaintEvent*event) override;
     QSize sizeHint() const override;
+    QSize  minimumSizeHint() const override;
     void mousePressEvent(QMouseEvent *event) override;
 private:
-    bool isLive = true;
+    cameraMode cameramode = LiveMode;
 signals:
     void cameraModeChanged(int option);
 };

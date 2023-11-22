@@ -21,7 +21,6 @@ int main(int argc, char *argv[]) {
     MainWindow w;
     setWindowAlignCenter(&w);
     w.show();
-
 #endif
     return QApplication::exec();
 }

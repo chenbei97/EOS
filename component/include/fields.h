@@ -254,8 +254,10 @@ static const char* StitchField = "stitch";
 // photocanvas
 static const char* LiveField = "live";
 static const char* PhotoField = "photo";
+static const char* VideoField = "video";
 #define LiveFieldMetricWidth DefaultPainterMetric.width(LiveField)
 #define PhotoFieldMetricWidth DefaultPainterMetric.width(PhotoField)
+#define VideoFieldMetricWidth DefaultPainterMetric.width(VideoField)
 #define PreviewPhotoCanvasViewRectColor QColor("#00A2E8")
 
 // appselect + canvas
