@@ -38,6 +38,7 @@
 #include "configreadwrite.h"
 #include "inireadwrite.h"
 #include "log.h"
+#include "recordimage.h"
 
 #include "picture.h"
 #include "colorbutton.h"

@@ -27,13 +27,13 @@ void Preview::toggleChannel(int option)
     m[BrightField] = current_info[BrightField];
     m[TurnOffLight] = 0;
 
-    AssemblerPointer->assemble(TcpFramePool.frame0x0006,m);
+    AssemblerPointer->assemble(TcpFramePool.toggleChannelEvent,m);
     auto msg = AssemblerPointer->message();
 
-    SocketPointer->exec(TcpFramePool.frame0x0006,msg, true);
+    SocketPointer->exec(TcpFramePool.toggleChannelEvent,msg, true);
 
     if (ParserResult.toBool()) {
-        LOG<<"开灯! 当前开灯通道为 "<<m[CurrentChannelField];
+        LOG<<"成开灯! 当前开灯通道为 "<<m[CurrentChannelField];
     }
 }
 
@@ -42,13 +42,13 @@ void Preview::adjustLens(int option)
 
     // 点调节镜头
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0008;
+    object[FrameField] = TcpFramePool.adjustLensEvent;
     object[DirectionField] = option;
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
 
     //LOG<<msg;
-    SocketPointer->exec(TcpFramePool.frame0x0008,msg, true);
+    SocketPointer->exec(TcpFramePool.adjustLensEvent,msg, true);
 
     if (ParserResult.toBool()) {
         LOG<<"移动镜头方向: "<<option;
@@ -81,20 +81,20 @@ void Preview::adjustCamera(int exp,int gain,int br)
 #endif
     // 滑动条速度很快,这里组装不再通过Assembler来组装,可能同步会出问题,直接组装
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0005;
-    object[Field0x0005.bright] = br;
-    object[Field0x0005.current_channel] = getIndexFromFields(current_channel);
+    object[FrameField] = TcpFramePool.adjustBrightEvent;
+    object[FieldAdjustBrightEvent.bright] = br;
+    object[FieldAdjustBrightEvent.current_channel] = getIndexFromFields(current_channel);
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());;
 
     // 发送消息异步发送就行不需要同步,防止卡住
-    SocketPointer->exec(TcpFramePool.frame0x0005,msg, false);
+    SocketPointer->exec(TcpFramePool.adjustBrightEvent,msg, false);
 }
 
 void Preview::onAdjustCamera(const QString & f,const QVariant & d)
 { // 这个是异步获取ParsePointer的parseResult,上方不使用同步,连接本函数
     static int count = 0;
-    if (d.toBool() && f == TcpFramePool.frame0x0005) {
+    if (d.toBool() && f == TcpFramePool.adjustBrightEvent) {
         LOG<<"调整相机参数"<<++count<<"次"; // 做这些事
     }
 }
@@ -214,9 +214,9 @@ void Preview::previewViewByClickView(const QPoint &viewpoint)
     m[BrightField] = bright;
     m[IsHoleField] = 0;
 
-    AssemblerPointer->assemble(TcpFramePool.frame0x0000,m);
+    AssemblerPointer->assemble(TcpFramePool.previewEvent,m);
     auto msg = AssemblerPointer->message();
-    SocketPointer->exec(TcpFramePool.frame0x0000,msg, true);
+    SocketPointer->exec(TcpFramePool.previewEvent,msg, true);
     if (ParserResult.toBool()) {
         LOG<<"已经移动电机到指定视野坐标 "<<viewpoint;
     }
@@ -265,16 +265,12 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     m[BrightField] = bright;
     m[IsHoleField] = 1;
 
-    AssemblerPointer->assemble(TcpFramePool.frame0x0000,m);
+    AssemblerPointer->assemble(TcpFramePool.previewEvent,m);
     auto msg = AssemblerPointer->message();
-    SocketPointer->exec(TcpFramePool.frame0x0000,msg, true);
+    SocketPointer->exec(TcpFramePool.previewEvent,msg, true);
     if (ParserResult.toBool()) {
         LOG<<"已经移动电机到指定孔坐标 "<<holepoint;
     }
-
-    //
-
-
 }
 
 void Preview::exportExperConfig(const QString& path)
@@ -284,7 +280,7 @@ void Preview::exportExperConfig(const QString& path)
 #ifdef usetab
     previewinfo[ExperToolField] = expertool->toolInfo();
 #endif
-    AssemblerPointer->assemble(TcpFramePool.frame0x0001,previewinfo);
+    AssemblerPointer->assemble(TcpFramePool.loadExperEvent,previewinfo);
     auto json = AssemblerPointer->message();
 
     json.chop(QString(SeparateField).count());//删掉尾缀@@@
@@ -345,10 +341,10 @@ void Preview::loadExper()
     if (ret == QDialog::Rejected)
         return;
 
-    AssemblerPointer->assemble(TcpFramePool.frame0x0001,previewinfo);
+    AssemblerPointer->assemble(TcpFramePool.loadExperEvent,previewinfo);
     auto json = AssemblerPointer->message();
 
-    SocketPointer->exec(TcpFramePool.frame0x0001,json);
+    SocketPointer->exec(TcpFramePool.loadExperEvent,json);
 #ifndef notusetoupcamera
     ToupCameraPointer->closeCamera();
 #else
@@ -384,5 +380,19 @@ void Preview::loadExper()
                 auto dose = holeinfo[HoleDoseField].toString();
                 auto unit = holeinfo[HoleDoseUnitField].toString();
         }
+    }
+}
+
+void Preview::stopExper()
+{
+    QVariantMap  m;
+    m[FrameField] = TcpFramePool.stopExperEvent;
+    m[StopField] = 1;
+    AssemblerPointer->assemble(TcpFramePool.stopExperEvent,m);
+    auto json = AssemblerPointer->message();
+
+    SocketPointer->exec(TcpFramePool.stopExperEvent,json,true);
+    if (ParserResult.toBool()) {
+        QMessageBox::information(this,InformationChinese,tr("Successfully stop the experiment!"));
     }
 }

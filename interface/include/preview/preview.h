@@ -116,6 +116,7 @@ private:
     void exportExperConfig(const QString& path);
     void importExperConfig(const QString& path);
     void loadExper();
+    void stopExper();
 #ifndef notusetoupcamera
     void showCapturedImage(const QImage& image);
 #endif

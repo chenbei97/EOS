@@ -28,6 +28,7 @@ ExperTool::ExperTool(QWidget*parent):QWidget(parent)
     connect(zstackbox,&ZStackBox::stitchChanged,this,&ExperTool::stitchChanged);
     connect(savebox,&SaveBox::exportFilePath,this,&ExperTool::exportFilePath);
     connect(savebox,&SaveBox::loadExper,this,&ExperTool::loadExper);
+    connect(savebox,&SaveBox::stopExper,this,&ExperTool::stopExper);
     connect(this,&ExperTool::objectiveChanged,timebox,&TimeBox::disableChannel);
 }
 

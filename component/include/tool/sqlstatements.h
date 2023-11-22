@@ -66,7 +66,7 @@ struct ExperTableField {
     const QString brand = BrandField;
     const QString wellsize = WellsizeField;
 
-    const QString camera_location = CameraLocationField;
+    const QString objective_location = ObjectiveLocationField;
     const QString objective = ObjectiveField;
 
     const QString br = BRField;

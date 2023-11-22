@@ -58,6 +58,7 @@ signals:
     void directionMove(int option); // 移动镜头
     void cameraAdjusted(int exp,int gain,int br);// 调整相机实时更改
     void loadExper(); // 启动实验
+    void stopExper(); // 停止实验
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
     void captureImage(const QImage& img,const QString& channel);

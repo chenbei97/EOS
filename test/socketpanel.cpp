@@ -15,7 +15,6 @@ void SocketPanel::onSend()
     testStateActivateCode();
     //testData1_2();
     //testData3();
-    testPhoto();
     //QThread::sleep(1);
 
 }
@@ -74,24 +73,8 @@ QByteArray SocketPanel::getTestData3()
 void SocketPanel::testData3()
 {
     edit->append(sendText.arg(QString::fromUtf8(getTestData3())));
-    SocketPointer->exec(TcpFramePool.frame0x0001,getTestData3());
+    SocketPointer->exec(TcpFramePool.loadExperEvent,getTestData3());
     edit->append(recvText.arg(ParserResult.toString()));
-}
-
-void SocketPanel::testPhoto()
-{
-    QVariantMap m;
-    m[BrightField] = "20";
-    m[ChannelField] = "2";
-    AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
-    auto msg = AssemblerPointer->message();
-    edit->append(sendText.arg(QString::fromUtf8(msg)));
-    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
-    if (ParserResult.toBool()) {
-        edit->append(recvText.arg("灯成功打开,可以进行拍照!"));
-    } else {
-        edit->append(recvText.arg("灯没有打开,不可以进行拍照!"));
-    }
 }
 
 void SocketPanel::testStateActivateCode()
@@ -102,15 +85,15 @@ void SocketPanel::testStateActivateCode()
 //    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
 //    LOG<<"activate code is "<<ParserResult.toString();
 
-    edit->append(sendText.arg(QString::fromUtf8(assemble0x0002(QVariantMap()))));
-    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
+    edit->append(sendText.arg(QString::fromUtf8(assembleAskConnectedStateEvent(QVariantMap()))));
+    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()));
     //if (ParserResult.toBool())
-   if (SocketPointer->result()[TcpFramePool.frame0x0002].toBool())
+   if (SocketPointer->result()[TcpFramePool.askConnectedStateEvent].toBool())
         edit->append(recvText.arg("[synchronous] socket is connect successful!"));
     else edit->append(recvText.arg("[synchronous] socket is connect failed!"));
 
-    edit->append(sendText.arg(QString::fromUtf8(assemble0x0003(QVariantMap()))));
-    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
+    edit->append(sendText.arg(QString::fromUtf8(assembleAskActivateCodeEvent(QVariantMap()))));
+    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()));
     edit->append(recvText.arg("[synchronous] activate code is "+ParserResult.toString()));
 }
 
@@ -143,10 +126,10 @@ SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
 void SocketPanel::parseResult0x0002_0x0003(const QString &f, const QVariant &d)
 { // 可以通过同步或者异步拿到消息
     //LOG<<"frame = "<<f<<" d = "<<d;
-    if (f == TcpFramePool.frame0x0002 && d.toBool()) {
+    if (f == TcpFramePool.askConnectedStateEvent && d.toBool()) {
         edit->append(recvText.arg("[asynchronous] socket is connect successful!"));
     }
-    if (f == TcpFramePool.frame0x0003 ) {
+    if (f == TcpFramePool.askActivateCodeEvent ) {
         edit->append(recvText.arg("[asynchronous] activate code is "+d.toString()));
     }
 }

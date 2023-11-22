@@ -69,28 +69,27 @@ void ObjectiveSetting::moveMachine()
 {
     QVariantMap  m;
     if (location_one->isChecked())
-        m[CameraLocationField] = 0;
+        m[ObjectiveLocationField] = 0;
     else if (location_two->isChecked())
-        m[CameraLocationField] = 1;
+        m[ObjectiveLocationField] = 1;
     else if (location_three->isChecked())
-        m[CameraLocationField] = 2;
+        m[ObjectiveLocationField] = 2;
     else if (location_four->isChecked())
-        m[CameraLocationField] = 3;
-    AssemblerPointer->assemble(TcpFramePool.frame0x0009,m);
+        m[ObjectiveLocationField] = 3;
+    AssemblerPointer->assemble(TcpFramePool.moveMachineEvent,m);
 
     //LOG<<AssemblerMessage;
-    SocketPointer->exec(TcpFramePool.frame0x0009,AssemblerMessage, false);
-//    auto d = ParserResult; // 在不使用同步时这里只能拿到invalid qqvariant
-//    LOG<<d;
-//    if (d.toBool()) {
-//        LOG<<"移动电机到位置"<<m[CameraLocationField].toInt();
-//    }
+    SocketPointer->exec(TcpFramePool.moveMachineEvent,AssemblerMessage, true);
+    auto d = ParserResult; // 在不使用同步时这里只能拿到invalid qqvariant
+    if (d.toBool()) {
+        LOG<<"移动电机到位置"<<m[ObjectiveLocationField].toInt();
+    }
 }
 
 void ObjectiveSetting::onMoveMachine(const QString& f,const QVariant& d)
 {
-    if (f == TcpFramePool.frame0x0009 && d.toBool()) {
-        LOG<<"移动电机成功"; // 使用异步时可以绑定信号来实现
+    if (f == TcpFramePool.moveMachineEvent && d.toBool()) {
+        LOG<<"移动电机成功"; // 使用异步时也可以绑定信号来实现
     }
 }
 
@@ -107,10 +106,10 @@ void ObjectiveSetting::updateCheckedState()
 
 void ObjectiveSetting::updateTipInfo()
 {
-    tipinfo->setText(tip.arg(CameraLocationField1).arg(info[CameraLocationField1]).
-                    arg(CameraLocationField2).arg(info[CameraLocationField2])
-                             .arg(CameraLocationField3).arg(info[CameraLocationField3])
-                             .arg(CameraLocationField4).arg(info[CameraLocationField4]));
+    tipinfo->setText(tip.arg(ObjectiveLocationField1).arg(info[ObjectiveLocationField1]).
+                    arg(ObjectiveLocationField2).arg(info[ObjectiveLocationField2])
+                             .arg(ObjectiveLocationField3).arg(info[ObjectiveLocationField3])
+                             .arg(ObjectiveLocationField4).arg(info[ObjectiveLocationField4]));
 }
 
 void ObjectiveSetting::initAttributes()
@@ -120,10 +119,10 @@ void ObjectiveSetting::initAttributes()
     buttongroup1->buttonClicked(0);
     buttongroup2->buttonClicked(0);
 
-    info[CameraLocationField1] = Objective4x;
-    info[CameraLocationField2] = Objective10x;
-    info[CameraLocationField3] = Objective20x;
-    info[CameraLocationField4] = Objective40x;
+    info[ObjectiveLocationField1] = Objective4x;
+    info[ObjectiveLocationField2] = Objective10x;
+    info[ObjectiveLocationField3] = Objective20x;
+    info[ObjectiveLocationField4] = Objective40x;
 
     tip = tr("Objective Info:    %1 [%2]    %3 [%4]    %5 [%6]    %7 [%8]");
     //emit objectiveSettingChanged(info);
@@ -192,10 +191,10 @@ void ObjectiveSetting::initObjects()
     buttongroup2 = new QButtonGroup;
     tipinfo = new Label;
 
-    location_one = new QRadioButton(CameraLocationField1);
-    location_two = new QRadioButton(CameraLocationField2);
-    location_three = new QRadioButton(CameraLocationField3);
-    location_four = new QRadioButton(CameraLocationField4);
+    location_one = new QRadioButton(ObjectiveLocationField1);
+    location_two = new QRadioButton(ObjectiveLocationField2);
+    location_three = new QRadioButton(ObjectiveLocationField3);
+    location_four = new QRadioButton(ObjectiveLocationField4);
     locationbtn = new PushButton(tr("move machine to this"));
 
     br4x = new QRadioButton(Objective4x);

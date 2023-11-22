@@ -28,7 +28,6 @@ public:
     QByteArray getTestData3();
     void testData1_2();
     void testData3();
-    void testPhoto();
     void testStateActivateCode();
 private:
     PushButton * btn;

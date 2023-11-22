@@ -43,24 +43,22 @@ class ParseManager:
         self.current_channel = "current_channel"
         self.turnoff_light = "turnoff_light"
         self.direction = "direction"
-        self.camera_loc = "camera_loc"
+        self.objective_loc = "objective_loc"
         self.ishole = "ishole"
         self.__socket = None
         self.parseFunctions = {
             "test0x0": self.__parsetest0x0,
             "test0x1": self.__parsetest0x1,
             "test0x2": self.__parsetest0x2,
-            "0x0000": self.__parse0x0000,
-            "0x0001": self.__parse0x0001,
-            "0x0002": self.__parse0x0002,
-            "0x0003": self.__parse0x0003,
-            "0x0004": self.__parse0x0004,
-            "0x0005": self.__parse0x0005,
-            "0x0006": self.__parse0x0006,
-            "0x0007": self.__parse0x0007,
-            "0x0008": self.__parse0x0008,
-            "0x0009": self.__parse0x0009,
-            "0x0010": self.__parse0x0010,
+            "0": self.__parse0x0000,
+            "1": self.__parse0x0001,
+            "2": self.__parse0x0002,
+            "3": self.__parse0x0003,
+            "4": self.__parse0x0004,
+            "5": self.__parse0x0005,
+            "6": self.__parse0x0006,
+            "7": self.__parse0x0007,
+            "8": self.__parse0x0008,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -116,7 +114,7 @@ class ParseManager:
         print("0x0000回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
-    def __parse0x0001(self,msg:dict): # 回复图片路径
+    def __parse0x0001(self,msg:dict): # 启动实验
         frame = msg[self.frame]
         reponse = defaultdict()
         reponse[self.frame] = frame
@@ -146,19 +144,7 @@ class ParseManager:
         print("0x0003回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
-    def __parse0x0004(self,msg:dict): # 拍照
-        frame = msg[self.frame]
-        bright = msg[self.bright]
-        #channel = msg[self.current_channel]
-        reponse = defaultdict()
-        reponse[self.frame] = frame
-        reponse[self.state] = "ok"
-        response = json.dumps(reponse)
-        response+=self.separate
-        print("0x0004回复: ", reponse)
-        self.__socket.sendall(response.encode("utf-8"))
-
-    def __parse0x0005(self,msg:dict): # 滑动条
+    def __parse0x0004(self,msg:dict): # 滑动条调节br
         frame = msg[self.frame]
         bright = msg[self.bright]
         channel = msg[self.current_channel]
@@ -167,10 +153,10 @@ class ParseManager:
         reponse[self.state] = "ok"
         response = json.dumps(reponse)
         response+=self.separate
-        #print("0x0005回复: ", reponse)
+        print("0x0004回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
-    def __parse0x0006(self,msg:dict): # 更改通道
+    def __parse0x0005(self,msg:dict): # 更改通道
         frame = msg[self.frame]
         bright = msg[self.bright]
         channel = msg[self.current_channel]
@@ -180,12 +166,23 @@ class ParseManager:
         reponse[self.state] = "ok"
         response = json.dumps(reponse)
         response+=self.separate
+        print("0x0005回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
+
+    def __parse0x0006(self,msg:dict): # 移动镜头
+        frame = msg[self.frame]
+        direction = msg[self.direction]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.state] = "ok"
+        response = json.dumps(reponse)
+        response+=self.separate
         print("0x0006回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
-    def __parse0x0007(self,msg:dict): # 回复关灯
+    def __parse0x0007(self,msg:dict): # 移动电机
         frame = msg[self.frame]
-
+        objective_loc = msg[self.objective_loc]
         reponse = defaultdict()
         reponse[self.frame] = frame
         reponse[self.state] = "ok"
@@ -194,29 +191,7 @@ class ParseManager:
         print("0x0007回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
-    def __parse0x0008(self,msg:dict): # 移动镜头
-        frame = msg[self.frame]
-        direction = msg[self.direction]
-        reponse = defaultdict()
-        reponse[self.frame] = frame
-        reponse[self.state] = "ok"
-        response = json.dumps(reponse)
-        response+=self.separate
-        print("0x0008回复: ", reponse)
-        self.__socket.sendall(response.encode("utf-8"))
-
-    def __parse0x0009(self,msg:dict): # 移动电机
-        frame = msg[self.frame]
-        camera_loc = msg[self.camera_loc]
-        reponse = defaultdict()
-        reponse[self.frame] = frame
-        reponse[self.state] = "ok"
-        response = json.dumps(reponse)
-        response+=self.separate
-        print("0x0009回复: ", reponse)
-        self.__socket.sendall(response.encode("utf-8"))
-
-    def __parse0x0010(self,msg:dict): # 移动电机
+    def __parse0x0008(self,msg:dict): # 停止实验
         frame = msg[self.frame]
         stop = msg[self.stop]
         reponse = defaultdict()
@@ -224,7 +199,7 @@ class ParseManager:
         reponse[self.state] = "ok"
         response = json.dumps(reponse)
         response+=self.separate
-        print("0x0010回复: ", reponse)
+        print("0x008回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
 class SocketServerManger:

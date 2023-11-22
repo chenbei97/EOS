@@ -47,6 +47,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(historybox,&HistoryBox::importFilePath,this,&PreviewTool::importFilePath);
     connect(savebox,&SaveBox::exportFilePath,this,&PreviewTool::exportFilePath);
     connect(savebox,&SaveBox::loadExper,this,&PreviewTool::loadExper);
+    connect(savebox,&SaveBox::stopExper,this,&PreviewTool::stopExper);
     connect(focusbox,&FocusBox::directionMove,this,&PreviewTool::directionMove);
     connect(recordbox,&RecordBox::pauseVideo,this,&PreviewTool::pauseVideo);
     connect(recordbox,&RecordBox::playVideo,this,&PreviewTool::playVideo);
@@ -83,7 +84,7 @@ PreviewToolInfo PreviewTool::toolInfo() const
 
     // 2. objective
     auto objectiveinfo = objectivebox->objectiveInfo();
-    info[CameraLocationField] = objectiveinfo[CameraLocationField];// 用了哪个位置的镜头
+    info[ObjectiveLocationField] = objectiveinfo[ObjectiveLocationField];// 用了哪个位置的镜头
     info[ObjectiveField] = objectiveinfo[ObjectiveField]; // 4x
     info[ObjectiveDescripField] = objectiveinfo[ObjectiveDescripField]; // br4x
     info[ObjectiveTypeField] = objectiveinfo[ObjectiveTypeField];

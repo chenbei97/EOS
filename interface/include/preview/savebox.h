@@ -29,5 +29,6 @@ private:
 signals:
     void exportFilePath(const QString&path);
     void loadExper();
+    void stopExper();
 };
 #endif //EOSI_SAVEBOX_H

@@ -13,6 +13,7 @@ RecordBox::RecordBox(QWidget *parent) : GroupBox(parent)
     imageformat = new ComboBox(ImageFormatFields);
     framerate = new ComboBox(VideoFrameRateFields);
     savepath = new Label;
+    recorder = new RecordImage;
 
     savepath->setFrameShape(Label::Box);
     selectvideo->setFrameShape(Label::Box);
@@ -59,16 +60,21 @@ RecordBox::RecordBox(QWidget *parent) : GroupBox(parent)
 
 void RecordBox::startRecord()
 {
-
+    recorder->setImageDir(savepath->elidedText());
+    recorder->setImageFormat(imageformat->currentText());
+    recorder->record();
 }
 
 void RecordBox::recordImage(const QImage &img)
 { // 相机传过来的原始无缩放图像
-
+    recorder->setImage(img);
 }
 
 void RecordBox::stopRecord()
 {
+    recorder->stop();
+
+    // 停止录制后要把图片保存的路径,视频要保存的格式传给服务,图片保存的路径也是视频保存的路径
 
 }
 

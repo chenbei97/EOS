@@ -101,7 +101,10 @@ static const char* FlaskFieldLabel = "flask: ";
 static const char* SlideField = "slide";
 static const char* SlideFieldLabel = "slide: ";
 
+#define AppendField(s,field) (s+field)
 #define AppendSeparateField(s) (s+SeparateField)
+#define PrependField(s,field) (field+s)
+#define PrependSeparateField(s) (SeparateField+s)
 
 static const QStringList TimeBoxTimeUnitFields = {
         HourField,MinuteField,

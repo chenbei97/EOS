@@ -36,23 +36,23 @@ void SummaryPanel::setData(const QVariantMap &m)
         edit->append(tr("<strong><font color = #20A848>[1]Basic Info:</font></strong>"));
         // 1.wellbox
         {
-            auto manufacturer = ManufacturerFields[toolinfo[Field0x0001.manufacturer].toInt()];
+            auto manufacturer = ManufacturerFields[toolinfo[FieldLoadExperEvent.manufacturer].toInt()];
             QString brand;
-            switch (toolinfo[Field0x0001.manufacturer].toInt()) {
+            switch (toolinfo[FieldLoadExperEvent.manufacturer].toInt()) {
                 case 0:
-                    brand = Brand1Fields[toolinfo[Field0x0001.wellbrand].toInt()];
+                    brand = Brand1Fields[toolinfo[FieldLoadExperEvent.wellbrand].toInt()];
                     break;
                 case 1:
-                    brand = Brand2Fields[toolinfo[Field0x0001.wellbrand].toInt()];
+                    brand = Brand2Fields[toolinfo[FieldLoadExperEvent.wellbrand].toInt()];
                     break;
                 case 2:
-                    brand = Brand3Fields[toolinfo[Field0x0001.wellbrand].toInt()];
+                    brand = Brand3Fields[toolinfo[FieldLoadExperEvent.wellbrand].toInt()];
                     break;
                 case 3:
-                    brand = Brand4Fields[toolinfo[Field0x0001.wellbrand].toInt()];
+                    brand = Brand4Fields[toolinfo[FieldLoadExperEvent.wellbrand].toInt()];
                     break;
             }
-            auto wellsize = WellsizeFields[toolinfo[Field0x0001.wellsize].toInt()];
+            auto wellsize = WellsizeFields[toolinfo[FieldLoadExperEvent.wellsize].toInt()];
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(1)WellInfo:</font></strong>"));
             //edit->setIndent(8,indent);
@@ -66,8 +66,8 @@ void SummaryPanel::setData(const QVariantMap &m)
 
         // 2. objectivebox
         {
-            auto cameraloc = CameraLocationFieldFields[toolinfo[Field0x0001.camera_location].toInt()];
-            auto objective = toolinfo[Field0x0001.objective].toString();//就是传递原字符串不需要改
+            auto cameraloc = ObjectiveLocationFields[toolinfo[FieldLoadExperEvent.objective_location].toInt()];
+            auto objective = toolinfo[FieldLoadExperEvent.objective].toString();//就是传递原字符串不需要改
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(2)Objective Info:</font></strong>"));
             //edit->setIndent(moveLength,indent);
@@ -77,7 +77,7 @@ void SummaryPanel::setData(const QVariantMap &m)
 
         // 3. camerabox
         {
-            auto capture_channels = toolinfo[Field0x0001.capture_channel].toStringList(); // 设置过相机参数的所有通道
+            auto capture_channels = toolinfo[FieldLoadExperEvent.capture_channel].toStringList(); // 设置过相机参数的所有通道
             edit->append("");
             if (!capture_channels.isEmpty()) {
                 edit->append(tr("<strong><font color = #00A2E8>(3)Channel Info:</font></strong>"));
@@ -100,8 +100,8 @@ void SummaryPanel::setData(const QVariantMap &m)
 
         // 4. focusbox
         {
-            auto focus = toolinfo[Field0x0001.focus].toString();
-            auto step = toolinfo[Field0x0001.focus_step].toString();
+            auto focus = toolinfo[FieldLoadExperEvent.focus].toString();
+            auto step = toolinfo[FieldLoadExperEvent.focus_step].toString();
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(4)Focus Info:</font></strong>"));
             edit->append(tr("<strong><font color = #00A2E8>1.focus: %1</font></strong>").arg(focus));
@@ -111,13 +111,13 @@ void SummaryPanel::setData(const QVariantMap &m)
         // 5. zstackbox
         {
 #ifdef usetab
-            auto zstack = experinfo[Field0x0001.zstack].toBool();
-            auto stitch = experinfo[Field0x0001.stitch].toBool();
+            auto zstack = experinfo[FieldLoadExperEvent.zstack].toBool();
+            auto stitch = experinfo[FieldLoadExperEvent.stitch].toBool();
 #else
-            auto zstack = toolinfo[Field0x0001.zstack].toBool();
-            auto stitch = toolinfo[Field0x0001.stitch].toBool();
+            auto zstack = toolinfo[FieldLoadExperEvent.zstack].toBool();
+            auto stitch = toolinfo[FieldLoadExperEvent.stitch].toBool();
 #endif
-            auto app = AppFields[m[Field0x0001.app].toInt()];
+            auto app = AppFields[m[FieldLoadExperEvent.app].toInt()];
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(5)Other Info:</font></strong>"));
             edit->append(tr("<strong><font color = #00A2E8>1.zstack: %1</font></strong>").arg(zstack));
@@ -128,17 +128,17 @@ void SummaryPanel::setData(const QVariantMap &m)
         // 6. experbox
         {
 #ifdef usetab
-            auto is_schedule = experinfo[Field0x0001.is_schedule].toBool();
-            auto duration = experinfo[Field0x0001.duration_time].toLongLong()*1.0;
-            auto total = experinfo[Field0x0001.total_time].toLongLong()*1.0;
-            auto start_time = experinfo[Field0x0001.start_time].toString();
-            auto channels = experinfo[Field0x0001.channel].toString().split(",",QString::SkipEmptyParts);
+            auto is_schedule = experinfo[FieldLoadExperEvent.is_schedule].toBool();
+            auto duration = experinfo[FieldLoadExperEvent.duration_time].toLongLong()*1.0;
+            auto total = experinfo[FieldLoadExperEvent.total_time].toLongLong()*1.0;
+            auto start_time = experinfo[FieldLoadExperEvent.start_time].toString();
+            auto channels = experinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
 #else
-            auto is_schedule = toolinfo[Field0x0001.is_schedule].toBool();
-            auto duration = toolinfo[Field0x0001.duration_time].toLongLong()*1.0;
-            auto total = toolinfo[Field0x0001.total_time].toLongLong()*1.0;
-            auto start_time = toolinfo[Field0x0001.start_time].toString();
-            auto channels = toolinfo[Field0x0001.channel].toString().split(",",QString::SkipEmptyParts);
+            auto is_schedule = toolinfo[FieldLoadExperEvent.is_schedule].toBool();
+            auto duration = toolinfo[FieldLoadExperEvent.duration_time].toLongLong()*1.0;
+            auto total = toolinfo[FieldLoadExperEvent.total_time].toLongLong()*1.0;
+            auto start_time = toolinfo[FieldLoadExperEvent.start_time].toString();
+            auto channels = toolinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
 #endif
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(6)Exper Info:</font></strong>"));
@@ -160,7 +160,7 @@ void SummaryPanel::setData(const QVariantMap &m)
             else edit->append(tr("<strong><font color = #00A2E8>5.channels: no channel selected</font></strong>"));
 
             // 做些提示,已经勾选的通道是否保存过参数
-            auto capture_channels = toolinfo[Field0x0001.capture_channel].toStringList();
+            auto capture_channels = toolinfo[FieldLoadExperEvent.capture_channel].toStringList();
             if (!channel.isEmpty()) {
                 if (capture_channels.isEmpty()) {
                     edit->append(tr("<strong><font color = #FF1E27>Warning: the channel you have checked [%1] none of the camera parameters have been saved, "

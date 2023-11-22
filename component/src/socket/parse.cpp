@@ -33,7 +33,7 @@ void Parse::parse(const QString&f,const QByteArray &msg)
 
     // 可能没这个帧头导致函数指针越界
     if (!TcpUsedFrameList.contains(frame)) { // 返回的检测一下就可,组装的是我控制的一定不出现
-        LOG<<frame<<" 不存在";
+        LOG<<frame<<" not exists";
         emit parseResult(f,QVariant());
         return;
     }

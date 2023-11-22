@@ -30,6 +30,7 @@ private:
     ComboBox * videoformat;
     ComboBox * imageformat;
     ComboBox * framerate;
+    RecordImage * recorder;
 private:
     void changeSavePath();
     void selectVideo();

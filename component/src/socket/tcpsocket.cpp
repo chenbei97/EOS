@@ -43,7 +43,7 @@ void TcpSocket::processMsgQueue()
 
 void TcpSocket::exec(const QString& f,const QByteArray& c,bool user_sync)
 {
-    //LOG<<"request msg = "<<c;
+    LOG<<"request msg = "<<c;
     frame = f;
     socket->write(c);
     if (user_sync) // 使用同步

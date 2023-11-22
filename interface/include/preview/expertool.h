@@ -34,6 +34,7 @@ signals:
     void stitchChanged(bool isChecked);
     void exportFilePath(const QString&path); // 导出文件配置的路径
     void loadExper(); // 启动实验
+    void stopExper();
 signals:
     void objectiveChanged(const QString& obj);
 };

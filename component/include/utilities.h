@@ -21,8 +21,20 @@
 #include "qmainwindow.h"
 //#include "sysinfoapi.h"
 //#include <windows.h>
-/*获取windows内存情况*/
 
+
+/*将指定数字转为0x前缀的16进制字符串,且0x后边有*指定的位数*/
+static QString convertToHex(quint32 number,int bits = 8) {
+    // 例如指定8bits,1000,000和1000分别转换为"0x000f4240" "0x000003e8"
+    QString hex = QString::number(number, 16);
+    while (hex.length() < bits) {
+        hex.prepend("0");
+    }
+    return "0x" + hex;
+}
+
+
+/*获取windows内存情况*/
 struct WindowsMemoryInfo
 {
     QString memoryUsageRate; // 内存使用率

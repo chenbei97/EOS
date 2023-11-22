@@ -16,10 +16,10 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
     rbtn_loc3 = new QRadioButton(Objective20x);
     rbtn_loc4 = new QRadioButton(Objective40x);
 
-    location_button[CameraLocationField1] = rbtn_loc1;
-    location_button[CameraLocationField2] = rbtn_loc2;
-    location_button[CameraLocationField3] = rbtn_loc3;
-    location_button[CameraLocationField4] = rbtn_loc3;
+    location_button[ObjectiveLocationField1] = rbtn_loc1;
+    location_button[ObjectiveLocationField2] = rbtn_loc2;
+    location_button[ObjectiveLocationField3] = rbtn_loc3;
+    location_button[ObjectiveLocationField4] = rbtn_loc3;
 
     QHBoxLayout * lay = new QHBoxLayout;
     lay->addWidget(rbtn_loc1);
@@ -40,10 +40,10 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
 
 void ObjectiveBox::onObjectiveSettingChanged(const LocationObjectiveInfo &m)
 { // 每个镜头放的物镜型号
-    rbtn_loc1->setText(m[CameraLocationField1]);
-    rbtn_loc2->setText(m[CameraLocationField2]);
-    rbtn_loc3->setText(m[CameraLocationField3]);
-    rbtn_loc4->setText(m[CameraLocationField4]);
+    rbtn_loc1->setText(m[ObjectiveLocationField1]);
+    rbtn_loc2->setText(m[ObjectiveLocationField2]);
+    rbtn_loc3->setText(m[ObjectiveLocationField3]);
+    rbtn_loc4->setText(m[ObjectiveLocationField4]);
 
     // 可能有无镜头的选项
     if (m.values().contains(NoneField)) {
@@ -132,20 +132,20 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
     QString text;
     if (rbtn_loc1->isChecked()) {
         text = rbtn_loc1->text(); // 传递实际字符串 br4x
-        m[CameraLocationField] = QString::number(CameraLocationField1Index);
+        m[ObjectiveLocationField] = QString::number(ObjectiveLocationField1Index);
 
     }
     else if (rbtn_loc2->isChecked()) {
         text = rbtn_loc2->text();
-        m[CameraLocationField] = QString::number(CameraLocationField2Index);
+        m[ObjectiveLocationField] = QString::number(ObjectiveLocationField2Index);
     }
     else if (rbtn_loc3->isChecked()) {
         text = rbtn_loc3->text();
-        m[CameraLocationField] = QString::number(CameraLocationField3Index);
+        m[ObjectiveLocationField] = QString::number(ObjectiveLocationField3Index);
     }
     else if (rbtn_loc4->isChecked()) {
         text = rbtn_loc4->text();
-        m[CameraLocationField] = QString::number(CameraLocationField4Index);
+        m[ObjectiveLocationField] = QString::number(ObjectiveLocationField4Index);
     }
 
     text = convertTo(text); // 兼容老代码,字段转换

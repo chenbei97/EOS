@@ -179,7 +179,7 @@ static const QFieldList ChannelFields = {
 #define BrightUpLimit 100
 #define FocusToolFocusMaxVal 50000
 #define FocusToolStepMaxVal 25000
-static const char* CameraLocationField = "camera_loc";
+static const char* ObjectiveLocationField = "objective_loc";
 static const char* CameraChannelField = "camera_channel";
 static const char* ExposureField = "exposure";
 static const char* ExposureFieldLabel = "exposure: ";
@@ -198,17 +198,17 @@ static const char* FocusSkipViewsField = "skip views";
 static const char* FocusSkipHolesLabelField = "skip holes: ";
 static const char* FocusSkipViewsLabelField = "skip views: ";
 static const char* FocusStepField = "focus_step";
-static const char* CameraLocationField1 = "objective1";
-static const char* CameraLocationField2 = "objective2";
-static const char* CameraLocationField3 = "objective3";
-static const char* CameraLocationField4 = "objective4";
-static const QFieldList CameraLocationFieldFields = {
-        CameraLocationField1,CameraLocationField2,CameraLocationField3,CameraLocationField4
+static const char* ObjectiveLocationField1 = "objective1";
+static const char* ObjectiveLocationField2 = "objective2";
+static const char* ObjectiveLocationField3 = "objective3";
+static const char* ObjectiveLocationField4 = "objective4";
+static const QFieldList ObjectiveLocationFields = {
+        ObjectiveLocationField1,ObjectiveLocationField2,ObjectiveLocationField3,ObjectiveLocationField4
 };
-#define CameraLocationField1Index  CameraLocationFieldFields.indexOf(CameraLocationField1)
-#define CameraLocationField2Index  CameraLocationFieldFields.indexOf(CameraLocationField2)
-#define CameraLocationField3Index  CameraLocationFieldFields.indexOf(CameraLocationField3)
-#define CameraLocationField4Index  CameraLocationFieldFields.indexOf(CameraLocationField4)
+#define ObjectiveLocationField1Index  ObjectiveLocationFields.indexOf(ObjectiveLocationField1)
+#define ObjectiveLocationField2Index  ObjectiveLocationFields.indexOf(ObjectiveLocationField2)
+#define ObjectiveLocationField3Index  ObjectiveLocationFields.indexOf(ObjectiveLocationField3)
+#define ObjectiveLocationField4Index  ObjectiveLocationFields.indexOf(ObjectiveLocationField4)
 
 // timebox涉及的
 #define TimeBoxPhotoTimeLimit 1800
@@ -311,7 +311,7 @@ static const char* OtherInfoField = "otherinfo";//ZStackField,StitchField
 static const QList<QFieldList> SocketNeedMapFields{
         Brand1Fields,Brand2Fields,Brand3Fields,Brand4Fields,
         ChannelFields,ManufacturerFields,ObjectiveMagnificationFields,ObjectiveTypeFields,
-        CameraLocationFieldFields,AppFields,WellsizeFields,
+        ObjectiveLocationFields,AppFields,WellsizeFields,
         VideoFormatFields,ImageFormatFields
 };
 // #include "qdebug.h"

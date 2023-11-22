@@ -245,10 +245,12 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
     connect(previewtool,&PreviewTool::importFilePath,this,&Preview::importExperConfig);
     connect(previewtool,&PreviewTool::loadExper,this,&Preview::loadExper);
+    connect(previewtool,&PreviewTool::stopExper,this,&Preview::stopExper);
 #ifdef usetab
     connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
     connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);
     connect(expertool,&ExperTool::loadExper,this,&Preview::loadExper);
+    connect(expertool,&ExperTool::stopExper,this,&Preview::stopExper);
 #endif
 
     // (2) preview内部信号-槽函数

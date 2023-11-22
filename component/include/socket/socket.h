@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-17 16:24:37
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-17 16:25:07
+ * @LastEditTime: 2023-11-22 15:14:51
  * @FilePath: \EOS\component\include\socket\socket.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -20,6 +20,7 @@
 #include "qtimer.h"
 #include "fields.h"
 #include "constant.h"
+#include "utilities.h"
 
 // (1) 静态全局指针
 class TcpSocket;
@@ -43,27 +44,37 @@ class ParserControl;
 #endif
 
 // (3) 帧头定义
-typedef struct { // 注册过的帧头命令
-    const QString frame0x0000 = "0x0000";
-    const QString frame0x0001 = "0x0001";
-    const QString frame0x0002 = "0x0002";
-    const QString frame0x0003 = "0x0003";
-    const QString frame0x0004 = "0x0004";
-    const QString frame0x0005 = "0x0005";
-    const QString frame0x0006 = "0x0006";
-    const QString frame0x0007 = "0x0007";
-    const QString frame0x0008 = "0x0008";
-    const QString frame0x0009 = "0x0009";
-    const QString frame0x0010 = "0x0010";
-} TcpFrameList;
-
-const QFieldList TcpUsedFrameList {
-        "0x0000","0x0001","0x0002","0x0003","0x0004",
-        "0x0005","0x0006","0x0007","0x0008","0x0009",
-        "0x0010",
+enum TcpEventType {
+    PreviewEvent = 0, // 点击孔,视野的预览事件
+    LoadExperEvent, // 启动实验事件
+    AskConnectedStateEvent, // 询问套接字连接状态事件
+    AskActivateCodeEvent,// 请求激活码事件
+    AdjustBrightEvent, // 滑动条调整brght事件
+    ToggleChannelEvent, // 切换通道关灯开灯事件
+    AdjustLensEvent, // 上下左右调整镜头事件
+    MoveMachineEvent,// 移动点击到指定物镜位置事件
+    StopExperEvent, // 停止实验事件
 };
 
-struct Field0x0000 {
+typedef struct { // 注册过的帧头命令
+    const QString previewEvent = QString::number(PreviewEvent);
+    const QString loadExperEvent = QString::number(LoadExperEvent);
+    const QString askConnectedStateEvent = QString::number(AskConnectedStateEvent);
+    const QString askActivateCodeEvent = QString::number(AskActivateCodeEvent);
+    const QString adjustBrightEvent = QString::number(AdjustBrightEvent);
+    const QString toggleChannelEvent = QString::number(ToggleChannelEvent);
+    const QString adjustLensEvent = QString::number(AdjustLensEvent);
+    const QString moveMachineEvent = QString::number(MoveMachineEvent);
+    const QString stopExperEvent = QString::number(StopExperEvent);
+} TcpFrameList;
+
+const QFieldList TcpUsedFrameList { // 用于解析时检测返回的帧是否正确,在这个列表内
+        QString::number(PreviewEvent),QString::number(LoadExperEvent),QString::number(AskConnectedStateEvent),
+        QString::number(AskActivateCodeEvent),QString::number(AdjustBrightEvent),QString::number(ToggleChannelEvent),
+        QString::number(AdjustLensEvent),QString::number(MoveMachineEvent),QString::number(StopExperEvent),
+};
+
+struct FieldPreviewEvent {
     //const QString viewpoint = ViewCoordinateField;
     //const QString holepoint = HoleCoordinateField;
     const QString view_x = ViewXCoordinateField;
@@ -81,7 +92,7 @@ struct Field0x0000 {
     const QString state = StateField; // 解析使用
 };
 
-struct Field0x0001{
+struct FieldLoadExperEvent{
     // 不需要传递给下位机(但是Tcp用过的字段)
     const QString capture_channel = CaptureChannelField;//配置过相机参数的所有通道
     const QString state = StateField; // 解析使用
@@ -91,7 +102,7 @@ struct Field0x0001{
     const QString wellbrand = BrandField;
     const QString wellsize = WellsizeField;
     // objective
-    const QString camera_location = CameraLocationField;
+    const QString objective_location = ObjectiveLocationField;
     const QString objective = ObjectiveField;
     const QString objective_descrip = ObjectiveDescripField;
     const QString objective_type = ObjectiveTypeField;
@@ -125,123 +136,107 @@ struct Field0x0001{
     const QString points = PointsField;
 };
 
-struct Field0x0002 {
+struct FieldAskConnectedStateEvent {
     const QString state = StateField; // 程序启动时发送命令询问是否连接上了
 };
 
-struct Field0x0003 {
+struct FieldAskActivateCodeEvent {
     const QString activate_code = ActivateCodeField; // 询问激活码
 };
 
-struct Field0x0004 {
-    //const QString current_channel = CurrentChannelField; // 拍照不再需要传递当前通道
-    const QString bright = BrightField;// 拍照
-    const QString state = StateField;
-};
-
-struct Field0x0005 {
-    const QString current_channel = CurrentChannelField; // 调节相机参数
+struct FieldAdjustBrightEvent {
+    const QString current_channel = CurrentChannelField; // 调节某个通道的bright参数
     const QString bright = BrightField;
     const QString state = StateField;
 };
 
-struct Field0x0006 {
+struct FieldToggleChannelEvent {
     const QString turnoff_light = TurnOffLight;
     const QString current_channel = CurrentChannelField; // 切换通道
     const QString bright = BrightField;
     const QString state = StateField;
 };
 
-struct Field0x0007 {
-//    const QString turnoff_light = TurnOffLight;
-//    const QString current_channel = CurrentChannelField;
-    const QString state = StateField;
-};
-
-struct Field0x0008 { // 移动镜头
+struct FieldAdjustLensEvent { // 移动镜头
     const QString direction = DirectionField;
     const QString state = StateField;
 };
 
-struct Field0x0009 { // 移动电机
-    const QString  camera_loc = CameraLocationField;
+struct FieldMoveMachineEvent { // 移动电机
+    const QString  objective_loc = ObjectiveLocationField;
     const QString state = StateField;
 };
 
-struct Field0x0010 { // 停止实验
+struct FieldStopExperEvent { // 停止实验
     const QString  stop = StopField;
     const QString state = StateField;
 };
 
 typedef struct {
-    Field0x0000 field0x0000;
-    Field0x0001 field0x0001;
-    Field0x0002 field0x0002;
-    Field0x0003 field0x0003;
-    Field0x0004 field0x0004;
-    Field0x0005 field0x0005;
-    Field0x0006 field0x0006;
-    Field0x0007 field0x0007;
-    Field0x0008 field0x0008;
-    Field0x0009 field0x0009;
-    Field0x0010 field0x0010;
+    FieldPreviewEvent fieldPreviewEvent;
+    FieldLoadExperEvent fieldLoadExperEvent;
+    FieldAskConnectedStateEvent fieldAskConnectedStateEvent;
+    FieldAskActivateCodeEvent fieldAskActivateCodeEvent;
+    FieldAdjustBrightEvent fieldAdjustBrightEvent;
+    FieldToggleChannelEvent fieldToggleChannelEvent;
+    FieldAdjustLensEvent fieldAdjustLensEvent;
+    FieldMoveMachineEvent fieldMoveMachineEvent;
+    FieldStopExperEvent fieldStopExperEvent;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
 static const TcpFrameList TcpFramePool;
 static const TcpFieldList TcpFieldPool;
 
-#define Field0x0000 TcpFieldPool.field0x0000
-#define Field0x0001 TcpFieldPool.field0x0001
-#define Field0x0002 TcpFieldPool.field0x0002
-#define Field0x0003 TcpFieldPool.field0x0003
-#define Field0x0004 TcpFieldPool.field0x0004
-#define Field0x0005 TcpFieldPool.field0x0005
-#define Field0x0006 TcpFieldPool.field0x0006
-#define Field0x0007 TcpFieldPool.field0x0007
-#define Field0x0008 TcpFieldPool.field0x0008
-#define Field0x0009 TcpFieldPool.field0x0009
-#define Field0x0010 TcpFieldPool.field0x0010
+#define FieldPreviewEvent TcpFieldPool.fieldPreviewEvent
+#define FieldLoadExperEvent TcpFieldPool.fieldLoadExperEvent
+#define FieldAskConnectedStateEvent TcpFieldPool.fieldAskConnectedStateEvent
+#define FieldAskActivateCodeEvent TcpFieldPool.fieldAskActivateCodeEvent
+#define FieldAdjustBrightEvent TcpFieldPool.fieldAdjustBrightEvent
+#define FieldToggleChannelEvent TcpFieldPool.fieldToggleChannelEvent
+#define FieldAdjustLensEvent TcpFieldPool.fieldAdjustLensEvent
+#define FieldMoveMachineEvent TcpFieldPool.fieldMoveMachineEvent
+#define FieldStopExperEvent TcpFieldPool.fieldStopExperEvent
 
-static QVariant parse0x0000(QCVariantMap m)
+static QVariant parsePreviewEvent(QCVariantMap m)
 { // 预览事件
-    if (!m.keys().contains(Field0x0000.state)) return false;
+    if (!m.keys().contains(FieldPreviewEvent.state)) return false;
     if (!m.keys().contains(FrameField)) return false;
     return m[StateField].toString() == OkField;
 }
 
-static QByteArray assemble0x0000(QCVariantMap m)
+static QByteArray assemblePreviewEvent(QCVariantMap m)
 {// 预览事件
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0000;
+    object[FrameField] = PreviewEvent;
 
-    object[Field0x0000.brand] = m[BrandField].toString();
-    object[Field0x0000.manufacturer] = m[ManufacturerField].toString();
-    object[Field0x0000.wellsize] = m[WellsizeField].toString();
-    object[Field0x0000.objective] = m[ObjectiveField].toString();
-    object[Field0x0000.viewsize] = m[HoleViewSizeField].toString();
-    //object[Field0x0000.current_channel] = m[CurrentChannelField].toString();
+    object[FieldPreviewEvent.brand] = m[BrandField].toInt();
+    object[FieldPreviewEvent.manufacturer] = m[ManufacturerField].toInt();
+    object[FieldPreviewEvent.wellsize] = m[WellsizeField].toInt();
+    object[FieldPreviewEvent.objective] = m[ObjectiveField].toInt();
+    object[FieldPreviewEvent.viewsize] = m[HoleViewSizeField].toInt();
+    //object[FieldPreviewEvent.current_channel] = m[CurrentChannelField].toString();
     auto holepoint = m[HoleCoordinateField].toPoint();
     auto viewpoint = m[ViewCoordinateField].toPoint();
-    object[Field0x0000.hole_x] = holepoint.x();
-    object[Field0x0000.hole_y] = holepoint.y();
-    object[Field0x0000.view_x] = viewpoint.x();
-    object[Field0x0000.view_y] = viewpoint.y();
-    object[Field0x0000.ishole] = m[IsHoleField].toInt();
+    object[FieldPreviewEvent.hole_x] = holepoint.x();
+    object[FieldPreviewEvent.hole_y] = holepoint.y();
+    object[FieldPreviewEvent.view_x] = viewpoint.x();
+    object[FieldPreviewEvent.view_y] = viewpoint.y();
+    object[FieldPreviewEvent.ishole] = m[IsHoleField].toInt();
 
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
-static QVariant parse0x0001(QCVariantMap m)
+static QVariant parseLoadExperEvent(QCVariantMap m)
 {// 启动实验
-    if (!m.keys().contains(Field0x0001.state)) return false;
+    if (!m.keys().contains(FieldLoadExperEvent.state)) return false;
     if (!m.keys().contains(FrameField)) return false;
     return m[StateField].toString() == OkField;
 }
 
-static QByteArray assemble0x0001(QCVariantMap m)
+static QByteArray assembleLoadExperEvent(QCVariantMap m)
 {// 启动实验
     auto toolinfo = m[PreviewToolField].value<QVariantMap>();
     auto patterninfo = m[PreviewPatternField].value<QVariantMap>();
@@ -249,21 +244,21 @@ static QByteArray assemble0x0001(QCVariantMap m)
     auto experinfo = m[ExperToolField].value<QVariantMap>();
 #endif
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0001;
+    object[FrameField] = LoadExperEvent;
 
     // wellbox
-    object[Field0x0001.manufacturer] = toolinfo[Field0x0001.manufacturer].toString();
-    object[Field0x0001.wellbrand] = toolinfo[Field0x0001.wellbrand].toString();
-    object[Field0x0001.wellsize] = toolinfo[Field0x0001.wellsize].toString();
+    object[FieldLoadExperEvent.manufacturer] = toolinfo[FieldLoadExperEvent.manufacturer].toInt();
+    object[FieldLoadExperEvent.wellbrand] = toolinfo[FieldLoadExperEvent.wellbrand].toInt();
+    object[FieldLoadExperEvent.wellsize] = toolinfo[FieldLoadExperEvent.wellsize].toInt();
 
     // objectivebox
-    object[Field0x0001.camera_location] = toolinfo[Field0x0001.camera_location].toString();
-    object[Field0x0001.objective_descrip] = toolinfo[Field0x0001.objective_descrip].toString();//就是传递原字符串不需要改
-    object[Field0x0001.objective] = getIndexFromFields(toolinfo[Field0x0001.objective].toString());
-    object[Field0x0001.objective_type] = toolinfo[Field0x0001.objective_type].toString();
+    object[FieldLoadExperEvent.objective_location] = toolinfo[FieldLoadExperEvent.objective_location].toInt();
+    object[FieldLoadExperEvent.objective_descrip] = toolinfo[FieldLoadExperEvent.objective_descrip].toString();//就是传递原字符串不需要改
+    object[FieldLoadExperEvent.objective] = getIndexFromFields(toolinfo[FieldLoadExperEvent.objective].toString()).toInt();
+    object[FieldLoadExperEvent.objective_type] = toolinfo[FieldLoadExperEvent.objective_type].toInt();
 
     // camerabox
-    auto capture_channels = toolinfo[Field0x0001.capture_channel].toStringList(); // 设置过相机参数的所有通道
+    auto capture_channels = toolinfo[FieldLoadExperEvent.capture_channel].toStringList(); // 设置过相机参数的所有通道
     QJsonArray channelCameraInfo; // 组列表
     if (!capture_channels.isEmpty()) { // 例如channels= {"PH","GFP"}
 
@@ -274,13 +269,13 @@ static QByteArray assemble0x0001(QCVariantMap m)
             auto channelInfo = toolinfo[currentChannel].value<QVariantMap>();
 
             Q_ASSERT(currentChannel == channelInfo[ChannelField]);
-            auto exposure = channelInfo[ExposureField].toString();
-            auto gain = channelInfo[GainField].toString();
-            auto bright = channelInfo[BrightField].toString();
+            auto exposure = channelInfo[ExposureField].toInt();
+            auto gain = channelInfo[GainField].toInt();
+            auto bright = channelInfo[BrightField].toInt();
             //LOG<<exposure<<gain<<bright;
 
             QJsonObject currentChannelInfoObject; // 每个通道的3个信息
-            currentChannelInfoObject[ChannelField] = getIndexFromFields(currentChannel); // 如PH转为0
+            currentChannelInfoObject[ChannelField] = getIndexFromFields(currentChannel).toInt(); // 如PH转为0
             currentChannelInfoObject[ExposureField] = exposure;
             currentChannelInfoObject[GainField] = gain;
             currentChannelInfoObject[BrightField] = bright;
@@ -292,35 +287,35 @@ static QByteArray assemble0x0001(QCVariantMap m)
     }
 
     // focusbox
-    object[Field0x0001.focus] = toolinfo[Field0x0001.focus].toString();
-    object[Field0x0001.focus_step] = toolinfo[Field0x0001.focus_step].toString();
+    object[FieldLoadExperEvent.focus] = toolinfo[FieldLoadExperEvent.focus].toDouble();
+    object[FieldLoadExperEvent.focus_step] = toolinfo[FieldLoadExperEvent.focus_step].toDouble();
 
 #ifdef usetab
     // zstackbox
-    object[Field0x0001.zstack] = experinfo[Field0x0001.zstack].toString();
-    object[Field0x0001.stitch] = experinfo[Field0x0001.stitch].toString();
+    object[FieldLoadExperEvent.zstack] = experinfo[FieldLoadExperEvent.zstack].toInt();
+    object[FieldLoadExperEvent.stitch] = experinfo[FieldLoadExperEvent.stitch].toInt();
 
     // experbox
-    object[Field0x0001.total_time] = experinfo[Field0x0001.total_time].toString();
-    object[Field0x0001.duration_time] = experinfo[Field0x0001.duration_time].toString();
-    object[Field0x0001.start_time] = experinfo[Field0x0001.start_time].toString();
-    object[Field0x0001.channel] = experinfo[Field0x0001.channel].toString();
-    object[Field0x0001.is_schedule] = experinfo[Field0x0001.is_schedule].toString();
+    object[FieldLoadExperEvent.total_time] = experinfo[FieldLoadExperEvent.total_time].toInt();
+    object[FieldLoadExperEvent.duration_time] = experinfo[FieldLoadExperEvent.duration_time].toInt();
+    object[FieldLoadExperEvent.start_time] = experinfo[FieldLoadExperEvent.start_time].toString();
+    object[FieldLoadExperEvent.channel] = experinfo[FieldLoadExperEvent.channel].toInt();
+    object[FieldLoadExperEvent.is_schedule] = experinfo[FieldLoadExperEvent.is_schedule].toInt();
 #else
     // zstackbox
-    object[Field0x0001.zstack] = toolinfo[Field0x0001.zstack].toString();
-    object[Field0x0001.stitch] = toolinfo[Field0x0001.stitch].toString();
+    object[FieldLoadExperEvent.zstack] = toolinfo[FieldLoadExperEvent.zstack].toInt();
+    object[FieldLoadExperEvent.stitch] = toolinfo[FieldLoadExperEvent.stitch].toInt();
 
     // experbox
-    object[Field0x0001.total_time] = toolinfo[Field0x0001.total_time].toString();
-    object[Field0x0001.duration_time] = toolinfo[Field0x0001.duration_time].toString();
-    object[Field0x0001.start_time] = toolinfo[Field0x0001.start_time].toString();
-    object[Field0x0001.channel] = toolinfo[Field0x0001.channel].toString();
-    object[Field0x0001.is_schedule] = toolinfo[Field0x0001.is_schedule].toString();
+    object[FieldLoadExperEvent.total_time] = toolinfo[FieldLoadExperEvent.total_time].toInt();
+    object[FieldLoadExperEvent.duration_time] = toolinfo[FieldLoadExperEvent.duration_time].toInt();
+    object[FieldLoadExperEvent.start_time] = toolinfo[FieldLoadExperEvent.start_time].toString();
+    object[FieldLoadExperEvent.channel] = toolinfo[FieldLoadExperEvent.channel].toInt();
+    object[FieldLoadExperEvent.is_schedule] = toolinfo[FieldLoadExperEvent.is_schedule].toInt();
 #endif
 
     // 其它全局信息
-    object[Field0x0001.app] = m[Field0x0001.app].toString();
+    object[FieldLoadExperEvent.app] = m[FieldLoadExperEvent.app].toInt();
 
     // 组-孔-视野的信息
     QJsonArray arr; // "group"的值是个列表 arr group=[{},{},{}]
@@ -349,8 +344,8 @@ static QByteArray assemble0x0001(QCVariantMap m)
 
             QJsonObject holeObject;// "a组"=[{},{},{}],是每个小的{}
             //holeObject[HoleCoordinateField] = QString("(%1,%2)").arg(QChar(coordinate.x()+65)).arg(coordinate.y());
-            holeObject[Field0x0001.x] = coordinate.x();
-            holeObject[Field0x0001.y] = coordinate.y();
+            holeObject[FieldLoadExperEvent.x] = coordinate.x();
+            holeObject[FieldLoadExperEvent.y] = coordinate.y();
 
             QJsonArray pointValues; // point字段的值是个列表
             for(int viewcount = 0; viewcount<viewpoints.count(); ++viewcount) {
@@ -359,188 +354,154 @@ static QByteArray assemble0x0001(QCVariantMap m)
                 auto viewpoint_y = viewpoints[viewcount].y();
 
                 //viewObject[HoleCoordinateField] = QString("(%1,%2)").arg(viewpoint_x).arg(viewpoint_y);
-                viewObject[Field0x0001.x] = viewpoint_x;
-                viewObject[Field0x0001.y] = viewpoint_y;
+                viewObject[FieldLoadExperEvent.x] = viewpoint_x;
+                viewObject[FieldLoadExperEvent.y] = viewpoint_y;
                 pointValues.append(viewObject);
             }
 
-            holeObject[Field0x0001.points] = pointValues;
+            holeObject[FieldLoadExperEvent.points] = pointValues;
             groupValues.append(holeObject);
         }
         groupObject[group] = groupValues;
         arr.append(groupObject);
     }
-    object[Field0x0001.group] = arr;
+    object[FieldLoadExperEvent.group] = arr;
     //LOG<<object;
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
-static QVariant parse0x0002(QCVariantMap m)
+static QVariant parseAskConnectedStateEvent(QCVariantMap m)
 { // 用于询问是否连接的命令,只要有回复不为空就ok,随便发
-    if (!m.keys().contains(Field0x0002.state)) return false;
+    if (!m.keys().contains(FieldAskConnectedStateEvent.state)) return false;
     if (!m.keys().contains(FrameField)) return false;
-    auto text = m[Field0x0002.state].toString(); // 只要有回复就可
-    return text==OkField;
+    auto text = m[FieldAskConnectedStateEvent.state].toString();
+    return text == OkField;
 }
 
-static QByteArray assemble0x0002(QCVariantMap m)
+static QByteArray assembleAskConnectedStateEvent(QCVariantMap m)
 { // 用于询问是否连接的命令,只要有回复不为空就ok,随便发
     Q_UNUSED(m);
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0002;
-    object[Field0x0002.state] = "socket is connected?";
+    object[FrameField] = AskConnectedStateEvent;
+    object[FieldAskConnectedStateEvent.state] = "socket is connected?";
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
+    //auto length = convertToHex(json.length()).toUtf8();
+
+    //LOG<<length<<json.length();
+    //LOG<<PrependSeparateField(PrependField(json,length));
     return AppendSeparateField(json);
 }
 
-static QVariant parse0x0003(QCVariantMap m)
+static QVariant parseAskActivateCodeEvent(QCVariantMap m)
 { // 询问设备激活码,回复激活码
-    if (!m.keys().contains(Field0x0003.activate_code)) return QVariant();
+    if (!m.keys().contains(FieldAskActivateCodeEvent.activate_code)) return QVariant();
     if (!m.keys().contains(FrameField)) return QVariant();
-    auto code = m[Field0x0003.activate_code].toString();
+    auto code = m[FieldAskActivateCodeEvent.activate_code].toString();
     return code;
 }
 
-static QByteArray assemble0x0003(QCVariantMap m)
+static QByteArray assembleAskActivateCodeEvent(QCVariantMap m)
 { // 询问设备激活码,回复激活码
     Q_UNUSED(m);
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0003;
-    object[Field0x0003.activate_code] = "ask activate_code";
+    object[FrameField] = AskActivateCodeEvent;
+    object[FieldAskActivateCodeEvent.activate_code] = "ask activate_code";
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
-static QByteArray assemble0x0004(QCVariantMap m)
-{ // 拍照事件
+static QByteArray assembleAdjustBrightEvent(QCVariantMap m)
+{ // 调节bright参数
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0004;
-    object[Field0x0004.bright] = m[BrightField].toString();
-    //object[Field0x0004.current_channel] = m[CurrentChannelField].toString();
+    object[FrameField] = AdjustBrightEvent;
+    object[FieldAdjustBrightEvent.bright] = m[BrightField].toString();
+    object[FieldAdjustBrightEvent.current_channel] = m[CurrentChannelField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
-static QVariant parse0x0004(QCVariantMap m)
-{// 拍照事件
-    if (!m.keys().contains(FrameField)) return false;
-    if (!m.keys().contains(Field0x0004.state)) return false;
-    auto ret = m[Field0x0004.state].toString();
-    return ret == OkField;
-}
-
-static QByteArray assemble0x0005(QCVariantMap m)
+static QVariant parseAdjustBrightEvent(QCVariantMap m)
 { // 调节相机参数
-    QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0005;
-    object[Field0x0005.bright] = m[BrightField].toString();
-    object[Field0x0005.current_channel] = m[CurrentChannelField].toString();
-    TcpAssemblerDoc.setObject(object);
-    auto json = TcpAssemblerDoc.toJson();
-    return AppendSeparateField(json);
-}
-
-static QVariant parse0x0005(QCVariantMap m)
-{ // 调节相机参数
-    if (!m.keys().contains(Field0x0005.state)) return false;
+    if (!m.keys().contains(FieldAdjustBrightEvent.state)) return false;
     if (!m.keys().contains(FrameField)) return false;
     return m[StateField].toString() == OkField;
 }
 
-static QByteArray assemble0x0006(QCVariantMap m)
+static QByteArray assembleToggleChannelEvent(QCVariantMap m)
 { // 切换通道
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0006;
-    object[Field0x0006.bright] = m[BrightField].toString();
-    object[Field0x0006.turnoff_light] = m[TurnOffLight].toString();
-    object[Field0x0006.current_channel] = m[CurrentChannelField].toString();
+    object[FrameField] = ToggleChannelEvent;
+    object[FieldToggleChannelEvent.bright] = m[BrightField].toString();
+    object[FieldToggleChannelEvent.turnoff_light] = m[TurnOffLight].toString();
+    object[FieldToggleChannelEvent.current_channel] = m[CurrentChannelField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
-static QVariant parse0x0006(QCVariantMap m)
+static QVariant parseToggleChannelEvent(QCVariantMap m)
 {// 切换通道
     if (!m.keys().contains(FrameField)) return false;
-    if (!m.keys().contains(Field0x0006.state)) return false;
+    if (!m.keys().contains(FieldToggleChannelEvent.state)) return false;
     auto ret = m[StateField].toString();
     return ret == OkField;
 }
 
-static QByteArray assemble0x0007(QCVariantMap m)
-{
-    QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0007;
-//    object[Field0x0007.turnoff_light] = m[TurnOffLight].toString();
-//    object[Field0x0007.current_channel] = m[CurrentChannelField].toString();
-    TcpAssemblerDoc.setObject(object);
-    auto json = TcpAssemblerDoc.toJson();
-    return AppendSeparateField(json);
-}
-
-static QVariant parse0x0007(QCVariantMap m)
-{
-    if (!m.keys().contains(FrameField)) return false;
-    if (!m.keys().contains(Field0x0007.state)) return false;
-    auto ret = m[StateField].toString();
-    return ret == OkField;
-}
-
-static QByteArray assemble0x0008(QCVariantMap m)
+static QByteArray assembleAdjustLensEvent(QCVariantMap m)
 { // 移动镜头
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0008;
-    object[Field0x0008.direction] = m[DirectionField].toString();
+    object[FrameField] = AdjustLensEvent;
+    object[FieldAdjustLensEvent.direction] = m[DirectionField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
-static QVariant parse0x0008(QCVariantMap m)
+static QVariant parseAdjustLensEvent(QCVariantMap m)
 {// 移动镜头
     if (!m.keys().contains(FrameField)) return false;
-    if (!m.keys().contains(Field0x0008.state)) return false;
+    if (!m.keys().contains(FieldAdjustLensEvent.state)) return false;
     auto ret = m[StateField].toString();
     return ret == OkField;
 }
 
-static QByteArray assemble0x0009(QCVariantMap m)
+static QByteArray assembleMoveMachineEvent(QCVariantMap m)
 { // 移动电机到指定位置
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0009;
-    object[Field0x0009.camera_loc] = m[CameraLocationField].toString();
+    object[FrameField] = MoveMachineEvent;
+    object[FieldMoveMachineEvent.objective_loc] = m[ObjectiveLocationField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
-static QVariant parse0x0009(QCVariantMap m)
+static QVariant parseMoveMachineEvent(QCVariantMap m)
 {// 移动电机到指定位置
     if (!m.keys().contains(FrameField)) return false;
-    if (!m.keys().contains(Field0x0009.state)) return false;
+    if (!m.keys().contains(FieldMoveMachineEvent.state)) return false;
     auto ret = m[StateField].toString();
     return ret == OkField;
 }
 
-static QByteArray assemble0x0010(QCVariantMap m)
+static QByteArray assembleStopExperEvent(QCVariantMap m)
 { // 停止实验
     QJsonObject object;
-    object[FrameField] = TcpFramePool.frame0x0010;
-    object[Field0x0010.stop] = m[StopField].toString();
+    object[FrameField] = StopExperEvent;
+    object[FieldStopExperEvent.stop] = m[StopField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
-static QVariant parse0x0010(QCVariantMap m)
+static QVariant parseStopExperEvent(QCVariantMap m)
 {// 停止实验
     if (!m.keys().contains(FrameField)) return false;
-    if (!m.keys().contains(Field0x0010.state)) return false;
+    if (!m.keys().contains(FieldStopExperEvent.state)) return false;
     auto ret = m[StateField].toString();
     return ret == OkField;
 }
@@ -589,32 +550,29 @@ static QVariant parse_test0x1(QCVariantMap m)
 
 // 根据帧头选择对应的解析函数
 static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
-        {TcpFramePool.frame0x0000,parse0x0000},
-        {TcpFramePool.frame0x0001,parse0x0001},
-        {TcpFramePool.frame0x0002,parse0x0002},
-        {TcpFramePool.frame0x0003,parse0x0003},
-        {TcpFramePool.frame0x0004,parse0x0004},
-        {TcpFramePool.frame0x0005,parse0x0005},
-        {TcpFramePool.frame0x0006,parse0x0006},
-        {TcpFramePool.frame0x0007,parse0x0007},
-        {TcpFramePool.frame0x0008,parse0x0008},
-        {TcpFramePool.frame0x0009,parse0x0009},
-        {TcpFramePool.frame0x0010,parse0x0010},
+        {TcpFramePool.previewEvent,parsePreviewEvent},
+        {TcpFramePool.loadExperEvent, parseLoadExperEvent},
+        {TcpFramePool.askConnectedStateEvent, parseAskConnectedStateEvent},
+        {TcpFramePool.askActivateCodeEvent, parseAskActivateCodeEvent},
+        {TcpFramePool.adjustBrightEvent, parseAdjustBrightEvent},
+        {TcpFramePool.toggleChannelEvent, parseToggleChannelEvent},
+        {TcpFramePool.adjustLensEvent, parseAdjustLensEvent},
+        {TcpFramePool.moveMachineEvent, parseMoveMachineEvent},
+        {TcpFramePool.stopExperEvent, parseStopExperEvent},
         {"test0x0",parse_test0x0},
         {"test0x1",parse_test0x1},
 };
 
 static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
-        {TcpFramePool.frame0x0000,assemble0x0000},
-        {TcpFramePool.frame0x0001,assemble0x0001},
-        {TcpFramePool.frame0x0002,assemble0x0002},
-        {TcpFramePool.frame0x0003,assemble0x0003},
-        {TcpFramePool.frame0x0004,assemble0x0004},
-        {TcpFramePool.frame0x0005,assemble0x0005},
-        {TcpFramePool.frame0x0006,assemble0x0006},
-        {TcpFramePool.frame0x0007,assemble0x0007},
-        {TcpFramePool.frame0x0009,assemble0x0009},
-        {TcpFramePool.frame0x0010,assemble0x0010},
+        {TcpFramePool.previewEvent,assemblePreviewEvent},
+        {TcpFramePool.loadExperEvent,assembleLoadExperEvent},
+        {TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent},
+        {TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent},
+        {TcpFramePool.adjustBrightEvent,assembleAdjustBrightEvent},
+        {TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent},
+        {TcpFramePool.adjustLensEvent,assembleAdjustLensEvent},
+        {TcpFramePool.moveMachineEvent,assembleMoveMachineEvent},
+        {TcpFramePool.stopExperEvent,assembleStopExperEvent},
         {"test0x0",assemble_test0x0},
         {"test0x1",assemble_test0x1},
 };
