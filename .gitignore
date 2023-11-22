@@ -21,4 +21,6 @@ theme
 temp
 *.eos
 *.avi
-*.wmv
+*.wav
+*.mp4
+*.mp3
