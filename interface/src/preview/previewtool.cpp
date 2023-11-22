@@ -16,6 +16,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     focusbox = new FocusBox;
     channelbox = new ChannelBoxx;
     camerabox = new CameraBox;
+    recordbox = new RecordBox;
     timebox = new TimeBox;
     zstackbox = new ZStackBox;
     savebox = new SaveBox;
@@ -27,6 +28,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lay->addWidget(focusbox);
     lay->addWidget(channelbox);
     lay->addWidget(camerabox);
+    lay->addWidget(recordbox);
     lay->addWidget(timebox);
     lay->addWidget(zstackbox);
     lay->addWidget(savebox);
@@ -46,14 +48,18 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(savebox,&SaveBox::exportFilePath,this,&PreviewTool::exportFilePath);
     connect(savebox,&SaveBox::loadExper,this,&PreviewTool::loadExper);
     connect(focusbox,&FocusBox::directionMove,this,&PreviewTool::directionMove);
+    connect(recordbox,&RecordBox::pauseVideo,this,&PreviewTool::pauseVideo);
+    connect(recordbox,&RecordBox::playVideo,this,&PreviewTool::playVideo);
+    connect(recordbox,&RecordBox::stopVideo,this,&PreviewTool::stopVideo);
     // 2. 信号槽函数
     connect(channelbox,&ChannelBoxx::channelChanged,camerabox,&CameraBox::setChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBoxx::disableChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,timebox,&TimeBox::disableChannel);
     // 3.外部信号
     connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
-    connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage);
+    connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage); // 当前通道的图像
     connect(this,&PreviewTool::captureImage,channelbox,&ChannelBoxx::takePhoto);
+    connect(this,&PreviewTool::imageCaptured,recordbox,&RecordBox::recordImage); // 原始相机图像
     connect(this,&PreviewTool::exposureGainCaptured,camerabox,&CameraBox::captureExposureGain);
 
 #ifdef usetab

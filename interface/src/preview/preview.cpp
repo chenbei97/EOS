@@ -114,6 +114,28 @@ void Preview::setAppInfo(int app)
     previewinfo[AppSelectField] = QString::number(app);
 }
 
+void Preview::playVideo(const QString& path)
+{
+    LOG<<"video path = "<<path;
+    cameramode->changeMode(CameraMode::VideoMode);
+    if (path.isEmpty()) return;
+
+    videocanvas->setMedia(path);
+    videocanvas->play();
+}
+
+void Preview::stopVideo()
+{
+    cameramode->changeMode(CameraMode::VideoMode);
+    videocanvas->stop();
+}
+
+void Preview::pauseVideo()
+{
+    cameramode->changeMode(CameraMode::VideoMode);
+    videocanvas->pause();
+}
+
 void Preview::initLayout()
 {
     // 1.右侧布局
@@ -209,9 +231,13 @@ void Preview::initObjects()
 
 void Preview::initConnections()
 {
+    // (1) previewtool/expertool => preview 信号-槽函数直连
     connect(previewtool,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);
     connect(previewtool,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
     connect(previewtool,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
+    connect(previewtool,&PreviewTool::playVideo,this,&Preview::playVideo);
+    connect(previewtool,&PreviewTool::stopVideo,this,&Preview::stopVideo);
+    connect(previewtool,&PreviewTool::pauseVideo,this,&Preview::pauseVideo);
     connect(previewtool,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
     connect(previewtool,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
     connect(previewtool,&PreviewTool::directionMove,this,&Preview::adjustLens);
@@ -219,15 +245,13 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
     connect(previewtool,&PreviewTool::importFilePath,this,&Preview::importExperConfig);
     connect(previewtool,&PreviewTool::loadExper,this,&Preview::loadExper);
-
-    connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);
-#ifdef notusetoupcamera
-    connect(this, &Preview::evtCallback, this, &Preview::processCallback);
-#else
-    connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::showCapturedImage);
-    connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,previewtool,&PreviewTool::exposureGainCaptured);
+#ifdef usetab
+    connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
+    connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);
+    connect(expertool,&ExperTool::loadExper,this,&Preview::loadExper);
 #endif
 
+    // (2) preview内部信号-槽函数
     connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stack->setCurrentIndex(option);});
 #ifdef uselabelcanvas
     connect(livecanvas,&LabelTriangle::triangleClicked,this,&Preview::adjustLens);
@@ -245,12 +269,18 @@ void Preview::initConnections()
     connect(viewpattern,&ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不按组更新孔窗口的信息
     connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
 
-    connect(this,&Preview::objectiveSettingChanged,previewtool,&PreviewTool::objectiveSettingChanged);
-#ifdef usetab
-    connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
-    connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);
-    connect(expertool,&ExperTool::loadExper,this,&Preview::loadExper);
+    // (3) 外部信号=>preview/previewtool
+    connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);
+#ifdef notusetoupcamera
+    connect(this, &Preview::evtCallback, this, &Preview::processCallback);
+#else
+    connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::showCapturedImage);
+    connect(ToupCameraPointer,&ToupCamera::imageCaptured,previewtool,&PreviewTool::imageCaptured);
+    connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,previewtool,&PreviewTool::exposureGainCaptured);
 #endif
+    connect(this,&Preview::objectiveSettingChanged,previewtool,&PreviewTool::objectiveSettingChanged);//调整物镜位置
+
+
 #ifndef notusetoupcamera
 //    connect(&timer,&QTimer::timeout,this,[=]{
 //        QImage img1(CURRENT_PATH+"/images/cell.png");

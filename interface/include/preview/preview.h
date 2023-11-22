@@ -103,6 +103,9 @@ private:
     void onManufacturerChanged(int option);
     void onWellbrandChanged(int option);
     void onObjectiveChanged(const QString& obj);
+    void playVideo(const QString& path);
+    void stopVideo();
+    void pauseVideo();
     void takingPhoto();
     void adjustCamera(int exp,int gain,int br);
     void onAdjustCamera(const QString &f,const QVariant & d);

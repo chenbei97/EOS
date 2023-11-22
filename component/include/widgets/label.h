@@ -16,8 +16,13 @@ class COMPONENT_IMEXPORT Label : public QLabel
     Q_OBJECT
 public:
     explicit Label(QWidget*parent=nullptr);
-    explicit Label(const QString&text,QWidget*parent=nullptr);
-    //void paintEvent(QPaintEvent*event) override;
-
+    explicit Label(const QString &text,QWidget*parent=nullptr);
+    void mousePressEvent(QMouseEvent *e) override;
+    void setElidedText(const QString& text,Qt::TextElideMode elideMode = Qt::ElideRight,int pixelWidth = 250);
+    QString elidedText() const;
+private:
+    QString elidedtext;
+signals:
+    void mouseClicked();
 };
 #endif //EOSI_LABEL_H

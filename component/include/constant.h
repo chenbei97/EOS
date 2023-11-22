@@ -100,21 +100,11 @@ static const char* FlaskField = "flask";
 static const char* FlaskFieldLabel = "flask: ";
 static const char* SlideField = "slide";
 static const char* SlideFieldLabel = "slide: ";
-static const char* ImageFormatField = "imageFormat";
-static const char* VideoFormatField = "videoFormat";
-static const char* ImageFormatLabelField = "imageFormat: ";
-static const char* VideoFormatLabelField = "videoFormat: ";
 
 #define AppendSeparateField(s) (s+SeparateField)
 
 static const QStringList TimeBoxTimeUnitFields = {
         HourField,MinuteField,
-};
-static const QFieldList ImageFormatFields = {
-        "jpg","png","ico","bmp"
-};
-static const QFieldList VideoFormatFields = {
-        "avi","wmv"
 };
 static const QFieldList DishFields = {
         "dish1","dish2","dish3"

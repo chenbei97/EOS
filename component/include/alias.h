@@ -198,6 +198,7 @@ typedef QMap<QString,QString> WellInfo;
 typedef QMap<QString,QString> ObjectiveInfo;
 typedef QMap<QString,QString> ChannelInfo;
 typedef QMap<QString,QString> CameraInfo;
+typedef QMap<QString,QString> RecordInfo;
 typedef QMap<QString,CameraInfo> MultiCameraInfo;
 typedef QMap<QString,QImage> ChannelImageInfo;
 typedef QVariantMap PreviewToolInfo;

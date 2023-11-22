@@ -20,6 +20,7 @@
 #include "savebox.h"
 #include "timebox.h"
 #include "historybox.h"
+#include "recordbox.h"
 
 class INTERFACE_IMEXPORT PreviewTool : public QWidget
 {
@@ -35,6 +36,7 @@ private:
     FocusBox * focusbox;
     ChannelBoxx * channelbox;
     CameraBox * camerabox;
+    RecordBox * recordbox;
     TimeBox * timebox;
     ZStackBox * zstackbox;
     SaveBox * savebox;
@@ -47,6 +49,9 @@ signals:
     void cameraInfoChanged(const MultiCameraInfo&m);// 通道配置改变
     void zstackChanged(bool isChecked);// 是否勾选zstack和stitch
     void stitchChanged(bool isChecked);
+    void playVideo(const QString& path); // 播放视频的功能
+    void stopVideo();
+    void pauseVideo();
     void exportFilePath(const QString&path); // 导出文件配置的路径
     void importFilePath(const QString&path); // 导入文件配置的路径
     void photoTaking();// 只有camerabox的拍照会触发该信号
@@ -57,6 +62,7 @@ signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
     void captureImage(const QImage& img,const QString& channel);
     void exposureGainCaptured(unsigned exp,unsigned gain);
+    void imageCaptured(const QImage& img);
 };
 
 #endif //EOSI_PREVIEWTOOL_H

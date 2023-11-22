@@ -251,6 +251,24 @@ static const QStringList GroupTypeFields = {
 static const char* ZStackField = "zstack";
 static const char* StitchField = "stitch";
 
+// recordbox
+static const char* ImageFormatField = "image_format";
+static const char* VideoFormatField = "video_format";
+static const char* VideoFrameRateField = "video_framerate";
+static const char* VideoSavePathField = "video_savepath";
+static const char* ImageFormatLabelField = "image format: ";
+static const char* VideoFormatLabelField = "video format: ";
+static const char* VideoFrameRateLabelField = "video framerate: ";
+static const QFieldList ImageFormatFields = {
+        "jpg","jpeg","png","ico","bmp","ttf"
+};
+static const QFieldList VideoFormatFields = {
+        "avi","wmv","mp4"
+};
+static const QFieldList VideoFrameRateFields = {
+        "10","20","30","40"
+};
+
 // photocanvas
 static const char* LiveField = "live";
 static const char* PhotoField = "photo";
@@ -293,7 +311,8 @@ static const char* OtherInfoField = "otherinfo";//ZStackField,StitchField
 static const QList<QFieldList> SocketNeedMapFields{
         Brand1Fields,Brand2Fields,Brand3Fields,Brand4Fields,
         ChannelFields,ManufacturerFields,ObjectiveMagnificationFields,ObjectiveTypeFields,
-        CameraLocationFieldFields,AppFields,WellsizeFields
+        CameraLocationFieldFields,AppFields,WellsizeFields,
+        VideoFormatFields,ImageFormatFields
 };
 // #include "qdebug.h"
 static QString getIndexFromFields (QCString field)

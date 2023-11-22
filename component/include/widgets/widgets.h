@@ -36,6 +36,7 @@
 #include "qcolordialog.h"
 #include "qmainwindow.h"
 #include "qstackedwidget.h"
+#include "qmessagebox.h"
 
 #include "qfiledialog.h"
 #include "qfile.h"

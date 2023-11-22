@@ -31,7 +31,7 @@ ZStackBox::ZStackBox(QWidget *parent) : GroupBox(parent)
 
     auto vlay = new QVBoxLayout;
     vlay->addLayout(hlay1);
-    vlay->addLayout(hlay2);
+    //vlay->addLayout(hlay2); // 这2个不需要,懒得删代码隐藏即可
 
     setLayout(vlay);
     setTitle(tr("Other"));
