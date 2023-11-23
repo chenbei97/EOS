@@ -75,7 +75,23 @@ void RecordBox::stopRecord()
     recorder->stop();
 
     // 停止录制后要把图片保存的路径,视频要保存的格式传给服务,图片保存的路径也是视频保存的路径
+    auto path = savepath->elidedText();
+    auto video_format = getIndexFromFields(videoformat->currentText()); // 映射值 avi,wmv,mp4的映射0,1,2
+    auto video_framerate = framerate->currentText().toInt(); // 实际值
 
+    QVariantMap m;
+    m[FieldRecordVideoEvent.path] = path;
+    m[FieldRecordVideoEvent.video_format] = video_format;
+    m[FieldRecordVideoEvent.video_framerate] = video_framerate;
+
+    AssemblerPointer->assemble(TcpFramePool.recordVideoEvent,m);
+    auto msg = AssemblerPointer->message();
+
+    SocketPointer->exec(TcpFramePool.recordVideoEvent,msg, true);
+
+    if (ParserResult.toBool()) {
+        LOG<<"generate video in "<<path<<" successful!";
+    }
 }
 
 void RecordBox::selectVideo()

@@ -80,6 +80,7 @@ static const char*  SqliteDataBaseConnectionsAgain =
         "SQLCIPHER_LEGACY_PAGE_SIZE=4096";
 static const char* FrameField = "frame";
 static const char* SeparateField = "@@@";
+static const char* PathField = "path";
 static const char* OkField = "ok";
 static const char* HourField = "hour";
 static const char* MinuteField = "minute";

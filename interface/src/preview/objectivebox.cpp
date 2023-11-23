@@ -39,7 +39,8 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
 }
 
 void ObjectiveBox::onObjectiveSettingChanged(const LocationObjectiveInfo &m)
-{ // 每个镜头放的物镜型号
+{ // setting设置的每个位置放的物镜型号
+
     rbtn_loc1->setText(m[ObjectiveLocationField1]);
     rbtn_loc2->setText(m[ObjectiveLocationField2]);
     rbtn_loc3->setText(m[ObjectiveLocationField3]);
@@ -48,26 +49,26 @@ void ObjectiveBox::onObjectiveSettingChanged(const LocationObjectiveInfo &m)
     // 可能有无镜头的选项
     if (m.values().contains(NoneField)) {
         auto loc = m.key(NoneField); // 找到无镜头的位置
-        location_button[loc]->setEnabled(false); // none不能选
+        location_button[loc]->setEnabled(false); // none不能选禁用
         foreach(auto cloc, m.keys()) {
             if (cloc != loc) {
                 location_button[cloc]->setEnabled(true); // 其它的要恢复使能
             }
-            location_button[cloc]->setChecked(true);//从none移开,选择个有效的就可触发更新ui信息即可
-            location_button[cloc]->click();// click才能触发
+            location_button[cloc]->setChecked(true);//从none移开,选择个有效的就可触发更新ui(更新channelbox,timebox有关通道的内容)信息即可
+            location_button[cloc]->click();// click才能触发更新信号
         }
     } else { // 没包含none
         foreach(auto cloc, m.keys()) {
                location_button[cloc]->setEnabled(true); // 可能第1次有none,第2次没有none要全部恢复使能
         }
         rbtn_loc1->setChecked(true); // 希望切换物镜硬件配置时能够确保UI界面信息的更新,手动触发
-        rbtn_loc1->click(); // click才能触发
+        rbtn_loc1->click(); // click才能触发更新信号 => onClick函数
     }
 }
 
 QString ObjectiveBox::convertTo(const QString &text) const
 { // 兼容老代码的字段 需要字段转换
-    QString field;
+    QString field = text; // 有不需要兼容的字符串,"NA20x0.5" 原封不动返回
     if (text == Objective4x)
         field = Bright4xField;
     else if (text == Objective10x)
@@ -89,7 +90,7 @@ QString ObjectiveBox::convertTo(const QString &text) const
 
 QString ObjectiveBox::convertFrom(const QString &text) const
 { // 兼容老代码的字段 需要字段转换,反向转换用于导入实验配置
-    QString field;
+    QString field = text;
     if (text == Bright4xField)
         field = Objective4x;
     else if (text == Bright10xField)
@@ -132,11 +133,14 @@ void ObjectiveBox::onClicked()
 
     // 原来br4x,改为4x,为了方便禁用channelbox的使能,要修正改回来br4x,一种代码兼容历史原因的手段
     text = convertTo(text);
+    if (text.contains(NAField,Qt::CaseInsensitive))
+        QMessageBox::information(this,InformationChinese,
+                                 tr("please using 0.17mm container!"),QMessageBox::Yes);
 
     int isph = 0;
-    if (text.contains(BRField,Qt::CaseInsensitive)) {
-        isph = 0;
-    } else if (text.contains(PHField,Qt::CaseInsensitive)) {
+    if (text.contains(BRField,Qt::CaseInsensitive)|| text.contains(NAField,Qt::CaseInsensitive)) {
+        isph = 0;// 新增的20XNA0.5WD2.1,20XNA0.8WD0.6,40XNA0.95WD0.18都属于BR镜头
+    } else if (text.contains(PHField,Qt::CaseInsensitive) ) {
         isph = 1;
     }
 
@@ -148,7 +152,8 @@ void ObjectiveBox::onClicked()
     //LOG<<objective<<objective_loc<<isph<<text;
 
     emit objectiveChanged(text);
-    emit objectiveToggled(objective,objective_loc,isph); // 用于切物镜时就动电机,需要给物镜倍数,物镜位置,是否为PH类型
+    // 用于切物镜时就动电机,需要给物镜倍数,物镜位置,是否为PH类型
+    emit objectiveToggled(objective,objective_loc,isph);
 }
 
 ObjectiveInfo ObjectiveBox::objectiveInfo() const
@@ -178,20 +183,21 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
     //LOG<<m; // 注意! : 由于objectivesetting信号是异步的,此时rbtn_loc1其实并未赋值,所以构造函数初始化时要保持一致
 
     // objective存放原字符串
-    if (m[ObjectiveDescripField].contains(Objective4x))
+    if (m[ObjectiveDescripField].contains(Objective4x,Qt::CaseInsensitive))
         m[ObjectiveField]=Objective4x;
-    else if (m[ObjectiveDescripField].contains(Objective10x))
+    else if (m[ObjectiveDescripField].contains(Objective10x,Qt::CaseInsensitive))
         m[ObjectiveField]=Objective10x;
-    else if (m[ObjectiveDescripField].contains(Objective20x))
+    else if (m[ObjectiveDescripField].contains(Objective20x,Qt::CaseInsensitive))
         m[ObjectiveField]=Objective20x;
-    else if (m[ObjectiveDescripField].contains(Objective40x))
+    else if (m[ObjectiveDescripField].contains(Objective40x,Qt::CaseInsensitive))
         m[ObjectiveField]=Objective40x;
 
     // 同理增加,ObjectiveTypeField
-    if (m[ObjectiveDescripField].contains(ObjectivePH))
+    if (m[ObjectiveDescripField].contains(ObjectivePH,Qt::CaseInsensitive))
         m[ObjectiveTypeField]=getIndexFromFields(ObjectivePH);
-    else if (m[ObjectiveDescripField].contains(ObjectiveBR))
-        m[ObjectiveTypeField]=getIndexFromFields(ObjectiveBR);
+    else if (m[ObjectiveDescripField].contains(ObjectiveBR,Qt::CaseInsensitive)
+        || m[ObjectiveDescripField].contains(NAField,Qt::CaseInsensitive))
+        m[ObjectiveTypeField]=getIndexFromFields(ObjectiveBR); // NA物镜都是BR类型
 
     return m;
 }
@@ -199,7 +205,7 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
 void ObjectiveBox::importExperConfig(const QString &objectiveDescrip)
 { // objectiveDescrip = br4x
     QStringList objectives = {rbtn_loc1->text(),rbtn_loc2->text(),
-            rbtn_loc3->text(),rbtn_loc4->text()};
+            rbtn_loc3->text(),rbtn_loc4->text()}; // 当前的每个位置的物镜配置
 
     auto objectiveDes = convertFrom(objectiveDescrip); // br4x转4x,ph4x转4xPH
     LOG<<objectives<<objectiveDes; // ("4x", "4xPH", "10xPH", "40x") "4x"
@@ -208,8 +214,8 @@ void ObjectiveBox::importExperConfig(const QString &objectiveDescrip)
         rbtn_loc1->setChecked(true);
         return;
     }
-    // 相等的那个为true
 
+    // 相等的那个为true
     rbtn_loc1->setChecked(rbtn_loc1->text() == objectiveDes);
     rbtn_loc2->setChecked(rbtn_loc2->text() == objectiveDes);
     rbtn_loc3->setChecked(rbtn_loc3->text() == objectiveDes);

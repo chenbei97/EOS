@@ -36,6 +36,8 @@ class ParseManager:
         self.wellsize = "wellsize"
         self.manufacturer = "manufacturer"
         self.viewsize = "viewsize"
+        self.video_format = "video_format"
+        self.video_framerate = "video_framerate"
         self.state = "state"
         self.activate_code = "activate_code"
         self.bright = "bright"
@@ -61,6 +63,7 @@ class ParseManager:
             "7": self.__parse0x0007,
             "8": self.__parse0x0008,
             "9": self.__parse0x0009,
+            "10": self.__parse0x0010,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -215,6 +218,19 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0009回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
+
+    def __parse0x0010(self,msg:dict): # 录制视频事件
+        frame = msg[self.frame]
+        path = msg[self.path]
+        format = msg[self.video_format]
+        rate = msg[self.video_framerate]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.state] = "ok"
+        response = json.dumps(reponse)
+        response+=self.separate
+        print("0x0010回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
 class SocketServerManger:

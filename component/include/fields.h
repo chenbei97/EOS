@@ -44,6 +44,42 @@ static const QFieldList Brand3Fields = {
 static const QFieldList Brand4Fields = {
         "brand4_6","brand4_24","brand4_96","brand4_384"
 };
+enum class ManufacturerType {
+    Manufacturer1 = 0,
+    Manufacturer2 = 1,
+    Manufacturer3 = 2,
+    Manufacturer4 = 3
+};
+enum class WellBrand1Type {
+    WellBrand1_6 = 0,
+    WellBrand1_24 = 1,
+    WellBrand1_96 = 2,
+    WellBrand1_384 = 3
+};
+enum class WellBrand2Type {
+    WellBrand2_6 = 0,
+    WellBrand2_24 = 1,
+    WellBrand2_96 = 2,
+    WellBrand2_384 = 3
+};
+enum class WellBrand3Type {
+    WellBrand3_6 = 0,
+    WellBrand3_24 = 1,
+    WellBrand3_96 = 2,
+    WellBrand3_384 = 3
+};
+enum class WellBrand4Type {
+    WellBrand4_6 = 0,
+    WellBrand4_24 = 1,
+    WellBrand4_96 = 2,
+    WellBrand4_384 = 3
+};
+enum class WellSizeType {
+    WellSize6 = 0,
+    WellSize24 = 1,
+    WellSize96 = 2,
+    WellSize384 = 3
+};
 /*
     6孔板
     4x: 10*10，
@@ -120,6 +156,16 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
 };
 
 // objective涉及的数据类型
+enum class ObjectiveMagnification {
+    _4x = 0,
+    _10x = 1,
+    _20x = 2,
+    _40x = 3
+};
+enum class ObjectiveType {
+    BR = 0,
+    PH = 1
+};
 static const char* ObjectiveField = "objective";
 static const char* ObjectiveDescripField = "objective_descrip";
 static const char* ObjectiveTypeField = "objective_type";
@@ -131,6 +177,10 @@ static const char* Objective4x  = "4x";
 static const char* Objective10x = "10x";
 static const char* Objective20x = "20x";
 static const char* Objective40x = "40x";
+static const char* ObjectiveLabel4x  = "4x: ";
+static const char* ObjectiveLabel10x = "10x: ";
+static const char* ObjectiveLabel20x = "20x: ";
+static const char* ObjectiveLabel40x = "40x: ";
 static const QFieldList ObjectiveTypeFields = {
         ObjectiveBR,ObjectivePH
 };
@@ -139,6 +189,13 @@ static const QFieldList ObjectiveMagnificationFields = {
 };
 
 // channel涉及的数据类型
+enum class ChannelType {
+    BR = 0,
+    PH = 1,
+    GFP = 2,
+    RFP = 3,
+    DAPI = 4
+};
 static const char* ChannelField = "channel";
 static const char* ChannelFieldLabel = "channel: ";
 static const char* CurrentInfoField = "current_info";
@@ -161,6 +218,10 @@ static const char* _20xPHField = "20xPH";
 static const char* Bright40xField = "br40x";
 static const char* PH40xField = "ph40x";
 static const char* _40xPHField = "40xPH";
+static const char* NA20x05Field = "NA20x0.5";
+static const char* NA20x08Field = "NA20x0.8";
+static const char* NA40x095Field = "NA40x0.95";
+static const char* NAField = "NA";
 static const char* NoneField = "none";
 static const QFieldList ObjectiveSettingFields = {
         Objective4x,_4xPHField,Objective10x,_10xPHField,
@@ -172,6 +233,12 @@ static const QFieldList ChannelFields = {
 };
 
 // camerabox涉及的
+enum class ObjectiveLocationType {
+    loc1 = 0,
+    loc2 = 1,
+    loc3 = 2,
+    loc4 = 3
+};
 #define ExposureLowLimit 0
 #define ExposureUpLimit 15000
 #define GainLowLimit 100
@@ -270,6 +337,28 @@ static const QFieldList VideoFrameRateFields = {
         "10","20","30","40"
 };
 
+enum class ImageFormatType {
+    jpg = 0,
+    jpeg = 1,
+    png = 2,
+    ico = 3,
+    bmp = 4,
+    ttf = 5,
+};
+
+enum class VideoFormatType {
+    avi = 0,
+    wmv = 1,
+    mp4 = 2
+};
+
+enum class VideoFrameRateType {
+    _10 = 0,
+    _20 = 1,
+    _30 = 2,
+    _40 = 3
+};
+
 // photocanvas
 static const char* LiveField = "live";
 static const char* PhotoField = "photo";
@@ -287,6 +376,24 @@ static const QFieldList AppFields = {
         QObject::tr("Proliferation"),QObject::tr("Scratch"),QObject::tr("Invasion"),QObject::tr("Transfection"),
         QObject::tr("Morphology"),QObject::tr("Organoid"),QObject::tr("Pharmacodynamics"),QObject::tr("Custom")
 };
+
+enum class AppType {
+    Proliferation = 0 ,
+    Scratch = 1,
+    Invasion = 2,
+    Transfection = 3,
+    Morphology = 4,
+    Organoid = 5,
+    Pharmacodynamics = 6,
+    Custom = 7,
+};
+enum class LenMoveDirectionType {
+    Left = 0,
+    Top = 1,
+    Right = 2,
+    Bottom = 3
+};
+
 static const QFieldList NavigBarFields = {
         "Logo","Main","Preview","Data","Analysis","Settings"
 };
@@ -313,7 +420,7 @@ static const QList<QFieldList> SocketNeedMapFields{
         Brand1Fields,Brand2Fields,Brand3Fields,Brand4Fields,
         ChannelFields,ManufacturerFields,ObjectiveMagnificationFields,ObjectiveTypeFields,
         ObjectiveLocationFields,AppFields,WellsizeFields,
-        VideoFormatFields,ImageFormatFields
+        VideoFormatFields,ImageFormatFields,
 };
 // #include "qdebug.h"
 static QString getIndexFromFields (QCString field)

@@ -49,7 +49,7 @@ void ObjectiveSetting::saveSetting()
                                            tr("The lens is already occupied, do you want to replace it?")
                                            ,QMessageBox::Yes|QMessageBox::No);
             if (ret == QMessageBox::No) {
-                emit objectiveSettingChanged(info);
+                //emit objectiveSettingChanged(info);//取消了就不用触发了
                 return;
             }
         }
@@ -136,6 +136,9 @@ void ObjectiveSetting::initAttributes()
     objective_button[_20xPHField] = ph10x;
     objective_button[_10xPHField] = ph20x;
     objective_button[_40xPHField] = ph40x;
+    objective_button[NA20x05Field] = na20x05;
+    objective_button[NA20x08Field] = na20x08;
+    objective_button[NA40x095Field] = na40x095;
     objective_button[NoneField] = none;
 }
 
@@ -153,20 +156,51 @@ void ObjectiveSetting::initLayout()
     auto box1 = new GroupBox;
     box1->setLayout(lay1);
 
-    auto lay2 = new QHBoxLayout;
+    auto lay2 = new QVBoxLayout;
     lay2->addWidget(new Label(tr("Objective Option: ")));
-    lay2->addWidget(br4x);
-    lay2->addWidget(ph4x);
-    lay2->addWidget(br10x);
-    lay2->addWidget(ph10x);
-    lay2->addWidget(br20x);
-    lay2->addWidget(ph20x);
-    lay2->addWidget(br40x);
-    lay2->addWidget(ph40x);
-    lay2->addWidget(none);
-    lay2->addWidget(savebtn);
-    lay2->addStretch();
-    lay2->setSpacing(20);
+
+    auto lay21 = new QHBoxLayout;
+    lay21->addSpacing(ObjectiveSettingLeftSpacing);
+    lay21->addWidget(new Label(ObjectiveLabel4x));
+    lay21->addWidget(br4x);
+    lay21->addWidget(ph4x);
+    lay21->addStretch();
+
+    auto lay22 = new QHBoxLayout;
+    lay22->addSpacing(ObjectiveSettingLeftSpacing);
+    lay22->addWidget(new Label(ObjectiveLabel10x));
+    lay22->addWidget(br10x);
+    lay22->addWidget(ph10x);
+    lay22->addStretch();
+
+    auto lay23 = new QHBoxLayout;
+    lay23->addSpacing(ObjectiveSettingLeftSpacing);
+    lay23->addWidget(new Label(ObjectiveLabel20x));
+    lay23->addWidget(br20x);
+    lay23->addWidget(ph20x);
+    lay23->addWidget(na20x05);
+    lay23->addWidget(na20x08);
+    lay23->addStretch();
+
+    auto lay24 = new QHBoxLayout;
+    lay24->addSpacing(ObjectiveSettingLeftSpacing);
+    lay24->addWidget(new Label(ObjectiveLabel40x));
+    lay24->addWidget(br40x);
+    lay24->addWidget(ph40x);
+    lay24->addWidget(na40x095);
+    lay24->addWidget(none);
+    lay24->addStretch();
+
+    auto lay25 = new QHBoxLayout;
+    lay25->addSpacing(ObjectiveSettingLeftSpacing);
+    lay25->addWidget(savebtn);
+    lay25->addStretch();
+
+    lay2->addLayout(lay21);
+    lay2->addLayout(lay22);
+    lay2->addLayout(lay23);
+    lay2->addLayout(lay24);
+    lay2->addLayout(lay25);
     auto box2 = new GroupBox;
     box2->setLayout(lay2);
 
@@ -205,8 +239,11 @@ void ObjectiveSetting::initObjects()
     ph20x = new QRadioButton(_20xPHField);
     br40x = new QRadioButton(Objective40x);
     ph40x = new QRadioButton(_40xPHField);
+    na20x05 = new QRadioButton(NA20x05Field);
+    na20x08 = new QRadioButton(NA20x08Field);
+    na40x095 = new QRadioButton(NA40x095Field);
     none = new QRadioButton(NoneField);
-    savebtn = new PushButton(tr("save current objective option"));
+    savebtn = new PushButton(tr("save option on current objective location"));
 
     buttongroup1->addButton(location_one,0);
     buttongroup1->addButton(location_two,1);
@@ -221,5 +258,8 @@ void ObjectiveSetting::initObjects()
     buttongroup2->addButton(ph20x,5);
     buttongroup2->addButton(br40x,6);
     buttongroup2->addButton(ph40x,7);
-    buttongroup2->addButton(none,8);
+    buttongroup2->addButton(na20x05,8);
+    buttongroup2->addButton(na20x08,9);
+    buttongroup2->addButton(na40x095,10);
+    buttongroup2->addButton(none,11);
 }

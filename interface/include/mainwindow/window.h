@@ -84,6 +84,8 @@ using std::modf;
     #define TimeBoxSpinBoxMaxWidth 100 // timebox不想让spinbox太长
     #define TimeBoxDateTimeEditMaxWidth 200
 
+    #define ObjectiveSettingLeftSpacing 150
+
 #endif
 
 

@@ -48,6 +48,9 @@ private:
     QRadioButton * ph20x;
     QRadioButton * br40x;
     QRadioButton * ph40x;
+    QRadioButton * na20x05;
+    QRadioButton * na20x08;
+    QRadioButton * na40x095;
     QRadioButton * none;
     PushButton * savebtn;
 signals:

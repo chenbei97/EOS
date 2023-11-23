@@ -55,6 +55,7 @@ enum TcpEventType {
     MoveMachineEvent,// 移动点击到指定物镜位置事件
     StopExperEvent, // 停止实验事件
     ToggleObjectiveEvent, // 切换物镜动电机事件
+    RecordVideoEvent, // 录制视频事件
 };
 
 typedef struct { // 注册过的帧头命令
@@ -68,13 +69,14 @@ typedef struct { // 注册过的帧头命令
     const QString moveMachineEvent = QString::number(MoveMachineEvent);
     const QString stopExperEvent = QString::number(StopExperEvent);
     const QString toggleObjectiveEvent = QString::number(ToggleObjectiveEvent);
+    const QString recordVideoEvent = QString::number(RecordVideoEvent);
 } TcpFrameList;
 
 const QFieldList TcpUsedFrameList { // 用于解析时检测返回的帧是否正确,在这个列表内
         QString::number(PreviewEvent),QString::number(LoadExperEvent),QString::number(AskConnectedStateEvent),
         QString::number(AskActivateCodeEvent),QString::number(AdjustBrightEvent),QString::number(ToggleChannelEvent),
         QString::number(AdjustLensEvent),QString::number(MoveMachineEvent),QString::number(StopExperEvent),
-        QString::number(ToggleObjectiveEvent),
+        QString::number(ToggleObjectiveEvent),QString::number(RecordVideoEvent),
 };
 
 struct FieldPreviewEvent {
@@ -182,6 +184,13 @@ struct FieldToggleObjectiveEvent {
     const QString state = StateField;
 };
 
+struct FieldRecordVideoEvent {
+    const QString path = PathField;
+    const QString video_format = VideoFormatField;
+    const QString video_framerate = VideoFrameRateField;
+    const QString state = StateField;
+};
+
 typedef struct {
     FieldPreviewEvent fieldPreviewEvent;
     FieldLoadExperEvent fieldLoadExperEvent;
@@ -193,6 +202,7 @@ typedef struct {
     FieldMoveMachineEvent fieldMoveMachineEvent;
     FieldStopExperEvent fieldStopExperEvent;
     FieldToggleObjectiveEvent fieldToggleObjectiveEvent;
+    FieldRecordVideoEvent fieldRecordVideoEvent;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
@@ -209,6 +219,7 @@ static const TcpFieldList TcpFieldPool;
 #define FieldMoveMachineEvent TcpFieldPool.fieldMoveMachineEvent
 #define FieldStopExperEvent TcpFieldPool.fieldStopExperEvent
 #define FieldToggleObjectiveEvent TcpFieldPool.fieldToggleObjectiveEvent
+#define FieldRecordVideoEvent TcpFieldPool.fieldRecordVideoEvent
 
 static QVariant parsePreviewEvent(QCVariantMap m)
 { // 预览事件
@@ -539,6 +550,26 @@ static QVariant parseToggleObjectiveEvent(QCVariantMap m)
     return ret == OkField;
 }
 
+static QByteArray assembleRecordVideoEvent(QCVariantMap m)
+{ // 录制视频事件
+    QJsonObject object;
+    object[FrameField] = RecordVideoEvent;
+    object[FieldRecordVideoEvent.path] = m[PathField].toString();
+    object[FieldRecordVideoEvent.video_format] = m[VideoFormatField].toInt();
+    object[FieldRecordVideoEvent.video_framerate] = m[VideoFrameRateField].toInt();
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parseRecordVideoEvent(QCVariantMap m)
+{// 录制视频事件
+    if (!m.keys().contains(FrameField)) return false;
+    if (!m.keys().contains(FieldRecordVideoEvent.state)) return false;
+    auto ret = m[StateField].toString();
+    return ret == OkField;
+}
+
 /*---------以下都是临时测试函数,以后可以注释掉-----------------*/
 static QByteArray assemble_test0x0(QCVariantMap m)
 { // test0x0会传来x,y,frame字段
@@ -593,6 +624,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.moveMachineEvent, parseMoveMachineEvent},
         {TcpFramePool.stopExperEvent, parseStopExperEvent},
         {TcpFramePool.toggleObjectiveEvent, parseToggleObjectiveEvent},
+        {TcpFramePool.recordVideoEvent, parseRecordVideoEvent},
         {"test0x0",parse_test0x0},
         {"test0x1",parse_test0x1},
 };
@@ -608,6 +640,7 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
         {TcpFramePool.moveMachineEvent,assembleMoveMachineEvent},
         {TcpFramePool.stopExperEvent,assembleStopExperEvent},
         {TcpFramePool.toggleObjectiveEvent, assembleToggleObjectiveEvent},
+        {TcpFramePool.recordVideoEvent, assembleRecordVideoEvent},
         {"test0x0",assemble_test0x0},
         {"test0x1",assemble_test0x1},
 };
