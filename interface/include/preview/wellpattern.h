@@ -35,6 +35,9 @@ public:
     void mouseReleaseEvent(QMouseEvent *event) override;// 框选数量大于1不允许打开视野窗口,只能基于特定孔
     void mouseDoubleClickEvent(QMouseEvent*event) override;// 双击也能打开视野窗口
 
+    int numberOfViews() const; // 计算已选择孔的所有视野数 用于计算占用空间
+    int numberOfViews(const QString& group); // 这个组的视野数
+    int numberOfViews(const QPoint& holepoint); // 这个孔的视野数
     QSet<QString> getAllWellGroupNames() const;// 返回所有分过的组,不重复
     void updateHoleInfoByGroupInfo(QCVariantMap m);// 右击打开分组窗口的信息(color+name)拿去更新孔数据
     void updateHoleInfoByViewInfoApplyHole(QCVariantMap m); // 删点保存点的映射

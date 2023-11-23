@@ -30,14 +30,16 @@ void initApp(QApplication& a)
     LOG << "UserScreen Width:" << UserScreenWidth << "UserScreen Height:" << UserScreenHeight;
     LOG<<"main thread is "<<CURRENT_THREAD;
     LOG<<"current path = "<<CURRENT_PATH;
-//    QTextCodec *codec = QTextCodec::codecForName("utf-8");
-//    QTextCodec::setCodecForLocale(codec);
+    foreach(auto p, systemDrivers()) {
+        LOG<<p<<" total = "<<getDiskSpace(p,false)<<"MB free = "<<getDiskSpace(p)<<"MB "
+        << getDiskSpace(p) / getDiskSpace(p,false) * 100.0 <<"%";
+    }
+    //QTextCodec *codec = QTextCodec::codecForName("utf-8");
+    //QTextCodec::setCodecForLocale(codec);
     a.setFont(QFont(DefaultFontFamily,DefaultFontSize));
-    //qRegisterMetaType<QList<int>>("QList<int>");
     a.setWindowIcon(QApplication::style()->standardIcon(QStyle::SP_DesktopIcon));
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     //QTimer::singleShot(0,qApp,SLOT(quit()));
-
 
     // 这段Python进程的代码移动到initApp去写而不是在mainwindow.cpp的构造函数去写
     // 因为mainwindow.cpp构造完成之前可能已经触发了某些信号给服务端发送命令,例如独立于mainwindow构造的setting

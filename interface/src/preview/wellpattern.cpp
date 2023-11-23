@@ -103,6 +103,38 @@ int WellPattern::drapPointCount() const
     return count;
 }
 
+int WellPattern::numberOfViews() const
+{
+    int count = 0;
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            if (mHoleInfo[row][col].isselected)
+                count += mHoleInfo[row][col].viewpoints.count();
+        }
+    }
+    return count;
+}
+
+int WellPattern::numberOfViews(const QPoint &holepoint)
+{ // 外部调用holepoint有义务不越界
+    int count = 0;
+    if (mHoleInfo[holepoint.x()][holepoint.y()].isselected)
+        count = mHoleInfo[holepoint.x()][holepoint.y()].viewpoints.count();
+    return count;
+}
+
+int WellPattern::numberOfViews(const QString &group)
+{
+    int count = 0;
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            if (mHoleInfo[row][col].isselected && mHoleInfo[row][col].group == group)
+                count += mHoleInfo[row][col].viewpoints.count();
+        }
+    }
+    return count;
+}
+
 QSet<QString> WellPattern::getAllWellGroupNames() const
 { // 返回所有分过的组,不重复
     QSet<QString> set;

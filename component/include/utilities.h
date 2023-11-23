@@ -19,9 +19,35 @@
 #include "qapplication.h"
 #include "qdesktopwidget.h"
 #include "qmainwindow.h"
+#include "qstorageinfo.h"
 //#include "sysinfoapi.h"
 //#include <windows.h>
 
+/*获取电脑所有的盘符*/
+static QStringList systemDrivers()
+{ // ("C:/", "D:/")
+    QStringList list;
+    auto drivers = QDir::drives();
+    foreach(auto info,drivers) {
+        list.append(info.path());
+    }
+    return list;
+}
+
+/*获取电脑指定盘符的总空间或者剩余空间,getFree表示获取剩余空间*/
+static double getDiskSpace(QString path, bool getFree = true) {
+    double res = 0.0;
+    double MB = 1024.0 * 1024.0;
+    QList<QStorageInfo> storageInfoList = QStorageInfo::mountedVolumes();
+            foreach (QStorageInfo storageInfo, storageInfoList) {
+            if (path.startsWith(storageInfo.rootPath())) {
+                getFree? res = (double )storageInfo.bytesAvailable() / MB:
+                        res = (double)storageInfo.bytesTotal() / MB;
+                break;
+            }
+        }
+    return res;
+}
 
 /*将指定数字转为0x前缀的16进制字符串,且0x后边有*指定的位数*/
 static QString convertToHex(quint32 number,int bits = 8) {

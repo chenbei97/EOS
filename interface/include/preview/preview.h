@@ -127,4 +127,16 @@ signals:
     void evtCallback(unsigned nEvent);
 #endif
 };
+
+/*每张图分辨率为2048*2048,大小暂时不确定,2048*2048/(1024*1024)=4M,imgSize暂时取个估计值4M*/
+const double PerImageSpace = 4.0; // MB
+static double calculateExperSpaceMB(int numOfViews,int numOfChannel,double perImgSpace = PerImageSpace)
+{ // 占用空间 = 所有视野数 x 通道数 x 每张图的大小（4mb暂定）
+    return numOfViews * numOfChannel * perImgSpace; // MB
+}
+
+static double calculateExperSpaceGB(int numOfViews,int numOfChannel,double perImgSpace = PerImageSpace)
+{ // 占用空间 = 所有视野数 x 通道数 x 每张图的大小
+    return numOfViews * numOfChannel * perImgSpace / 1024.0; // GB
+}
 #endif //EOSI_PREVIEW_H
