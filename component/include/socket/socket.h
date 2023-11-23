@@ -54,6 +54,7 @@ enum TcpEventType {
     AdjustLensEvent, // 上下左右调整镜头事件
     MoveMachineEvent,// 移动点击到指定物镜位置事件
     StopExperEvent, // 停止实验事件
+    ToggleObjectiveEvent, // 切换物镜动电机事件
 };
 
 typedef struct { // 注册过的帧头命令
@@ -66,12 +67,14 @@ typedef struct { // 注册过的帧头命令
     const QString adjustLensEvent = QString::number(AdjustLensEvent);
     const QString moveMachineEvent = QString::number(MoveMachineEvent);
     const QString stopExperEvent = QString::number(StopExperEvent);
+    const QString toggleObjectiveEvent = QString::number(ToggleObjectiveEvent);
 } TcpFrameList;
 
 const QFieldList TcpUsedFrameList { // 用于解析时检测返回的帧是否正确,在这个列表内
         QString::number(PreviewEvent),QString::number(LoadExperEvent),QString::number(AskConnectedStateEvent),
         QString::number(AskActivateCodeEvent),QString::number(AdjustBrightEvent),QString::number(ToggleChannelEvent),
         QString::number(AdjustLensEvent),QString::number(MoveMachineEvent),QString::number(StopExperEvent),
+        QString::number(ToggleObjectiveEvent),
 };
 
 struct FieldPreviewEvent {
@@ -168,7 +171,13 @@ struct FieldMoveMachineEvent { // 移动电机
 };
 
 struct FieldStopExperEvent { // 停止实验
-    const QString  stop = StopField;
+    const QString stop = StopField;
+    const QString state = StateField;
+};
+
+struct FieldToggleObjectiveEvent {
+    const QString objective_loc = ObjectiveLocationField;
+    const QString objective = ObjectiveField;
     const QString state = StateField;
 };
 
@@ -182,6 +191,7 @@ typedef struct {
     FieldAdjustLensEvent fieldAdjustLensEvent;
     FieldMoveMachineEvent fieldMoveMachineEvent;
     FieldStopExperEvent fieldStopExperEvent;
+    FieldToggleObjectiveEvent fieldToggleObjectiveEvent;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
@@ -197,6 +207,7 @@ static const TcpFieldList TcpFieldPool;
 #define FieldAdjustLensEvent TcpFieldPool.fieldAdjustLensEvent
 #define FieldMoveMachineEvent TcpFieldPool.fieldMoveMachineEvent
 #define FieldStopExperEvent TcpFieldPool.fieldStopExperEvent
+#define FieldToggleObjectiveEvent TcpFieldPool.fieldToggleObjectiveEvent
 
 static QVariant parsePreviewEvent(QCVariantMap m)
 { // 预览事件
@@ -388,10 +399,11 @@ static QByteArray assembleAskConnectedStateEvent(QCVariantMap m)
     object[FieldAskConnectedStateEvent.state] = "socket is connected?";
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
-    //auto length = convertToHex(json.length()).toUtf8();
 
-    //LOG<<length<<json.length();
-    //LOG<<PrependSeparateField(PrependField(json,length));
+    auto length = convertToHex(json.length()).toUtf8();
+    // "@@@0x00000038{\n    \"frame\": 2,\n    \"state\": \"socket is connected?\"\n}\n"
+    LOG<<PrependSeparateField(PrependField(json,length));
+
     return AppendSeparateField(json);
 }
 
@@ -506,6 +518,25 @@ static QVariant parseStopExperEvent(QCVariantMap m)
     return ret == OkField;
 }
 
+static QByteArray assembleToggleObjectiveEvent(QCVariantMap m)
+{ // 切物镜动电机事件
+    QJsonObject object;
+    object[FrameField] = ToggleObjectiveEvent;
+    object[FieldToggleObjectiveEvent.objective_loc] = m[ObjectiveLocationField].toInt();
+    object[FieldToggleObjectiveEvent.objective] = m[ObjectiveField].toInt();
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parseToggleObjectiveEvent(QCVariantMap m)
+{// 切物镜动电机事件
+    if (!m.keys().contains(FrameField)) return false;
+    if (!m.keys().contains(FieldToggleObjectiveEvent.state)) return false;
+    auto ret = m[StateField].toString();
+    return ret == OkField;
+}
+
 /*---------以下都是临时测试函数,以后可以注释掉-----------------*/
 static QByteArray assemble_test0x0(QCVariantMap m)
 { // test0x0会传来x,y,frame字段
@@ -559,6 +590,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.adjustLensEvent, parseAdjustLensEvent},
         {TcpFramePool.moveMachineEvent, parseMoveMachineEvent},
         {TcpFramePool.stopExperEvent, parseStopExperEvent},
+        {TcpFramePool.toggleObjectiveEvent, parseToggleObjectiveEvent},
         {"test0x0",parse_test0x0},
         {"test0x1",parse_test0x1},
 };
@@ -573,6 +605,7 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
         {TcpFramePool.adjustLensEvent,assembleAdjustLensEvent},
         {TcpFramePool.moveMachineEvent,assembleMoveMachineEvent},
         {TcpFramePool.stopExperEvent,assembleStopExperEvent},
+        {TcpFramePool.toggleObjectiveEvent, assembleToggleObjectiveEvent},
         {"test0x0",assemble_test0x0},
         {"test0x1",assemble_test0x1},
 };

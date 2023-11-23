@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-31 14:39:22
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-31 14:41:42
+ * @LastEditTime: 2023-11-23 09:57:15
  * @FilePath: \EOS\interface\src\setting\objectivesetting.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -119,7 +119,7 @@ void ObjectiveSetting::initAttributes()
     buttongroup1->buttonClicked(0);
     buttongroup2->buttonClicked(0);
 
-    info[ObjectiveLocationField1] = Objective4x;
+    info[ObjectiveLocationField1] = Objective4x; // 初始默认4个位置的物镜类型
     info[ObjectiveLocationField2] = Objective10x;
     info[ObjectiveLocationField3] = Objective20x;
     info[ObjectiveLocationField4] = Objective40x;

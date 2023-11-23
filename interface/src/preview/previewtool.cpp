@@ -91,7 +91,7 @@ PreviewToolInfo PreviewTool::toolInfo() const
 
     // 3. channel
     auto channelinfo = channelbox->channelInfo();//这个属于临时信息,其实没用(拍照这里有用,当前拍的通道)
-    info[CurrentChannelField] = channelinfo[CurrentChannelField]; // 实际字符串 PH,如果都没开灯是空字符串
+    info[CurrentChannelField] = channelinfo[CurrentChannelField]; // 实际字符串BR,PH,如果都没开灯是空字符串
 
     // 4. camerainfo,分不同通道,保存了gain,exposure,bright
     auto camerainfo = camerabox->cameraInfo();

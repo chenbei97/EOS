@@ -47,15 +47,22 @@ void TimeBox::importExperConfig(bool is_schedule,long long total,long long durat
 }
 
 void TimeBox::disableChannel(const QString &obj)
-{ // obj = br4x,ph4x
+{ // obj = br4x,ph4x 老式字符串
     if (obj.contains(ObjectiveBR)) {
         phbox->setEnabled(false);
         phbox->setChecked(false); // 被禁用时也要取消掉勾选
         brbox->setEnabled(true);
+        gfpbox->setEnabled(true);
+        rfpbox->setEnabled(true);
+        dapibox->setEnabled(true);
     } else if (obj.contains(ObjectivePH)) {
         phbox->setEnabled(true);
         brbox->setEnabled(false);
         brbox->setChecked(false);// 被禁用时也要取消掉勾选
+        gfpbox->setEnabled(false);
+        rfpbox->setEnabled(false);
+        dapibox->setEnabled(false);
+        phbox->setChecked(true); // 因为只能选择PH物镜,帮他勾上
     } else {
         // 可能是无镜头 none 对通道的勾选没有影响
     }

@@ -98,7 +98,7 @@ void ChannelBoxx::clickBr()
         m[CurrentChannelField] = 0;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.frame0x0006,assemble0x0006(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
         if (ParserResult.toBool()) {
             LOG<<"关闭BR";
         }
@@ -118,7 +118,7 @@ void ChannelBoxx::clickPh()
         m[CurrentChannelField] = 1;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.frame0x0006,assemble0x0006(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
         if (ParserResult.toBool()) {
             LOG<<"关闭PH";
         }
@@ -138,7 +138,7 @@ void ChannelBoxx::clickGfp()
         m[CurrentChannelField] = 2;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.frame0x0006,assemble0x0006(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
         if (ParserResult.toBool()) {
             LOG<<"关闭GFP";
         }
@@ -158,7 +158,7 @@ void ChannelBoxx::clickRfp()
         m[CurrentChannelField] = 3;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.frame0x0006,assemble0x0006(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
         if (ParserResult.toBool()) {
             LOG<<"关闭RFP";
         }
@@ -179,7 +179,7 @@ void ChannelBoxx::clickDapi()
         m[CurrentChannelField] = 4;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.frame0x0006,assemble0x0006(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
         if (ParserResult.toBool()) {
             LOG<<"关闭DAPI";
         }
@@ -196,15 +196,24 @@ void ChannelBoxx::takePhoto(const QImage &img, const QString &channel)
 }
 
 void ChannelBoxx::disableChannel(const QString &obj)
-{ // obj = br4x,ph4x
+{ // obj = br10x, ph4x是兼容的老式字符串
+    LOG<<"objective = "<<obj;
     if (obj.contains(ObjectiveBR)) {
         phbtn->setEnabled(false);
         phbtn->resetBackGroundColor();
         brbtn->setEnabled(true);
+        // BR物镜-荧光通道使能要改回来
+        gfpbtn->setEnabled(true);
+        rfpbtn->setEnabled(true);
+        dapibtn->setEnabled(true);
     } else if (obj.contains(ObjectivePH)) {
         phbtn->setEnabled(true);
         brbtn->setEnabled(false);
         brbtn->resetBackGroundColor();
+        // PH物镜-新增荧光通道也不能选
+        gfpbtn->setEnabled(false);
+        rfpbtn->setEnabled(false);
+        dapibtn->setEnabled(false);
     } else {
         // 可能是无镜头 none 对通道的勾选没有影响
     }

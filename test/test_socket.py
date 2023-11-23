@@ -257,8 +257,8 @@ class SocketServerManger:
                 print("取出: ", msg, " 队列长度: ",self.__msgQueue.qsize())
                 #print("队列长度: ",self.__msgQueue.qsize())
                 msg_dict = json.loads(msg)
-                frame = msg_dict[self.__parser.frame]
-                self.__parseFunctions[frame](msg_dict)
+                frame = msg_dict[self.__parser.frame] # 客户端传的数字不是字符串了
+                self.__parseFunctions[str(frame)](msg_dict)
                 time.sleep(0.0001) # 由于已经通过@@@区分开了,下方根据{}的程序也就不必了
 def test_server():
     m = SocketServerManger()

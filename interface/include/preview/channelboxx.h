@@ -4,7 +4,7 @@
 
 #include "window.h"
 
-#define use_channelnotifier 0
+//#define use_channelnotifier 0
 #ifdef use_channelnotifier
 #include "channelnotifier.h"
 #endif
