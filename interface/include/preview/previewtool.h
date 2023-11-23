@@ -45,6 +45,7 @@ signals:
     void wellbrandChanged(int option);// wellbox的信息
     void manufacturerChanged(int option);
     void objectiveChanged(const QString& obj);
+    void objectiveToggled(int objective,int objective_loc,int isPh);
     void channelChanged(int option);// 通道选择
     void cameraInfoChanged(const MultiCameraInfo&m);// 通道配置改变
     void zstackChanged(bool isChecked);// 是否勾选zstack和stitch

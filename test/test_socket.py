@@ -45,6 +45,7 @@ class ParseManager:
         self.direction = "direction"
         self.objective_loc = "objective_loc"
         self.ishole = "ishole"
+        self.isPH = "isPH"
         self.__socket = None
         self.parseFunctions = {
             "test0x0": self.__parsetest0x0,
@@ -59,6 +60,7 @@ class ParseManager:
             "6": self.__parse0x0006,
             "7": self.__parse0x0007,
             "8": self.__parse0x0008,
+            "9": self.__parse0x0009,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -200,6 +202,19 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x008回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
+
+    def __parse0x0009(self,msg:dict): # 切物镜动电机事件
+        frame = msg[self.frame]
+        objective = msg[self.objective]
+        loc = msg[self.objective_loc]
+        isph = msg[self.isPH]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.state] = "ok"
+        response = json.dumps(reponse)
+        response+=self.separate
+        print("0x0009回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
 class SocketServerManger:

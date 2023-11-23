@@ -43,34 +43,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     connect(setting,&Setting::objectiveSettingChanged,preview,&Preview::objectiveSettingChanged);
     setting->emitSignals(); // 把objectivesetting的初始配置触发一下去更新previewtool
-
-
-#ifdef use_python
-    process = new PythonProcess;
-#ifndef  use_testSocket
-    process->start("Eos_I/Eos_main.py");
-    //StartPythonPointer->start("Eos_I","Eos_main","main");
-#else
-    process->start("../test/test_socket.py");
-    //StartPythonPointer->start("../test","test_socket","test_server");
-#endif
-#else
-    SocketInit;
-    auto * process = new QProcess;
-    process->start("C:\\Users\\22987\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
-                   QStringList()<<"../test/test_socket.py");
-    process->waitForStarted();
-    QObject::connect(qApp, &QCoreApplication::aboutToQuit, [process]() {
-        process->close();
-        process->waitForFinished();
-        LOG<<"python process is kill? "<<!process->isOpen();
-    });
-    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
-    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
-    else LOG<<"socket is connect failed!";
-    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
-    LOG<<"activate code is "<<ParserResult.toString();
-#endif
 }
 
 void MainWindow::navigbarSelect(int id)

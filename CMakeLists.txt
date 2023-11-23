@@ -17,10 +17,10 @@ message(STATUS "FAMILYPC = $ENV{MY_ENV_VAR}")
 if (MSVC)
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-    set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.14.2/5.14.2/msvc2017_64")
-else(GNU)
-    set(CMAKE_PREFIX_PATH "E:/Qt5.14.2/5.14.2/mingw73_64")
-endif ()
+    set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.14.2/5.14.2/msvc2017_64") # 这个目录取决于电脑Qt的安装目录,每台电脑不同,只能使用绝对路径编译
+else(GNU)  # 再者,cmake使用绝对路径也不影响打包的结果,cmake不是真实的业务代码只是用于编译,业务代码当然不能使用绝对路径
+    set(CMAKE_PREFIX_PATH "E:/Qt5.14.2/5.14.2/mingw73_64") # 这也是为何cmake种我想要把Qt安装目录下的一些文件复制到bin下这样可以使用相对路径,但是我不可能知道Qt安装目录本身
+endif () # qmake的编译配置也是用的个人的安装目录,只不过qtcreator帮用户做好了,cmake需要自己修改而已
 # E:/Qt5.14.2/5.14.2/msvc2017_64  C:/Qt/Qt5.14.2/5.14.2/msvc2017_64
 # E:/Qt5.14.2/5.14.2/mingw73_64 C:/Qt/Qt5.14.2/5.14.2/mingw73_64
 

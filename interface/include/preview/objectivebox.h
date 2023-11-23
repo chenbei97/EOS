@@ -31,6 +31,7 @@ private:
     QString convertFrom(const QString& text) const;
 signals:
     void objectiveChanged(const QString& obj);
+    void objectiveToggled(int objective,int objective_loc,int isPh);
 };
 
 #endif //EOSI_OBJECTIVEBOX_H

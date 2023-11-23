@@ -112,18 +112,43 @@ QString ObjectiveBox::convertFrom(const QString &text) const
 void ObjectiveBox::onClicked()
 {
     QString text;
-    if (rbtn_loc1->isChecked())
+    int objective_loc = 0;
+    if (rbtn_loc1->isChecked()) {
         text = rbtn_loc1->text();
-    else if (rbtn_loc2->isChecked())
+        objective_loc = 0;
+    }
+    else if (rbtn_loc2->isChecked()){
         text = rbtn_loc2->text();
-    else if (rbtn_loc3->isChecked())
+        objective_loc = 1;
+    }
+    else if (rbtn_loc3->isChecked()){
         text = rbtn_loc3->text();
-    else if (rbtn_loc4->isChecked())
+        objective_loc = 2;
+    }
+    else if (rbtn_loc4->isChecked()){
         text = rbtn_loc4->text();
+        objective_loc = 3;
+    }
 
-    // 原来br4x,改为4x,为了方便禁用channelbox的使能,要修正回来br4x
+    // 原来br4x,改为4x,为了方便禁用channelbox的使能,要修正改回来br4x,一种代码兼容历史原因的手段
     text = convertTo(text);
+
+    int isph = 0;
+    if (text.contains(BRField,Qt::CaseInsensitive)) {
+        isph = 0;
+    } else if (text.contains(PHField,Qt::CaseInsensitive)) {
+        isph = 1;
+    }
+
+    int objective = 0;
+    if (text.contains(Objective4x)) objective = 0;
+    else if (text.contains(Objective10x)) objective = 1;
+    else if (text.contains(Objective20x)) objective = 2;
+    else if (text.contains(Objective40x)) objective = 3;
+    //LOG<<objective<<objective_loc<<isph<<text;
+
     emit objectiveChanged(text);
+    emit objectiveToggled(objective,objective_loc,isph); // 用于切物镜时就动电机,需要给物镜倍数,物镜位置,是否为PH类型
 }
 
 ObjectiveInfo ObjectiveBox::objectiveInfo() const

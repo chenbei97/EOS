@@ -8,6 +8,24 @@
  */
 #include "preview.h"
 
+void Preview::toggleObjective(int objective,int objective_loc,int isPh)
+{ // objective: 物镜倍数代号 objective_loc: 切到的物镜位置代号 isPH:指示是否为PH类型
+    //LOG<<"objective = "<<objective<<" loc = "<<objective_loc<<" isph = "<<isPh;
+    QVariantMap m;
+    m[ObjectiveField] = objective;
+    m[ObjectiveLocationField] = objective_loc;
+    m[IsPHField] = isPh;
+
+    AssemblerPointer->assemble(TcpFramePool.toggleObjectiveEvent,m);
+    auto msg = AssemblerPointer->message();
+
+    SocketPointer->exec(TcpFramePool.toggleObjectiveEvent,msg, true);
+
+    if (ParserResult.toBool()) {
+        LOG<<"toggle objective successful! multiple = "<<objective<<" isPH? "<<isPh;
+    } else {LOG<<"toggle objective failed!";}
+}
+
 void Preview::toggleChannel(int option)
 {
     auto toolinfo = previewtool->toolInfo();
@@ -33,7 +51,7 @@ void Preview::toggleChannel(int option)
     SocketPointer->exec(TcpFramePool.toggleChannelEvent,msg, true);
 
     if (ParserResult.toBool()) {
-        LOG<<"成开灯! 当前开灯通道为 "<<m[CurrentChannelField];
+        LOG<<"turn on light successful! current channel is "<<m[CurrentChannelField];
     }
 }
 

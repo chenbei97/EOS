@@ -124,6 +124,7 @@ static const char* ObjectiveField = "objective";
 static const char* ObjectiveDescripField = "objective_descrip";
 static const char* ObjectiveTypeField = "objective_type";
 static const char* ObjectiveFieldLabel = "objective: ";
+static const char* IsPHField = "isPH";
 static const char* ObjectivePH = "ph";
 static const char* ObjectiveBR = "br";
 static const char* Objective4x  = "4x";

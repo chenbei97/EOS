@@ -38,6 +38,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(wellbox,&WellBox::wellbrandChanged,this,&PreviewTool::wellbrandChanged);
     connect(wellbox,&WellBox::manufacturerChanged,this,&PreviewTool::manufacturerChanged);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::objectiveChanged);
+    connect(objectivebox,&ObjectiveBox::objectiveToggled,this,&PreviewTool::objectiveToggled);
     connect(camerabox,&CameraBox::cameraInfoChanged,this,&PreviewTool::cameraInfoChanged);
     connect(camerabox,&CameraBox::photoTaking,this,&PreviewTool::photoTaking);
     connect(camerabox,&CameraBox::cameraAdjusted,this,&PreviewTool::cameraAdjusted);

@@ -235,6 +235,7 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);
     connect(previewtool,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
     connect(previewtool,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
+    connect(previewtool,&PreviewTool::objectiveToggled,this,&Preview::toggleObjective);
     connect(previewtool,&PreviewTool::playVideo,this,&Preview::playVideo);
     connect(previewtool,&PreviewTool::stopVideo,this,&Preview::stopVideo);
     connect(previewtool,&PreviewTool::pauseVideo,this,&Preview::pauseVideo);

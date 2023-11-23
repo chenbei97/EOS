@@ -178,6 +178,7 @@ struct FieldStopExperEvent { // 停止实验
 struct FieldToggleObjectiveEvent {
     const QString objective_loc = ObjectiveLocationField;
     const QString objective = ObjectiveField;
+    const QString isPH = IsPHField;
     const QString state = StateField;
 };
 
@@ -524,6 +525,7 @@ static QByteArray assembleToggleObjectiveEvent(QCVariantMap m)
     object[FrameField] = ToggleObjectiveEvent;
     object[FieldToggleObjectiveEvent.objective_loc] = m[ObjectiveLocationField].toInt();
     object[FieldToggleObjectiveEvent.objective] = m[ObjectiveField].toInt();
+    object[FieldToggleObjectiveEvent.isPH] = m[IsPHField].toInt();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);

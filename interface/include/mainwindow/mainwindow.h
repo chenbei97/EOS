@@ -32,9 +32,6 @@ private:
     Preview * preview;
     Setting * setting;
     QStackedWidget * stack;
-//#ifdef use_python
-//    PythonProcess * process;
-//#endif
 private:
     void navigbarSelect(int id);
 };

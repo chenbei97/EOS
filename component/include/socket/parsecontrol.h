@@ -23,6 +23,7 @@ public:
 private:
     explicit ParserControl(QObject *parent = nullptr);
     ~ParserControl();
+    void async(QCString f,QCVariant d);
     QThread parsethread;
     Parse * parser;
     EventLoop loop;

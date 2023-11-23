@@ -107,6 +107,7 @@ private:
     void stopVideo();
     void pauseVideo();
     void takingPhoto();
+    void toggleObjective(int objective,int objective_loc,int isPh);
     void adjustCamera(int exp,int gain,int br);
     void onAdjustCamera(const QString &f,const QVariant & d);
     void adjustLens(int option);

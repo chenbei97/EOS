@@ -37,4 +37,36 @@ void initApp(QApplication& a)
     a.setWindowIcon(QApplication::style()->standardIcon(QStyle::SP_DesktopIcon));
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     //QTimer::singleShot(0,qApp,SLOT(quit()));
+
+
+    // 这段Python进程的代码移动到initApp去写而不是在mainwindow.cpp的构造函数去写
+    // 因为mainwindow.cpp构造完成之前可能已经触发了某些信号给服务端发送命令,例如独立于mainwindow构造的setting
+    // 这样setting有关的信号发送的时候python进程尚未启动(mainwindow并未构造完)导致服务端没收到消息
+    // 所以提前启动Python进程,这样mainwindow或者settng初始化发送某些信号时都能保证服务端已经正常
+#ifdef use_python
+    auto process = new PythonProcess;
+#ifndef  use_testSocket
+    process->start("Eos_I/Eos_main.py");
+    //StartPythonPointer->start("Eos_I","Eos_main","main");
+#else
+    process->start("../test/test_socket.py");
+    //StartPythonPointer->start("../test","test_socket","test_server");
+#endif
+#else
+    SocketInit;
+    auto * process = new QProcess;
+    process->start("C:\\Users\\22987\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",//测试方便,暂时需要保留
+                   QStringList()<<"../test/test_socket.py");
+    process->waitForStarted();
+    QObject::connect(qApp, &QCoreApplication::aboutToQuit, [process]() {
+        process->close();
+        process->waitForFinished();
+        LOG<<"python process is kill? "<<!process->isOpen();
+    });
+    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
+    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
+    else LOG<<"socket is connect failed!";
+    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
+    LOG<<"activate code is "<<ParserResult.toString();
+#endif
 }
