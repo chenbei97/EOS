@@ -81,6 +81,7 @@ static const char*  SqliteDataBaseConnectionsAgain =
 static const char* FrameField = "frame";
 static const char* SeparateField = "@@@";
 static const char* PathField = "path";
+static const char* EquipField = "equip";
 static const char* EstimatedSpace = "estimateSpace";
 static const char* OkField = "ok";
 static const char* HourField = "hour";

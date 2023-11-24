@@ -108,8 +108,6 @@ void ViewPattern::drawCircle(QPainter &painter)
 void ViewPattern::drawDisbaleRect(QPainter &painter)
 {
     auto  rects = getInnerRects();
-    LOG<<mDisablePoints[0][0]<<mDisablePoints[0][1]<<mDisablePoints[0][2]<<mDisablePoints[0][3]
-       <<mDisablePoints[1][0];
     // 绘制置灰的所有视野
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {

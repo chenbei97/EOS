@@ -116,14 +116,14 @@ void WellPattern::setDisablePoint(QCPoint point, bool enable)
 }
 
 void WellPattern::setDisablePoints(QCPointVector points, bool enable)
-{
+{// 对指定的有限坐标进行设置
     foreach(auto pt , points) {
        setDisablePoint(pt,enable);
     }
 }
 
 void WellPattern::setDisablePoints(bool enable)
-{
+{// 对所有的坐标进行设置
     for(int r = 0; r < mrows; ++r) {
         for(int c = 0; c < mcols; ++c) {
             mDisablePoints[r][c] = enable;

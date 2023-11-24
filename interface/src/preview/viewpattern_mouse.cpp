@@ -81,7 +81,6 @@ void ViewPattern::mouseReleaseEvent(QMouseEvent *event)
 { // 拖拽区域点个数为0才是预览事件(这里不能对applyall,applygroup,remove的使能操作)
 
     // 1. 点到边缘不能保存点
-    LOG<<mMousePoint;
     if (mMousePoint == QPoint(-1,-1) ){ // 右击不触发
         saveviewact->setEnabled(false);
         removeviewact->setEnabled(false);

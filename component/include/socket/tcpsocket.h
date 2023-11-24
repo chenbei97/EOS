@@ -27,6 +27,7 @@ private:
     void processMsgQueue();
     QTcpSocket * socket = nullptr;
     QByteQueue msgQueue;
+    QByteArray message;
     QString frame;
     EventLoop loop;
     QTimer timer;

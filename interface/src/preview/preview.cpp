@@ -61,10 +61,11 @@ void Preview::onWellbrandChanged(int option)
     } else {
         pattern->setDisablePoints(false);
     }
-    if (objective_descrip == NA20x05Field || objective_descrip == NA20x08Field) {
-        viewpattern->setDisablePoints(QPointVector()
-                                              <<QPoint(0,0)<<QPoint(0,1)<<QPoint(0,2)<<QPoint(0,3));
-    } else viewpattern->setDisablePoints(false);
+    if (objective_descrip == NA20x05Field)
+        viewpattern->setDisablePoints(NA20x05DisablePoints);
+    else if (objective_descrip == NA20x08Field)
+        viewpattern->setDisablePoints(NA20x08DisablePoints);
+    else viewpattern->setDisablePoints(false);
 }
 
 void Preview::onObjectiveChanged(const QString& obj)
@@ -104,10 +105,11 @@ void Preview::onObjectiveChanged(const QString& obj)
         pattern->setDisablePoint(QPoint(0,0),false);//默认只允许(0,0)可选
     } else  pattern->setDisablePoints(false);
 
-    if (obj == NA20x05Field || obj == NA20x08Field) {
-        viewpattern->setDisablePoints(QPointVector()
-         <<QPoint(0,0)<<QPoint(0,1)<<QPoint(0,2)<<QPoint(0,3));
-    } else viewpattern->setDisablePoints(false);
+    if (obj == NA20x05Field)
+        viewpattern->setDisablePoints(NA20x05DisablePoints);
+    else if (obj == NA20x08Field)
+        viewpattern->setDisablePoints(NA20x08DisablePoints);
+    else viewpattern->setDisablePoints(false);
 }
 
 void Preview::updateViewPatternUi()

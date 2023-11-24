@@ -22,7 +22,7 @@ void Preview::toggleObjective(int objective,int objective_loc,int isPh)
     SocketPointer->exec(TcpFramePool.toggleObjectiveEvent,msg, true);
 
     if (ParserResult.toBool()) {
-        LOG<<"toggle objective successful! multiple = "<<objective<<" isPH? "<<isPh;
+        LOG<<"toggle objective successful! magnification ="<<ObjectiveMagnificationFields[objective]<<"isPH? "<<isPh;
     } else {LOG<<"toggle objective failed!";}
 }
 

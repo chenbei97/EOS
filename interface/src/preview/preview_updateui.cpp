@@ -46,10 +46,11 @@ void Preview::updateViewWindow(const QVariantMap& m)
 
     // 6. 对NA物镜的特殊处理要放在最后,setStrategy会重新初始化视野尺寸
     auto objective_descrip = toolinfo[ObjectiveDescripField].toString();
-    if (objective_descrip == NA20x05Field || objective_descrip == NA20x08Field) {
-        viewpattern->setDisablePoints(QPointVector()
-                                              <<QPoint(0,0)<<QPoint(0,1)<<QPoint(0,2)<<QPoint(0,3));
-    } else viewpattern->setDisablePoints(false);
+    if (objective_descrip == NA20x05Field)
+        viewpattern->setDisablePoints(NA20x05DisablePoints);
+    else if (objective_descrip == NA20x08Field)
+        viewpattern->setDisablePoints(NA20x08DisablePoints);
+    else viewpattern->setDisablePoints(false);
 }
 
 void Preview::updateSetGroupWindow(const QVariantMap& m)

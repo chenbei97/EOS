@@ -430,16 +430,14 @@ void ViewPattern::setDisablePoint(QCPoint point, bool enable)
 }
 
 void ViewPattern::setDisablePoints(QCPointVector points, bool enable)
-{
+{ // 对指定的有限坐标设置
    foreach(auto pt , points) {
       setDisablePoint(pt,enable);
    }
-    LOG<<mDisablePoints[0][0]<<mDisablePoints[0][1]<<mDisablePoints[0][2]<<mDisablePoints[0][3]
-       <<mDisablePoints[1][0];
 }
 
 void ViewPattern::setDisablePoints(bool enable)
-{
+{ // 对所有的坐标进行设置
     for(int r = 0; r < mrows; ++r) {
         for(int c = 0; c < mcols; ++c) {
             mDisablePoints[r][c] = enable;

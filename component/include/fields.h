@@ -231,6 +231,13 @@ static const QFieldList ObjectiveSettingFields = {
 static const QFieldList ChannelFields = {
         BRField,PHField,GFPField,RFPField,DAPIField
 };
+// 其实还跟不同孔板规格有关系: 6,24,96,384孔板对于2个NA型号共8种设置应该,现在先这样简写
+static const QPointVector NA20x05DisablePoints = { // 对于NA0.5-20倍镜需要限制不能选择的视野坐标
+        QPoint(0,0),QPoint(0,1),QPoint(0,2),QPoint(0,3),
+};
+static const QPointVector NA20x08DisablePoints = { // 对于NA0.8-20倍镜需要限制不能选择的视野坐标
+        QPoint(0,0),QPoint(0,1),QPoint(0,2),QPoint(0,3),
+};
 
 // camerabox涉及的
 enum class ObjectiveLocationType {
@@ -261,6 +268,8 @@ static const char* FocusToolFocusLabel = "focus: ";
 static const char* FocusToolStepLabel = "step: ";
 static const char* FocusField = "focus";
 static const char* FocusxField = "Focus";
+static const char* StepField = "step";
+static const char* IsCoarseField = "isCoarse";
 static const char* FocusSkipHolesField = "skip holes";
 static const char* FocusSkipViewsField = "skip views";
 static const char* FocusSkipHolesLabelField = "skip holes: ";

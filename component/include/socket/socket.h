@@ -56,6 +56,7 @@ enum TcpEventType {
     StopExperEvent, // 停止实验事件
     ToggleObjectiveEvent, // 切换物镜动电机事件
     RecordVideoEvent, // 录制视频事件
+    ManualFocusEvent, // 手动聚焦事件
 };
 
 typedef struct { // 注册过的帧头命令
@@ -70,13 +71,14 @@ typedef struct { // 注册过的帧头命令
     const QString stopExperEvent = QString::number(StopExperEvent);
     const QString toggleObjectiveEvent = QString::number(ToggleObjectiveEvent);
     const QString recordVideoEvent = QString::number(RecordVideoEvent);
+    const QString manualFocusEvent = QString::number(ManualFocusEvent);
 } TcpFrameList;
 
 const QFieldList TcpUsedFrameList { // 用于解析时检测返回的帧是否正确,在这个列表内
         QString::number(PreviewEvent),QString::number(LoadExperEvent),QString::number(AskConnectedStateEvent),
         QString::number(AskActivateCodeEvent),QString::number(AdjustBrightEvent),QString::number(ToggleChannelEvent),
         QString::number(AdjustLensEvent),QString::number(MoveMachineEvent),QString::number(StopExperEvent),
-        QString::number(ToggleObjectiveEvent),QString::number(RecordVideoEvent),
+        QString::number(ToggleObjectiveEvent),QString::number(RecordVideoEvent),QString::number(ManualFocusEvent),
 };
 
 struct FieldPreviewEvent {
@@ -188,6 +190,10 @@ struct FieldRecordVideoEvent {
     const QString path = PathField;
     const QString video_format = VideoFormatField;
     const QString video_framerate = VideoFrameRateField;
+};
+
+struct FieldManualFocusEvent {
+    const QString focus = FocusField;
     const QString state = StateField;
 };
 
@@ -203,6 +209,7 @@ typedef struct {
     FieldStopExperEvent fieldStopExperEvent;
     FieldToggleObjectiveEvent fieldToggleObjectiveEvent;
     FieldRecordVideoEvent fieldRecordVideoEvent;
+    FieldManualFocusEvent fieldManualFocusEvent;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
@@ -565,9 +572,9 @@ static QByteArray assembleRecordVideoEvent(QCVariantMap m)
 static QVariant parseRecordVideoEvent(QCVariantMap m)
 {// 录制视频事件
     if (!m.keys().contains(FrameField)) return false;
-    if (!m.keys().contains(FieldRecordVideoEvent.state)) return false;
-    auto ret = m[StateField].toString();
-    return ret == OkField;
+    if (!m.keys().contains(FieldRecordVideoEvent.path)) return false;
+    auto path = m[FieldRecordVideoEvent.path].toString(); // 会回复合成xxx.avi所在路径
+    return path;
 }
 
 /*---------以下都是临时测试函数,以后可以注释掉-----------------*/
@@ -575,8 +582,8 @@ static QByteArray assemble_test0x0(QCVariantMap m)
 { // test0x0会传来x,y,frame字段
     QJsonObject object;
     object[FrameField] = "test0x0";
-    object["x"] = m["x"].toString();
-    object["y"] = m["y"].toString();
+    object[XField] = m[XField].toString();
+    object[YField] = m[YField].toString();
 
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
@@ -584,19 +591,19 @@ static QByteArray assemble_test0x0(QCVariantMap m)
 }
 static QVariant parse_test0x0(QCVariantMap m)
 {// test0x0会返回x,y,frame,path字段
-    if (!m.keys().contains("x")) return QVariant();
-    if (!m.keys().contains("y")) return QVariant();
-    if (!m.keys().contains("path")) return QVariant();
+    if (!m.keys().contains(XField)) return QVariant();
+    if (!m.keys().contains(YField)) return QVariant();
+    if (!m.keys().contains(PathField)) return QVariant();
     if (!m.keys().contains(FrameField)) return QVariant();
 
-    auto path = m["path"].toString();
+    auto path = m[PathField].toString();
     return path;
 }
 static QByteArray assemble_test0x1(QCVariantMap m)
 { // test0x1会传来equip,frame字段
     QJsonObject object;
     object[FrameField] = "test0x1";
-    object["equip"] = m["equip"].toString();
+    object[EquipField] = m[EquipField].toString();
 
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
@@ -604,10 +611,10 @@ static QByteArray assemble_test0x1(QCVariantMap m)
 }
 static QVariant parse_test0x1(QCVariantMap m)
 {// test0x1会返回equip,frame字段
-    if (!m.keys().contains("equip")) return QVariant();
+    if (!m.keys().contains(EquipField)) return QVariant();
     if (!m.keys().contains(FrameField)) return QVariant();
 
-    auto equip = m["equip"].toString();
+    auto equip = m[EquipField].toString();
     return equip;
 }
 /*---------以上都是临时测试函数,以后可以注释掉-----------------*/
