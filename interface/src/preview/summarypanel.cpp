@@ -27,6 +27,7 @@ void SummaryPanel::setData(const QVariantMap &m)
 #ifdef usetab
     auto experinfo = m[ExperToolField].value<QVariantMap>();
 #endif
+    auto estimatedSpace = m[EstimatedSpace].toString();
     edit->clear();
     QString indent = "      ";
     QString indent2x = indent+indent;
@@ -205,5 +206,13 @@ void SummaryPanel::setData(const QVariantMap &m)
             }
         }
 
+        //8.磁盘剩余可用空间和本次实验预计占据的空间
+        edit->append("");
+        edit->append(tr("<strong><font color = #20A848>[2]Disk Info:</font></strong>"));
+        foreach(auto p,systemDrivers()) {
+                edit->append(tr("<strong><font color = #FF1E27>\"%1\": totoal[%2MB] free[%3MB] percent[%4%]</font></strong>").arg(p).arg(
+                        getDiskSpace(p, false)).arg(getDiskSpace(p)).arg(100.0*getDiskSpace(p)/ getDiskSpace(p, false)));
+        }
+        edit->append(tr("<strong><font color = #FF1E27>estimated space: %1MB</font></strong>").arg(estimatedSpace));
     }
 }

@@ -20,11 +20,11 @@ void ViewPattern::drawSelectRect(QPainter &painter)
 
     if (mViewSelectPoints[idx].isEmpty()) return; // 删孔后清除缓存信息这里是空直接返回否则遍历越界
     auto  rects = getInnerRects();
-    // 绘制框选的所有孔
+    // 绘制框选的所有视野
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
             auto rect = rects[row][col];
-            if (mViewSelectPoints[idx][row][col]) {
+            if (mViewSelectPoints[idx][row][col] && !mDisablePoints[row][col]) { // 多层保护,不可选的视野不允许绘制
                 painter.fillRect(rect,groupcolor);
             }
 //            else { // 不加也行,就是删除点时候要恢复成白色,默认也是白色
@@ -38,23 +38,14 @@ void ViewPattern::drawDrapRect(QPainter &painter)
 {// 绘制推拽矩形框包含的小矩形区域
     auto  rects = getInnerRects();
 
-    // 绘制框选的所有孔
+    // 绘制框选的所有视野
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            if (mDrapPoints[row][col]) {
+            if (mDrapPoints[row][col] && !mDisablePoints[row][col]) { // 多层保护,不可选的视野不允许绘制
                 auto rect = rects[row][col];
                 painter.fillRect(rect,mMouseClickColor);
             }
         }
-    }
-    // 绘制框
-    if (!mDrapRect.isNull()) {
-        auto pen = painter.pen();
-        pen.setColor(Qt::blue);
-        painter.setPen(pen);
-        painter.drawRect(mDrapRect);
-        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
-        painter.setPen(pen);
     }
 }
 
@@ -114,6 +105,23 @@ void ViewPattern::drawCircle(QPainter &painter)
     painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
 }
 
+void ViewPattern::drawDisbaleRect(QPainter &painter)
+{
+    auto  rects = getInnerRects();
+    LOG<<mDisablePoints[0][0]<<mDisablePoints[0][1]<<mDisablePoints[0][2]<<mDisablePoints[0][3]
+       <<mDisablePoints[1][0];
+    // 绘制置灰的所有视野
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            if (mDisablePoints[row][col]) {
+                auto rect = rects[row][col];
+                painter.fillRect(rect,mGrayColor);
+                painter.drawLine(rect.topLeft(),rect.bottomRight());
+                painter.drawLine(rect.topRight(),rect.bottomLeft());
+            }
+        }
+    }
+}
 
 void ViewPattern::paintEvent(QPaintEvent *event)
 {
@@ -129,9 +137,21 @@ void ViewPattern::paintEvent(QPaintEvent *event)
         return;
     }
 
-    drawSelectRect(painter);
-    drawCircle(painter);
+
+    drawDrapRect(painter); // 1.绘制拖拽区域最前
+    drawSelectRect(painter); // 2. 被选中的高亮其次,要覆盖拖拽区域
+    drawDisbaleRect(painter); // 3. 置灰区域覆盖被选中的区域再其次
+    drawCircle(painter); // 4. 画线画圆防止被覆盖,最后
     drawInnerLine(painter);
-    drawDrapRect(painter);
+    // 绘制框,最后画防止被覆盖
+    if (!mDrapRect.isNull()) {
+        auto pen = painter.pen();
+        pen.setColor(Qt::blue);
+        painter.setPen(pen);
+        painter.drawRect(mDrapRect);
+        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
+        painter.setPen(pen);
+    }
+
     event->accept();
 }

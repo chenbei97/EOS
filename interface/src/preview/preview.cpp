@@ -33,9 +33,8 @@ void Preview::onWellbrandChanged(int option)
         case 3: pattern->setPatternSize(16,24);
             break;
     }
-
-    // 1.更新视野的尺寸
     auto toolinfo = previewtool->toolInfo();
+    // 1.更新视野的尺寸
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
@@ -53,13 +52,30 @@ void Preview::onWellbrandChanged(int option)
     dock->setWindowTitle(tr("Select Hole Inside View"));
 
     // 4.切换厂家setPattenSize已经都清理完了,无需再调用
+
+    // 5. 对NA物镜的特殊处理放最后,因为viewpattern->clearAllViewWindowCache被调用在前
+    auto objective_descrip = toolinfo[ObjectiveDescripField].toString();
+    if (objective_descrip == NA40x095Field) { // 只能选择1个孔
+        pattern->setDisablePoints();
+        pattern->setDisablePoint(QPoint(0,0),false);//默认只允许(0,0)可选
+    } else {
+        pattern->setDisablePoints(false);
+    }
+    if (objective_descrip == NA20x05Field || objective_descrip == NA20x08Field) {
+        viewpattern->setDisablePoints(QPointVector()
+                                              <<QPoint(0,0)<<QPoint(0,1)<<QPoint(0,2)<<QPoint(0,3));
+    } else viewpattern->setDisablePoints(false);
 }
 
 void Preview::onObjectiveChanged(const QString& obj)
 { // 切换物镜的尺寸,视野尺寸发生变化
     LOG<<"objective option = "<<obj;
+
     // 1.更新视野的尺寸
     auto toolinfo = previewtool->toolInfo();
+    //auto wellsize = WellsizeFields[toolinfo[WellsizeField].toInt()].toInt();
+    //auto patternSize = pattern->patternSize();
+    //Q_ASSERT(wellsize == (patternSize.width() * patternSize.height()));
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
@@ -81,6 +97,17 @@ void Preview::onObjectiveChanged(const QString& obj)
     } else {
         LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 无需清理";
     }
+
+    // 3. 对NA物镜的特殊处理要放在最后,因为上边的代码viewpattern->clearAllViewWindowCache会重新初始化视野尺寸
+    if (obj == NA40x095Field) { // 只能选择1个孔
+        pattern->setDisablePoints();
+        pattern->setDisablePoint(QPoint(0,0),false);//默认只允许(0,0)可选
+    } else  pattern->setDisablePoints(false);
+
+    if (obj == NA20x05Field || obj == NA20x08Field) {
+        viewpattern->setDisablePoints(QPointVector()
+         <<QPoint(0,0)<<QPoint(0,1)<<QPoint(0,2)<<QPoint(0,3));
+    } else viewpattern->setDisablePoints(false);
 }
 
 void Preview::updateViewPatternUi()

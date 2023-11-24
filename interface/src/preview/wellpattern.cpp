@@ -62,6 +62,7 @@ WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,col
     addAction(removeholeact);
     setContextMenuPolicy(Qt::ActionsContextMenu);
     initDrapPoints();
+    initDisablePoints();
     initHoleInfo();
 
     connect(setgroupact,&QAction::triggered,this,&WellPattern::onSetGroupAct);
@@ -73,6 +74,7 @@ void WellPattern::setPatternSize(int rows, int cols)
 {
     Pattern::setPatternSize(rows,cols);
     initDrapPoints();
+    initDisablePoints();
     initHoleInfo();
 }
 
@@ -91,12 +93,51 @@ void WellPattern::initDrapPoints()
     update();
 }
 
+void WellPattern::initDisablePoints()
+{
+    mDisablePoints.clear();
+    for(int row = 0 ; row < mrows; ++ row) {
+        QBoolVector var;
+        for (int col = 0; col < mcols; ++col){
+            var.append(false);
+        }
+        mDisablePoints.append(var);
+    }
+    update();
+}
+
+void WellPattern::setDisablePoint(QCPoint point, bool enable)
+{ // 2x3,x只能取0,1,y取0,1,2,不能取等号
+    if (point.x()< 0 || point.x() >= mrows // 防止越界,外部也有义务不许越界
+        || point.y()<0 || point.y() >= mcols)
+        return;
+    mDisablePoints[point.x()][point.y()] = enable;
+    update();
+}
+
+void WellPattern::setDisablePoints(QCPointVector points, bool enable)
+{
+    foreach(auto pt , points) {
+       setDisablePoint(pt,enable);
+    }
+}
+
+void WellPattern::setDisablePoints(bool enable)
+{
+    for(int r = 0; r < mrows; ++r) {
+        for(int c = 0; c < mcols; ++c) {
+            mDisablePoints[r][c] = enable;
+        }
+    }
+    update();
+}
+
 int WellPattern::drapPointCount() const
 { // 计算拖拽区域包含的点个数
     int count = 0;
     for(int r = 0; r < mrows; ++ r) {
         for(int c = 0; c < mcols; ++c) {
-            if (mDrapPoints[r][c])
+            if (mDrapPoints[r][c] && !mDisablePoints[r][c])
                 count++;
         }
     }
@@ -108,7 +149,8 @@ int WellPattern::numberOfViews() const
     int count = 0;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            if (mHoleInfo[row][col].isselected)
+            if (mHoleInfo[row][col].isselected
+            && !mDisablePoints[row][col])// 多层保护没坏处,虽然置灰点mHoleInfo对应的isselected一定是false
                 count += mHoleInfo[row][col].viewpoints.count();
         }
     }
@@ -118,7 +160,8 @@ int WellPattern::numberOfViews() const
 int WellPattern::numberOfViews(const QPoint &holepoint)
 { // 外部调用holepoint有义务不越界
     int count = 0;
-    if (mHoleInfo[holepoint.x()][holepoint.y()].isselected)
+    if (mHoleInfo[holepoint.x()][holepoint.y()].isselected &&
+        !mDisablePoints[holepoint.x()][holepoint.y()]) // 多层保护没坏处,虽然置灰点mHoleInfo对应的isselected一定是false
         count = mHoleInfo[holepoint.x()][holepoint.y()].viewpoints.count();
     return count;
 }
@@ -128,7 +171,9 @@ int WellPattern::numberOfViews(const QString &group)
     int count = 0;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            if (mHoleInfo[row][col].isselected && mHoleInfo[row][col].group == group)
+            if (mHoleInfo[row][col].isselected
+                && mHoleInfo[row][col].group == group
+                && !mDisablePoints[row][col]) // 多层保护没坏处,虽然置灰点mHoleInfo对应的isselected一定是false
                 count += mHoleInfo[row][col].viewpoints.count();
         }
     }
@@ -143,7 +188,7 @@ QSet<QString> WellPattern::getAllWellGroupNames() const
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){
             auto gname = mHoleInfo[row][col].group;
-            if (!gname.isEmpty()) {
+            if (!gname.isEmpty() && !mDisablePoints[row][col]) {
                 map[gname]++;
                 set.insert(gname);
             }
@@ -162,7 +207,7 @@ QPointVector WellPattern::getHoleGroupCoordinates(const QString &groupName) cons
     for(int r = 0; r < mrows; ++r) {
         for(int c = 0; c < mcols; ++c) {
             auto holeinfo = mHoleInfo[r][c];
-            if (holeinfo.group == groupName) {
+            if (holeinfo.group == groupName && !mDisablePoints[r][c]) {
                 vec.append(holeinfo.coordinate);
             }
         }
@@ -214,7 +259,7 @@ void WellPattern::initHoleInfo()
 }
 
 void WellPattern::clearAllHoleViewPoints()
-{
+{ // 切换物镜时调用,需要清理掉视野窗口映射的2个信息
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
             mHoleInfo[row][col].viewpoints = QPointVector();

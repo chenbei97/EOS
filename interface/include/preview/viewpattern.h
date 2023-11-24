@@ -15,6 +15,9 @@ public:
     void clearViewWindowCache(const QPoint& holepoint);
     void clearAllViewWindowCache(int viewsize);
     void updateViewWindowCache(QCPoint holepoint,QCPointVector viewpoints,int viewsize);
+    void setDisablePoints(bool enable = true);
+    void setDisablePoint(QCPoint point,bool enable = true);
+    void setDisablePoints(QCPointVector points, bool enable = true);
 private: // 动作菜单
     DrawStrategy strategy = NoStrategy;
     QVariantMap mCurrentViewInfo;
@@ -39,13 +42,16 @@ private:
 
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true
+    QBool2DVector mDisablePoints; // 置灰区域,不可选的区域
     void initDrapPoints(); // 拖拽结束后清除这些点
+    void initDisablePoints(); // 初始化置灰区域
     int drapPointCount() const;// 计算拖拽区域包含的点个数
 
 public: // 鼠标事件,viewpattern_mouse.cpp
     QPoint mMousePoint = QPoint(-1,-1);
     QPoint mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
     QColor mMouseClickColor = Qt::green;
+    QColor mGrayColor = Qt::gray;
     void mousePressEvent(QMouseEvent *event) override;// 左键点击清除框选,计算鼠标点击的小矩形区域坐标
     void mouseMoveEvent(QMouseEvent *event) override;// 绘制拖拽框
     void mouseReleaseEvent(QMouseEvent *event) override;// 拖拽区域点个数为0才是预览事件
@@ -55,6 +61,7 @@ public:// 绘图的函数,定义在viewpattern_paint.cpp
 private:
     void drawDrapRect(QPainter&painter);// 绘制推拽矩形框包含的小矩形区域
     void drawSelectRect(QPainter&painter); // 根据当前孔的组颜色去绘制视野已经被选择的小矩形区域
+    void drawDisbaleRect(QPainter&painter); // 绘制置灰区域
     void drawCircle(QPainter&painter); // 画窗口的内接圆
     void drawInnerLine(QPainter&painter); // 画窗口的线区分出小矩形区域
 

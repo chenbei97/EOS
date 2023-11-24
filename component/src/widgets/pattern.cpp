@@ -212,6 +212,11 @@ void Pattern::setPatternSize(int rows,int cols)
     update();
 }
 
+QSize Pattern::patternSize() const
+{
+    return QSize(mrows,mcols);
+}
+
 void Pattern::clearMousePoint()
 {
     mMousePos = QPoint(-1,-1);

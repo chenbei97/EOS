@@ -17,13 +17,23 @@ void WellPattern::mouseReleaseEvent(QMouseEvent *event)
         if (mMousePos == QPoint(-1,-1)){
             openviewact->setEnabled(false);
             setgroupact->setEnabled(false);
+            removeholeact->setEnabled(false);
             return;
         }
 
-        // 2. 不点到边缘位置就可以分组
-        setgroupact->setEnabled(true);
+        // 2.点到不可选的孔也不能打开
+        if (mDisablePoints[mMousePos.x()][mMousePos.y()]) {
+            openviewact->setEnabled(false);
+            setgroupact->setEnabled(false);
+            removeholeact->setEnabled(false);
+            return;
+        }
 
-        // 3. 框选的数量大于1个不允许打开视野动作使能,打开视野只能基于特定孔打开
+        // 3. 点到其它可用的孔且非边缘位置就可以打开分组窗口
+        setgroupact->setEnabled(true);
+        removeholeact->setEnabled(true);
+
+        // 4. 框选的数量大于1个不允许打开视野动作使能,打开视野只能基于特定孔打开
         int count = drapPointCount();
         if (count > 1) // 只框选了1个不会弹
             openviewact->setEnabled(false);
@@ -43,8 +53,9 @@ void WellPattern::mouseMoveEvent(QMouseEvent *event)
             auto rects = getChildRects();
             for(int row = 0; row < mrows; ++row)
                 for(int col = 0; col < mcols; ++col) {
-                    if(mDrapRect.intersects(rects[row][col])){ // 小矩形区域在这个推拽区域内有交集
-                        mDrapPoints[row][col] = true;
+                    if(mDrapRect.intersects(rects[row][col])// 小矩形区域在这个推拽区域内有交集
+                        && !mDisablePoints[row][col]){ // 根源在mDrapPoints直接限制好,paintEvent不加
+                        mDrapPoints[row][col] = true; //!mDisablePoints[row][col]判断也可以
                     }
                 }
 
@@ -71,5 +82,16 @@ void WellPattern::mousePressEvent(QMouseEvent *event)
 void WellPattern::mouseDoubleClickEvent(QMouseEvent*event)
 { // 双击也能打开视野窗口
     Pattern::mouseDoubleClickEvent(event);
+
+    // 点到不可选的孔也不能打开,这样wellpattern的限制就禁止了viewpattern的打开,viewpattern不再需要针对置灰功能写逻辑
+    if (mDisablePoints[mMousePos.x()][mMousePos.y()]) {
+        openviewact->setEnabled(false);
+        setgroupact->setEnabled(false);
+        removeholeact->setEnabled(false);
+        return;
+    }
+    openviewact->setEnabled(true);
+    setgroupact->setEnabled(true);
+    removeholeact->setEnabled(true);
     openviewact->trigger(); // 触发一下
 }

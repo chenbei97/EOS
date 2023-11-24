@@ -75,23 +75,27 @@ void WellPattern::paintEvent(QPaintEvent *event)
                                    mGap+cell_h/2+mSpace+(cell_h+mSpace)*row);
             // (1) 绘制鼠标点击的高亮
             //启用了鼠标事件mMousePos才会被赋值,否则是(-1,-1),所以这里不用再判断是否启用了鼠标事件
-            if (mMousePos.x() == row && mMousePos.y() == col && !mHoleInfo[row][col].isselected) {
-                path.clear(); // 已绘制的点不要绘制鼠标选中高亮
+            if (mMousePos.x() == row && mMousePos.y() == col
+                && !mHoleInfo[row][col].isselected// 已绘制的点不要绘制鼠标选中高亮
+                && !mDisablePoints[row][col]) { // 置灰不可选的点不要绘制鼠标高亮
+                path.clear();
                 path.moveTo(center);
                 path.addEllipse(center, radius * 0.75, radius * 0.75);
                 painter.fillPath(path, mMouseClickColor);
             }
 
             // (2) 绘制框选的所有孔
-            if (mDrapPoints[row][col]) { // && !mHoleInfo[row][col].isSelected 绘制拖拽临时的点,如果有已被选中的不需要再绘制
-                path.clear(); // 不过这样取消选中时不能绘制拖拽的点感受不好,还是恢复
+            if (mDrapPoints[row][col]
+                // && !mHoleInfo[row][col].isSelected //绘制拖拽临时的点,如果有已被选中的不需要再绘制,不过这样取消选中时不能绘制拖拽的点感受不好,还是恢复
+                && !mDisablePoints[row][col]) {  // 不可选的孔不允许绘制
+                path.clear(); //
                 path.moveTo(center);
                 path.addEllipse(center, radius * 0.75, radius * 0.75);
                 painter.fillPath(path, mMouseClickColor);
             }
 
             // (3) 绘制确实选中的孔和绘制孔内选中的点
-            if (mHoleInfo[row][col].isselected) //  绘制确定选中的点
+            if (mHoleInfo[row][col].isselected && !mDisablePoints[row][col]) //  绘制确定选中的点,不可选的孔不允许绘制
             {
                 // (3.1) 绘制确实选中的孔
                 path.clear();
@@ -137,10 +141,23 @@ void WellPattern::paintEvent(QPaintEvent *event)
                 }
             }
 
+            // (4) 绘制不可选置灰的点,将其高亮颜色变为灰色,并画个x
+            if (mDisablePoints[row][col]) {
+                path.clear();
+                path.moveTo(center);
+                path.addEllipse(center,radius,radius);
+                painter.fillPath(path,mInnerCircleColor);
 
+                auto p11 = center + QPointF(radius*sqrt(2)/2,-radius* sqrt(2)/2);
+                auto p12 = center - QPointF(radius*sqrt(2)/2,-radius* sqrt(2)/2);
+                auto p21 = center + QPointF(radius*sqrt(2)/2,radius* sqrt(2)/2);
+                auto p22 = center - QPointF(radius*sqrt(2)/2,radius* sqrt(2)/2);
+                painter.drawLine(p11,p12);
+                painter.drawLine(p21,p22);
+            }
         }
     }
-    // (4) 绘制框选框(放最后画,防止被填充颜色覆盖)
+    // (5) 绘制框选框(放最后画,防止被填充颜色覆盖)
     if (!mDrapRect.isNull()) {
         auto pen = painter.pen();
         pen.setColor(Qt::blue);

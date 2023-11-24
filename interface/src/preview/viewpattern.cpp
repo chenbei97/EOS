@@ -42,6 +42,7 @@ void ViewPattern::setStrategy(ViewPattern::DrawStrategy s, const QVariantMap& m)
     mrows = size.width();
     mcols = size.height();
     initDrapPoints();// 先更新尺寸
+    initDisablePoints(); // 初始化置灰区域
     initSelectPoints();// 才能基于尺寸更新视野已被选择的信息(上次设置的临时信息)
 
     // 4.更新应用到本组的使能,未分过组或者分过组但是没选过视野
@@ -58,11 +59,11 @@ void ViewPattern::setStrategy(ViewPattern::DrawStrategy s, const QVariantMap& m)
 }
 
 void ViewPattern::clearViewWindowCache(const QPoint &holepoint)
-{ // 删孔时清除该孔的缓存信息
+{ // 删孔时清除该孔对应的视野缓存信息
     // 1. 计算这个孔的id
     auto idx = holepoint.x()*PointToIDCoefficient+holepoint.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
 
-    // 此时点击视野坐标会越界所以还是需要重新分配空间
+    // 2.此时点击视野坐标会越界所以还是需要重新分配空间
     QBool2DVector vec;
     for(int row = 0 ; row < mrows; ++ row) {
         QBoolVector var;
@@ -94,6 +95,7 @@ void ViewPattern::clearAllViewWindowCache(int viewsize)
     mrows = viewsize;
     mcols = viewsize;
     initDrapPoints();
+    initDisablePoints();
     initSelectPoints();
     update();
 }
@@ -104,6 +106,7 @@ void ViewPattern::updateViewWindowCache(QCPoint holepoint, QCPointVector viewpoi
     mrows = viewsize;
     mcols = viewsize;
     initDrapPoints();
+    initDisablePoints();
     initSelectPoints();
 
     auto coordinate = mCurrentViewInfo[HoleCoordinateField].toPoint();
@@ -116,15 +119,15 @@ void ViewPattern::updateViewWindowCache(QCPoint holepoint, QCPointVector viewpoi
 }
 
 void ViewPattern::onSaveViewAct()
-{ // 保存选择的视野到当前孔id对应的视野数据区并保存到临时信息用于initSelectPoints重新初始化
+{ // 保存选择的视野坐标到当前孔id对应的视野数据区并保存到临时信息用于initSelectPoints重新初始化
 
     // 1. 计算当前孔的唯一id
     auto coordinate = mCurrentViewInfo[HoleCoordinateField].toPoint();
     auto idx = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
     bool haveSelect = false; // 是否至少选了1个视野,viewPointCount()计算也可以,这里少做次循环
 
-    // 2. 防止框选时鼠标点击的地方漏掉,鼠标点击的坐标也要认为是框选上,一层保障
-    if (mMousePoint != QPoint(-1,-1)) {
+    // 2. 防止框选时鼠标点击的地方漏掉,鼠标点击的坐标也要认为是框选上,一层保障,非禁用坐标
+    if (mMousePoint != QPoint(-1,-1) && !mDisablePoints[mMousePoint.x()][mMousePoint.y()]) {
         mViewSelectPoints[idx][mMousePoint.x()][mMousePoint.y()] = true;
         haveSelect = true;
         mDrapPoints[mMousePoint.x()][mMousePoint.y()] = false;
@@ -133,7 +136,7 @@ void ViewPattern::onSaveViewAct()
     // 3. 把框选区域的视野保存,然后清除框选区域
     for(int r = 0; r < mrows; ++r) {
         for(int c = 0; c < mcols; ++c) {
-            if (mDrapPoints[r][c]) {
+            if (mDrapPoints[r][c] && !mDisablePoints[r][c]) { // 多层保护 灰色坐标不可选中
                 mDrapPoints[r][c] = false;
                 mViewSelectPoints[idx][r][c] = true;
                 haveSelect = true;
@@ -160,7 +163,7 @@ void ViewPattern::onSaveViewAct()
 void ViewPattern::onRemoveViewAct()
 {
     // 1.判断是否允许删点
-    if (mMousePoint==QPoint(-1,-1) || !viewPointCount())
+    if (mMousePoint==QPoint(-1,-1) || !viewPointCount() || mDisablePoints[mMousePoint.x()][mMousePoint.y()])
         return; // 一层保障
 
     // 2. 计算当前孔的唯一id拿到当前孔对应视野信息
@@ -172,7 +175,7 @@ void ViewPattern::onRemoveViewAct()
     currentviewinfo[mMousePoint.x()][mMousePoint.y()] = false;
     for(int r = 0; r < mrows; ++r) { // 鼠标+框选的都可以删除
         for(int c = 0; c < mcols; ++c) {
-            if (mDrapPoints[r][c]) {
+            if (mDrapPoints[r][c] && !mDisablePoints[r][c]) { // 多层保护,灰色坐标不可更新
                 currentviewinfo[r][c] = false;
                 mDrapPoints[r][c] = false;
             }
@@ -215,7 +218,7 @@ void ViewPattern::onApplyHoleAct()
     QPointVector viewpoints;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            if (mViewSelectPoints[idx][row][col]) {
+            if (mViewSelectPoints[idx][row][col] && !mDisablePoints[row][col]) { // 为true的是被选中的且不能是灰色区域的
                 viewpoints.append(QPoint(row,col)); // 当前孔选择的全部视野坐标
             }
         }
@@ -248,7 +251,7 @@ void ViewPattern::onApplyGroupAct()
     QPointVector viewpoints;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            if (mViewSelectPoints[idx][row][col]) {
+            if (mViewSelectPoints[idx][row][col] && !mDisablePoints[row][col]) { // 为true选中的且不是灰色区域的
                 viewpoints.append(QPoint(row,col)); // 当前孔选择的全部视野坐标
             }
         }
@@ -269,7 +272,7 @@ void ViewPattern::onApplyGroupAct()
     }
     for(int r = 0; r < mrows; ++r) {
         for(int c = 0; c < mcols; ++c) {
-            if (mViewSelectPoints[idx][r][c]) {// 使用当前孔的视野信息更新
+            if (mViewSelectPoints[idx][r][c] && !mDisablePoints[r][c]) {// 使用当前孔的视野信息更新
                 vec[r][c] = true;
             }
         }
@@ -303,7 +306,7 @@ void ViewPattern::onApplyAllAct()
     QPointVector viewpoints;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            if (mViewSelectPoints[idx][row][col]) {
+            if (mViewSelectPoints[idx][row][col] && !mDisablePoints[row][col]) { // 被选中的且不是灰色区域的视野
                 viewpoints.append(QPoint(row,col)); // 当前孔选择的全部视野坐标
             }
         }
@@ -317,7 +320,7 @@ void ViewPattern::onApplyAllAct()
         QBoolVector var;
         for (int col = 0; col < mcols; ++col){
             var.append(false);
-            if(mViewSelectPoints[idx][row][col]) {
+            if(mViewSelectPoints[idx][row][col] && !mDisablePoints[row][col]) {
                 var[col] = true; // 优化一下变成1个循环
             }
         }
@@ -325,7 +328,7 @@ void ViewPattern::onApplyAllAct()
     }
 //    for(int r = 0; r < mrows; ++r) {
 //        for(int c = 0; c < mcols; ++c) {
-//            if (mViewSelectPoints[idx][r][c]) {// 使用当前孔的视野信息更新
+//            if (mViewSelectPoints[idx][r][c] && !mDisablePoints[r][c]) {// 使用当前孔的视野信息更新
 //                vec[r][c] = true;
 //            }
 //        }
@@ -382,7 +385,7 @@ int ViewPattern::viewPointCount() const
     int count = 0;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            if (viewinfo[row][col]) { // 视野被选择过的数量
+            if (viewinfo[row][col] && !mDisablePoints[row][col]) { // 视野被选择过的数量,多层保护不包含灰色区域的
                 count++;
             }
         }
@@ -404,12 +407,53 @@ void ViewPattern::initDrapPoints()
     update();
 }
 
+void ViewPattern::initDisablePoints()
+{
+    mDisablePoints.clear();
+    for(int row = 0 ; row < mrows; ++ row) {
+        QBoolVector var;
+        for (int col = 0; col < mcols; ++col){
+            var.append(false);
+        }
+        mDisablePoints.append(var);
+    }
+    update();
+}
+
+void ViewPattern::setDisablePoint(QCPoint point, bool enable)
+{ // 2x3,x只能取0,1,y取0,1,2,不能取等号
+    if (point.x()< 0 || point.x() >= mrows // 防止越界,外部也有义务不许越界
+        || point.y()<0 || point.y() >= mcols)
+        return;
+    mDisablePoints[point.x()][point.y()] = enable;
+    update();
+}
+
+void ViewPattern::setDisablePoints(QCPointVector points, bool enable)
+{
+   foreach(auto pt , points) {
+      setDisablePoint(pt,enable);
+   }
+    LOG<<mDisablePoints[0][0]<<mDisablePoints[0][1]<<mDisablePoints[0][2]<<mDisablePoints[0][3]
+       <<mDisablePoints[1][0];
+}
+
+void ViewPattern::setDisablePoints(bool enable)
+{
+    for(int r = 0; r < mrows; ++r) {
+        for(int c = 0; c < mcols; ++c) {
+            mDisablePoints[r][c] = enable;
+        }
+    }
+    update();
+}
+
 int ViewPattern::drapPointCount() const
 { // 计算拖拽区域包含的点个数
     int count = 0;
     for(int r = 0; r < mrows; ++ r) {
         for(int c = 0; c < mcols; ++c) {
-            if (mDrapPoints[r][c])
+            if (mDrapPoints[r][c] && !mDisablePoints[r][c])
                 count++;
         }
     }
@@ -429,7 +473,9 @@ ViewPattern::ViewPattern(QWidget *parent) : QWidget(parent)
     mMousePoint = QPoint(-1,-1);
     mLastPos = {-1,-1};
     mMouseClickColor.setAlpha(DefaultColorAlpha);
+    mGrayColor.setAlpha(DefaultColorAlpha);
     //initDrapPoints();// 无需调用,构造出来默认不会有拖拽框
+    //initDisablePoints(); // 不需要在这初始化,因为mrows,mcols都是0
     //initSelectPoints();//无需调用,因为当前孔未知
     saveviewact = new QAction(tr("Selecting Points"));
     removeviewact = new QAction(tr("Remove Points"));

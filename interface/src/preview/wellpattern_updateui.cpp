@@ -46,7 +46,7 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){
             auto pt = mDrapPoints[row][col]; // 右击分组时当前拖拽区域内的点是一组
-            if (pt){ // 是拖拽区域的
+            if (pt && !mDisablePoints[row][col]){ // 是拖拽区域的(拖拽区域已经不会包含置灰的不可选的孔,mouseMoveEvent已经对其限制),不过多一层保护没坏处
                 mHoleInfo[row][col].isselected = true;//框选内对应的点都设为选中
                 mHoleInfo[row][col].group = gname; // 名称是分组窗口设置的分组
                 mHoleInfo[row][col].color = gcolor; // 颜色跟随分组窗口设置的颜色
@@ -67,7 +67,8 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
     }
 
     // 2. 框选的时候会遗漏鼠标当前选中的点
-    if (mMousePos != QPoint(-1,-1)) {// 没启用鼠标事件或者点击外围,这是{-1,-1}会越界
+    if (mMousePos != QPoint(-1,-1) && !mDisablePoints[mMousePos.x()][mMousePos.y()]) {// 没启用鼠标事件或者点击外围,这是{-1,-1}会越界
+        // 注意2个判断先后顺序,如果是-1,-1就返回了,编译器不会执行后边的判断也就不会越界
         mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = true; // 鼠标点击的这个
         mHoleInfo[mMousePos.x()][mMousePos.y()].color = gcolor;
         mHoleInfo[mMousePos.x()][mMousePos.y()].group = gname;

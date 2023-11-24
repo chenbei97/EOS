@@ -21,6 +21,11 @@ public:
 
     void setPatternSize(int rows,int cols) override;
     void initDrapPoints(); // 清除拖拽区域
+    void initDisablePoints(); // 初始化置灰区域
+    void setDisablePoints(bool enable = true);
+    void setDisablePoint(QCPoint point,bool enable = true);
+    void setDisablePoints(QCPointVector points, bool enable = true);
+
     int drapPointCount() const; // 计算拖拽区域包含的点个数
     void initHoleInfo(); // 初始化孔信息
     void clearAllHoleViewPoints();
@@ -43,11 +48,13 @@ public:
     void updateHoleInfoByViewInfoApplyHole(QCVariantMap m); // 删点保存点的映射
     void updateHoleInfoByViewInfoApplyGroup(QCVariantMap m); // 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
     void updateHoleInfoByViewInfoApplyAll(QCVariantMap m);
-private:
+
+protected:
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true
+    QBool2DVector mDisablePoints; // 置灰区域,不可选的区域
     QHoleInfo2DVector mHoleInfo; // 每个孔的所有信息用结构体封装
-private:
+protected:
     QAction * setgroupact;
     QAction * openviewact;
     QAction * removeholeact;

@@ -43,6 +43,13 @@ void Preview::updateViewWindow(const QVariantMap& m)
     if (point == QPoint(-1,-1))
         viewpattern->setStrategy(ViewPattern::NoStrategy);
     else viewpattern->setStrategy(ViewPattern::InnerCircleRect,nm);//⭐⭐⭐⭐ 把图案的信息传给视野窗口
+
+    // 6. 对NA物镜的特殊处理要放在最后,setStrategy会重新初始化视野尺寸
+    auto objective_descrip = toolinfo[ObjectiveDescripField].toString();
+    if (objective_descrip == NA20x05Field || objective_descrip == NA20x08Field) {
+        viewpattern->setDisablePoints(QPointVector()
+                                              <<QPoint(0,0)<<QPoint(0,1)<<QPoint(0,2)<<QPoint(0,3));
+    } else viewpattern->setDisablePoints(false);
 }
 
 void Preview::updateSetGroupWindow(const QVariantMap& m)

@@ -358,12 +358,13 @@ void Preview::loadExper()
 #ifdef usetab
     auto channels = experinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
 #else
-    auto channels = previewinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
+    auto channels = previewinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts)
 #endif
     auto totalViews = pattern->numberOfViews();
     auto totalChannels = channels.count("1"); // 为1的是勾选上的
-    auto estimateSpace = calculateExperSpaceGB(totalViews,totalChannels);
+    auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
     LOG<<"totalViews = "<<totalViews<<"totalChannels = "<<totalChannels<<" estimateSpace = "<<estimateSpace;
+    previewinfo[EstimatedSpace] = estimateSpace;
 
     auto dlg = new SummaryDialog(previewinfo);
     setWindowAlignCenter(dlg);

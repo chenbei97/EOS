@@ -21,6 +21,7 @@ class COMPONENT_IMEXPORT Pattern : public QWidget
 public:
     explicit Pattern(int rows, int cols,QWidget*parent= nullptr);
     virtual void setPatternSize(int rows,int cols);
+    QSize patternSize() const;
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent*event) override;

@@ -197,7 +197,7 @@ void ChannelBoxx::takePhoto(const QImage &img, const QString &channel)
 
 void ChannelBoxx::disableChannel(const QString &obj)
 { // obj = br10x, ph4x是兼容的老式字符串
-    LOG<<"objective = "<<obj;
+    //LOG<<"objective = "<<obj;
     if (obj.contains(ObjectiveBR)) {
         phbtn->setEnabled(false);
         phbtn->resetBackGroundColor();
