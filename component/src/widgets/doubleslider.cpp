@@ -25,7 +25,7 @@ DoubleSlider::DoubleSlider(QWidget *parent) : QWidget(parent)
     setLayout(hlay);
 
     connect(slider,&QSlider::sliderMoved,this,&DoubleSlider::onSliderChanged);
-    connect(slider,&QSlider::sliderMoved,this,&DoubleSlider::valueChanged);
+    connect(slider,&QSlider::sliderPressed,this,&DoubleSlider::sliderPressed);
 }
 
 void DoubleSlider::setDirection(Qt::Orientation orientation)
@@ -45,6 +45,7 @@ void DoubleSlider::onSliderChanged(int val)
     auto text = QString("%1 %2").arg(s).arg(suffixtext);
     accumulateval = val;
     suffix->setText(text);
+    emit valueChanged(accumulateval);
 }
 
 void DoubleSlider::setRange(int min,int max)
@@ -84,6 +85,7 @@ void DoubleSlider::setValue(double val)
     slider->blockSignals(true);
     setValue((int)accumulateval-1);
     slider->blockSignals(false);
+    emit valueChanged(accumulateval);
 }
 
 void DoubleSlider::setValue(int value)
@@ -98,7 +100,7 @@ void DoubleSlider::setValue(int value)
 }
 
 void DoubleSlider::addValue(double val)
-{
+{ // 浮点数很大的时候会出现被系统丢去精度
 #ifdef DoubleVeryBig
     double intpart, fracpart;
     fracpart = modf(val,&intpart);
@@ -133,6 +135,7 @@ void DoubleSlider::addValue(double val)
     slider->blockSignals(true); // 防止触发slidermove信号,这个是int的会重新设置suffix
     setValue((int)accumulateval-1);
     slider->blockSignals(false);
+    emit valueChanged(accumulateval);
 }
 
 void DoubleSlider::subtractValue(double val)
@@ -166,4 +169,5 @@ void DoubleSlider::subtractValue(double val)
     slider->blockSignals(true);
     setValue((int)accumulateval+1);
     slider->blockSignals(false);
+    emit valueChanged(accumulateval);
 }

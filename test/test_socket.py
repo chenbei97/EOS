@@ -25,6 +25,7 @@ class ParseManager:
         self.x = "x"
         self.stop = "stop"
         self.y = "y"
+        self.focus = "focus"
         self.brand = "brand"
         self.equip = "equip"
         self.path = "path"
@@ -64,6 +65,7 @@ class ParseManager:
             "8": self.__parse0x0008,
             "9": self.__parse0x0009,
             "10": self.__parse0x0010,
+            "11": self.__parse0x0011,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -231,6 +233,17 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0010回复: ", reponse)
+        self.__socket.sendall(response.encode("utf-8"))
+
+    def __parse0x0011(self,msg:dict): # 手动调焦事件
+        frame = msg[self.frame]
+        focus = msg[self.focus]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.state] = "ok"
+        response = json.dumps(reponse)
+        response += self.separate
+        print("0x0011回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
 class SocketServerManger:

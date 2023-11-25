@@ -18,6 +18,7 @@ private:
     QEventLoop loop;
 public:
     explicit EventLoop(QObject *parent = nullptr);
+    bool isRunning() const;
 public slots:
     void quit();
     void exec();

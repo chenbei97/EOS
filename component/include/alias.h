@@ -101,6 +101,8 @@ typedef QVector<QVector<QBoolColorPair>> QBoolColorPair2DVector;
 typedef const QVector<QVector<QBoolColorPair>>& QCBoolColorPair2DVector;
 
 typedef QQueue<QByteArray> QByteQueue;
+typedef QPair<QString,QByteArray> QRequestMsg;
+typedef QQueue<QRequestMsg> QRequestQueue;
 typedef const QVariantMap& QCVariantMap;
 typedef QVariant(*TcpParseFuncPointer)(QCVariantMap m);
 typedef QByteArray(*TcpAssembleFuncPointer)(QCVariantMap m);

@@ -22,7 +22,10 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     connect(pattern,&TriangleMove::topTriangleClicked,this,&FocusBox::topMove);
     connect(pattern,&TriangleMove::bottomTriangleClicked,this,&FocusBox::bottomMove);
     connect(pattern,&TriangleMove::triangleClicked,this,&FocusBox::directionMove);
-    setTitle(tr("Focus"));
+    connect(slider,&DoubleSlider::valueChanged,this,&FocusBox::valueChanged);
+    connect(slider,&DoubleSlider::sliderPressed,this,&FocusBox::sliderPressed);
+
+    setTitle(tr(FocusBoxTitle));
 }
 
 void FocusBox::onAutoFocus()
@@ -95,8 +98,8 @@ void FocusBox::initLayout()
 
 void FocusBox::initObjects()
 {
-    pattern = new TriangleMove;
-    autofocusbtn = new PushButton(tr("auto focus"));
+    pattern = new TriangleMove; // 懒得删代码了
+    autofocusbtn = new PushButton(tr(AutoFocusField));
 
     slider = new DoubleSlider;
     step = new SpinBox(true);

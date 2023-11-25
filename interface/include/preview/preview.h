@@ -111,6 +111,7 @@ private:
     void adjustCamera(int exp,int gain,int br);
     void onAdjustCamera(const QString &f,const QVariant & d);
     void adjustLens(int option);
+    void manualFocus(double val);
     void toggleChannel(int option);
     void previewViewByClickView(const QPoint& viewpoint);
     void previewViewByClickHole(const QPoint& holepoint);

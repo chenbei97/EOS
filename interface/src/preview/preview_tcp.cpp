@@ -8,8 +8,23 @@
  */
 #include "preview.h"
 
+void Preview::manualFocus(double val)
+{ // 手动调焦,来自focusslider的信号,目前是移动滑动条时就会触发,点击2个细调按钮也会触发
+    //LOG<<"focus = "<<val;
+    QVariantMap m;
+    m[FocusField] = val;
+    m[FrameField] = TcpFramePool.manualFocusEvent;
+    auto msg = assembleManualFocusEvent(m);
+    SocketPointer->exec(TcpFramePool.manualFocusEvent,msg, true);
+    if (ParserResult.toBool()) {
+        LOG<<"adjust focus to "<<val<<"successful!";
+    }
+}
+
 void Preview::toggleObjective(int objective,int objective_loc,int isPh)
 { // objective: 物镜倍数代号 objective_loc: 切到的物镜位置代号 isPH:指示是否为PH类型
+    // 这个初始化setting时会初始化4个位置的物镜,从而会触发本函数,在mainwindow没构造完成就发了命令,故需要invokeMethod立即处理
+    // 其它的函数不需要invokeMethod,本函数特殊
     //LOG<<"objective = "<<objective<<" loc = "<<objective_loc<<" isph = "<<isPh;
     QVariantMap m;
     m[ObjectiveField] = objective;
@@ -20,7 +35,7 @@ void Preview::toggleObjective(int objective,int objective_loc,int isPh)
     auto msg = AssemblerPointer->message();
 
     SocketPointer->exec(TcpFramePool.toggleObjectiveEvent,msg, true);
-
+    QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
     if (ParserResult.toBool()) {
         LOG<<"toggle objective successful! magnification ="<<ObjectiveMagnificationFields[objective]<<"isPH? "<<isPh;
     } else {LOG<<"toggle objective failed!";}
@@ -105,16 +120,24 @@ void Preview::adjustCamera(int exp,int gain,int br)
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());;
 
-    // 发送消息异步发送就行不需要同步,防止卡住
-    SocketPointer->exec(TcpFramePool.adjustBrightEvent,msg, false);
+    // 发送消息同步,异步都行,如果用同步这里就可以打印消息,这里所有的函数都可以异步也可以同步,2种方式都没有问题
+    // 异步做法对adjustCamera则是用ParsePointer的parseResult信号绑定到下边的onAdjustCamera函数
+    // 然后打印消息也是可以的,2种写法机制测试了所有情况都没有问题,尤其现在exec引入请求消息队列更加优化了代码不出问题
+    SocketPointer->exec(TcpFramePool.adjustBrightEvent,msg, true);
+    if (ParserResult.toBool()) {
+        LOG<<"adjust exp gain bright to"<<exp<<gain<<br;
+    }
 }
 
+// 一个例子,其它的函数例如adjustLens也可以绑一个函数给ParserPointer,内部f==TcpFramePool.adjustLensEvent时去做一些事
+// 只不过这里我觉得为了方便打log犯不着额外绑定个函数
 void Preview::onAdjustCamera(const QString & f,const QVariant & d)
-{ // 这个是异步获取ParsePointer的parseResult,上方不使用同步,连接本函数
+{ // 这个是异步获取ParsePointer的parseResult,上方不使用同步,连接本函数也是可以的
     static int count = 0;
     if (d.toBool() && f == TcpFramePool.adjustBrightEvent) {
-        LOG<<"调整相机参数"<<++count<<"次"; // 做这些事
+        LOG<<"adjust exp gain bright successful!"<<count;
     }
+    count++;
 }
 
 #ifndef notusetoupcamera

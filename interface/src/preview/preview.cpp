@@ -271,6 +271,7 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
     connect(previewtool,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
     connect(previewtool,&PreviewTool::directionMove,this,&Preview::adjustLens);
+    connect(previewtool,&PreviewTool::focusChanged,this,&Preview::manualFocus);
     connect(previewtool,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
     connect(previewtool,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
     connect(previewtool,&PreviewTool::importFilePath,this,&Preview::importExperConfig);

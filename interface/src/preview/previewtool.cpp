@@ -50,6 +50,8 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(savebox,&SaveBox::loadExper,this,&PreviewTool::loadExper);
     connect(savebox,&SaveBox::stopExper,this,&PreviewTool::stopExper);
     connect(focusbox,&FocusBox::directionMove,this,&PreviewTool::directionMove);
+    connect(focusbox,&FocusBox::sliderPressed,this,&PreviewTool::focusSliderPressed);
+    connect(focusbox,&FocusBox::valueChanged,this,&PreviewTool::focusChanged);
     connect(recordbox,&RecordBox::pauseVideo,this,&PreviewTool::pauseVideo);
     connect(recordbox,&RecordBox::playVideo,this,&PreviewTool::playVideo);
     connect(recordbox,&RecordBox::stopVideo,this,&PreviewTool::stopVideo);

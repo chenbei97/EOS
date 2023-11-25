@@ -27,7 +27,7 @@ Sliderx::Sliderx(Qt::Orientation orientation, QWidget *parent) : QSlider(parent)
 }
 
 void Sliderx::mousePressEvent(QMouseEvent *event)
-{
+{ // 为了支持点击滑动条也能更改值
     if (!enableMouse)
         event->ignore();
     else {
@@ -41,13 +41,15 @@ void Sliderx::mousePressEvent(QMouseEvent *event)
         }
 
         // (val-min)/(max-min) = per => val = per*(max-min)+min
-        LOG<<per;
+        //LOG<<per;
         int value = per*(maximum() - minimum()) + minimum();
 
         setValue(value);
         setSliderPosition(value);
         emit valueChanged(value);
         emit sliderMoved(value); // 这个信号也要发送
+        emit sliderPressed();
+        emit sliderReleased();
 
         QSlider::mousePressEvent(event);
     }

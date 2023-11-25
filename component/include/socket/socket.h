@@ -227,6 +227,7 @@ static const TcpFieldList TcpFieldPool;
 #define FieldStopExperEvent TcpFieldPool.fieldStopExperEvent
 #define FieldToggleObjectiveEvent TcpFieldPool.fieldToggleObjectiveEvent
 #define FieldRecordVideoEvent TcpFieldPool.fieldRecordVideoEvent
+#define FieldManualFocusEvent TcpFieldPool.fieldManualFocusEvent
 
 static QVariant parsePreviewEvent(QCVariantMap m)
 { // 预览事件
@@ -577,6 +578,24 @@ static QVariant parseRecordVideoEvent(QCVariantMap m)
     return path;
 }
 
+static QByteArray assembleManualFocusEvent(QCVariantMap m)
+{// 手动调焦事件
+    QJsonObject object;
+    object[FrameField] = ManualFocusEvent;
+    object[FieldManualFocusEvent.focus] = m[FocusField].toDouble(); // focus注意传浮点数
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parseManualFocusEvent(QCVariantMap m)
+{// 手动调焦事件
+    if (!m.keys().contains(FrameField)) return false;
+    if (!m.keys().contains(FieldManualFocusEvent.state)) return false;
+    auto state = m[FieldManualFocusEvent.state].toString();
+    return state == OkField;
+}
+
 /*---------以下都是临时测试函数,以后可以注释掉-----------------*/
 static QByteArray assemble_test0x0(QCVariantMap m)
 { // test0x0会传来x,y,frame字段
@@ -632,6 +651,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.stopExperEvent, parseStopExperEvent},
         {TcpFramePool.toggleObjectiveEvent, parseToggleObjectiveEvent},
         {TcpFramePool.recordVideoEvent, parseRecordVideoEvent},
+        {TcpFramePool.manualFocusEvent, parseManualFocusEvent},
         {"test0x0",parse_test0x0},
         {"test0x1",parse_test0x1},
 };
@@ -648,6 +668,7 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
         {TcpFramePool.stopExperEvent,assembleStopExperEvent},
         {TcpFramePool.toggleObjectiveEvent, assembleToggleObjectiveEvent},
         {TcpFramePool.recordVideoEvent, assembleRecordVideoEvent},
+        {TcpFramePool.manualFocusEvent, assembleManualFocusEvent},
         {"test0x0",assemble_test0x0},
         {"test0x1",assemble_test0x1},
 };

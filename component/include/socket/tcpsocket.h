@@ -17,20 +17,25 @@ class COMPONENT_IMEXPORT TcpSocket: public QObject
     Q_OBJECT
 public:
     static TcpSocket& instance();
+    bool isConnected() const;
+    QTcpSocket::SocketState socketState() const;
     void connectToHost(const QString &hostName = LocalHost, quint16 port = SocketPort);
-    void exec(const QString& f,const QByteArray& c,bool user_sync = true);
+    void exec(const QString& f,const QByteArray& c,bool use_sync = true);
     QVariantMap result() const;
 private:
     explicit TcpSocket(QObject *parent = nullptr);
     ~TcpSocket();
     void onReadyReadSlot();
     void processMsgQueue();
+    Q_INVOKABLE void processRequestQueue();
     QTcpSocket * socket = nullptr;
     QByteQueue msgQueue;
+    QRequestQueue requestQueue;
     QByteArray message;
     QString frame;
     EventLoop loop;
-    QTimer timer;
+    QTimer looptimer;
+    QTimer requesttimer;
 signals:
 };
 #endif //EOSI_TCPSOCKET_H

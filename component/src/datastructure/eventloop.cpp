@@ -23,3 +23,8 @@ void EventLoop::exec()
     emit started();
     loop.exec();
 }
+
+bool EventLoop::isRunning() const
+{
+    return loop.isRunning();
+}

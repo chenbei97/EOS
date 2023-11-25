@@ -67,6 +67,8 @@ static const char * LastLoginField = "last_login";
 static const char * IDField = "id";
 static const char * DateTimeField = "datetime";
 static const char * FlagField = "flag";
+static const char * FocusBoxTitle = "Focus";
+static const char * AutoFocusField = "auto focus";
 
 static const char * AdminField = "admin";
 static const char * DefalutPwdField = "123456";

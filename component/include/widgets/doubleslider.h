@@ -15,7 +15,8 @@
 
 #define DoubleNotBig 0
 //#define DoubleVeryBig 0
-
+// qslider本身不支持浮点数,需要1个中间double变量去代替保存值和显示到ui
+// 也就是accumulateval,这个也要取整反馈给滑动条,实际值10.4,视觉上滑动条设置10不会影响
 class COMPONENT_IMEXPORT DoubleSlider: public QWidget
 {
     Q_OBJECT
@@ -27,7 +28,7 @@ public:
     void setSingleStep(int step);
     void setMouseEvent(bool enabled);
     double value() const;
-    void setValue(double val);
+    void setValue(double val); // 外部可以传double
 
     void addValue(double val);
     void subtractValue(double val);
@@ -41,11 +42,12 @@ private:
     double accumulateval = 0.0;
     double fracval = 0.0;
     double intval = 0.0;
-    void setValue(int val);
+    void setValue(int val);//内部使用转换到滑动条上
 private slots:
     void onSliderChanged(int val);
 signals:
-    void valueChanged(int val);
+    void valueChanged(double val);
+    void sliderPressed();
 };
 
 #endif //EOSI_DOUBLESLIDER_H
