@@ -3,11 +3,11 @@
 
 RecordBox::RecordBox(QWidget *parent) : GroupBox(parent)
 {
-    startrecord = new PushButton(tr("start"));
-    stoprecord = new PushButton(tr("stop"));
-    playvideo = new PushButton(tr("play"));
-    stopvideo = new PushButton(tr("stop"));
-    pausevideo  = new PushButton(tr("pause"));
+    startrecord = new PushButton(tr(StartField));
+    stoprecord = new PushButton(tr(StopField));
+    playvideo = new PushButton(tr(PlayField));
+    stopvideo = new PushButton(tr(StopField));
+    pausevideo  = new PushButton(tr(PauseField));
     selectvideo  = new Label;
     videoformat = new ComboBox(VideoFormatFields);
     imageformat = new ComboBox(ImageFormatFields);
@@ -20,7 +20,7 @@ RecordBox::RecordBox(QWidget *parent) : GroupBox(parent)
 //    savepath->setWordWrap(true);
 //    selectvideo->setWordWrap(true);
     savepath->setElidedText(getAppStandardDirPath());
-    selectvideo->setElidedText(tr("select video"));
+    selectvideo->setElidedText(tr(SelectVideoField));
 
     auto hlay1 = new QHBoxLayout;
     hlay1->addWidget(startrecord);
@@ -37,8 +37,8 @@ RecordBox::RecordBox(QWidget *parent) : GroupBox(parent)
 
 
     auto formlay = new QFormLayout;
-    formlay->addRow(tr("video record: "),hlay1);
-    formlay->addRow(tr("video play: "),hlay2);
+    formlay->addRow(tr(VideoRecordLabelField),hlay1);
+    formlay->addRow(tr(VideoPlayLabelField),hlay2);
     formlay->addRow(tr(ImageFormatLabelField),imageformat);
     formlay->addRow(tr(VideoFormatLabelField),videoformat);
     formlay->addRow(tr(VideoFrameRateLabelField),framerate);
@@ -55,7 +55,7 @@ RecordBox::RecordBox(QWidget *parent) : GroupBox(parent)
     connect(selectvideo,&Label::mouseClicked,this,&RecordBox::selectVideo);
 
     setLayout(formlay);
-    setTitle(tr("Record"));
+    setTitle(tr(RecordBoxTitle));
 }
 
 void RecordBox::startRecord()
@@ -100,7 +100,7 @@ void RecordBox::selectVideo()
     if (pathExisted(selectvideo->elidedText()))
         curdir = QFileInfo(selectvideo->elidedText()).dir().path();
     auto filter = "wav(*.wav);avi(*.avi);mp4(*.mp4)";
-    QString path=QFileDialog::getOpenFileName(this,tr("Select Video"),curdir,filter);
+    QString path=QFileDialog::getOpenFileName(this,tr(SelectVideoField),curdir,filter);
     if (path.isEmpty())
         return;
     else selectvideo->setElidedText(path);
@@ -109,7 +109,7 @@ void RecordBox::selectVideo()
 
 void RecordBox::changeSavePath()
 {
-    QString dir =  QFileDialog::getExistingDirectory(this,tr("Select Save Dir"),savepath->elidedText(),
+    QString dir =  QFileDialog::getExistingDirectory(this,tr(SelectSaveDirField),savepath->elidedText(),
                                                      QFileDialog::ShowDirsOnly|QFileDialog::DontUseNativeDialog
                                                      |QFileDialog::DontResolveSymlinks);
     if (!dir.isEmpty()) savepath->setElidedText(dir);

@@ -29,7 +29,7 @@ ChannelBox::ChannelBox(QWidget*parent): GroupBox(parent)
     lay->addWidget(dapibox);
 
     setLayout(lay);
-    setTitle(tr("通道"));
+    setTitle(tr(ChannelBoxTitle));
 
     QButtonGroup * group = new QButtonGroup;
     group->addButton(brbox,0);

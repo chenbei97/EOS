@@ -10,8 +10,8 @@
 
 ZStackBox::ZStackBox(QWidget *parent) : GroupBox(parent)
 {
-    zstack = new CheckBox("z_stack");
-    stitchimage = new CheckBox("stitch_image");
+    zstack = new CheckBox(Z_StackField);
+    stitchimage = new CheckBox(StitchImageField);
     videoformat = new ComboBox(VideoFormatFields);
     imageformat = new ComboBox(ImageFormatFields);
 
@@ -34,7 +34,7 @@ ZStackBox::ZStackBox(QWidget *parent) : GroupBox(parent)
     //vlay->addLayout(hlay2); // 这2个不需要,懒得删代码隐藏即可
 
     setLayout(vlay);
-    setTitle(tr("Other"));
+    setTitle(tr(OtherBoxField));
 
     connect(zstack,&CheckBox::checkedChanged,this,&ZStackBox::zstackChanged);
     connect(stitchimage,&CheckBox::checkedChanged,this,&ZStackBox::stitchChanged);

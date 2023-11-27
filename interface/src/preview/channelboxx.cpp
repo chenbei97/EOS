@@ -28,7 +28,7 @@ ChannelBoxx::ChannelBoxx(QWidget*parent): GroupBox(parent)
     mainlay->addLayout(lay);
     mainlay->addWidget(canvas);
     setLayout(mainlay);
-    setTitle(tr("Channel"));
+    setTitle(tr(ChannelBoxTitle));
 
 #ifdef use_channelnotifier
     QButtonGroup * group = new QButtonGroup;
@@ -120,7 +120,7 @@ void ChannelBoxx::clickPh()
         m[BrightField] = -1;
         SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
         if (ParserResult.toBool()) {
-            LOG<<"关闭PH";
+            LOG<<"close PH";
         }
     }
 }
@@ -140,7 +140,7 @@ void ChannelBoxx::clickGfp()
         m[BrightField] = -1;
         SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
         if (ParserResult.toBool()) {
-            LOG<<"关闭GFP";
+            LOG<<"close GFP";
         }
     }
 }
@@ -160,7 +160,7 @@ void ChannelBoxx::clickRfp()
         m[BrightField] = -1;
         SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
         if (ParserResult.toBool()) {
-            LOG<<"关闭RFP";
+            LOG<<"close RFP";
         }
     }
 }
@@ -181,7 +181,7 @@ void ChannelBoxx::clickDapi()
         m[BrightField] = -1;
         SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
         if (ParserResult.toBool()) {
-            LOG<<"关闭DAPI";
+            LOG<<"close DAPI";
         }
     }
 

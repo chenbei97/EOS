@@ -205,8 +205,8 @@ void Preview::takingPhoto()
         photocanvas->setImage(pix);
 
         // 存图功能,目前默认存到temp下,用户会更改前缀目录,或者需要按分不同通道文件夹归类等
-        createPath(CURRENT_PATH+"/temp");
-        auto path = CURRENT_PATH+"/temp/"
+        createPath(TakePhotoTempPath);
+        auto path = TakePhotoTempPath
                     +QDateTime::currentDateTime().toString(DefaultImageSaveDateTimeFormat)+JPGSuffix;
         pix.save(path,JPGField,100);
 

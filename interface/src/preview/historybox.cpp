@@ -10,8 +10,8 @@
 
 HistoryBox::HistoryBox(QWidget *parent) : GroupBox(parent)
 {
-    checkbox = new CheckBox(tr("apply historical config?"));
-    btn = new PushButton(tr("select config file"));
+    checkbox = new CheckBox(tr(ApplyHistoryConfigLabelField));
+    btn = new PushButton(tr(SelectConfigLabelField));
     btn->hide();
 
     auto lay = new QHBoxLayout;
@@ -28,8 +28,8 @@ HistoryBox::HistoryBox(QWidget *parent) : GroupBox(parent)
 
 void HistoryBox::onBtn()
 {
-    auto path = QFileDialog::getOpenFileName(this,tr("Select Configuration File"),"",
-                                            "config (*.eos)");
+    auto path = QFileDialog::getOpenFileName(this,tr(SelectConfigLabelField),"",
+                                            "(*.eos)");
     if (path.isEmpty()) return;
 
     emit importFilePath(path);

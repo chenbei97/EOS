@@ -26,7 +26,7 @@ Q_ENUMS(SQLType)
 #define UserScreenWidth (QApplication::desktop()->screenGeometry().width())
 #define UserScreenHeight (QApplication::desktop()->screenGeometry().height())
 #define WarningChinese tr("Warning")
-#define InformationChinese tr("Information")
+#define  InformationChinese tr("Information")
 #define CriticalChinese tr("Critical")
 #define DefaultDateTimeFormat "yyyy-MM-dd hh:mm"
 #define DefaultImageDateTimeFormat "yyyy-MM-dd-hh-mm-ss"
@@ -45,6 +45,10 @@ Q_ENUMS(SQLType)
 #define LocalHost "localhost"
 #define SocketWaitTime 3000
 //#define UseSqlcipher true
+#define TakePhotoTempPath (CURRENT_PATH+"/temp/photo/")
+#define MergeChannelTempPath (CURRENT_PATH+"/temp/merge/")
+#define RecordVideoDefaultTempPath (CURRENT_PATH+"/temp/video/")
+#define AutoFocusTempPath (CURRENT_PATH+"/temp/focus/")
 
 static const char* RollBackField = "rollback";
 static const char* OriginalField = "original";
@@ -67,7 +71,6 @@ static const char * LastLoginField = "last_login";
 static const char * IDField = "id";
 static const char * DateTimeField = "datetime";
 static const char * FlagField = "flag";
-static const char * FocusBoxTitle = "Focus";
 static const char * AutoFocusField = "auto focus";
 
 static const char * AdminField = "admin";
@@ -105,6 +108,33 @@ static const char* FlaskField = "flask";
 static const char* FlaskFieldLabel = "flask: ";
 static const char* SlideField = "slide";
 static const char* SlideFieldLabel = "slide: ";
+static const char* VideoRecordLabelField = "video record: ";
+static const char* VideoPlayLabelField = "video play: ";
+static const char* SelectVideoField = "select video";
+static const char* SelectSaveDirField = "Select Save Dir";
+static const char* SaveSettingToFileField = "save settings to file?";
+static const char* PleaseInputFileNameField = "please input filename";
+static const char* SelectSavePathField = "select save path";
+static const char* StartField = "start";
+static const char* PlayField = "play";
+static const char* PauseField = "pause";
+static const char* MergeField = "merge";
+static const char* SaveCurrentChannelSettingLabelField = "save current channel settings";
+static const char* ApplyHistoryConfigLabelField = "apply historical config?";
+static const char* SelectConfigLabelField = "select config file";
+static const char* StartExperField = "start exper";
+static const char* StopExperField = "stop exper";
+static const char* Z_StackField = "z_stack";
+static const char* StitchImageField = "stitch_image";
+
+static const char* ChannelBoxTitle = "Channel";
+static const char* RecordBoxTitle = "Record";
+static const char* CameraBoxTitle ="Camera";
+static const char * FocusBoxTitle = "Focus";
+static const char * ObjectiveBoxTitle = "Objective";
+static const char * SaveBoxTitle = "Save";
+static const char * ExperimentBoxTitle = "Experiment";
+static const char* OtherBoxField = "Other";
 
 #define AppendField(s,field) (s+field)
 #define AppendSeparateField(s) (s+SeparateField)

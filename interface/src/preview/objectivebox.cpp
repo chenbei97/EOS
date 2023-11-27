@@ -30,7 +30,7 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
     rbtn_loc1->setChecked(true);
 
     setLayout(lay);
-    setTitle(tr("Objective"));
+    setTitle(tr(ObjectiveBoxTitle));
 
     connect(rbtn_loc1,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
     connect(rbtn_loc2,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);

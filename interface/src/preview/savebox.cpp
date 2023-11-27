@@ -10,11 +10,11 @@
 
 SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
 {
-    filenameedit = new LineEdit("please input filename");
-    exportToFile = new CheckBox(tr("save settings to file?"));
-    exportallbtn = new PushButton(tr("export"));
-    loadbtn = new PushButton(tr("start exper"));
-    stopbtn = new PushButton(tr("stop exper"));
+    filenameedit = new LineEdit(PleaseInputFileNameField);
+    exportToFile = new CheckBox(tr(SaveSettingToFileField));
+    exportallbtn = new PushButton(tr(ExportField));
+    loadbtn = new PushButton(tr(StartExperField));
+    stopbtn = new PushButton(tr(StopExperField ));
     filenameedit->hide();
     exportallbtn->hide();
 
@@ -27,7 +27,7 @@ SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
     lay->addWidget(loadbtn);
 
     setLayout(lay);
-    setTitle(tr("Save"));
+    setTitle(tr(SaveBoxTitle));
 
     connect(exportToFile,&CheckBox::checkedChanged,this,&SaveBox::showExport);
     connect(exportallbtn,&PushButton::clicked,this,&SaveBox::exportFile);
@@ -44,7 +44,7 @@ void SaveBox::exportFile()
                                  tr("Please specify the name of the saved file first!"));
         return;
     }
-    auto dir = QFileDialog::getExistingDirectory(this,tr("Select Save Path"));
+    auto dir = QFileDialog::getExistingDirectory(this,tr(SelectSavePathField));
     if (dir.isEmpty()) return;
 
     auto path = dir + +"/" + filename + EOSSuffix;

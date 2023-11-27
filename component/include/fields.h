@@ -201,6 +201,7 @@ static const char* ChannelFieldLabel = "channel: ";
 static const char* CurrentInfoField = "current_info";
 static const char* CurrentChannelField = "current_channel";
 static const char* CaptureChannelField = "capture_channel";
+static const char* CaptureField = "capture";
 static const char* BRField = "BR";
 static const char* PHField = "PH";
 static const char* GFPField = "GFP";
