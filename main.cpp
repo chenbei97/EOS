@@ -64,17 +64,17 @@ void initApp(QApplication& a)
     //StartPythonPointer->start("../test","test_socket","test_server");
 #endif
 #else
-//    auto * process = new QProcess;
-//    // 22987 Lenovo
-//    process->start("C:\\Users\\22987\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
-//                   QStringList()<<"../test/test_socket.py");
-//    process->waitForStarted();
-//    QObject::connect(qApp, &QCoreApplication::aboutToQuit, [process]() {
-//        process->close();
-//        process->waitForFinished();
-//        LOG<<"python process is kill? "<<!process->isOpen();
-//    });
+    auto * process = new QProcess;
+    // 22987 Lenovo
+    process->start("C:\\Users\\22987\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+                   QStringList()<<"../test/test_socket.py");
+    process->waitForStarted();
+    QObject::connect(qApp, &QCoreApplication::aboutToQuit, [process]() {
+        process->close();
+        process->waitForFinished();
+        LOG<<"python process is kill? "<<!process->isOpen();
+    });
     SocketInit;
-//    LOG<<"is connect? "<<SocketPointer->isConnected()<<SocketPointer->socketState();
+    LOG<<"is connect? "<<SocketPointer->isConnected()<<SocketPointer->socketState();
 #endif
 }

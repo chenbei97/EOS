@@ -54,7 +54,7 @@ void ChannelNotifier::notify(PushButton *btn)
                     m[BrightField] = -1;
                     SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
                     if (ParserResult.toBool()) {
-                        LOG<<"关闭"<<ChannelFields[button->getID()];
+                        LOG<<"close "<<ChannelFields[button->getID()];
                     }
                 }
             }
