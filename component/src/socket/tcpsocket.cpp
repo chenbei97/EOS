@@ -11,12 +11,26 @@
 void TcpSocket::onReadyReadSlot()
 {
     while (socket->bytesAvailable()) { // 有效就都读出来了
-        QByteArray msg = socket->readAll();
-
-        auto msgs = QString::fromUtf8(msg).split(SeparateField,QString::SkipEmptyParts);
+#ifdef use_msgqueue_v1
+        message = socket->readAll();
+        // 这种写法一般来说不会有问题,只要服务端的代码不会让socket同时出现多条命令就不会出错,一收一发式的理想情况
+        auto msgs = QString::fromUtf8(message).split(SeparateField,QString::SkipEmptyParts);
         //LOG<<"response msg  = "<<msgs;
         foreach(auto m ,msgs)
             msgQueue.enqueue(m.toUtf8()); // 将消息添加到队列中
+#else
+        message += socket->readAll();
+        int count = message.count(SeparateField);
+        //LOG<<"before: "<<message<<" count = "<<count;
+        while (count--) {
+            auto len = message.indexOf(SeparateField,0);
+            auto response = message.left(len);
+            msgQueue.enqueue(response);
+            message.remove(0,len);
+            message.remove(0,QString(SeparateField).count());
+        }
+        //LOG<<"after: "<<message;
+#endif
         /*
         Tcp粘包问题，粘包问题参考网站解释,比较清楚明白，并不是发送方发5次就会触发readyRead5次
             1). https://blog.csdn.net/dengdew/article/details/79065608
@@ -29,7 +43,7 @@ void TcpSocket::onReadyReadSlot()
                  3. 为了避免数据混乱，在消息结尾或者开头加入特定字符串表示一个包的开始和结束，来划分不同的包
                  4. 操作中继者,系统TCP/IP，让它不必超时或者缓存满了才发出，有消息就发出（暂时没找到方法）
                  5. socket->setSocketOption(QAbstractSocket::LowDelayOption, true); 一种手段但是不能避免
-        readAll可能的情况如下:
+        readAll可能的情况如下(对EOS来说没有复杂的高并发,socket都是一收一发式的不会出现粘包,但应该有安全保障机制):
             其中F1F2表示完整的文本内容,sep表示分隔符,分隔符可能不完整
             所以数学上可以看成是[F1][F2][se][p]的组合 但是有些限制,[p]只能在[se]后面,[F2]后边只能是[se]等这种顺序限制
             如果没有限制,数学上4个位置的全排列是4!=24种,现在其实是16种
@@ -41,6 +55,46 @@ void TcpSocket::onReadyReadSlot()
                 [se][p][F1][F2][se] 这里从[se]进行重复,实际4种情形
             (4) 1.[p] 2.[p][F1] 3.[p][F1][F2] 4.[p][F1][F2][se] 不完整分隔符的后一部分,当然可能是p,也可能ep
                 [p][F1][F2][se][p] 这里从[p]进行重复,实际4种情形
+            一般来说对于EOS都是[F1][F2][se][p]这样理想的情况,不会出现问题;
+            客户端传给服务端已经引入队列机制,不会出现滑动条移动让socket瞬时有n条消息,这样服务端必须考虑粘包的情况(而且服务端也本应该考虑,即使不出现)
+            服务端给客户端,目前data界面还没设计,尚未知道服务端给客户端是如何发送消息的,所以要考虑服务端没有使用消息队列给客户端发消息时粘包的处理
+            除了上述16种情况,还有12种情况,也就是还要考虑3,2,1份的组合,上边是4个进行组合
+            (5) [F1][F2][se],[F2][se][p],[se][p][F1],[p][F1][F2]
+            (6) [F1][F2] [F2][se] [se][p] [p][F1]
+            (7) [F1] [F2] [se] [p]
+
+            不论是以上哪种情况,其实就是考虑是否出现一个完整命令[F1][F2][se][p],从首次readAll开始一定是[F1]开始
+            如果没有遇到完整的sep,就让消息先进入缓存,直到出现sep取出左边的完整命令,清理缓存,也就是可以先计算sep出现的次数
+            以下的伪代码就是这样的一种保障机制,实际上这部分工作服务端就应该做好不允许多条命令或者不完整的命令写入套接字,但是客户端也可以建立安全机制
+            或者说是服务端有责任和义务避免多条命令或者不完整的命令同时写入套接字造成客户端粘包
+            伪代码:
+            buffer += socket->readAll();
+            int count = buffer.count(sep);
+            while (count--) { // 可能出现2个以上
+                auto idx = buffer.indexOf(sep,0); // idx是sep中s的位置,from=0,先处理最左边的完整命令
+                auto response = buffer.left(idx); // idx也恰好是sep前边(不包含s)的字符数量,得到完整的请求命令
+                msgQueue.enqueue(response); // 放入回复消息队列处理
+                buffer.remove(0,idx); // 移除[F1][F2]
+                buffer.remove(0,sep.count());// sep也要移除
+            }
+
+            sscom调为TcpServer格式,启动EOS,sscom循环给客户端发送5条消息
+            {"frame":"2","state":3}@@@{"frame":"2","state":3}@@@
+            {"frame":"2",
+            "state":3}@@@
+            {"frame":"2","state":3}@
+            @@
+            会有以下打印结果:
+            before:  "{\"frame\":\"2\",\"state\":3}@@@{\"frame\":\"2\",\"state\":3}@@@"  count =  2
+            after:  "" 第1条发送了完整的2条消息,所以都解析了
+            before:  "{\"frame\":\"2\","  count =  0
+            after:  "{\"frame\":\"2\"," 第2条
+            before:  "{\"frame\":\"2\",\"state\":3}@@@"  count =  1
+            after:  "" 和第3条合并才是完整的
+            before:  "{\"frame\":\"2\",\"state\":3}@"  count =  0
+            after:  "{\"frame\":\"2\",\"state\":3}@" 第4条
+            before:  "{\"frame\":\"2\",\"state\":3}@@@"  count =  1
+            after:  "" 和第5条合并才是完整的
          */
     }
 }
@@ -63,7 +117,7 @@ void TcpSocket::processRequestQueue()
         requestQueue.dequeue();
         //LOG<<"process request "<<request;
         socket->write(request);
-        //LOG<<"before loop is running? "<<loop.isRunning();
+        //LOG<<"before loop is running? "<<loop.isRunning();//可以看出每次调用前exec已经退出
         loop.exec();
         //LOG<<"after loop is running? "<<loop.isRunning();
     }
@@ -77,6 +131,7 @@ void TcpSocket::exec(const QString& f,const QByteArray& c,bool use_sync)
      * 以下代码写法会出现 0x7ffeab390740 has already called exec()这样的警告,也就是提升loop已经被调用,尚未退出又被调用,因为loop作用域是类内部只有1个实例
      * 其实这个警告不会影响实际功能,只是系统压入栈需要时间处理频繁的loop被调用然后释放本地循环
      * 下方新代码的写法是针对请求消息可以使用队列机制就可以避免loop被频繁调用,1条条处理队列的请求消息
+     * 或者说是客户端有责任和义务避免多条命令或者不完整的命令同时写入套接字造成服务端粘包
      frame = f;
      socket->write(c);
     LOG<<"loop is running? "<<loop.isRunning(); // 快速滑slider会出现 "loop is running?  true"
@@ -104,7 +159,7 @@ void TcpSocket::exec(const QString& f,const QByteArray& c,bool use_sync)
          *  放入队列,快速滑slider时队列会逐个去请求,不会重复调用loop.exec
          *  然后定时器触发processRequestQueue逐个的去处理,并且从loop的running打印结果可以看出服务端收到解析信号就及时退出了loop
          *  下次调用不会出现loop已经处于running的状态,也就不会出现V1写法的警告 has already called exec()
-            [ "11:34:38:348" TcpSocket::exec ]  before =  3
+            [ "11:34:38:348" TcpSocket::exec ]  before =  3 // 快速滑动时processRequestQueue的执行晚于exec,故队列开始增加
             [ "11:34:38:348" TcpSocket::exec ]  after =  4
             [ "11:34:38:349" TcpSocket::exec ]  before =  4
             [ "11:34:38:350" TcpSocket::exec ]  after =  5
@@ -112,7 +167,7 @@ void TcpSocket::exec(const QString& f,const QByteArray& c,bool use_sync)
             [ "11:34:38:352" TcpSocket::exec ]  after =  6
             [ "11:34:38:354" TcpSocket::exec ]  before =  6
             [ "11:34:38:355" TcpSocket::exec ]  after =  7
-            ....
+            .... // 之后定时器异步的起作用逐个处理,队列减少
             [ "11:37:47:596" TcpSocket::processRequestQueue ]  requestQueue's count =  12 //这里看出loop下次exec前已经quit
             [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
             [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
