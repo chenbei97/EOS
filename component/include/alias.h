@@ -100,6 +100,16 @@ typedef const QVector<QPair<bool,QColor>>& QCBoolColorPairVector;
 typedef QVector<QVector<QBoolColorPair>> QBoolColorPair2DVector;
 typedef const QVector<QVector<QBoolColorPair>>& QCBoolColorPair2DVector;
 
+typedef QPair<QRectF,bool> QRectFMask;
+typedef QVector<QRectFMask> QRectFMaskVector;
+struct ViewRectF
+{
+    QRectF rect;
+    bool flag;
+};
+Q_DECLARE_METATYPE(ViewRectF);
+typedef QVector<ViewRectF> ViewRectFVector;
+
 typedef QQueue<QByteArray> QByteQueue;
 typedef QPair<QString,QByteArray> QRequestMsg;
 typedef QQueue<QRequestMsg> QRequestQueue;
