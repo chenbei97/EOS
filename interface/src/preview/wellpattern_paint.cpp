@@ -26,8 +26,8 @@ namespace V1 {
         auto rect = QRectF(center,QSize(radius*2,radius*2)); // 这个孔内圆的外接正方形
 
         // 3. 拿到这个孔存储的视野尺寸信息
-        auto viewrows = mHoleInfo[coordinate.x()][coordinate.y()].viewsize.width();
-        auto viewcols = mHoleInfo[coordinate.x()][coordinate.y()].viewsize.height();
+        auto viewrows = mHoleInfo[coordinate.x()][coordinate.y()].viewsize;
+        auto viewcols = viewrows;
 
         // 4. 得到外接正方形根据视野尺寸划分后每个小矩形的长度和宽度
         QRectF2DVector m;
@@ -104,40 +104,21 @@ namespace V1 {
                     path.addEllipse(center,radius*0.75,radius*0.75);
                     painter.fillPath(path,mHoleInfo[row][col].color);
 
-                    // (3.2) 绘制视野选中的点对应的孔内小矩形区域
-                    auto points = mHoleInfo[row][col].viewpoints; // 视野选中点不为空
-                    if (!points.isEmpty()) {
-                        // 1.改为直接计算圆心和该圆外接正方形的左上角顶点
+                    // (3.2) 绘制视野选中的区域对应的孔内小矩形区域
+                    auto rects = mHoleInfo[row][col].viewrects; // 视野选中区域不为空
+                    if (!rects.isEmpty()) {
+                        // 1. 圆孔内圆的外接正方形的左上角顶点
                         auto topleft = center-QPointF(radius*0.75,radius*0.75);
-                        // 2.划分小矩形的行数和列数,得到等分的宽度和高度
-                        auto viewrows = mHoleInfo[row][col].viewsize.width();
-                        auto viewcols = mHoleInfo[row][col].viewsize.height();
-                        auto viewwidth = 2 * radius * 0.75 / viewrows; // 整个内圆外接正方形的尺寸就是2*radius*0.75
-                        auto viewheight = 2 * radius * 0.75 / viewcols;
-                        // 3.得到左上角小矩形区域中心的作为起点
-                        auto rect_center = QPointF(viewwidth/2,viewheight/2)+topleft;
-                        for(int i = 0; i < points.count(); ++i) {
-                            /*
-                             这里如果视野尺寸100x100,有40x40个视野坐标,有100个孔被selected
-                             计算量就是2*10000x1600x100=16亿次 会崩掉,
-                             其中getHoleRectsOnViewSize的计算2万次(getCenterPoints也被调用了)需要优化一下,不再划分区域,直接把viewpoints映射到实际物理坐标
-                            auto viewrects = getHoleRectsOnViewSize(row,col);
-                            auto viewpoint = points[i]; // 视野的坐标
-                            auto viewrect = viewrects[viewpoint.x()][viewpoint.y()]; // 视野坐标对应的孔内小矩形区域
-                            painter.fillRect(viewrect,Qt::black);
-                             计算量如下: 6孔板:116x116x6=80736; 24孔板: 24x45x45=48600; 96孔板:96x24x24=55296; 384x12x12=55296
-                            */
-                            // 4.此时就可以根据viewpoints的实际坐标拿到真实的点物理坐标
-                            auto viewpoint = points[i]; // 视野的坐标
-                            // 物理坐标 = (x0,y0)+(x*w,y*h),例如视野坐标(3,4),就是(x0+3w,y0+4h)
-                            auto coord = rect_center+QPointF(viewpoint.y()*viewwidth,viewpoint.x()*viewheight);
-                            auto pen = painter.pen();
-                            pen.setWidth(3);
-                            painter.setPen(pen);
-                            painter.drawPoint(coord);
-                            pen = painter.pen();
-                            pen.setWidth(1);
-                            painter.setPen(pen);
+                        for(auto rect: rects) { // 可对照ViewPattern::mapToSize的逻辑
+                            auto x = rect.rect.topLeft().x() * radius * 1.5+ topleft.x();
+                            auto y = rect.rect.topLeft().y() * radius * 1.5 + topleft.y();
+                            auto w = rect.rect.size().width() * radius * 1.5;
+                            auto h = rect.rect.size().height() * radius * 1.5;
+                            if (rect.flag) { // rect.rect是0-1的,映射到圆孔需要基于当前的topleft,以及内圆的直径
+                                painter.fillRect(QRectF(x,y,w,h),Qt::black);
+                            } else {
+                                painter.fillRect(QRectF(x,y,w,h),DefaultNativeColor);
+                            }
                         }
                     }
                 }

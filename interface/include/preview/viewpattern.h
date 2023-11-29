@@ -3,7 +3,7 @@
 
 #include "window.h"
 
-namespace V2 { // 2024//11/27 需求变更需要重新设计
+inline namespace V2 { // 2024//11/27 需求变更需要重新设计
     class INTERFACE_IMEXPORT ViewPattern: public QWidget
     {
         Q_OBJECT
@@ -15,10 +15,23 @@ namespace V2 { // 2024//11/27 需求变更需要重新设计
         void mouseReleaseEvent(QMouseEvent *event) override;
         void mouseMoveEvent(QMouseEvent *event) override;
         void paintEvent(QPaintEvent *event) override;
+
+        void clearViewWindowCache(const QPoint &holePoint);
+        void clearAllViewWindowCache(int viewSize);
+        void updateViewWindowCache(QCPoint holePoint, QCPointVector viewPoints,int viewSize);
+
+        void setDisablePoint(QCPoint point, bool enable = true);
+        void setDisablePoints(QCPointVector points, bool enable = true);
+        void setDisablePoints(bool enable = true);
     private:
         int mSize = 0;
         QBool2DVector mViewMask;
         void initViewMask();
+        QPointFVector viewMaskPoints() const;
+        void viewRectsMapToViewMask();
+        QRectF mapToSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);
+        QRectF mapFromSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);
+
     private:
         ViewInfo mViewInfo;
         QPointF mMousePos;
@@ -38,15 +51,26 @@ namespace V2 { // 2024//11/27 需求变更需要重新设计
         void onApplyGroupAct();
         void onApplyAllAct();
         int holeID() const;
+        int holeID(const QPoint& holePoint) const;
+        bool checkField() const;
+    private:
+        double getCircleRadius() const; // 视野圆半径
+        double getInnerRectWidth() const; // 小矩形区域的宽度
+        double getInnerRectHeight() const; // 小矩形区域的高度
+        QPointF getInnerRectTopLeftPoint() const; // 外接正方形左上角顶点
+        QPointF getInnerRectTopRightPoint() const;// 外接正方形右上角顶点
+        QPointF getInnerRectBottomLeftPoint() const;// 外接正方形左下角顶点
+        QPointF getInnerRectBottomRightPoint() const;// 外接正方形右下角顶点
+        QRectF getValidRect() const;
     signals:
-        void previewEvent(const QPoint& point);
+        void previewEvent(const QPointF& point);
         void applyHoleEvent(const QVariantMap&m);
         void applyGroupEvent(const QVariantMap&m);
         void applyAllEvent(const QVariantMap&m);
     };
 }
 
-inline namespace V1 {
+namespace V1 {
     class INTERFACE_IMEXPORT ViewPattern: public QWidget
     {
         Q_OBJECT

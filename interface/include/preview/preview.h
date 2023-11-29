@@ -58,7 +58,7 @@ private:
     ExperTool * expertool;
 #endif
     PhotoCanvas * photocanvas;
-    ViewPattern * viewpattern;
+    V2::ViewPattern * viewpattern;
     VideoWidget * videocanvas;
     QStackedWidget * stack;
     PreviewTool * previewtool;
@@ -113,8 +113,8 @@ private:
     void adjustLens(int option);
     void manualFocus(double val);
     void toggleChannel(int option);
-    void previewViewByClickView(const QPoint& viewpoint);
-    void previewViewByClickHole(const QPoint& holepoint);
+    void previewViewByClickView(const QPointF& viewPoint);
+    void previewViewByClickHole(const QPoint& holePoint);
     void exportExperConfig(const QString& path);
     void importExperConfig(const QString& path);
     void loadExper();

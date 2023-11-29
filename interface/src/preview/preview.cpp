@@ -68,15 +68,12 @@ void Preview::onWellbrandChanged(int option)
     else viewpattern->setDisablePoints(false);
 }
 
+// 切换物镜的尺寸,视野尺寸要发生变化
 void Preview::onObjectiveChanged(const QString& obj)
-{ // 切换物镜的尺寸,视野尺寸发生变化
+{
     LOG<<"objective option = "<<obj;
-
     // 1.更新视野的尺寸
     auto toolinfo = previewtool->toolInfo();
-    //auto wellsize = WellsizeFields[toolinfo[WellsizeField].toInt()].toInt();
-    //auto patternSize = pattern->patternSize();
-    //Q_ASSERT(wellsize == (patternSize.width() * patternSize.height()));
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
@@ -87,16 +84,15 @@ void Preview::onObjectiveChanged(const QString& obj)
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
     // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
-    auto current_size = viewpattern->currentViewInfo()[HoleViewSizeField].toSize().width();
+    auto oldViewSize = viewpattern->viewInfo()[HoleViewSizeField].toInt();
 
-    if (current_size != size) { // 如果视野尺寸前后没发生变化,不需要清理
-        LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 需要清理";
-        viewpattern->clearAllViewWindowCache(size);
-        // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
+    if (oldViewSize != size) { // 如果视野尺寸前后没发生变化,不需要清理
+        LOG<<"切换物镜前视野尺寸: "<<oldViewSize<<" 切换物镜后尺寸: "<<size<<" 需要清理";
+        viewpattern->clearAllViewWindowCache(size); // 清理ViewPattern
         dock->setWindowTitle(tr("Select Hole Inside View"));
-        pattern->clearAllHoleViewPoints();// 只需要清理视野信息,其它保留
+        pattern->clearAllHoleViewPoints();// 只需要孔关于视野的信息,其它保留
     } else {
-        LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 无需清理";
+        LOG<<"切换物镜前视野尺寸: "<<oldViewSize<<" 切换物镜后尺寸: "<<size<<" 无需清理";
     }
 
     // 3. 对NA物镜的特殊处理要放在最后,因为上边的代码viewpattern->clearAllViewWindowCache会重新初始化视野尺寸
@@ -110,6 +106,61 @@ void Preview::onObjectiveChanged(const QString& obj)
     else if (obj == NA20x08Field)
         viewpattern->setDisablePoints(NA20x08DisablePoints);
     else viewpattern->setDisablePoints(false);
+}
+
+// 打开viewpattern
+void Preview::updateViewWindow(const QVariantMap& m)
+{
+    // 1. 更新视野窗口的标题
+    auto holepoint = m[HoleCoordinateField].toPoint();
+    auto groupname = m[HoleGroupNameField].toString();
+    if (groupname.isEmpty())
+        groupname = tr("Group not set");
+
+    dock->setWindowTitle(tr("Select Hole Inside View(%1,%2)-Group(%3)")
+                                 .arg(QChar(holepoint.x()+65)).arg(holepoint.y()+1).arg(groupname));
+    dock->setFloating(true);
+
+    // 2.根据当前brand/objective更新视野的尺寸
+    auto toolinfo = previewtool->toolInfo();
+    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
+    auto brand = toolinfo[BrandField].toUInt();
+    auto manufacturer = toolinfo[ManufacturerField].toUInt();
+    auto size = ViewCircleMapFields[manufacturer][brand][objective];
+    if (size > view_well_6_4x*10)
+        dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
+    else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
+    else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
+    //LOG<<" manufacturer = "<<manufacturer<<" brand = "<<brand<<" objective = "<<objective<<" size = "<<size;
+
+    // 3. ⭐⭐⭐⭐ 把图案的信息传给视野窗口,必须这里额外组装2个字段
+    auto nm = m;
+    nm[HoleViewSizeField] = size;
+    nm[HoleViewPointsField].setValue(ViewRectFVector());
+
+    if (holepoint != QPoint(-1,-1))
+        viewpattern->setViewInfo(nm);
+//
+//    // 6. 对NA物镜的特殊处理要放在最后,setStrategy会重新初始化视野尺寸
+//    auto objective_descrip = toolinfo[ObjectiveDescripField].toString();
+//    if (objective_descrip == NA20x05Field)
+//        viewpattern->setDisablePoints(NA20x05DisablePoints);
+//    else if (objective_descrip == NA20x08Field)
+//        viewpattern->setDisablePoints(NA20x08DisablePoints);
+//    else viewpattern->setDisablePoints(false);
+}
+
+// 使用该孔对应的信息去更新分组窗口的UI
+void Preview::updateSetGroupWindow(const QVariantMap& m)
+{
+    // 1. 更新分组窗口的ui信息
+    groupinfo->setGroupInfo(m);
+
+    // 2. 分组窗口设置的组信息去更新孔的数据
+    int ret = groupinfo->exec();
+    if (ret == QDialog::Accepted) {
+        pattern->updateHoleInfoByGroupInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
+    }
 }
 
 void Preview::updateViewPatternUi()
@@ -126,7 +177,7 @@ void Preview::updateViewPatternUi()
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
     // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
-    auto current_size = viewpattern->currentViewInfo()[HoleViewSizeField].toSize().width();
+    auto current_size = viewpattern->viewInfo()[HoleViewSizeField].toSize().width();
     if (current_size != size) {
         LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 需要清理";
         viewpattern->clearAllViewWindowCache(size);
@@ -251,7 +302,7 @@ void Preview::initObjects()
     pattern = new WellPattern(2,3);
     groupinfo = new GroupInfo;
     previewtool = new PreviewTool;
-    viewpattern = new ViewPattern;// 视野窗口
+    viewpattern = new V2::ViewPattern;// 视野窗口
     dock = new DockWidget(tr("Select Hole Inside View"));
     dockcanvas = new QMainWindow;
     scrollarea = new QScrollArea;
@@ -295,12 +346,12 @@ void Preview::initConnections()
     connect(pattern,&WellPattern::openViewWindow,this,&Preview::updateViewWindow); // 打开和更新视野窗口
     connect(pattern,&WellPattern::openSetGroupWindow,this,&Preview::updateSetGroupWindow);// 打开分组窗口
     connect(pattern,&WellPattern::mouseClicked,this,&Preview::previewViewByClickHole); // 点击孔也触发预览
-    connect(pattern,&WellPattern::clearViewWindowCache,viewpattern,&ViewPattern::clearViewWindowCache);//删孔时清除该孔的缓存信息
+    connect(pattern,&WellPattern::clearViewWindowCache,viewpattern,&V2::ViewPattern::clearViewWindowCache);//删孔时清除该孔的缓存信息
 
-    connect(viewpattern,&ViewPattern::applyHoleEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyHole);//删点或者保存点就应用到本孔
-    connect(viewpattern,&ViewPattern::applyGroupEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyGroup); // 按组更新孔窗口的信息
-    connect(viewpattern,&ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不按组更新孔窗口的信息
-    connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
+    connect(viewpattern,&V2::ViewPattern::applyHoleEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyHole);//删点或者保存点就应用到本孔
+    connect(viewpattern,&V2::ViewPattern::applyGroupEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyGroup); // 按组更新孔窗口的信息
+    connect(viewpattern,&V2::ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不按组更新孔窗口的信息
+    connect(viewpattern,&V2::ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
 
     // (3) 外部信号=>preview/previewtool
     connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);

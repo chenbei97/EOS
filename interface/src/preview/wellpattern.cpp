@@ -20,7 +20,7 @@ namespace V1 {
                 QVariantMap groupInfo;
                 auto holes = getHoleGroupCoordinates(group);
 
-                        foreach(auto hole,holes)
+                foreach(auto hole,holes)
                     {
                         QVariantMap holeInfo; // 这个孔存储的所有信息都在这里保存
 
@@ -35,7 +35,7 @@ namespace V1 {
 
                         holeInfo[HoleCoordinateField] = hole; // 1. 坐标信息
                         holeInfo[HoleViewSizeField] = currentholeinfo.viewsize; // 2. 视野信息
-                        holeInfo[HoleViewPointsField].setValue(currentholeinfo.viewpoints);
+                        holeInfo[HoleViewPointsField].setValue(currentholeinfo.viewrects);
                         holeInfo[HoleExperTypeField] = currentholeinfo.type; // 3.备忘录信息
                         holeInfo[HoleMedicineField] = currentholeinfo.medicine;
                         holeInfo[HoleDoseField] = currentholeinfo.dose;
@@ -118,9 +118,9 @@ namespace V1 {
 
     void WellPattern::setDisablePoints(QCPointVector points, bool enable)
     {// 对指定的有限坐标进行设置
-                foreach(auto pt , points) {
-                setDisablePoint(pt,enable);
-            }
+        foreach(auto pt , points) {
+            setDisablePoint(pt,enable);
+        }
     }
 
     void WellPattern::setDisablePoints(bool enable)
@@ -150,9 +150,11 @@ namespace V1 {
         int count = 0;
         for(int row = 0 ; row < mrows; ++ row) {
             for (int col = 0; col < mcols; ++col) {
-                if (mHoleInfo[row][col].isselected
-                    && !mDisablePoints[row][col])// 多层保护没坏处,虽然置灰点mHoleInfo对应的isselected一定是false
-                    count += mHoleInfo[row][col].viewpoints.count();
+                if (mHoleInfo[row][col].isselected && !mDisablePoints[row][col])// 多层保护没坏处,虽然置灰点mHoleInfo对应的isselected一定是false
+                {
+                    // 1. 遍历所有viewrects,将rect映射到viewsize上得到新的rect
+                    // 2. 如果rect和QRectF(c,r,1.0,1.0)
+                }
             }
         }
         return count;
@@ -161,23 +163,23 @@ namespace V1 {
     int WellPattern::numberOfViews(const QPoint &holepoint)
     { // 外部调用holepoint有义务不越界
         int count = 0;
-        if (mHoleInfo[holepoint.x()][holepoint.y()].isselected &&
-            !mDisablePoints[holepoint.x()][holepoint.y()]) // 多层保护没坏处,虽然置灰点mHoleInfo对应的isselected一定是false
-            count = mHoleInfo[holepoint.x()][holepoint.y()].viewpoints.count();
+//        if (mHoleInfo[holepoint.x()][holepoint.y()].isselected &&
+//            !mDisablePoints[holepoint.x()][holepoint.y()]) // 多层保护没坏处,虽然置灰点mHoleInfo对应的isselected一定是false
+//            count = mHoleInfo[holepoint.x()][holepoint.y()].viewpoints.count();
         return count;
     }
 
     int WellPattern::numberOfViews(const QString &group)
     {
         int count = 0;
-        for(int row = 0 ; row < mrows; ++ row) {
-            for (int col = 0; col < mcols; ++col) {
-                if (mHoleInfo[row][col].isselected
-                    && mHoleInfo[row][col].group == group
-                    && !mDisablePoints[row][col]) // 多层保护没坏处,虽然置灰点mHoleInfo对应的isselected一定是false
-                    count += mHoleInfo[row][col].viewpoints.count();
-            }
-        }
+//        for(int row = 0 ; row < mrows; ++ row) {
+//            for (int col = 0; col < mcols; ++col) {
+//                if (mHoleInfo[row][col].isselected
+//                    && mHoleInfo[row][col].group == group
+//                    && !mDisablePoints[row][col]) // 多层保护没坏处,虽然置灰点mHoleInfo对应的isselected一定是false
+//                    count += mHoleInfo[row][col].viewpoints.count();
+//            }
+//        }
         return count;
     }
 
@@ -241,8 +243,8 @@ namespace V1 {
                 info.group = QString();
                 info.coordinate = QPoint(row,col);
                 info.color = Qt::red;
-                info.viewsize = QSize(-1,-1);
-                info.viewpoints = QPointVector();
+                info.viewsize = 0;
+                info.viewrects = ViewRectFVector();
 
                 info.isselected = false;
                 info.allgroup = QSet<QString>();
@@ -263,8 +265,8 @@ namespace V1 {
     { // 切换物镜时调用,需要清理掉视野窗口映射的2个信息
         for(int row = 0 ; row < mrows; ++ row) {
             for (int col = 0; col < mcols; ++col) {
-                mHoleInfo[row][col].viewpoints = QPointVector();
-                mHoleInfo[row][col].viewsize = QSize(-1,-1);
+                mHoleInfo[row][col].viewrects = ViewRectFVector();
+                mHoleInfo[row][col].viewsize = 0;
             }
         }
         update();
@@ -275,8 +277,8 @@ namespace V1 {
 
         Q_ASSERT(mHoleInfo[point.x()][point.y()].coordinate == point);
         mHoleInfo[point.x()][point.y()].group = group;
-        mHoleInfo[point.x()][point.y()].viewpoints = viewpoints;
-        mHoleInfo[point.x()][point.y()].viewsize = QSize(viewsize,viewsize);
+        //mHoleInfo[point.x()][point.y()].viewrects = viewpoints;
+        //mHoleInfo[point.x()][point.y()].viewsize = viewsize;
         mHoleInfo[point.x()][point.y()].isselected = true;
 
         mHoleInfo[point.x()][point.y()].allgroup = getAllWellGroupNames();

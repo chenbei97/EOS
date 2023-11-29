@@ -248,7 +248,7 @@ static QByteArray assemblePreviewEvent(QCVariantMap m)
     object[FieldPreviewEvent.viewsize] = m[HoleViewSizeField].toInt();
     //object[FieldPreviewEvent.current_channel] = m[CurrentChannelField].toString();
     auto holepoint = m[HoleCoordinateField].toPoint();
-    auto viewpoint = m[ViewCoordinateField].toPoint();
+    auto viewpoint = m[ViewCoordinateField].toPointF();
     object[FieldPreviewEvent.hole_x] = holepoint.x();
     object[FieldPreviewEvent.hole_y] = holepoint.y();
     object[FieldPreviewEvent.view_x] = viewpoint.x();

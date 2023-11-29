@@ -212,14 +212,9 @@ void Preview::takingPhoto()
 
 }
 
-void Preview::previewViewByClickView(const QPoint &viewpoint)
+void Preview::previewViewByClickView(const QPointF &viewpoint)
 {
-    if (viewpoint == QPoint(-1,-1)) return;
-
     auto toolinfo = previewtool->toolInfo();
-//    auto patterninfo = pattern->patternInfo();
-//    previewinfo[PreviewToolField] = toolinfo;
-//    previewinfo[PreviewPatternField] = patterninfo;
 
     // 预览事件需要的参数
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
@@ -227,7 +222,7 @@ void Preview::previewViewByClickView(const QPoint &viewpoint)
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto wellsize = toolinfo[WellsizeField].toUInt();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
-    auto holecoordinate = viewpattern->currentViewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
+    auto holecoordinate = viewpattern->viewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
     //auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     auto bright = current_info[BrightField];
@@ -268,9 +263,6 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     if (holepoint == QPoint(-1,-1)) return;
 
     auto toolinfo = previewtool->toolInfo();
-//    auto patterninfo = pattern->patternInfo();
-//    previewinfo[PreviewToolField] = toolinfo;
-//    previewinfo[PreviewPatternField] = patterninfo;
 
     // 预览事件需要的参数
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
@@ -301,8 +293,7 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     m[WellsizeField] = wellsize;
     m[HoleViewSizeField] = viewsize;
     m[HoleCoordinateField] = holecoordinate;
-    m[ViewCoordinateField] = QPoint(-1,-1);//点孔触发视野坐标没有意义
-    //m[CurrentChannelField] = current_channel; // 不需要再发当前通道了
+    m[ViewCoordinateField] = QPointF(-1.0,-1.0);//点孔触发视野坐标没有意义
     m[BrightField] = bright;
     m[IsHoleField] = 1;
 

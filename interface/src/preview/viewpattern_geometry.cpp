@@ -9,6 +9,62 @@
 
 #include "viewpattern.h"
 
+inline namespace V2 {
+
+    QRectF ViewPattern::getValidRect() const
+    { // 有效区域是圆外界正方形内的区域
+        return QRectF(getInnerRectTopLeftPoint(),QSize(getCircleRadius()*2.0,getCircleRadius()*2.0));
+    }
+
+    double ViewPattern::getCircleRadius() const
+    { // 视野圆半径
+        return width()>=height()?height()/2.0:width()/2.0;
+    }
+
+    double ViewPattern::getInnerRectWidth() const
+    {// 小矩形区域的宽度
+        return 2 * getCircleRadius() /  mSize *1.0;
+    }
+
+    double ViewPattern::getInnerRectHeight() const
+    {// 小矩形区域的高度
+        return 2 * getCircleRadius() / mSize *1.0;
+    }
+
+    QPointF ViewPattern::getInnerRectTopLeftPoint() const
+    {// 外接正方形左上角顶点
+        if (width()>=height())
+            return QPointF(width()/2.0-getCircleRadius(),0.0);
+        else
+            return QPointF(0.0,height()/2.0-getCircleRadius()); // 左上角x=0
+    }
+
+    QPointF ViewPattern::getInnerRectTopRightPoint() const
+    {// 外接正方形右上角顶点
+        if (width()>=height())
+            return QPointF(width()/2.0+getCircleRadius(),0.0);
+        else
+            return QPointF(width(),height()/2.0-getCircleRadius());
+    }
+
+    QPointF ViewPattern::getInnerRectBottomLeftPoint() const
+    {// 外接正方形左下角顶点
+        if (width()>=height())
+            return QPointF(width()/2.0-getCircleRadius(),height());
+        else
+            return QPointF(0,height()/2.0+getCircleRadius());
+    }
+
+    QPointF ViewPattern::getInnerRectBottomRightPoint() const
+    {// 外接正方形右下角顶点
+        if (width()>=height())
+            return QPointF(width()/2.0+getCircleRadius(),height());
+        else
+            return QPointF(width(),height()/2.0+getCircleRadius());
+    }
+
+} // end namespace v2
+
 namespace V1 {
     double ViewPattern::getCircleRadius() const
     { // 视野圆半径

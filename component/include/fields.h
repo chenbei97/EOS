@@ -298,9 +298,9 @@ static const char* DurationTimeField = "duration_time";
 static const char* StartTimeField = "start_time";
 
 // groupinfo涉及的
-static const char* HoleGroupNameField = "holegroup_name"; // 本孔所属组名称
-static const char* HoleGroupColorField = "holegroup_color"; // 本孔所属组颜色
-static const char* HoleGroupCoordinatesField = "holegroup_coordinates"; // 本孔所属组的所有孔坐标
+static const char* HoleGroupNameField = "hole_groupname"; // 本孔所属组名称
+static const char* HoleGroupColorField = "hole_groupcolor"; // 本孔所属组颜色
+static const char* HoleGroupCoordinatesField = "hole_groupcoordinates"; // 本孔所属组的所有孔坐标
 static const char* HoleCoordinateField = "hole_coordinate"; // 孔的坐标
 static const char* ViewCoordinateField = "view_coordinate"; // 视野的坐标
 static const char* ViewXCoordinateField = "view_x";

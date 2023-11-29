@@ -9,12 +9,70 @@
 
 #include "viewpattern.h"
 
-namespace V2 {
+inline namespace V2 {
     void ViewPattern::paintEvent(QPaintEvent *event)
     {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        auto pen = painter.pen();
+        pen.setWidth(2);
+        painter.setPen(pen);
+        //painter.fillRect(rect(),Qt::white);
 
+        auto groupcolor = mViewInfo[HoleGroupColorField].toString();
+        auto diameter = width()>=height()?height():width();
+        if (!mViewRects[holeID()].isEmpty()) {
+            for(auto viewRect: mViewRects[holeID()]) {
+                if (viewRect.flag)
+                    painter.fillRect(mapToSize(viewRect.rect,getInnerRectTopLeftPoint(),diameter,diameter),groupcolor);
+                else painter.fillRect(mapToSize(viewRect.rect,getInnerRectTopLeftPoint(),diameter,diameter),DefaultNativeColor);
+            }
+        }
+
+        auto radius = width()>=height()?height()/2.0:width()/2.0;
+        painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
+
+        auto p11 = getInnerRectTopLeftPoint();
+        auto p12 = getInnerRectTopRightPoint();
+        auto p21 = getInnerRectBottomLeftPoint();
+        auto p22 = getInnerRectBottomRightPoint();
+        painter.drawLine(p11,p21);
+        painter.drawLine(p12,p22);
+        painter.drawLine(p11,p12);
+        painter.drawLine(p21,p22);
+        pen = painter.pen();
+        pen.setWidth(1);
+        pen.setColor(Qt::gray);
+        painter.setPen(pen);
+        auto hor_offset = getInnerRectWidth();
+        for (int i = 1; i <= mSize-1; ++i) {
+            auto top = p11 + QPointF(i*hor_offset,0);
+            auto bottom = p21 + QPointF(i*hor_offset,0);
+            painter.drawLine(top,bottom);
+        }
+        auto ver_offset = getInnerRectHeight();
+        for (int i = 1; i <= mSize-1; ++i){
+            auto top = p11 + QPointF(0,ver_offset*i);
+            auto bottom = p12 + QPointF(0,ver_offset*i);
+            painter.drawLine(top,bottom);
+        }
+        pen = painter.pen();
+        pen.setWidth(2);
+        pen.setColor(Qt::black);
+        painter.setPen(pen);
+
+        if (!mDrapRectF.isEmpty()) {
+            auto pen = painter.pen();
+            pen.setColor(Qt::blue);
+            painter.setPen(pen);
+            painter.drawRect(mapToSize(mDrapRectF,getInnerRectTopLeftPoint(),radius*2,radius*2));
+            pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
+            painter.setPen(pen);
+        }
+
+        event->accept();
     }
-}
+} // end namespace v2
 
 namespace V1 {
     void ViewPattern::drawSelectRect(QPainter &painter)

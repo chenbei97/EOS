@@ -102,10 +102,12 @@ typedef const QVector<QVector<QBoolColorPair>>& QCBoolColorPair2DVector;
 
 typedef QPair<QRectF,bool> QRectFMask;
 typedef QVector<QRectFMask> QRectFMaskVector;
-struct ViewRectF
-{
+struct ViewRectF {
     QRectF rect;
     bool flag;
+    friend QDebug operator<<(QDebug debug, const ViewRectF& s) {
+        debug<<"rect = "<<s.rect<<" flag = "<<s.flag;
+    }
 };
 Q_DECLARE_METATYPE(ViewRectF);
 typedef QVector<ViewRectF> ViewRectFVector;
@@ -169,22 +171,22 @@ struct HoleInfo {
     QPoint coordinate; // 本孔坐标
 
     // 视野窗口传递来的信息
-    QPointVector viewpoints; // 本孔分配的视野坐标
-    QSize viewsize; // 本孔分配的视野尺寸
+    ViewRectFVector viewrects; // 本孔分配的视野区域信息
+    int viewsize; // 本孔分配的视野尺寸
 
     // 每次打开分组窗口就会重新计算分过的组名和所有选中的孔坐标
     QSet<QString> allgroup; // 孔板所有分过的组别信息
     QPoint2DVector allcoordinate; // 孔板所有选过的孔坐标
 
     friend QDebug operator<<(QDebug debug, const HoleInfo& s) {
-        debug << "(group,coordinate,color,viewsize,viewpoints,"
+        debug << "(group,coordinate,color,viewsize,viewrects,"
                  "isselect,allgroup,allcoordinate,"
                  "type,medicine,dose,unit)=[";
         debug <<s.group<<",";
         debug <<s.coordinate<<",";
         debug <<s.color<<",";
         debug <<s.viewsize<<",";
-        debug <<s.viewpoints<<",";
+        debug <<s.viewrects<<",";
 
         debug <<s.isselected<<",";
         debug <<s.allgroup<<",";

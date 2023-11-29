@@ -9,10 +9,38 @@
 
 #include "viewpattern.h"
 
-namespace V2 {
+inline namespace V2 {
     void ViewPattern::mousePressEvent(QMouseEvent *event)
     {
+        mMousePos = event->pos();
+        if (!getValidRect().contains(mMousePos)) // 如果不是有效区域的鼠标点击无效
+            mMousePos = {-1.0,-1.0};
 
+        // 1.框选后随机点一下要清除框选
+        if (event->button() == Qt::LeftButton) {
+            mDrapRectF = QRectF();
+            update();
+        } else if (event->button() == Qt::RightButton) {
+            if (mViewInfo[HoleGroupNameField].toString().isEmpty() || mMousePos == QPointF(-1.0,-1.0)) {
+                applyallact->setEnabled(false);
+                applygroupact->setEnabled(false);
+                saveviewact->setEnabled(false);
+                removeviewact->setEnabled(false);
+            } else {
+                applyallact->setEnabled(true);
+                applygroupact->setEnabled(true);
+                saveviewact->setEnabled(true);
+                removeviewact->setEnabled(true);
+            }
+        }
+        // 将鼠标坐标映射为相对圆外接正方形左上角的相对坐标,并将其归一化
+        if (mMousePos != QPointF(-1.0,-1.0)) {
+            auto pos = mMousePos-getInnerRectTopLeftPoint();
+            pos = pos / (getCircleRadius() * 2.0);
+            emit previewEvent(pos);
+        }
+        update();
+        event->accept();
     }
 
     void ViewPattern::mouseReleaseEvent(QMouseEvent *event)
@@ -22,9 +50,19 @@ namespace V2 {
 
     void ViewPattern::mouseMoveEvent(QMouseEvent *event)
     {
-
+        if (event->buttons() & Qt::LeftButton){
+            auto end = event->pos(); // 鼠标停下的点
+            if (!getValidRect().contains(mMousePos) || !getValidRect().contains(end))
+                return; // 框选到无效区域
+            auto diameter = width()>=height()?height():width();
+            // 鼠标形成的矩形框将其等比例缩放到0-1
+            mDrapRectF = mapFromSize(QRectF(mMousePos,end),
+                                     getInnerRectTopLeftPoint(),diameter,diameter);
+        }
+        update();
+        event->accept();
     }
-}
+} // end namespace V2
 
 namespace V1 {
     void ViewPattern::mousePressEvent(QMouseEvent *event)

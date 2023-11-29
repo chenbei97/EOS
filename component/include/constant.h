@@ -26,7 +26,7 @@ Q_ENUMS(SQLType)
 #define UserScreenWidth (QApplication::desktop()->screenGeometry().width())
 #define UserScreenHeight (QApplication::desktop()->screenGeometry().height())
 #define WarningChinese tr("Warning")
-#define  InformationChinese tr("Information")
+#define InformationChinese tr("Information")
 #define CriticalChinese tr("Critical")
 #define DefaultDateTimeFormat "yyyy-MM-dd hh:mm"
 #define DefaultImageDateTimeFormat "yyyy-MM-dd-hh-mm-ss"
@@ -44,6 +44,7 @@ Q_ENUMS(SQLType)
 #define SocketPort 3000
 #define LocalHost "localhost"
 #define SocketWaitTime 3000
+#define DefaultNativeColor QColor("#F0F0F0")
 //#define UseSqlcipher true
 #define TakePhotoTempPath (CURRENT_PATH+"/temp/photo/")
 #define MergeChannelTempPath (CURRENT_PATH+"/temp/merge/")
