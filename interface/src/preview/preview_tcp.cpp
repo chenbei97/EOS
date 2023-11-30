@@ -254,7 +254,8 @@ void Preview::previewViewByClickView(const QPointF &viewpoint)
     auto msg = AssemblerPointer->message();
     SocketPointer->exec(TcpFramePool.previewEvent,msg, true);
     if (ParserResult.toBool()) {
-        LOG<<"已经移动电机到指定视野坐标 "<<viewpoint;
+        LOG<<QString("move to view point (%1,%2)").arg(convertPrecision(viewpoint.x()))
+        .arg(convertPrecision(viewpoint.y()));
     }
 }
 
@@ -301,7 +302,7 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     auto msg = AssemblerPointer->message();
     SocketPointer->exec(TcpFramePool.previewEvent,msg, true);
     if (ParserResult.toBool()) {
-        LOG<<"已经移动电机到指定孔坐标 "<<holepoint;
+        LOG<<"move to hole point "<<holepoint;
     }
 }
 
@@ -418,8 +419,10 @@ void Preview::loadExper()
                 auto grouppoints = holeinfo[HoleGroupCoordinatesField].value<QPointVector>();
 
                 auto coordinate = holeinfo[HoleCoordinateField].toPoint();
-                auto viewsize = holeinfo[HoleViewSizeField].toSize();
-                auto viewpoints = holeinfo[HoleViewPointsField].value<QPointVector>();
+                auto viewsize = holeinfo[HoleViewSizeField].toInt();
+                auto viewpoints = holeinfo[HoleViewPointsField].value<ViewPointVector>();
+                auto uipoints = holeinfo[HoleViewUiPointsField].value<ViewPointVector>();
+                auto viewrects = holeinfo[HoleViewRectsField].value<ViewRectFVector>();
 
                 auto expertype = holeinfo[HoleExperTypeField].toString();
                 auto medicine = holeinfo[HoleMedicineField].toString();

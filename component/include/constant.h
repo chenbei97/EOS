@@ -20,6 +20,7 @@
 enum class SQLType {Mysql,Sqlite};
 Q_ENUMS(SQLType)
 
+const int DefaultPrecisionBit = 6;
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 #define SqlExecFailedLOG (qDebug()<<"[" \
     <<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] sql exec failed! error is ")

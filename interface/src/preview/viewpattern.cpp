@@ -19,7 +19,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         update();
     }
 
-    void ViewPattern::clearAllViewWindowCache(int viewSize)
+    void ViewPattern::clearAllViewWindowCache(int viewSize,bool toggleObjective)
     {// 切换厂家或者物镜倍数时把所有的区域信息都要清空,对于mViewInfo只需要清理视野相关的2个信息
         mDrapRectF = QRectF();
         mViewRects.clear();
@@ -27,11 +27,24 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
 
         if (viewSize != mViewInfo[HoleViewSizeField].toInt()) {
             mViewInfo[HoleViewSizeField] = viewSize;
-            mViewInfo[HoleViewPointsField].setValue(ViewRectFVector()); // 清空视野信息
+            mViewInfo[HoleViewRectsField].setValue(ViewRectFVector()); // 清空视野信息
+            mViewInfo[HoleViewUiPointsField].setValue(ViewPointVector());
+            mViewInfo[HoleViewPointsField].setValue(ViewPointVector());
         } // 其它与孔有关的信息只有setViewInfo时才会传递,如果清除了就会丢掉这些信息
+        // 如果是切物镜,wellpattern没有清理掉well相关的信息,view也不需要清除
+        // 如果是切厂家,wellpattern完全重置,view也必须清理掉这些信息,否则信息传递的一些Q_Assert不成立
+        if (!toggleObjective) {
+            mViewInfo[HoleGroupColorField] = QColor(Qt::red);
+            mViewInfo[HoleGroupNameField] = "";
+            mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
+            mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
+            mViewInfo[WellAllGroupsField].setValue(QSet<QString>());
+        }
 
+        //m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
+        //m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
+        // HoleGroupCoordinatesField 该组的所有孔坐标不组装
         mSize = viewSize;
-        initViewMask();
         update();
     }
 
@@ -45,14 +58,18 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         checkField();
         if (mViewInfo[HoleGroupNameField].toString().isEmpty())
             return;
+
         QVariantMap m;
         m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
-        m[HoleViewPointsField].setValue(mViewRects[holeID()]); // 视野窗口的区域信息
+        m[HoleViewRectsField].setValue(mViewRects[holeID()]); // 视野窗口的区域信息
+        m[HoleViewUiPointsField].setValue(mUiViewMaskNormPoints);
+        m[HoleViewPointsField].setValue(mViewMaskNormPoints);
         m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以把所有组颜色统一(可能没分过组默认颜色红色,无所谓)
         m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名信息(应用到所有组时只有同组的组颜色需要覆盖)
+        m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
         //m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
         //m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
-        m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
+        // HoleGroupCoordinatesField 该组的所有孔坐标不组装
         emit applyAllEvent(m);// 5个信息足够
 
         auto allholes = mViewInfo[WellAllHolesField].value<QPoint2DVector>();//拿到所有分过组的孔坐标
@@ -79,7 +96,10 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
         m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
         m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
-        m[HoleViewPointsField].setValue(mViewRects[holeID()]); // 视野窗口的区域信息
+        // HoleGroupCoordinatesField 该组的所有孔坐标不组装
+        m[HoleViewRectsField].setValue(mViewRects[holeID()]); // 视野窗口的区域信息
+        m[HoleViewUiPointsField].setValue(mUiViewMaskNormPoints);
+        m[HoleViewPointsField].setValue(mViewMaskNormPoints);
         emit applyGroupEvent(m);
 
         auto holeCoordinates = mViewInfo[HoleGroupCoordinatesField].value<QPointVector>();//拿到本组其它孔的所有孔坐标
@@ -100,11 +120,14 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         QVariantMap m;
         m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名称,方便pattern依据组名查找所有孔
         m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
-        m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
-        m[HoleViewPointsField].setValue(mViewRects[holeID()]); // 视野窗口的区域信息
         m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
         m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
         m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
+        m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
+        // HoleGroupCoordinatesField 该组的所有孔坐标不组装
+        m[HoleViewRectsField].setValue(mViewRects[holeID()]); // 视野窗口的区域信息
+        m[HoleViewUiPointsField].setValue(mUiViewMaskNormPoints);
+        m[HoleViewPointsField].setValue(mViewMaskNormPoints);
         emit applyHoleEvent(m);
     }
 
@@ -122,7 +145,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
             info.rect = mMouseRect;
             mViewRects[id].append(info);
         }
-
+        viewRectsMapToViewMask();
         mMouseRect = QRectF();
         mTmpRects[id] = mViewRects[id];
         applyholeact->trigger();
@@ -143,7 +166,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
             info.rect = mMouseRect;
             mViewRects[id].append(info);
         }
-
+        viewRectsMapToViewMask();
         mMouseRect = QRectF();
         mTmpRects[id] = mViewRects[id];
         applyholeact->trigger();
@@ -169,13 +192,13 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         else mTmpRects[id].clear();
 
         mSize = size;
-        initViewMask(); // 先初始mSize再重新初始化mMask
 
         update();
     }
 
     ViewPattern::ViewPattern(QWidget *parent) : QWidget(parent)
     {
+        initViewMask();
         saveviewact = new QAction(tr("Selecting Points"));
         removeviewact = new QAction(tr("Remove Points"));
         applyholeact = new QAction(tr("Apply To Hole"));
@@ -208,18 +231,21 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
     }
 
     bool ViewPattern::checkField() const
-    { // 避免bug或者漏掉信息,审查mViewInfo的字段是否完整
-        //LOG<<mViewInfo;
+    {   // 避免bug或者漏掉信息,审查mViewInfo的字段是否完整
+        // wellpattern组装6个信息,viewpattern自行组装4个信息,共10个,其中HoleViewRectsField其实不需要了
+        // 但是为了兼容老接口,先如此保留,绘图时不使用HoleViewRectsField的信息去绘制了
         auto fields = mViewInfo.keys();
 
         bool r1 = fields.contains(HoleGroupNameField); // 组名称
         bool r2 = fields.contains(HoleGroupColorField);// 组颜色
-        bool r3 = fields.contains(HoleViewSizeField);// 视野内部划分尺寸
-        bool r4 = fields.contains(HoleViewPointsField); // 视野区域
-        bool r5 = fields.contains(WellAllGroupsField); // 所有组名
-        bool r6 = fields.contains(HoleCoordinateField); // 当前孔坐标
-        bool r7 = fields.contains(WellAllHolesField); // 所有孔坐标
-        bool r8 = fields.contains(HoleGroupCoordinatesField); // 本组的所有孔坐标
+        bool r3 = fields.contains(WellAllGroupsField); // 所有组名
+        bool r4 = fields.contains(HoleCoordinateField); // 当前孔坐标
+        bool r5 = fields.contains(WellAllHolesField); // 所有孔坐标
+        bool r6 = fields.contains(HoleGroupCoordinatesField); // 本组的所有孔坐标
+        bool r7 = fields.contains(HoleViewSizeField);// 视野内部划分尺寸
+        bool r8 = fields.contains(HoleViewRectsField); // 视野区域
+        bool r9 = fields.contains(HoleViewUiPointsField); // 视野掩码映射的坐标信息
+        bool ra = fields.contains(HoleViewPointsField); // 视野掩码映射的坐标信息
 
         Q_ASSERT(r1 == true);
         Q_ASSERT(r2 == true);
@@ -229,34 +255,32 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         Q_ASSERT(r6 == true);
         Q_ASSERT(r7 == true);
         Q_ASSERT(r8 == true);
+        Q_ASSERT(r9 == true);
+        Q_ASSERT(ra == true);
 
-        return r1&&r2&&r3&&r4&&r5&&r6&&r7&&r8;
+        return r1&&r2&&r3&&r4&&r5&&r6&&r7&&r8&&r9&&ra;
     }
 
     void ViewPattern::initViewMask()
     {
+        mUiViewMask.clear();
         mViewMask.clear();
-        for(int r = 0; r < mSize; ++r)
+        for(int r = 0; r < mUiViewMaskSize; ++r)
         {
             QBoolVector vec;
-            for(int c = 0; c < mSize; ++c) {
+            for(int c = 0; c < mUiViewMaskSize; ++c) {
+                vec.append(false);
+            }
+            mUiViewMask.append(vec);
+        }
+        for(int r = 0; r < mViewMaskSize; ++r)
+        {
+            QBoolVector vec;
+            for(int c = 0; c < mViewMaskSize; ++c) {
                 vec.append(false);
             }
             mViewMask.append(vec);
         }
-    }
-
-    QPointFVector ViewPattern::viewMaskPoints() const
-    { // 计算固定掩码选中的个数
-        QPointFVector points;
-        for(int r = 0; r < mSize; ++r) {
-            for(int c = 0; c < mSize; ++c) {
-                if (mViewMask[r][c])
-                    points.append(QPointF(r,c));
-            }
-        }
-        LOG<<"view mask's point count = "<<points.count();
-        return points;
     }
 
     QRectF ViewPattern::mapToSize(const QRectF &source,const QPointF&ref_point,int ref_w,int ref_h)
@@ -290,18 +314,95 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
     { // 把mViewRects[idx]的信息映射到Mask,依据mSize
         auto viewRects = mViewRects[holeID()];
 
-        for(int r = 0; r < mSize; ++r) {
-            for(int c = 0; c < mSize; ++c) {
-                for(auto viewRect: viewRects) {
-                    auto flag = viewRect.flag;
-                    auto rect = mapToSize(viewRect.rect,QPoint(0,0),mSize,mSize); // 等比例放大尺寸到mSize
-                    if (rect.intersects(QRectF(c,r,1.0,1.0))) {
-                        mViewMask[r][c] = flag; //掩码对应位置根据flag标记是保存还是删除的区域
+        mUiViewMaskPoints.clear();
+        mUiViewMaskNormPoints.clear();
+        mViewMaskNormPoints.clear();
+
+        if (mViewMaskSize >= mUiViewMaskSize) {
+            for(int r = 0; r < mViewMaskSize; ++r) {
+                for(int c = 0; c < mViewMaskSize; ++c) {
+                    for(auto viewRect: viewRects) {
+                        auto flag = viewRect.flag; // 对于位置[r][c] 3层的for结束后,就知道这个位置是否被选中
+                        // 1. 处理100x100的部分
+                        if (r < mUiViewMaskSize && c < mUiViewMaskSize)
+                        {
+                            auto rect = mapToSize(viewRect.rect,QPointF(0.0,0.0),
+                                                  mUiViewMaskSize,mUiViewMaskSize); // 等比例放大尺寸到mUiViewMaskSize
+                            if (rect.intersects(QRectF(c,r,1.0,1.0))) {
+                                mUiViewMask[r][c] = flag; //掩码对应位置根据flag标记是保存还是删除的区域
+                            }
+                        }
+                        // 2. 所有坐标都处理
+                        auto rect = mapToSize(viewRect.rect,QPointF(0.0,0.0),
+                                              mViewMaskSize,mViewMaskSize); // 等比例放大尺寸到mViewMaskSize
+                        if (rect.intersects(QRectF(c,r,1.0,1.0))) {
+                            mViewMask[r][c] = flag; //掩码对应位置根据flag标记是保存还是删除的区域
+                        }
+                    }  // end 2层for
+
+                    // 1. 处理100x100的部分
+                    if (r < mUiViewMaskSize && c < mUiViewMaskSize) {// 要放在二层for这里
+                        if (mUiViewMask[r][c]) { // 顺便把不为0的位置记录下来,其它地方就不再需要重复遍历了
+                            mUiViewMaskPoints.append(QPointF(c+0.5,r+0.5));
+                            ViewPoint point;
+                            point.x = convertPrecision((c+0.5)/mUiViewMaskSize);
+                            point.y = convertPrecision((r+0.5)/mUiViewMaskSize);
+                            mUiViewMaskNormPoints.append(point);
+                        }
                     }
-                } // 对于位置[r][c]for结束后,就知道这个位置是否被选中
+                    // 2. 所有坐标都处理
+                    if (mViewMask[r][c]) { // 顺便把不为0的位置记录下来,其它地方就不再需要重复遍历了
+                        ViewPoint point;
+                        point.x = convertPrecision((c+0.5)/mViewMaskSize);
+                        point.y = convertPrecision((r+0.5)/mViewMaskSize);
+                        mViewMaskNormPoints.append(point);
+                    }
+                }
+            }
+        } else { // mViewMaskSize比较小
+            for(int r = 0; r < mUiViewMaskSize; ++r) {
+                for(int c = 0; c < mUiViewMaskSize; ++c) {
+                    for(auto viewRect: viewRects) {
+                        auto flag = viewRect.flag; // 对于位置[r][c] 3层的for结束后,就知道这个位置是否被选中
+                        // 1. 处理100x100的部分
+                        if (r < mViewMaskSize && c < mViewMaskSize)
+                        {
+                            auto rect = mapToSize(viewRect.rect,QPointF(0.0,0.0),
+                                                  mViewMaskSize,mViewMaskSize); // 等比例放大尺寸到mUiViewMaskSize
+                            if (rect.intersects(QRectF(c,r,1.0,1.0))) {
+                                mViewMask[r][c] = flag; //掩码对应位置根据flag标记是保存还是删除的区域
+                            }
+                        }
+                        // 2. 所有坐标都处理
+                        auto rect = mapToSize(viewRect.rect,QPointF(0.0,0.0),
+                                              mUiViewMaskSize,mUiViewMaskSize); // 等比例放大尺寸到mViewMaskSize
+                        if (rect.intersects(QRectF(c,r,1.0,1.0))) {
+                            mUiViewMask[r][c] = flag; //掩码对应位置根据flag标记是保存还是删除的区域
+                        }
+                    }  // end 2层for
+
+                    // 1. 处理100x100的部分
+                    if (r < mViewMaskSize && c < mViewMaskSize) {// 要放在二层for这里
+                        if (mViewMask[r][c]) { // 顺便把不为0的位置记录下来,其它地方就不再需要重复遍历了
+                            ViewPoint point;
+                            point.x = convertPrecision((c+0.5)/mViewMaskSize);
+                            point.y = convertPrecision((r+0.5)/mViewMaskSize);
+                            mViewMaskNormPoints.append(point);
+                        }
+                    }
+                    // 2. 所有坐标都处理
+                    if (mUiViewMask[r][c]) { // 顺便把不为0的位置记录下来,其它地方就不再需要重复遍历了
+                        mUiViewMaskPoints.append(QPointF(c+0.5,r+0.5));
+                        ViewPoint point;
+                        point.x = convertPrecision((c+0.5)/mUiViewMaskSize);
+                        point.y = convertPrecision((r+0.5)/mUiViewMaskSize);
+                        mUiViewMaskNormPoints.append(point);
+                    }
+                }
             }
         }
 
+        LOG<<"ui count = "<<mUiViewMaskNormPoints.count()<<" mask count = "<<mViewMaskNormPoints.count();
     }
 
     ViewInfo ViewPattern::viewInfo() const
@@ -407,7 +508,7 @@ namespace V1 {
         Q_ASSERT(currentviewsize.width() == currentviewsize.height());
         if (currentviewsize.width() != viewsize) {// 视野尺寸相同就不需要清除
             mCurrentViewInfo[HoleViewSizeField] = QSize(viewsize,viewsize); // 更新viewsize
-            mCurrentViewInfo[HoleViewPointsField].setValue(QPointVector()); // 清除原有的视野点数
+            mCurrentViewInfo[HoleViewPointsField].setValue(QPointVector()); // 清除原有的视野区域
         } // 其它不要清除,否则WellPattern::updateHoleInfoByViewInfoApplyAll这里的交互和QAssert可能设定失败
 
         mrows = viewsize;

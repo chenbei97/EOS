@@ -34,6 +34,8 @@ using std::modf;
 // (3) 常量
 // navigbar
 //#define use_opencv2 0 // 要和interface-cmakelist的USE_OPNECV一致
+const int DefaultUiMaskSize = 50;
+const int DefaultMaskSize = 30;
 #define NavigPainterFontSize 20
 #define NavigPainterFont (QFont(DefaultFontFamily,NavigPainterFontSize,QFont::Bold))
 #define NavigPainterMetric (QFontMetrics(NavigPainterFont))

@@ -100,13 +100,36 @@ typedef const QVector<QPair<bool,QColor>>& QCBoolColorPairVector;
 typedef QVector<QVector<QBoolColorPair>> QBoolColorPair2DVector;
 typedef const QVector<QVector<QBoolColorPair>>& QCBoolColorPair2DVector;
 
-typedef QPair<QRectF,bool> QRectFMask;
-typedef QVector<QRectFMask> QRectFMaskVector;
+struct ViewPoint {
+    QString x;
+    QString y;
+
+    ViewPoint(){}
+    ViewPoint(const ViewPoint& s) {
+        x = s.x;
+        y = s.y;
+    }
+    ViewPoint(double x, double y) {
+        this->x = QString::number(x);
+        this->y = QString::number(y);
+    }
+    ViewPoint(int x, int y) {
+        this->x = QString::number(x);
+        this->y = QString::number(y);
+    }
+    friend QDebug operator<<(QDebug debug, const ViewPoint& s) {
+        debug<<QString("(%1,%2)").arg(s.x).arg(s.y);
+        return debug;
+    }
+};
+Q_DECLARE_METATYPE(ViewPoint);
+typedef QVector<ViewPoint> ViewPointVector;
 struct ViewRectF {
     QRectF rect;
     bool flag;
     friend QDebug operator<<(QDebug debug, const ViewRectF& s) {
         debug<<"rect = "<<s.rect<<" flag = "<<s.flag;
+        return debug;
     }
 };
 Q_DECLARE_METATYPE(ViewRectF);
@@ -172,6 +195,8 @@ struct HoleInfo {
 
     // 视野窗口传递来的信息
     ViewRectFVector viewrects; // 本孔分配的视野区域信息
+    ViewPointVector uipoints; // 绘图使用(够用就行)
+    ViewPointVector viewpoints; // 本孔要扫描的视野坐标(电机坐标更精细)
     int viewsize; // 本孔分配的视野尺寸
 
     // 每次打开分组窗口就会重新计算分过的组名和所有选中的孔坐标
@@ -179,7 +204,7 @@ struct HoleInfo {
     QPoint2DVector allcoordinate; // 孔板所有选过的孔坐标
 
     friend QDebug operator<<(QDebug debug, const HoleInfo& s) {
-        debug << "(group,coordinate,color,viewsize,viewrects,"
+        debug << "(group,coordinate,color,viewsize,rects,viewpoints,uipoints,"
                  "isselect,allgroup,allcoordinate,"
                  "type,medicine,dose,unit)=[";
         debug <<s.group<<",";
@@ -187,6 +212,8 @@ struct HoleInfo {
         debug <<s.color<<",";
         debug <<s.viewsize<<",";
         debug <<s.viewrects<<",";
+        debug <<s.viewpoints<<",";
+        debug <<s.uipoints<<",";
 
         debug <<s.isselected<<",";
         debug <<s.allgroup<<",";

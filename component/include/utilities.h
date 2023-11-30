@@ -23,6 +23,33 @@
 //#include "sysinfoapi.h"
 //#include <windows.h>
 
+/*精度转换函数*/
+static QString convertPrecision(const QString& s,int precision = 6)
+{
+    int idx = s.indexOf(".");
+    int count = s.mid(idx+1).count();
+    QString res = s;
+    if (count > precision) {
+        res = s.left(idx+1+precision);
+    } else if (count < precision) {
+        auto bit = precision-count;
+        while (bit--) {
+            res.append("0");
+        }
+    }
+    return res;
+}
+
+static QString convertPrecision(double n,int precision = 6)
+{
+    return convertPrecision(QString::number(n),precision);
+}
+
+static QString convertPrecision(int n,int precision = 6)
+{
+    return convertPrecision(QString::number(n)+".",precision);
+}
+
 /*获取电脑所有的盘符*/
 static QStringList systemDrivers()
 { // ("C:/", "D:/")

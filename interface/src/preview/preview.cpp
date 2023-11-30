@@ -46,7 +46,7 @@ void Preview::onWellbrandChanged(int option)
 
     // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
     //LOG<<manufacturer<<brand<<objective<<size;
-    viewpattern->clearAllViewWindowCache(size);
+    viewpattern->clearAllViewWindowCache(size, false);
 
     // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
     dock->setWindowTitle(tr("Select Hole Inside View"));
@@ -133,10 +133,12 @@ void Preview::updateViewWindow(const QVariantMap& m)
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
     //LOG<<" manufacturer = "<<manufacturer<<" brand = "<<brand<<" objective = "<<objective<<" size = "<<size;
 
-    // 3. ⭐⭐⭐⭐ 把图案的信息传给视野窗口,必须这里额外组装2个字段
+    // 3. ⭐⭐⭐⭐ 把图案的信息传给视野窗口,必须这里额外组装3个字段
     auto nm = m;
     nm[HoleViewSizeField] = size;
-    nm[HoleViewPointsField].setValue(ViewRectFVector());
+    nm[HoleViewRectsField].setValue(ViewRectFVector());
+    nm[HoleViewUiPointsField].setValue(ViewPointVector());
+    nm[HoleViewPointsField].setValue(ViewPointVector());
 
     if (holepoint != QPoint(-1,-1))
         viewpattern->setViewInfo(nm);

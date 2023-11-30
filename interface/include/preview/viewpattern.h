@@ -17,7 +17,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         void paintEvent(QPaintEvent *event) override;
 
         void clearViewWindowCache(const QPoint &holePoint);
-        void clearAllViewWindowCache(int viewSize);
+        void clearAllViewWindowCache(int viewSize,bool toggleObjective = true);
         void updateViewWindowCache(QCPoint holePoint, QCPointVector viewPoints,int viewSize);
 
         void setDisablePoint(QCPoint point, bool enable = true);
@@ -25,9 +25,14 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         void setDisablePoints(bool enable = true);
     private:
         int mSize = 0;
+        QBool2DVector mUiViewMask;
         QBool2DVector mViewMask;
+        const int mUiViewMaskSize = DefaultUiMaskSize; // 用于绘图 100就可以了
+        const int mViewMaskSize = DefaultMaskSize; // 电机坐标要精细一些
+        QPointFVector mUiViewMaskPoints;
+        ViewPointVector mUiViewMaskNormPoints;
+        ViewPointVector mViewMaskNormPoints;
         void initViewMask();
-        QPointFVector viewMaskPoints() const;
         void viewRectsMapToViewMask();
         QRectF mapToSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);
         QRectF mapFromSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);

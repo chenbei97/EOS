@@ -17,25 +17,34 @@ inline namespace V2 {
         auto pen = painter.pen();
         pen.setWidth(2);
         painter.setPen(pen);
-        //painter.fillRect(rect(),Qt::white);
-
-        auto groupcolor = mViewInfo[HoleGroupColorField].toString();
-        auto diameter = width()>=height()?height():width();
-        if (!mViewRects[holeID()].isEmpty()) {
-            for(auto viewRect: mViewRects[holeID()]) {
-                if (viewRect.flag)
-                    painter.fillRect(mapToSize(viewRect.rect,getInnerRectTopLeftPoint(),diameter,diameter),groupcolor);
-                else painter.fillRect(mapToSize(viewRect.rect,getInnerRectTopLeftPoint(),diameter,diameter),DefaultNativeColor);
-            }
-        }
 
         auto radius = width()>=height()?height()/2.0:width()/2.0;
-        painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
-
+        auto diameter = 2.0 * radius;
         auto p11 = getInnerRectTopLeftPoint();
         auto p12 = getInnerRectTopRightPoint();
         auto p21 = getInnerRectBottomLeftPoint();
         auto p22 = getInnerRectBottomRightPoint();
+        //painter.fillRect(rect(),Qt::white);
+
+        auto groupcolor = mViewInfo[HoleGroupColorField].toString();
+
+//        if (!mViewRects[holeID()].isEmpty()) {
+//            for(auto viewRect: mViewRects[holeID()]) {
+//                if (viewRect.flag)
+//                    painter.fillRect(mapToSize(viewRect.rect,p11,diameter,diameter),groupcolor);
+//                else painter.fillRect(mapToSize(viewRect.rect,p11,diameter,diameter),DefaultNativeColor);
+//            }
+//        }
+
+        // 新的写法,相当于弃用视野区域信息,wellpattern对应也使用点来绘制区域,2者的mViewMaskSize一致就可
+        for(auto pt: mUiViewMaskNormPoints) {
+                auto w = 1.0 / mUiViewMaskSize;
+                auto h = 1.0 / mUiViewMaskSize;
+                auto viewRect = QRectF(pt.x.toDouble(),pt.y.toDouble(),w,h);
+                painter.fillRect(mapToSize(viewRect,p11,diameter,diameter),groupcolor);
+        }
+
+        painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
         painter.drawLine(p11,p21);
         painter.drawLine(p12,p22);
         painter.drawLine(p11,p12);
