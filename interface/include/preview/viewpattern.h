@@ -25,6 +25,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         void setDisablePoints(bool enable = true);
     private:
         int mSize = 0;
+        //QMap<int,QBool2DVector> mUiViewMask;
         QBool2DVector mUiViewMask;
         const int mUiViewMaskSize = DefaultUiMaskSize; // 用于绘图 50-100就可以了
         ViewPointVector mViewMaskNormPoints;

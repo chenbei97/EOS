@@ -266,7 +266,7 @@ void WellPattern::initHoleInfo()
 }
 
 void WellPattern::clearAllHoleViewPoints()
-{ // 切换物镜时调用,需要清理掉视野窗口映射的2个信息
+{ // 切换物镜时调用,需要清理掉视野窗口映射的4个信息
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
             mHoleInfo[row][col].viewrects = ViewRectFVector();
@@ -281,13 +281,44 @@ void WellPattern::clearAllHoleViewPoints()
 void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize)
 { // 更新指定孔的信息,用于导入实验配置时逐孔更新
     ViewPointVector points;
+    QRectFVector rects;
     for(auto pt: viewpoints)
+    {
         points.append(ViewPoint(pt.x(),pt.y()));
+        auto rect = QRectF(pt.x(),pt.y(),1.0/viewsize,1.0/viewsize);
+        rects.append(rect);
+    }
+
+    ViewPointVector uipoints;
+    for(int r = 0; r < mUiViewMaskSize; ++r) {
+        for (int c = 0; c < mUiViewMaskSize; ++c) {
+            for(auto viewRect: rects) {
+                auto topleft = viewRect.topLeft();
+                auto size = viewRect.size();
+
+                auto x = topleft.x() * mUiViewMaskSize ;
+                auto y = topleft.y() * mUiViewMaskSize ;
+                auto w = size.width() * mUiViewMaskSize;
+                auto h = size.height() * mUiViewMaskSize;
+
+                auto rect = QRectF(x,y,w,h); // 等比例放大尺寸到mUiViewMaskSize
+                if (rect.intersects(QRectF(c,r,1.0,1.0))) {
+                    ViewPoint point;
+                    point.x = convertPrecision((r+0.5)/mUiViewMaskSize);
+                    point.y = convertPrecision((c+0.5)/mUiViewMaskSize);
+                    uipoints.append(point);
+                }
+            }  // end 3层for
+        }
+    }
+
 
     Q_ASSERT(mHoleInfo[point.x()][point.y()].coordinate == point);
 
+    // 颜色不更新,默认就红色,不同组的颜色也会一样
     mHoleInfo[point.x()][point.y()].group = group;
     mHoleInfo[point.x()][point.y()].viewpoints = points;
+    mHoleInfo[point.x()][point.y()].uipoints = uipoints;
 
     mHoleInfo[point.x()][point.y()].viewsize = viewsize;
     mHoleInfo[point.x()][point.y()].isselected = true;

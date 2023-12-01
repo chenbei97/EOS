@@ -88,7 +88,7 @@ void Preview::onObjectiveChanged(const QString& obj)
 
     if (oldViewSize != size) { // 如果视野尺寸前后没发生变化,不需要清理
         LOG<<"切换物镜前视野尺寸: "<<oldViewSize<<" 切换物镜后尺寸: "<<size<<" 需要清理";
-        viewpattern->clearAllViewWindowCache(size); // 清理ViewPattern
+        viewpattern->clearAllViewWindowCache(size,true); // 清理ViewPattern
         dock->setWindowTitle(tr("Select Hole Inside View"));
         pattern->clearAllHoleViewPoints();// 只需要孔关于视野的信息,其它保留
     } else {

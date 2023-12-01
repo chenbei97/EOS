@@ -112,8 +112,11 @@ void WellPattern::onOpenViewAct()
         m[HoleCoordinateField] = mMousePos; // 告知视野当前孔坐标
         m[HoleGroupNameField] = mHoleInfo[mMousePos.x()][mMousePos.y()].group; // 所在组
         m[HoleGroupColorField] = mHoleInfo[mMousePos.x()][mMousePos.y()].color; // 组的颜色
+        // 所有组只在打开分组对话框更新,但可能没打开分组对话框此时allgroup就没有被赋值会出现错误 在204行的设定可能会错误
+        mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = getAllWellGroupNames();
         m[WellAllGroupsField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup); // 已有的所有组(每次设置分组信息时会更新)
         m[HoleGroupCoordinatesField].setValue(getHoleGroupCoordinates(mHoleInfo[mMousePos.x()][mMousePos.y()].group));
+        mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = getAllWellHoleCoordinates();
         m[WellAllHolesField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate);
         //LOG<<"well send info to view is "<<m[HoleGroupNameField].toString()<<m[HoleGroupColorField].toString();//ViewPattern::setStrategy接收
         emit openViewWindow(m);
@@ -199,6 +202,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
     auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>(); // 关键信息
     auto uipoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
 
+    //切物镜时
     //LOG<<allcoordinates;
     //LOG<<getAllWellHoleCoordinates();
     Q_ASSERT(allcoordinates == getAllWellHoleCoordinates());
