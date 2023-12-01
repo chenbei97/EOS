@@ -18,7 +18,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
 
         void clearViewWindowCache(const QPoint &holePoint);
         void clearAllViewWindowCache(int viewSize,bool toggleObjective = true);
-        void updateViewWindowCache(QCPoint holePoint, QCPointVector viewPoints,int viewSize);
+        void updateViewWindowCache(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
 
         void setDisablePoint(QCPoint point, bool enable = true);
         void setDisablePoints(QCPointVector points, bool enable = true);
@@ -30,7 +30,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         ViewPointVector mViewMaskNormPoints;
         QMap<int,ViewPointVector> mUiViewMaskNormPoints;
         QMap<int,ViewPointVector> mTmpUiViewMaskNormPoints;
-        void initViewMask();
+        void initUiViewMask();
         void viewRectsMapToViewMask();
         QRectF mapToSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);
         QRectF mapFromSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);

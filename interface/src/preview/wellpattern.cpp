@@ -278,16 +278,17 @@ void WellPattern::clearAllHoleViewPoints()
     update();
 }
 
-void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointVector viewpoints,int viewsize)
+void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize)
 { // 更新指定孔的信息,用于导入实验配置时逐孔更新
     ViewPointVector points;
     for(auto pt: viewpoints)
         points.append(ViewPoint(pt.x(),pt.y()));
+
     Q_ASSERT(mHoleInfo[point.x()][point.y()].coordinate == point);
 
     mHoleInfo[point.x()][point.y()].group = group;
     mHoleInfo[point.x()][point.y()].viewpoints = points;
-    //mHoleInfo[point.x()][point.y()].viewrects = ; // 根据points把rect拼出来 QRectF(pt.x*10.05,pt.y-0.05,1,1)每个点的小区域
+
     mHoleInfo[point.x()][point.y()].viewsize = viewsize;
     mHoleInfo[point.x()][point.y()].isselected = true;
 

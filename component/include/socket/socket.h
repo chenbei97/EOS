@@ -251,8 +251,8 @@ static QByteArray assemblePreviewEvent(QCVariantMap m)
     auto viewpoint = m[ViewCoordinateField].toPointF();
     object[FieldPreviewEvent.hole_x] = holepoint.x();
     object[FieldPreviewEvent.hole_y] = holepoint.y();
-    object[FieldPreviewEvent.view_x] = convertPrecision(viewpoint.x()); // 浮点数保留6位需要变成字符串形式
-    object[FieldPreviewEvent.view_y] = convertPrecision(viewpoint.y());
+    object[FieldPreviewEvent.view_x] = convertPrecision(viewpoint.x()).toDouble(); // 浮点数保留6位需要变成字符串形式
+    object[FieldPreviewEvent.view_y] = convertPrecision(viewpoint.y()).toDouble(); // 又改回来了
     object[FieldPreviewEvent.ishole] = m[IsHoleField].toInt();
 
     TcpAssemblerDoc.setObject(object);
@@ -330,7 +330,8 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
     object[FieldLoadExperEvent.total_time] = experinfo[FieldLoadExperEvent.total_time].toInt();
     object[FieldLoadExperEvent.duration_time] = experinfo[FieldLoadExperEvent.duration_time].toInt();
     object[FieldLoadExperEvent.start_time] = experinfo[FieldLoadExperEvent.start_time].toString();
-    object[FieldLoadExperEvent.channel] = experinfo[FieldLoadExperEvent.channel].toInt();
+    object[FieldLoadExperEvent.channel] = experinfo[FieldLoadExperEvent.channel].toString();
+    LOG<<experinfo[FieldLoadExperEvent.channel];
     object[FieldLoadExperEvent.is_schedule] = experinfo[FieldLoadExperEvent.is_schedule].toInt();
 #else
     // zstackbox
@@ -341,7 +342,7 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
     object[FieldLoadExperEvent.total_time] = toolinfo[FieldLoadExperEvent.total_time].toInt();
     object[FieldLoadExperEvent.duration_time] = toolinfo[FieldLoadExperEvent.duration_time].toInt();
     object[FieldLoadExperEvent.start_time] = toolinfo[FieldLoadExperEvent.start_time].toString();
-    object[FieldLoadExperEvent.channel] = toolinfo[FieldLoadExperEvent.channel].toInt();
+    object[FieldLoadExperEvent.channel] = toolinfo[FieldLoadExperEvent.channel].toString();
     object[FieldLoadExperEvent.is_schedule] = toolinfo[FieldLoadExperEvent.is_schedule].toInt();
 #endif
 
@@ -386,8 +387,8 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
                 auto viewpoint_y = viewpoints[viewcount].y;
 
                 //viewObject[HoleCoordinateField] = QString("(%1,%2)").arg(viewpoint_x).arg(viewpoint_y);
-                viewObject[FieldLoadExperEvent.x] = viewpoint_x;
-                viewObject[FieldLoadExperEvent.y] = viewpoint_y;
+                viewObject[FieldLoadExperEvent.x] = viewpoint_x.toDouble();
+                viewObject[FieldLoadExperEvent.y] = viewpoint_y.toDouble();
                 pointValues.append(viewObject);
             }
 

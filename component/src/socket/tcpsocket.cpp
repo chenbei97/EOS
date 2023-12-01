@@ -20,13 +20,13 @@ void TcpSocket::onReadyReadSlot()
             msgQueue.enqueue(m.toUtf8()); // 将消息添加到队列中
 #else
         message += socket->readAll();
-        int count = message.count(SeparateField);
+        int count = message.count(SeparateField);//出现分隔符就知道有count条完整的消息出现
         //LOG<<"before: "<<message<<" count = "<<count;
         while (count--) {
-            auto len = message.indexOf(SeparateField,0);
-            auto response = message.left(len);
-            msgQueue.enqueue(response);
-            message.remove(0,len);
+            auto len = message.indexOf(SeparateField,0); //从最左边的完整消息结束符开始
+            auto response = message.left(len); // 最左边的完整消息
+            msgQueue.enqueue(response); // 去处理
+            message.remove(0,len); // 把已经处理的消息和分隔符去掉,处理下一轮
             message.remove(0,QString(SeparateField).count());
         }
         //LOG<<"after: "<<message;
@@ -56,19 +56,19 @@ void TcpSocket::onReadyReadSlot()
                 [se][p][F1][F2][se] 这里从[se]进行重复,实际4种情形
             (4) 1.[p] 2.[p][F1] 3.[p][F1][F2] 4.[p][F1][F2][se] 不完整分隔符的后一部分,当然可能是p,也可能ep
                 [p][F1][F2][se][p] 这里从[p]进行重复,实际4种情形
-            (5) [F1][F2][se],[F2][se][p],[se][p][F1],[p][F1][F2]
-            (6) [F1][F2] [F2][se] [se][p] [p][F1]
-            (7) [F1] [F2] [se] [p]
 
             一般来说对于EOS都是[F1][F2][se][p]这样理想的情况,不会出现问题;
             客户端传给服务端已经引入队列机制,不会出现滑动条移动让socket瞬时有n条消息,否则服务端必须考虑粘包的情况(而且服务端也本应该建立这种安全机制,即使不出现)
             服务端给客户端,目前data界面还没设计,尚未知道服务端给客户端是如何发送消息的,所以要考虑服务端没有使用消息队列给客户端发消息时粘包的处理
             除了上述16种情况,还有12种情况,也就是还要考虑3,2,1份的组合,上边是4个进行组合
+            (5) [F1][F2][se],[F2][se][p],[se][p][F1],[p][F1][F2] 其余的12种情况
+            (6) [F1][F2] [F2][se] [se][p] [p][F1]
+            (7) [F1] [F2] [se] [p]
 
             不论是以上哪种情况,其实就是考虑是否出现一个完整命令[F1][F2][se][p],从首次readAll开始一定是[F1]开始
             如果没有遇到完整的sep,就让消息先进入缓存,直到出现sep取出左边的完整命令,清理缓存,也就是可以先计算sep出现的次数
-            以下的伪代码就是这样的一种保障机制,实际上这部分工作服务端就应该做好不允许多条命令或者不完整的命令写入套接字,但是客户端也可以建立安全机制
-            或者说是服务端有责任和义务避免多条命令或者不完整的命令同时写入套接字造成客户端粘包
+            以下的伪代码就是这样的一种保障机制,实际上这部分工作服务端就应该做好不允许多条命令或者不完整的命令写入套接字,
+            或者说是服务端有责任和义务避免多条命令或者不完整的命令同时写入套接字造成客户端粘包,但是客户端也可以建立安全机制以防服务端没有做这种工作
             伪代码:
             buffer += socket->readAll();
             int count = buffer.count(sep);
@@ -161,7 +161,7 @@ void TcpSocket::exec(const QString& f,const QByteArray& c,bool use_sync)
          *  放入队列,快速滑slider时队列会逐个去请求,不会重复调用loop.exec
          *  然后定时器触发processRequestQueue逐个的去处理,并且从loop的running打印结果可以看出服务端收到解析信号就及时退出了loop
          *  下次调用不会出现loop已经处于running的状态,也就不会出现V1写法的警告 has already called exec()
-            [ "11:34:38:348" TcpSocket::exec ]  before =  3 // 快速滑动时processRequestQueue的执行晚于exec,故队列开始增加
+            [ "11:34:38:348" TcpSocket::exec ]  before =  3 // 快速滑动时processRequestQueue的执行晚于exec,故请求队列开始增加,积累请求
             [ "11:34:38:348" TcpSocket::exec ]  after =  4
             [ "11:34:38:349" TcpSocket::exec ]  before =  4
             [ "11:34:38:350" TcpSocket::exec ]  after =  5
@@ -169,7 +169,7 @@ void TcpSocket::exec(const QString& f,const QByteArray& c,bool use_sync)
             [ "11:34:38:352" TcpSocket::exec ]  after =  6
             [ "11:34:38:354" TcpSocket::exec ]  before =  6
             [ "11:34:38:355" TcpSocket::exec ]  after =  7
-            .... // 之后定时器异步的起作用逐个处理,队列减少
+            .... // 之后定时器异步的起作用逐个处理,请求队列减少
             [ "11:37:47:596" TcpSocket::processRequestQueue ]  requestQueue's count =  12 //这里看出loop下次exec前已经quit
             [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
             [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false

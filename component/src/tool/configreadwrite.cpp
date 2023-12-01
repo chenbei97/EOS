@@ -91,10 +91,10 @@ void ConfigReadWrite::parseGroupField(const QJsonValue &key, const QJsonValue &v
             auto viewpointsArr = holeobject[PointsField].toArray(); // viewpoints是个列表
 
             auto holepoint = QPoint(holeobject[XField].toInt(),holeobject[YField].toInt());
-            QPointVector holeviewpoints;
+            QPointFVector holeviewpoints;
             foreach(auto ptVal,viewpointsArr) {
                 auto pt = ptVal.toObject();
-                holeviewpoints<<QPoint(pt[XField].toInt(),pt[YField].toInt());
+                holeviewpoints<<QPointF(pt[XField].toDouble(),pt[YField].toDouble());
             }
 
             QVariantMap holetmp;

@@ -18,7 +18,6 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         mTmpRects[id].clear();
         mUiViewMaskNormPoints[id].clear();
         mViewMaskNormPoints.clear();
-        initViewMask();// 把视野信息也清除
         update();
     }
 
@@ -50,12 +49,30 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         //m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
         // HoleGroupCoordinatesField 该组的所有孔坐标不组装
         mSize = viewSize;
-        initViewMask();
         update();
     }
 
-    void ViewPattern::updateViewWindowCache(QCPoint holePoint, QCPointVector viewPoints,int viewSize)
-    {// 导入实验配置时去更新view的ui信息
+    void ViewPattern::updateViewWindowCache(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
+    {// 导入实验配置时去更新view的ui信息(和setViewInfo初始化的代码差不多)
+        mViewInfo[HoleCoordinateField] = holePoint;
+        mMousePos = {-1.0,-1.0};
+        mMouseRect = QRectF();
+        mDrapRectF = QRectF();
+        mSize = viewSize;
+
+        auto id = holeID();
+
+        ViewPointVector points;
+        ViewRectFVector rects;
+
+        for(auto pt: viewPoints) { // 电机坐标要转成UI坐标
+            points.append(ViewPoint(pt.x(),pt.y()));
+            rects.append(ViewRectF(QRectF(pt.x(),pt.y(),
+                   1.0/mSize,1.0/mSize),true));// 这个坐标导出时根据每个小视野的尺寸为单位导出,小视野的比例就是1/mSize
+        }
+        mUiViewMaskNormPoints[id] = points;
+        mTmpUiViewMaskNormPoints[id] = points;
+
         update();
     }
 
@@ -204,15 +221,12 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         else mTmpUiViewMaskNormPoints[id].clear();
 
         mSize = size;
-        //initViewMask(); //只是打开视野窗口并不是切物镜厂家不需要调用
-        //mUiViewMaskNormPoints[holeID()].clear();
-        //mViewMaskNormPoints.clear();
         update();
     }
 
     ViewPattern::ViewPattern(QWidget *parent) : QWidget(parent)
     {
-        initViewMask();
+        initUiViewMask();
         saveviewact = new QAction(tr("Selecting Points"));
         removeviewact = new QAction(tr("Remove Points"));
         applyholeact = new QAction(tr("Apply To Hole"));
@@ -275,7 +289,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         return r1&&r2&&r3&&r4&&r5&&r6&&r7&&r8&&r9&&ra;
     }
 
-    void ViewPattern::initViewMask()
+    void ViewPattern::initUiViewMask()
     {
         mUiViewMask.clear();
         for(int r = 0; r < mUiViewMaskSize; ++r)

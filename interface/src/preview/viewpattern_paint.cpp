@@ -43,6 +43,7 @@ inline namespace V2 {
                 auto w = 1.0 / mUiViewMaskSize;
                 auto h = 1.0 / mUiViewMaskSize;
                 auto viewRect = QRectF(pt.x.toDouble(),pt.y.toDouble(),w,h);
+                LOG<<mapToSize(viewRect,p11,diameter,diameter);
                 painter.fillRect(mapToSize(viewRect,p11,diameter,diameter),groupcolor);
         }
 

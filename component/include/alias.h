@@ -127,6 +127,11 @@ typedef QVector<ViewPoint> ViewPointVector;
 struct ViewRectF {
     QRectF rect;
     bool flag;
+    ViewRectF(){}
+    ViewRectF(const QRectF& rect,bool flag) {
+        this->rect = rect;
+        this->flag = flag;
+    }
     friend QDebug operator<<(QDebug debug, const ViewRectF& s) {
         debug<<"rect = "<<s.rect<<" flag = "<<s.flag;
         return debug;

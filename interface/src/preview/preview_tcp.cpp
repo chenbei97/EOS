@@ -347,7 +347,7 @@ void Preview::importExperConfig(const QString& path)
             auto holeinfo = groupinfo[hole].value<QVariantMap>();
             //LOG<<holeinfo;
             auto holepoint = holeinfo[HoleCoordinateField].toPoint();
-            auto viewpoints = holeinfo[PointsField].value<QPointVector>();
+            auto viewpoints = holeinfo[PointsField].value<QPointFVector>();
 
             // 把holepoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
             pattern->updateHoleInfo(holepoint,group,viewpoints,viewsize);
