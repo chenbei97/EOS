@@ -21,7 +21,8 @@ inline namespace V2 {
             mDrapRectF = QRectF();
             update();
         } else if (event->button() == Qt::RightButton) {
-            if (mViewInfo[HoleGroupNameField].toString().isEmpty() || mMousePos == QPointF(-1.0,-1.0)) {
+            if (mViewInfo[HoleGroupNameField].toString().isEmpty()
+                || mMousePos==QPointF(-1.0,-1.0)) {
                 applyallact->setEnabled(false);
                 applygroupact->setEnabled(false);
                 saveviewact->setEnabled(false);
@@ -31,7 +32,40 @@ inline namespace V2 {
                 applygroupact->setEnabled(true);
                 saveviewact->setEnabled(true);
                 removeviewact->setEnabled(true);
+
+//                auto rectinfo = mViewRects[holeID()];
+//                if (rectinfo.isEmpty()) {
+//                    removeviewact->setEnabled(false);
+//                } else {
+//                    for(auto viewRect: rectinfo) {
+//                        if (viewRect.flag) { // 保存的区域
+//                            if (viewRect.rect.contains(mDrapRectF)) { // 已经包含了
+//                                saveviewact->setEnabled(false);
+//                                removeviewact->setEnabled(true);
+//                            } else if (!viewRect.rect.intersects(mDrapRectF)){ // 无交集
+//                                saveviewact->setEnabled(true); // 不是已经保存的可以保存
+//                                removeviewact->setEnabled(true);
+//                            } else { // 有交集
+//                                saveviewact->setEnabled(true);
+//                                removeviewact->setEnabled(true);
+//                            }
+//                        } else {
+//                            if (viewRect.rect.contains(mDrapRectF)) { // 已经是完全删除的
+//                                saveviewact->setEnabled(true); //可以保存但是不可以删
+//                                removeviewact->setEnabled(false);
+//                            } else if (!viewRect.rect.intersects(mDrapRectF)){ // 不是删除的
+//                                saveviewact->setEnabled(false);
+//                                removeviewact->setEnabled(true);// 不是已经删除的去删除
+//                            } else {
+//                                saveviewact->setEnabled(true);
+//                                removeviewact->setEnabled(true);
+//                            }
+//                        }
+//                    }
+//                }
             }
+
+
         }
         // 将鼠标坐标映射为相对圆外接正方形左上角的相对坐标,并将其归一化
         if (mMousePos != QPointF(-1.0,-1.0)) {

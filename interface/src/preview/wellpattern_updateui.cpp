@@ -132,7 +132,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyHole(QCVariantMap m)
     // HoleGroupCoordinatesField 该组的所有孔坐标不解析
     auto viewsize = m[HoleViewSizeField].toInt();
     auto viewrects = m[HoleViewRectsField].value<ViewRectFVector>(); // 关键信息
-    auto viewpoints = m[HoleViewUiPointsField].value<ViewPointVector>();// 关键信息
+    auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>();// 关键信息
     auto uipoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
 
     // 2. 把信息更新到本孔
@@ -162,7 +162,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyGroup(QCVariantMap m)
     auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
     auto viewsize = m[HoleViewSizeField].toInt();
     auto viewrects = m[HoleViewRectsField].value<ViewRectFVector>(); // 关键信息
-    auto viewpoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
+    auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>(); // 关键信息
     auto uipoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
 
     // 2. 根据视野窗口传来的组名 把coordinate对应的组(color+viewpoints,viewsize)都更新 (不需要更新group,allgroup,dose,medicine,unit,type)

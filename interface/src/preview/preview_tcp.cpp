@@ -378,7 +378,7 @@ void Preview::loadExper()
     auto totalViews = pattern->numberOfViews();
     auto totalChannels = channels.count("1"); // 为1的是勾选上的
     auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
-    LOG<<"totalViews = "<<totalViews<<"totalChannels = "<<totalChannels<<" estimateSpace = "<<estimateSpace;
+    LOG<<"totalViews = "<<totalViews<<"totalChannels = "<<totalChannels<<" estimateSpace = "<<estimateSpace<<"MB";
     previewinfo[EstimatedSpace] = estimateSpace;
 
     auto dlg = new SummaryDialog(previewinfo);

@@ -28,6 +28,8 @@ inline namespace V2 {
 
         auto groupcolor = mViewInfo[HoleGroupColorField].toString();
 
+        // 以下2种绘制法都可以,和wellpattern绘制对应
+
 //        if (!mViewRects[holeID()].isEmpty()) {
 //            for(auto viewRect: mViewRects[holeID()]) {
 //                if (viewRect.flag)
@@ -36,8 +38,8 @@ inline namespace V2 {
 //            }
 //        }
 
-        // 新的写法,相当于弃用视野区域信息,wellpattern对应也使用点来绘制区域,2者的mViewMaskSize一致就可
-        for(auto pt: mUiViewMaskNormPoints) {
+        // 新的写法,,wellpattern对应也使用点来绘制区域,2者的mViewMaskSize一致就可
+        for(auto pt: mUiViewMaskNormPoints[holeID()]) {
                 auto w = 1.0 / mUiViewMaskSize;
                 auto h = 1.0 / mUiViewMaskSize;
                 auto viewRect = QRectF(pt.x.toDouble(),pt.y.toDouble(),w,h);

@@ -26,17 +26,14 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
     private:
         int mSize = 0;
         QBool2DVector mUiViewMask;
-        QBool2DVector mViewMask;
-        const int mUiViewMaskSize = DefaultUiMaskSize; // 用于绘图 100就可以了
-        const int mViewMaskSize = DefaultMaskSize; // 电机坐标要精细一些
-        QPointFVector mUiViewMaskPoints;
-        ViewPointVector mUiViewMaskNormPoints;
+        const int mUiViewMaskSize = DefaultUiMaskSize; // 用于绘图 50-100就可以了
         ViewPointVector mViewMaskNormPoints;
+        QMap<int,ViewPointVector> mUiViewMaskNormPoints;
+        QMap<int,ViewPointVector> mTmpUiViewMaskNormPoints;
         void initViewMask();
         void viewRectsMapToViewMask();
         QRectF mapToSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);
         QRectF mapFromSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);
-
     private:
         ViewInfo mViewInfo;
         QPointF mMousePos;
