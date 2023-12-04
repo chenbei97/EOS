@@ -236,6 +236,7 @@ void WellPattern::onRemoveHoleAct()
     mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = false;
     mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = QPoint2DVector();
     mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = QSet<QString>();
+
     mHoleInfo[mMousePos.x()][mMousePos.y()].type = QString();
     mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = QString();
     mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = QString();
@@ -243,5 +244,6 @@ void WellPattern::onRemoveHoleAct()
 
     // 清除视野窗口的缓存信息
     emit clearViewWindowCache(mMousePos);
+    openviewact->trigger(); // 重新刷新一下
     update();
 }

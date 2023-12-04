@@ -280,21 +280,24 @@ void WellPattern::clearAllHoleViewPoints()
 
 void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize)
 { // 更新指定孔的信息,用于导入实验配置时逐孔更新
+
+    // 1. viewpoints存储的时候是电机坐标,并非UI坐标,需要转换
     ViewPointVector points;
-    QRectFVector rects;
+    QRectFVector rects; // 基于电机坐标的等比例区域
     for(auto pt: viewpoints)
     {
-        points.append(ViewPoint(pt.x(),pt.y()));
+        points.append(ViewPoint(pt.x(),pt.y())); // 当初电机坐标是按照1.0/viewsize去存的,现在的比例不变
         auto rect = QRectF(pt.x(),pt.y(),1.0/viewsize,1.0/viewsize);
         rects.append(rect);
     }
 
-    ViewPointVector uipoints;
+    // 2. 转换ui坐标需要 UI区域和掩码矩阵
+    ViewPointVector uipoints; // 要转换的UI坐标
     for(int r = 0; r < mUiViewMaskSize; ++r) {
         for (int c = 0; c < mUiViewMaskSize; ++c) {
             for(auto viewRect: rects) {
                 auto topleft = viewRect.topLeft();
-                auto size = viewRect.size();
+                auto size = viewRect.size(); // 每个等比例UI区域要放大到固定的UI掩码矩阵尺寸
 
                 auto x = topleft.x() * mUiViewMaskSize ;
                 auto y = topleft.y() * mUiViewMaskSize ;
@@ -302,7 +305,7 @@ void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointFVector vie
                 auto h = size.height() * mUiViewMaskSize;
 
                 auto rect = QRectF(x,y,w,h); // 等比例放大尺寸到mUiViewMaskSize
-                if (rect.intersects(QRectF(c,r,1.0,1.0))) {
+                if (rect.intersects(QRectF(c,r,1.0,1.0))) { // 掩码区域包含的点都视为UI点
                     ViewPoint point;
                     point.x = convertPrecision((r+0.5)/mUiViewMaskSize);
                     point.y = convertPrecision((c+0.5)/mUiViewMaskSize);
@@ -315,7 +318,7 @@ void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointFVector vie
 
     Q_ASSERT(mHoleInfo[point.x()][point.y()].coordinate == point);
 
-    // 颜色不更新,默认就红色,不同组的颜色也会一样
+    // 3.颜色不更新,默认就红色,不同组的颜色会一样,因为当初没有存不同的颜色
     mHoleInfo[point.x()][point.y()].group = group;
     mHoleInfo[point.x()][point.y()].viewpoints = points;
     mHoleInfo[point.x()][point.y()].uipoints = uipoints;

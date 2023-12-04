@@ -14,10 +14,29 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
     void ViewPattern::clearViewWindowCache(const QPoint &holePoint)
     {// 删孔时清除该孔对应的视野信息
         auto id = holeID(holePoint);
+        mDrapRectF = QRectF();
         mViewRects[id].clear();
         mTmpRects[id].clear();
         mUiViewMaskNormPoints[id].clear();
+        mTmpUiViewMaskNormPoints[id].clear();
         mViewMaskNormPoints.clear();
+        initUiViewMask();
+
+        // 颜色+当前孔坐标+当前视野尺寸 无需清理（以下代码其实不清理也行,wellpattern删孔逻辑内重新触发了openviewwindow刷新了）
+        mViewInfo[HoleGroupNameField] = "";
+        mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
+        mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
+        mViewInfo[WellAllGroupsField].setValue(QSet<QString>());
+        mViewInfo[HoleViewRectsField].setValue(ViewRectFVector());
+        mViewInfo[HoleViewUiPointsField].setValue(ViewPointVector());
+        mViewInfo[HoleViewPointsField].setValue(ViewPointVector());
+        checkField();
+
+        applyallact->setEnabled(false);
+        applygroupact->setEnabled(false);
+        removeviewact->setEnabled(false);
+        saveviewact->setEnabled(false);
+
         update();
     }
 
@@ -27,7 +46,9 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
         mViewRects.clear();
         mTmpRects.clear();
         mUiViewMaskNormPoints.clear();
+        mTmpUiViewMaskNormPoints.clear();
         mViewMaskNormPoints.clear();
+        initUiViewMask(); // 这个掩码矩阵也要清理
 
         if (viewSize != mViewInfo[HoleViewSizeField].toInt()) {
             mViewInfo[HoleViewSizeField] = viewSize;
@@ -253,6 +274,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
             mViewRects[id] = mTmpRects[id];
         else mTmpRects[id].clear();
 
+        //initUiViewMask(); // 不要重新初始化,tmp的目的就是为了保留上次的设置,setViewInfo每次双击孔都会调用,所以不能在这初始化
         if (!mTmpUiViewMaskNormPoints[id].isEmpty() && size == mSize)
             mUiViewMaskNormPoints[id] = mTmpUiViewMaskNormPoints[id];
         else mTmpUiViewMaskNormPoints[id].clear();
@@ -381,7 +403,7 @@ inline namespace V2 { // 2024//11/27 需求变更需要重新设计
 
         for(int r = 0; r < mUiViewMaskSize; ++r) {
             for(int c = 0; c < mUiViewMaskSize; ++c) {
-                //mUiViewMask[r][c] = false; // 先清理掉否则重复添加
+                mUiViewMask[r][c] = false; // 先清理掉否则重复添加
                 for(auto viewRect: viewRects) {
                     auto flag = viewRect.flag; // 对于位置[r][c] 3层的for结束后,就知道这个位置是否被选中
                     auto rect = mapToSize(viewRect.rect,QPointF(0.0,0.0),
