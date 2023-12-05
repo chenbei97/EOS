@@ -11,6 +11,7 @@
 PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
 {
     historybox = new HistoryBox;
+    selectbox = new ViewSelect;
     wellbox = new WellBox;
     objectivebox = new ObjectiveBox;
     focusbox = new FocusBox;
@@ -23,6 +24,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
 
     lay = new QVBoxLayout;
     lay->addWidget(historybox);
+    lay->addWidget(selectbox);
     lay->addWidget(wellbox);
     lay->addWidget(objectivebox);
     lay->addWidget(focusbox);

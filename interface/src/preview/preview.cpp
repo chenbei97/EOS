@@ -196,6 +196,16 @@ void Preview::setAppInfo(int app)
     previewinfo[AppSelectField] = QString::number(app);
 }
 
+PreviewPatternInfo Preview::patternInfo() const
+{
+    return pattern->patternInfo();
+}
+
+PreviewToolInfo Preview::toolInfo() const
+{
+    return previewtool->toolInfo();
+}
+
 void Preview::playVideo(const QString& path)
 {
     LOG<<"video path = "<<path;
@@ -268,7 +278,8 @@ void Preview::initAttributes()
 
     pattern->setMinimumHeight(PreviewPatternMinHeight);
 
-    photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
+    //photocanvas->setStrategy(PhotoCanvas::SinglePixmap);// 默认单图模式
+    photocanvas->setStrategy(PhotoCanvas::GridPixmap);
 #ifdef uselabelcanvas
     livecanvas->setAlignment(Qt::AlignCenter);
     livecanvas->setScaledContents(true);
@@ -304,7 +315,7 @@ void Preview::initObjects()
     pattern = new WellPattern(2,3);
     groupinfo = new GroupInfo;
     previewtool = new PreviewTool;
-    viewpattern = new V2::ViewPattern;// 视野窗口
+    viewpattern = new ViewPattern;// 视野窗口
     dock = new DockWidget(tr("Select Hole Inside View"));
     dockcanvas = new QMainWindow;
     scrollarea = new QScrollArea;
@@ -348,12 +359,12 @@ void Preview::initConnections()
     connect(pattern,&WellPattern::openViewWindow,this,&Preview::updateViewWindow); // 打开和更新视野窗口
     connect(pattern,&WellPattern::openSetGroupWindow,this,&Preview::updateSetGroupWindow);// 打开分组窗口
     connect(pattern,&WellPattern::mouseClicked,this,&Preview::previewViewByClickHole); // 点击孔也触发预览
-    connect(pattern,&WellPattern::clearViewWindowCache,viewpattern,&V2::ViewPattern::clearViewWindowCache);//删孔时清除该孔的缓存信息
+    connect(pattern,&WellPattern::clearViewWindowCache,viewpattern,&ViewPattern::clearViewWindowCache);//删孔时清除该孔的缓存信息
 
-    connect(viewpattern,&V2::ViewPattern::applyHoleEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyHole);//删点或者保存点就应用到本孔
-    connect(viewpattern,&V2::ViewPattern::applyGroupEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyGroup); // 按组更新孔窗口的信息
-    connect(viewpattern,&V2::ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不按组更新孔窗口的信息
-    connect(viewpattern,&V2::ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
+    connect(viewpattern,&ViewPattern::applyHoleEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyHole);//删点或者保存点就应用到本孔
+    connect(viewpattern,&ViewPattern::applyGroupEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyGroup); // 按组更新孔窗口的信息
+    connect(viewpattern,&ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不按组更新孔窗口的信息
+    connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
 
     // (3) 外部信号=>preview/previewtool
     connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);

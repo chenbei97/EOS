@@ -202,6 +202,7 @@ void Preview::takingPhoto()
 #endif
 
         cameramode->changeMode(CameraMode::PhotoMode);
+        photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
         photocanvas->setImage(pix);
 
         // 存图功能,目前默认存到temp下,用户会更改前缀目录,或者需要按分不同通道文件夹归类等
@@ -318,7 +319,7 @@ void Preview::exportExperConfig(const QString& path)
 
     json.chop(QString(SeparateField).count());//删掉尾缀@@@
 
-    JsonReadWrite m; // 借助工具类写到文件内
+    JsonReadWrite m; // 借助工具类写到文件内(注意导出时有的信息没有导出,例如每个分组的颜色)
     m.writeJson(path,json);
 }
 
@@ -392,6 +393,7 @@ void Preview::loadExper()
     auto json = AssemblerPointer->message();
 
     SocketPointer->exec(TcpFramePool.loadExperEvent,json);
+
 #ifndef notusetoupcamera
     ToupCameraPointer->closeCamera();
 #else
@@ -405,6 +407,7 @@ void Preview::loadExper()
 #else
         livecanvas->setImage(QImage());
 #endif
+        photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
         photocanvas->setImage(QImage());
     }
 

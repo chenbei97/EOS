@@ -28,12 +28,13 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
             break;
         case SinglePixmap:
             if(mimage.isNull()) return;
-            auto targetRect = QRect(0,0,width(),height());
-            painter.drawImage(targetRect,mimage);
+            painter.drawImage(QRect(0,0,width(),height()),mimage);
             //painter.drawPixmap(targetRect,QPixmap::fromImage(mimage));
             break;
+        case GridPixmap:
+            drawGridLine(painter);
+            break;
     }
-
     // 绘制框
     if (!mDrapRect.isNull()) {
         auto pen = painter.pen();
@@ -92,7 +93,7 @@ void PhotoCanvas::setStrategy(PhotoCanvas::DrawStrategy s, const QVariantMap& m)
     mDrapRect = QRectF();
 
     // 2. 初始化xx策略需要的信息
-    mStrategyInfo = m;
+    mStrategyInfo = m; // 目前这个设计用不上,直接使用setImage/setData比较快捷,setImage最快捷
     update();
 }
 
@@ -175,3 +176,31 @@ void PhotoCanvas::stopOptimizePaint()
 {
     timer.stop();
 }
+
+void PhotoCanvas::drawGridLine(QPainter &painter)
+{
+    mGridSize = 10;
+    if (mGridSize == 0) return;
+    painter.drawRect(0,0,width(),height());
+    auto rw = getInnerRectWidth();
+    auto rh = getInnerRectHeight();
+    for(int i = 0; i < mGridSize; i++) {
+        auto left = QPointF(0.0,rh) + QPointF(0.0,rh*i);
+        auto right = QPointF(width(),rh) + QPointF(width(),rh*i);
+        auto top =QPointF(rw,0.0)+QPointF(rw*i,0.0);
+        auto bottom =QPointF(rw,height())+QPointF(rw*i,height());
+        painter.drawLine(left,right);
+        painter.drawLine(top,bottom);
+    }
+}
+
+double PhotoCanvas::getInnerRectWidth() const
+{
+    return width() * 1.0 / mGridSize;
+}
+
+double PhotoCanvas::getInnerRectHeight() const
+{
+    return height() * 1.0 / mGridSize;
+}
+

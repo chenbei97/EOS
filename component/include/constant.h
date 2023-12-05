@@ -21,6 +21,8 @@ enum class SQLType {Mysql,Sqlite};
 Q_ENUMS(SQLType)
 
 const int DefaultPrecisionBit = 6;
+const int DefaultDrawPointWidth = 8;
+const int DefaultPainterPenWidth = 2;
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 #define SqlExecFailedLOG (qDebug()<<"[" \
     <<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] sql exec failed! error is ")
@@ -52,6 +54,9 @@ const int DefaultPrecisionBit = 6;
 #define RecordVideoDefaultTempPath (CURRENT_PATH+"/temp/video/")
 #define AutoFocusTempPath (CURRENT_PATH+"/temp/focus/")
 
+static const char* PointModeField = "Point Mode";
+static const char* RectModeField = "Rect Mode";
+static const char* WholeModeField = "Whole Mode";
 static const char* RollBackField = "rollback";
 static const char* OriginalField = "original";
 static const char* ExportField = "export";
@@ -129,6 +134,7 @@ static const char* StopExperField = "stop exper";
 static const char* Z_StackField = "z_stack";
 static const char* StitchImageField = "stitch_image";
 
+static const char* ViewSelectBoxTitle = "View Mode";
 static const char* ChannelBoxTitle = "Channel";
 static const char* RecordBoxTitle = "Record";
 static const char* CameraBoxTitle ="Camera";

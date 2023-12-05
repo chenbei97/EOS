@@ -16,7 +16,7 @@ class COMPONENT_IMEXPORT PhotoCanvas: public QWidget
 {
     Q_OBJECT
 public:
-    enum DrawStrategy {NoStrategy,SinglePixmap};
+    enum DrawStrategy {NoStrategy,SinglePixmap,GridPixmap};
     explicit PhotoCanvas(QWidget*parent= nullptr);
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());
     void setData(const QVariantMap& m);
@@ -33,9 +33,14 @@ public:
     void mouseReleaseEvent(QMouseEvent *event) override;// 拖拽区域点个数为0才是预览事件
     void paintEvent(QPaintEvent *event) override;
 protected:
+    QImage mimage;
+    int mGridSize = 0;
+    void drawGridLine(QPainter&painter);
+    double getInnerRectWidth() const;
+    double getInnerRectHeight() const;
+protected:
     DrawStrategy strategy = NoStrategy;
     QVariantMap mStrategyInfo;
-    QImage mimage;
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QPoint mMousePoint = QPoint(-1,-1);
     QPoint mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标

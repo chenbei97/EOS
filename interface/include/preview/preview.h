@@ -37,6 +37,8 @@ class INTERFACE_IMEXPORT Preview : public QWidget
 public:
     explicit Preview(QWidget*parent= nullptr);
     void setAppInfo(int app);// 用于appselect传递当前app信息
+    PreviewPatternInfo patternInfo() const; // WellPattern的数据
+    PreviewToolInfo toolInfo() const;
 #ifdef notusetoupcamera
     bool isCameraOpen() const;
     void openCamera();
@@ -58,7 +60,7 @@ private:
     ExperTool * expertool;
 #endif
     PhotoCanvas * photocanvas;
-    V2::ViewPattern * viewpattern;
+    ViewPattern * viewpattern;
     VideoWidget * videocanvas;
     QStackedWidget * stack;
     PreviewTool * previewtool;

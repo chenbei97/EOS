@@ -21,6 +21,7 @@
 #include "timebox.h"
 #include "historybox.h"
 #include "recordbox.h"
+#include "viewselect.h"
 
 class INTERFACE_IMEXPORT PreviewTool : public QWidget
 {
@@ -31,6 +32,7 @@ public:
     void importExperConfig(const QVariantMap& m);
 private:
     HistoryBox * historybox;
+    ViewSelect * selectbox;
     WellBox * wellbox;
     ObjectiveBox * objectivebox;
     FocusBox * focusbox;
