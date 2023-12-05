@@ -19,9 +19,12 @@ class COMPONENT_IMEXPORT Pattern : public QWidget
 {
     Q_OBJECT
 public:
+//    enum PatternMode {PlateMode,SlideMode};
     explicit Pattern(int rows, int cols,QWidget*parent= nullptr);
     virtual void setPatternSize(int rows,int cols);
     QSize patternSize() const;
+//    void setPatternMode(PatternMode mode);
+//    PatternMode patternMode() const;
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent*event) override;

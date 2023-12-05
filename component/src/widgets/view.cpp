@@ -46,6 +46,9 @@ void View::initDispersedMask()
 
 QPointFVector View::overlap(const QPointFVector &points, double rate)
 {
+    if (points.isEmpty())  // 删点时可能为空,下边索引0就越界了
+        return points;
+
     QPointFVector pts;
     pts.append(points[0]);
     auto x0 = points[0].x();

@@ -18,7 +18,7 @@ WellBox::WellBox(QWidget*parent): GroupBox(parent)
     lay->addWidget(wellbrandCombo);
 
     setLayout(lay);
-    setTitle(tr("Wellsize"));
+    setTitle(tr(WellBoxTitle));
 
     connect(wellbrandCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::wellbrandChanged);
     connect(manufacturerCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::manufacturerChanged);

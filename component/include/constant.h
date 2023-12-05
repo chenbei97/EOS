@@ -137,6 +137,7 @@ static const char* Z_StackField = "z_stack";
 static const char* StitchImageField = "stitch_image";
 
 static const char* ViewSelectBoxTitle = "View Mode";
+static const char* WellBoxTitle = "WellSize";
 static const char* ChannelBoxTitle = "Channel";
 static const char* RecordBoxTitle = "Record";
 static const char* CameraBoxTitle ="Camera";

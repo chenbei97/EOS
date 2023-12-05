@@ -66,15 +66,16 @@ void Pattern::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     auto pen = painter.pen();
-    pen.setWidth(2);
+    pen.setWidth(DefaultPainterPenWidth);
     painter.setPen(pen);
 
     painter.drawRect(0,0,width(),height());
 
-    drawLine(painter);
-    drawText(painter);
-    drawHighlight(painter);
-
+//    if (mPatternMode == PlateMode) {
+        drawLine(painter);
+        drawText(painter);
+        drawHighlight(painter);
+//    }
     event->accept();
 }
 
@@ -216,6 +217,16 @@ QSize Pattern::patternSize() const
 {
     return QSize(mrows,mcols);
 }
+
+//void Pattern::setPatternMode(Pattern::PatternMode mode)
+//{
+//    mPatternMode = mode;
+//}
+//
+//Pattern::PatternMode Pattern::patternMode() const
+//{
+//    return mPatternMode;
+//}
 
 void Pattern::clearMousePoint()
 {

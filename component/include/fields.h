@@ -33,16 +33,16 @@ static const QFieldList WellsizeFields = {
         WellSize6,WellSize24,WellSize96,WellSize384
 };
 static const QFieldList Brand1Fields = {
-        "brand1_6","brand1_24","brand1_96","brand1_384"
+        "brand1_6","brand1_24","brand1_96","brand1_384","slide"
 };
 static const QFieldList Brand2Fields = {
-        "brand2_6","brand2_24","brand2_96","brand2_384"
+        "brand2_6","brand2_24","brand2_96","brand2_384","slide"
 };
 static const QFieldList Brand3Fields = {
-        "brand3_6","brand3_24","brand3_96","brand3_384"
+        "brand3_6","brand3_24","brand3_96","brand3_384","slide"
 };
 static const QFieldList Brand4Fields = {
-        "brand4_6","brand4_24","brand4_96","brand4_384"
+        "brand4_6","brand4_24","brand4_96","brand4_384","slide"
 };
 enum class ManufacturerType {
     Manufacturer1 = 0,
@@ -131,6 +131,7 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
                 {view_well_24_4x,view_well_24_10x,view_well_24_20x,view_well_24_40x},// 品牌2
                 {view_well_96_4x,view_well_96_10x,view_well_96_20x,view_well_96_40x},// 品牌3
                 {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌4
+                {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌5
         },
 
         {
@@ -138,6 +139,7 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
                 {view_well_24_4x,view_well_24_10x,view_well_24_20x,view_well_24_40x},// 品牌2
                 {view_well_96_4x,view_well_96_10x,view_well_96_20x,view_well_96_40x},// 品牌3
                 {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌4
+                {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌5
         },
 
         {
@@ -145,6 +147,7 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
                 {view_well_24_4x,view_well_24_10x,view_well_24_20x,view_well_24_40x},// 品牌2
                 {view_well_96_4x,view_well_96_10x,view_well_96_20x,view_well_96_40x},// 品牌3
                 {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌4
+                {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌5
         },
 
         {
@@ -152,6 +155,7 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
                 {view_well_24_4x,view_well_24_10x,view_well_24_20x,view_well_24_40x},// 品牌2
                 {view_well_96_4x,view_well_96_10x,view_well_96_20x,view_well_96_40x},// 品牌3
                 {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌4
+                {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌5
         },
 };
 

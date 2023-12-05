@@ -17,6 +17,7 @@
 #include "viewpattern.h"
 #include "summarydialog.h"
 #include "videowidget.h"
+#include "slidepattern.h"
 
 //#define notusetoupcamera 0
 //#define uselabelcanvas 0
@@ -62,9 +63,11 @@ private:
     PhotoCanvas * photocanvas;
     ViewPattern * viewpattern;
     VideoWidget * videocanvas;
-    QStackedWidget * stack;
+    QStackedWidget * stackcanvas;
     PreviewTool * previewtool;
     WellPattern * wellpattern;
+    SlidePattern * slidepattern;
+    QStackedWidget * patterncanvas;
     DockWidget * dock;
     QMainWindow * dockcanvas;
     GroupInfo * groupinfo;
