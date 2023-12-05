@@ -1,6 +1,14 @@
+/*** 
+ * @Author: chenbei97 chenbei_electric@163.com
+ * @Date: 2023-12-05 08:57:10
+ * @LastEditors: chenbei97 chenbei_electric@163.com
+ * @LastEditTime: 2023-12-05 09:16:17
+ * @FilePath: \EOS\component\include\widgets\viewpatternv1.h
+ * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
+ */
 
-#ifndef EOS_MAIN_CORE_PY_VIEWPATTERNV1_H
-#define EOS_MAIN_CORE_PY_VIEWPATTERNV1_H
+#ifndef EOS_VIEWPATTERNV1_H
+#define EOS_VIEWPATTERNV1_H
 
 #include "widgets.h"
 namespace obsoleteClass { // 过时,开发了新版本
@@ -90,4 +98,4 @@ namespace obsoleteClass { // 过时,开发了新版本
     };
 };
 
-#endif //EOS_MAIN_CORE_PY_VIEWPATTERNV1_H
+#endif //EOS_VIEWPATTERNV1_H

@@ -300,54 +300,9 @@ void ViewPattern::onSaveViewAct()
     update();
 }
 
-void ViewPattern::setViewInfo(const ViewInfo &info)
-{
-    mViewInfo = info;
-    checkField();
-
-    mMousePos = {-1.0,-1.0};
-    mMouseRect = QRectF();
-    mDrapRectF = QRectF();
-
-    auto id = holeID();
-    mViewRects[id].clear();
-    mUiViewMaskNormPoints[id].clear();
-
-    auto size =  mViewInfo[HoleViewSizeField].toInt();
-
-    if(!mTmpRects[id].isEmpty() && size == mSize)
-        mViewRects[id] = mTmpRects[id];
-    else mTmpRects[id].clear();
-
-    //initUiViewMask(); // 不要重新初始化,tmp的目的就是为了保留上次的设置,setViewInfo每次双击孔都会调用,所以不能在这初始化
-    if (!mTmpUiViewMaskNormPoints[id].isEmpty() && size == mSize)
-        mUiViewMaskNormPoints[id] = mTmpUiViewMaskNormPoints[id];
-    else mTmpUiViewMaskNormPoints[id].clear();
-
-    mSize = size;
-    update();
-}
-
-ViewPattern::ViewPattern(QWidget *parent) : QWidget(parent)
+ViewPattern::ViewPattern(QWidget *parent) : View(parent)
 {
     initUiViewMask();
-    saveviewact = new QAction(tr("Selecting Points"));
-    removeviewact = new QAction(tr("Remove Points"));
-    applyholeact = new QAction(tr("Apply To Hole"));
-    applygroupact = new QAction(tr("Apply To Group"));
-    applyallact = new QAction(tr("Apply To All"));
-    addAction(saveviewact);
-    addAction(removeviewact);
-    //addAction(applyholeact); // 不显式添加
-    addAction(applygroupact);
-    addAction(applyallact);
-    setContextMenuPolicy(Qt::ActionsContextMenu);
-
-    connect(saveviewact,&QAction::triggered,this,&ViewPattern::onSaveViewAct);
-    connect(removeviewact,&QAction::triggered,this,&ViewPattern::onRemoveViewAct);
-    connect(applyholeact,&QAction::triggered,this,&ViewPattern::onApplyHoleAct);
-    connect(applygroupact,&QAction::triggered,this,&ViewPattern::onApplyGroupAct);
-    connect(applyallact,&QAction::triggered,this,&ViewPattern::onApplyAllAct);
 }
 
 int ViewPattern::holeID() const
@@ -362,40 +317,6 @@ int ViewPattern::holeID(const QPoint& holePoint) const
     return holePoint.x() * PointToIDCoefficient + holePoint.y();
 }
 
-bool ViewPattern::checkField() const
-{   // 避免bug或者漏掉信息,审查mViewInfo的字段是否完整
-    // wellpattern组装6个信息,viewpattern自行组装4个信息,共10个,其中HoleViewRectsField其实不需要了
-    // 但是为了兼容老接口,先如此保留,绘图时不使用HoleViewRectsField的信息去绘制了
-    auto fields = mViewInfo.keys();
-//        foreach(auto field,fields) {
-//            LOG<<field<<mViewInfo[field];
-//        }
-
-    bool r1 = fields.contains(HoleGroupNameField); // 组名称
-    bool r2 = fields.contains(HoleGroupColorField);// 组颜色
-    bool r3 = fields.contains(WellAllGroupsField); // 所有组名
-    bool r4 = fields.contains(HoleCoordinateField); // 当前孔坐标
-    bool r5 = fields.contains(WellAllHolesField); // 所有孔坐标
-    bool r6 = fields.contains(HoleGroupCoordinatesField); // 本组的所有孔坐标
-    bool r7 = fields.contains(HoleViewSizeField);// 视野内部划分尺寸
-    bool r8 = fields.contains(HoleViewRectsField); // 视野区域
-    bool r9 = fields.contains(HoleViewUiPointsField); // 视野掩码映射的坐标信息
-    bool ra = fields.contains(HoleViewPointsField); // 视野掩码映射的坐标信息
-
-    Q_ASSERT(r1 == true);
-    Q_ASSERT(r2 == true);
-    Q_ASSERT(r3 == true);
-    Q_ASSERT(r4 == true);
-    Q_ASSERT(r5 == true);
-    Q_ASSERT(r6 == true);
-    Q_ASSERT(r7 == true);
-    Q_ASSERT(r8 == true);
-    Q_ASSERT(r9 == true);
-    Q_ASSERT(ra == true);
-
-    return r1&&r2&&r3&&r4&&r5&&r6&&r7&&r8&&r9&&ra;
-}
-
 void ViewPattern::initUiViewMask()
 {
     mUiViewMask.clear();
@@ -407,50 +328,6 @@ void ViewPattern::initUiViewMask()
         }
         mUiViewMask.append(vec);
     }
-}
-
-QPointF ViewPattern::mapFromPointF(const QPointF &point) const
-{ // 把坐标归一化到0-1
-    auto pos = point-getInnerRectTopLeftPoint();
-    //LOG<<point<<getInnerRectTopLeftPoint()<<pos;
-    pos = pos / (getCircleRadius() * 2.0);
-    return pos;
-}
-
-QPointF ViewPattern::mapToPointF(const QPointF &point) const
-{ // 把0-1的坐标放大到ui尺寸上
-    auto pos = QPointF(point.x() * getCircleRadius() * 2.0,
-                       point.y() * getCircleRadius() * 2.0);
-
-    pos = pos+getInnerRectTopLeftPoint();
-    return pos;
-}
-
-QRectF ViewPattern::mapToSize(const QRectF &source,const QPointF&ref_point,int ref_w,int ref_h)
-{ // source已经是0-1的等比例缩放了
-    auto topleft = source.topLeft();
-    auto size = source.size();
-
-    auto x = topleft.x() * ref_w + ref_point.x();// 左上角顶点(0.2,0.3),长度(0.25,0.35)
-    auto y = topleft.y() * ref_h + ref_point.y();// 放大到尺寸为(ref_w,ref_h),例如100
-    auto w = size.width() * ref_w; // 那么结果就是(20,30,25,35),如果左上角参考点还需要移动就变成 (30,50,25,35)
-    auto h = size.height() * ref_h;
-
-    return QRectF(x,y,w,h);
-}
-
-QRectF ViewPattern::mapFromSize(const QRectF &source,const QPointF&ref_point,int ref_w,int ref_h)
-{ //source非标准,将其标准化到0-1
-    auto topleft = source.topLeft();
-    auto size = source.size();
-
-    auto x = (topleft.x() - ref_point.x()) / ref_w;// 相对窗口左上角的区域(100,0,50,50),参考区域是(50,0,100,100)
-    auto y = (topleft.y() - ref_point.y()) / ref_h;// [(100-50)/100,(0-0)/100,50/100,50/100]
-    auto w = size.width() / ref_w; // 那么结果就是(0.5,0,0.5,0.5)
-    auto h = size.height() / ref_h;
-    //LOG<<QRectF(x,y,w,h);
-
-    return QRectF(x,y,w,h);
 }
 
 void ViewPattern::viewRectsMapToViewMask()
@@ -544,23 +421,144 @@ void ViewPattern::viewRectsMapToViewMask()
     <<" mask count = "<<mViewMaskNormPoints.count()<<points.count();
 }
 
-ViewInfo ViewPattern::viewInfo() const
+void ViewPattern::paintEvent(QPaintEvent *event)
 {
-    return mViewInfo;
+    View::paintEvent(event);
+    QPainter painter(this);
+    painter.drawRect(rect());
+    auto pen = painter.pen();
+
+    // 1. 变量准备
+    auto radius = width()>=height()?height()/2.0:width()/2.0;
+    auto diameter = 2.0 * radius;
+    auto p11 = getInnerRectTopLeftPoint();
+    auto p12 = getInnerRectTopRightPoint();
+    auto p21 = getInnerRectBottomLeftPoint();
+    auto p22 = getInnerRectBottomRightPoint();
+    auto groupcolor = mViewInfo[HoleGroupColorField].toString();
+    auto id = holeID();
+
+    if (mSelectMode == RectMode) { // 区域模式
+        // 2. 绘制选中的区域
+        // 以下2种绘制法都可以,和wellpattern绘制对应,wellpattern也是2种绘制法
+        // 1. 直接绘制视野区域 对应wellpattern的(3.2)画法
+//            if (!mViewRects[id].isEmpty()) {
+//                for(auto viewRect: mViewRects[id]) {
+//                    if (viewRect.flag)
+//                        painter.fillRect(mapToSize(viewRect.rect,p11,diameter,diameter),groupcolor);
+//                    else painter.fillRect(mapToSize(viewRect.rect,p11,diameter,diameter),DefaultNativeColor);
+//                }
+//            }
+
+        // 2. 使用掩码矩阵点的缩放区域绘制,和wellpattern的mViewMaskSize一致就可 对应(3.4)画法
+        //LOG<<mUiViewMaskNormPoints[holeID()].count()<<diameter;
+        //LOG<<"id = "<<id<<mUiViewMaskNormPoints[id].count();
+        for(auto pt: mUiViewMaskNormPoints[id]) {
+            auto w = 1.0 / mUiViewMaskSize;
+            auto h = 1.0 / mUiViewMaskSize;
+            auto viewRect = QRectF(pt.x.toDouble(),pt.y.toDouble(),w,h);
+            //LOG<<mapToSize(viewRect,p11,diameter,diameter);
+            painter.fillRect(mapToSize(viewRect,p11,diameter,diameter),groupcolor);
+        }
+
+        // 3. 绘制圆,外接正方形和便于区分的灰色网格线
+
+        painter.drawLine(p11,p21);
+        painter.drawLine(p12,p22);
+        painter.drawLine(p11,p12);
+        painter.drawLine(p21,p22);
+        pen = painter.pen();
+        pen.setWidth(1);
+        pen.setColor(Qt::gray);
+        painter.setPen(pen);
+        auto hor_offset = getInnerRectWidth();
+        for (int i = 1; i <= mSize-1; ++i) {
+            auto top = p11 + QPointF(i*hor_offset,0);
+            auto bottom = p21 + QPointF(i*hor_offset,0);
+            painter.drawLine(top,bottom);
+        }
+        auto ver_offset = getInnerRectHeight();
+        for (int i = 1; i <= mSize-1; ++i){
+            auto top = p11 + QPointF(0,ver_offset*i);
+            auto bottom = p12 + QPointF(0,ver_offset*i);
+            painter.drawLine(top,bottom);
+        }
+
+        pen = painter.pen();
+        pen.setWidth(DefaultPainterPenWidth);
+        pen.setColor(Qt::blue);
+        painter.setPen(pen);
+
+        // 4. 鼠标单击生成的矩形框
+        painter.drawRect(mapToSize(mMouseRect,p11,diameter,diameter));
+        // 5. 鼠标拖拽生成的矩形框
+        if (!mDrapRectF.isEmpty()) {
+            painter.drawRect(mapToSize(mDrapRectF,p11,diameter,diameter));
+        }
+
+        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
+        painter.setPen(pen);
+    } else { // 点模式
+        pen = painter.pen();
+        pen.setWidth(DefaultDrawPointWidth);
+        painter.setPen(pen);
+        //LOG<<mUiSelectedPoints[id];
+        for(auto pt:mUiSelectedPoints[id]) {
+            painter.drawPoint(mapToPointF(pt));
+        }
+        painter.drawPoint(mMousePos);
+        pen = painter.pen();
+        pen.setWidth(DefaultPainterPenWidth);
+        painter.setPen(pen);
+    }
+    // 画圆
+    painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
+
+    event->accept();
 }
 
-void ViewPattern::setDisablePoint(QCPoint point, bool enable)
+void ViewPattern::mousePressEvent(QMouseEvent *event)
 {
+    View::mousePressEvent(event);
 
-
+//                auto rectinfo = mViewRects[holeID()];
+//                if (rectinfo.isEmpty()) {
+//                    removeviewact->setEnabled(false);
+//                } else {
+//                    for(auto viewRect: rectinfo) {
+//                        if (viewRect.flag) { // 保存的区域
+//                            if (viewRect.rect.contains(mDrapRectF)) { // 已经包含了
+//                                saveviewact->setEnabled(false);
+//                                removeviewact->setEnabled(true);
+//                            } else if (!viewRect.rect.intersects(mDrapRectF)){ // 无交集
+//                                saveviewact->setEnabled(true); // 不是已经保存的可以保存
+//                                removeviewact->setEnabled(true);
+//                            } else { // 有交集
+//                                saveviewact->setEnabled(true);
+//                                removeviewact->setEnabled(true);
+//                            }
+//                        } else {
+//                            if (viewRect.rect.contains(mDrapRectF)) { // 已经是完全删除的
+//                                saveviewact->setEnabled(true); //可以保存但是不可以删
+//                                removeviewact->setEnabled(false);
+//                            } else if (!viewRect.rect.intersects(mDrapRectF)){ // 不是删除的
+//                                saveviewact->setEnabled(false);
+//                                removeviewact->setEnabled(true);// 不是已经删除的去删除
+//                            } else {
+//                                saveviewact->setEnabled(true);
+//                                removeviewact->setEnabled(true);
+//                            }
+//                        }
+//                    }
+//                }
 }
 
-void ViewPattern::setDisablePoints(QCPointVector points, bool enable)
+void ViewPattern::mouseReleaseEvent(QMouseEvent *event)
 {
-
+    View::mouseReleaseEvent(event);
 }
 
-void ViewPattern::setDisablePoints(bool enable)
+void ViewPattern::mouseMoveEvent(QMouseEvent *event)
 {
-
+    View::mouseMoveEvent(event);
 }
