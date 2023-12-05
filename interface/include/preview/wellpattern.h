@@ -15,11 +15,13 @@ class INTERFACE_IMEXPORT WellPattern: public Pattern
 {
     Q_OBJECT
 public:
+    enum ViewSelectMode {PointMode,RectMode};
     explicit WellPattern(int rows,int cols,QWidget*parent= nullptr);
 
     PreviewPatternInfo patternInfo() const;
-
     void setPatternSize(int rows,int cols) override;
+    void setSelectMode(ViewSelectMode mode);
+
     void initDrapPoints(); // 清除拖拽区域
     void initDisablePoints(); // 初始化置灰区域
     void setDisablePoints(bool enable = true);
@@ -29,7 +31,7 @@ public:
     int drapPointCount() const; // 计算拖拽区域包含的点个数
     void initHoleInfo(); // 初始化孔信息
     void clearAllHoleViewPoints();
-    void updateHoleInfo(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize);
+    void importHoleInfo(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize);
 
     void paintEvent(QPaintEvent *event) override;
     QRectF2DVector getHoleRectsOnViewSize(QCPoint coordinate) const; // 拿到某个孔基于视野窗口尺寸来划分的所有小矩形区域
@@ -50,6 +52,7 @@ public:
     void updateHoleInfoByViewInfoApplyAll(QCVariantMap m);
 
 protected:
+    ViewSelectMode mSelectMode = PointMode;
     const int mUiViewMaskSize = DefaultUiMaskSize;
     QRectF mDrapRect; // 鼠标拖动生成的矩形
     QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true

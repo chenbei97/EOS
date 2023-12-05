@@ -57,6 +57,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(recordbox,&RecordBox::pauseVideo,this,&PreviewTool::pauseVideo);
     connect(recordbox,&RecordBox::playVideo,this,&PreviewTool::playVideo);
     connect(recordbox,&RecordBox::stopVideo,this,&PreviewTool::stopVideo);
+    connect(selectbox,&ViewSelect::modeSelected,this,&PreviewTool::modeSelected);
     // 2. 信号槽函数
     connect(channelbox,&ChannelBoxx::channelChanged,camerabox,&CameraBox::setChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBoxx::disableChannel);

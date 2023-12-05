@@ -36,6 +36,7 @@ protected:
     ViewSelectMode mSelectMode = PointMode;
     ViewInfo mViewInfo;
     int mSize = 0;
+    double overlapRate = 0.1;
     QBool2DVector mDispersedMask;
     const int mDispersedMaskSize = DefaultUiMaskSize;
     QPointF mMousePos;
@@ -52,6 +53,7 @@ protected:
     virtual void onApplyGroupAct();
     virtual void onApplyAllAct();
 protected:
+    QPointFVector overlap(const QPointFVector& points, double rate);
     void initDispersedMask();
     QPointF mapFromPointF(const QPointF& point) const;
     QPointF mapToPointF(const QPointF& point) const;
@@ -66,6 +68,8 @@ protected:
     QPointF getInnerRectBottomLeftPoint() const;// 外接正方形左下角顶点
     QPointF getInnerRectBottomRightPoint() const;// 外接正方形右下角顶点
     QRectF getValidRect() const;
+    bool isValidRect(const QPointF& point) const;
+    bool isValidRect(const QRectF& rect) const;
 signals:
     void previewEvent(const QPointF& point);
     void applyHoleEvent(const QVariantMap&m);

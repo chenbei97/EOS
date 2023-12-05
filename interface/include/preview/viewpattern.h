@@ -14,18 +14,20 @@ public:
     void paintEvent(QPaintEvent *event) override;
     void clearViewWindowCache(const QPoint &holePoint);
     void clearAllViewWindowCache(int viewSize,bool toggleObjective = true);
-    void updateViewWindowCache(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
+    void importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
+    void setSelectMode(ViewSelectMode mode);
 private:
     // 区域模式: 电机坐标!=UI离散坐标
     QMap<int,QPointFVector> mViewRectDispersedPoints; // UI离散坐标
     QMap<int,QPointFVector> mTmpRectDispersedPoints;
     QMap<int,QRectFVector> mViewRects; // UI离散区域=>UI离散坐标
     QMap<int,QRectFVector> mTmpRects;
-    QPointFVector mViewMachinePoints; // 电机坐标
     void dispersedViewRects();
     // 点模式: 电机坐标=UI离散坐标
     QMap<int,QPointFVector> mViewPoints;
     QMap<int,QPointFVector> mTmpPoints;
+    // 电机坐标: 2种模式共用
+    QPointFVector mViewMachinePoints;
 private:
     virtual void onRemoveViewAct() override;
     virtual void onSaveViewAct() override;

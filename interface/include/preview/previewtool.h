@@ -64,6 +64,7 @@ signals:
     void cameraAdjusted(int exp,int gain,int br);// 调整相机实时更改
     void loadExper(); // 启动实验
     void stopExper(); // 停止实验
+    void modeSelected(int mode); // 视野选择模式
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
     void captureImage(const QImage& img,const QString& channel);

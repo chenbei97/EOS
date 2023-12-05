@@ -64,7 +64,7 @@ private:
     VideoWidget * videocanvas;
     QStackedWidget * stack;
     PreviewTool * previewtool;
-    WellPattern * pattern;
+    WellPattern * wellpattern;
     DockWidget * dock;
     QMainWindow * dockcanvas;
     GroupInfo * groupinfo;
@@ -101,8 +101,9 @@ private:
     void updateViewWindow(const QVariantMap& m);
     void updateSetGroupWindow(const QVariantMap& m);
 private:
-    void onManufacturerChanged(int option);
-    void onWellbrandChanged(int option);
+    void setSelectMode(int mode);
+    void toggleManufacturer(int option);
+    void toggleBrand(int option);
     void onObjectiveChanged(const QString& obj);
     void playVideo(const QString& path);
     void stopVideo();

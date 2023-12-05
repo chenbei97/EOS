@@ -16,21 +16,37 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     initLayout();
 }
 
-void Preview::onManufacturerChanged(int option)
+void Preview::setSelectMode(int mode)
+{
+    switch (mode) {
+        case 0:
+            viewpattern->setSelectMode(ViewPattern::PointMode);
+            wellpattern->setSelectMode(WellPattern::PointMode);
+            break;
+        case 1:
+            viewpattern->setSelectMode(ViewPattern::RectMode);
+            wellpattern->setSelectMode(WellPattern::RectMode);
+            break;
+        case 2:
+            break;
+    }
+}
+
+void Preview::toggleManufacturer(int option)
 {
 
 }
 
-void Preview::onWellbrandChanged(int option)
+void Preview::toggleBrand(int option)
 {
     switch (option) {
-        case 0: pattern->setPatternSize(2,3);
+        case 0: wellpattern->setPatternSize(2,3);
             break;
-        case 1: pattern->setPatternSize(4,6);
+        case 1: wellpattern->setPatternSize(4,6);
             break;
-        case 2: pattern->setPatternSize(8,12);
+        case 2: wellpattern->setPatternSize(8,12);
             break;
-        case 3: pattern->setPatternSize(16,24);
+        case 3: wellpattern->setPatternSize(16,24);
             break;
     }
     auto toolinfo = previewtool->toolInfo();
@@ -56,10 +72,10 @@ void Preview::onWellbrandChanged(int option)
     // 5. 对NA物镜的特殊处理放最后,因为viewpattern->clearAllViewWindowCache被调用在前
     auto objective_descrip = toolinfo[ObjectiveDescripField].toString();
     if (objective_descrip == NA40x095Field) { // 只能选择1个孔
-        pattern->setDisablePoints();
-        pattern->setDisablePoint(QPoint(0,0),false);//默认只允许(0,0)可选
+        wellpattern->setDisablePoints();
+        wellpattern->setDisablePoint(QPoint(0,0),false);//默认只允许(0,0)可选
     } else {
-        pattern->setDisablePoints(false);
+        wellpattern->setDisablePoints(false);
     }
     if (objective_descrip == NA20x05Field)
         viewpattern->setDisablePoints(NA20x05DisablePoints);
@@ -90,16 +106,16 @@ void Preview::onObjectiveChanged(const QString& obj)
         LOG<<"切换物镜前视野尺寸: "<<oldViewSize<<" 切换物镜后尺寸: "<<size<<" 需要清理";
         viewpattern->clearAllViewWindowCache(size,true); // 清理ViewPattern
         dock->setWindowTitle(tr("Select Hole Inside View"));
-        pattern->clearAllHoleViewPoints();// 只需要孔关于视野的信息,其它保留
+        wellpattern->clearAllHoleViewPoints();// 只需要孔关于视野的信息,其它保留
     } else {
         LOG<<"切换物镜前视野尺寸: "<<oldViewSize<<" 切换物镜后尺寸: "<<size<<" 无需清理";
     }
 
     // 3. 对NA物镜的特殊处理要放在最后,因为上边的代码viewpattern->clearAllViewWindowCache会重新初始化视野尺寸
     if (obj == NA40x095Field) { // 只能选择1个孔
-        pattern->setDisablePoints();
-        pattern->setDisablePoint(QPoint(0,0),false);//默认只允许(0,0)可选
-    } else  pattern->setDisablePoints(false);
+        wellpattern->setDisablePoints();
+        wellpattern->setDisablePoint(QPoint(0,0),false);//默认只允许(0,0)可选
+    } else  wellpattern->setDisablePoints(false);
 
     if (obj == NA20x05Field)
         viewpattern->setDisablePoints(NA20x05DisablePoints);
@@ -161,7 +177,7 @@ void Preview::updateSetGroupWindow(const QVariantMap& m)
     // 2. 分组窗口设置的组信息去更新孔的数据
     int ret = groupinfo->exec();
     if (ret == QDialog::Accepted) {
-        pattern->updateHoleInfoByGroupInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
+        wellpattern->updateHoleInfoByGroupInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
     }
 }
 
@@ -172,7 +188,7 @@ void Preview::setAppInfo(int app)
 
 PreviewPatternInfo Preview::patternInfo() const
 {
-    return pattern->patternInfo();
+    return wellpattern->patternInfo();
 }
 
 PreviewToolInfo Preview::toolInfo() const
@@ -207,7 +223,7 @@ void Preview::initLayout()
     // 1.右侧布局
     auto pbox = new GroupBox(tr("Hole Selection"));
     auto play = new QVBoxLayout;
-    play->addWidget(pattern);
+    play->addWidget(wellpattern);
     pbox->setLayout(play);
 
     auto rlay = new QVBoxLayout;
@@ -250,7 +266,7 @@ void Preview::initAttributes()
     dockcanvas->setCentralWidget(dock);
     dockcanvas->addDockWidget(Qt::BottomDockWidgetArea,dock);// 这个地方不能选all/no,否则无法实现点击隐藏关闭效果
 
-    pattern->setMinimumHeight(PreviewPatternMinHeight);
+    wellpattern->setMinimumHeight(PreviewPatternMinHeight);
 
     //photocanvas->setStrategy(PhotoCanvas::SinglePixmap);// 默认单图模式
     photocanvas->setStrategy(PhotoCanvas::GridPixmap);
@@ -286,7 +302,7 @@ void Preview::initObjects()
     photocanvas = new PhotoCanvas;
     videocanvas = new VideoWidget;
     stack = new QStackedWidget;
-    pattern = new WellPattern(2,3);
+    wellpattern = new WellPattern(2,3);
     groupinfo = new GroupInfo;
     previewtool = new PreviewTool;
     viewpattern = new ViewPattern;// 视野窗口
@@ -299,8 +315,8 @@ void Preview::initObjects()
 void Preview::initConnections()
 {
     // (1) previewtool/expertool => preview 信号-槽函数直连
-    connect(previewtool,&PreviewTool::manufacturerChanged,this,&Preview::onManufacturerChanged);
-    connect(previewtool,&PreviewTool::wellbrandChanged,this,&Preview::onWellbrandChanged);
+    connect(previewtool,&PreviewTool::manufacturerChanged,this,&Preview::toggleManufacturer);
+    connect(previewtool,&PreviewTool::wellbrandChanged,this,&Preview::toggleBrand);
     connect(previewtool,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(previewtool,&PreviewTool::objectiveToggled,this,&Preview::toggleObjective);
     connect(previewtool,&PreviewTool::playVideo,this,&Preview::playVideo);
@@ -315,6 +331,7 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::importFilePath,this,&Preview::importExperConfig);
     connect(previewtool,&PreviewTool::loadExper,this,&Preview::loadExper);
     connect(previewtool,&PreviewTool::stopExper,this,&Preview::stopExper);
+    connect(previewtool,&PreviewTool::modeSelected,this,&Preview::setSelectMode);
 #ifdef usetab
     connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
     connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);
@@ -330,14 +347,14 @@ void Preview::initConnections()
     connect(livecanvas,&PhotoCanvasTriangle::triangleClicked,this,&Preview::adjustLens);
 #endif
 
-    connect(pattern,&WellPattern::openViewWindow,this,&Preview::updateViewWindow); // 打开和更新视野窗口
-    connect(pattern,&WellPattern::openSetGroupWindow,this,&Preview::updateSetGroupWindow);// 打开分组窗口
-    connect(pattern,&WellPattern::mouseClicked,this,&Preview::previewViewByClickHole); // 点击孔也触发预览
-    connect(pattern,&WellPattern::clearViewWindowCache,viewpattern,&ViewPattern::clearViewWindowCache);//删孔时清除该孔的缓存信息
+    connect(wellpattern,&WellPattern::openViewWindow,this,&Preview::updateViewWindow); // 打开和更新视野窗口
+    connect(wellpattern,&WellPattern::openSetGroupWindow,this,&Preview::updateSetGroupWindow);// 打开分组窗口
+    connect(wellpattern,&WellPattern::mouseClicked,this,&Preview::previewViewByClickHole); // 点击孔也触发预览
+    connect(wellpattern,&WellPattern::clearViewWindowCache,viewpattern,&ViewPattern::clearViewWindowCache);//删孔时清除该孔的缓存信息
 
-    connect(viewpattern,&ViewPattern::applyHoleEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyHole);//删点或者保存点就应用到本孔
-    connect(viewpattern,&ViewPattern::applyGroupEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyGroup); // 按组更新孔窗口的信息
-    connect(viewpattern,&ViewPattern::applyAllEvent,pattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不按组更新孔窗口的信息
+    connect(viewpattern,&ViewPattern::applyHoleEvent,wellpattern,&WellPattern::updateHoleInfoByViewInfoApplyHole);//删点或者保存点就应用到本孔
+    connect(viewpattern,&ViewPattern::applyGroupEvent,wellpattern,&WellPattern::updateHoleInfoByViewInfoApplyGroup); // 按组更新孔窗口的信息
+    connect(viewpattern,&ViewPattern::applyAllEvent,wellpattern,&WellPattern::updateHoleInfoByViewInfoApplyAll); // 不按组更新孔窗口的信息
     connect(viewpattern,&ViewPattern::previewEvent,this,&Preview::previewViewByClickView); // 点击视野预览
 
     // (3) 外部信号=>preview/previewtool

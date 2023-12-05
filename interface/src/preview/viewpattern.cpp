@@ -17,6 +17,8 @@ void ViewPattern::clearViewWindowCache(const QPoint &holePoint)
     mTmpRects[id].clear();
     mViewRectDispersedPoints[id].clear();
     mTmpRectDispersedPoints[id].clear();
+    mViewPoints[id].clear();
+    mTmpPoints[id].clear();
     mViewMachinePoints.clear();
     initDispersedMask();
 
@@ -45,9 +47,12 @@ void ViewPattern::clearAllViewWindowCache(int viewSize,bool toggleObjective)
     mTmpRects.clear();
     mViewRectDispersedPoints.clear();
     mTmpRectDispersedPoints.clear();
-    mViewMachinePoints.clear();
+    mViewPoints.clear();
+    mTmpPoints.clear();
     initDispersedMask(); // 这个掩码矩阵也要清理
+    mViewMachinePoints.clear(); // 电机坐标清理
 
+    // 视野的尺寸发生了变化,才清理掉视野的4个信息,否则不用动
     if (viewSize != mViewInfo[HoleViewSizeField].toInt()) {
         mViewInfo[HoleViewSizeField] = viewSize;
         mViewInfo[HoleViewRectsField].setValue(QRectFVector()); // 清空视野信息
@@ -71,7 +76,7 @@ void ViewPattern::clearAllViewWindowCache(int viewSize,bool toggleObjective)
     update();
 }
 
-void ViewPattern::updateViewWindowCache(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
+void ViewPattern::importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
 {// 导入实验配置时去更新view的ui信息(和setViewInfo初始化的代码差不多)
     mViewInfo[HoleCoordinateField] = holePoint;
     mViewInfo[HoleGroupNameField] = "";
@@ -130,8 +135,10 @@ void ViewPattern::onApplyAllAct()
     auto id = holeID();
     QVariantMap m;
     m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
-    m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
-    m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
+    if (mSelectMode == RectMode) {
+        m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
+        m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
+    }
     m[HoleViewPointsField].setValue(mViewMachinePoints);
     m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以把所有组颜色统一(可能没分过组默认颜色红色,无所谓)
     m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名信息(应用到所有组时只有同组的组颜色需要覆盖)
@@ -144,11 +151,17 @@ void ViewPattern::onApplyAllAct()
     auto allholes = mViewInfo[WellAllHolesField].value<QPoint2DVector>();//拿到所有分过组的孔坐标
     foreach(auto holes, allholes) {
         foreach (auto hole, holes) {
-            auto pt_idx = hole.x()*PointToIDCoefficient+hole.y(); // 所有其他孔的临时数据区更新为当前孔的视野信息
-            mTmpRects[pt_idx] = mViewRects[id];
-            mViewRects[pt_idx] = mViewRects[id];
-            mViewRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
-            mTmpRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
+            auto pt_idx = holeID(hole);// 所有其他孔的临时数据区更新为当前孔的视野信息
+            if (mSelectMode == RectMode) {
+                mViewRects[pt_idx] = mViewRects[id];
+                mTmpRects[pt_idx] = mViewRects[id];
+                mViewRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
+                mTmpRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
+            } else {
+                mViewPoints[pt_idx] = mViewPoints[id];
+                mTmpPoints[pt_idx] = mViewPoints[id];
+            }
+
         }
     }
     update();
@@ -169,18 +182,26 @@ void ViewPattern::onApplyGroupAct()
     m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
     m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
     // HoleGroupCoordinatesField 该组的所有孔坐标不组装
-    m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
-    m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
+    if (mSelectMode == RectMode) {
+        m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
+        m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
+    }
     m[HoleViewPointsField].setValue(mViewMachinePoints);
     emit applyGroupEvent(m);
 
     auto holeCoordinates = mViewInfo[HoleGroupCoordinatesField].value<QPointVector>();//拿到本组其它孔的所有孔坐标
     foreach(auto pt, holeCoordinates) {
-        auto pt_idx = pt.x()*PointToIDCoefficient+pt.y(); // 本组其他孔的临时数据区更新为当前孔的视野信息
-        mTmpRects[pt_idx] = mViewRects[id];
-        mViewRects[pt_idx] = mViewRects[id];
-        mViewRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
-        mTmpRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
+        auto pt_idx = holeID(pt);// 本组其他孔的临时数据区更新为当前孔的视野信息
+        if (mSelectMode == RectMode) {
+            mTmpRects[pt_idx] = mViewRects[id];
+            mViewRects[pt_idx] = mViewRects[id];
+            mViewRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
+            mTmpRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
+        } else {
+            mViewPoints[pt_idx] = mViewPoints[id];
+            mTmpPoints[pt_idx] = mViewPoints[id];
+        }
+
     }
     update();
 }
@@ -200,8 +221,10 @@ void ViewPattern::onApplyHoleAct()
     m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
     m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
     // HoleGroupCoordinatesField 该组的所有孔坐标不组装
-    m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
-    m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
+    if (mSelectMode == RectMode) {
+        m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
+        m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
+    }
     m[HoleViewPointsField].setValue(mViewMachinePoints);
     emit applyHoleEvent(m);
 }
@@ -231,7 +254,6 @@ void ViewPattern::onRemoveViewAct()
         dispersedViewRects();
         mMouseRect = QRectF();
         mTmpRects[id] = mViewRects[id];
-        applyholeact->trigger();
     } else {
         if (!mDrapRectF.isEmpty()) {
             QPointFVector points;
@@ -242,9 +264,10 @@ void ViewPattern::onRemoveViewAct()
             }
             mViewPoints[id] = points;
             mTmpRects[id] = mViewRects[id];
+            mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
         }
     }
-
+    applyholeact->trigger();
     update();
 }
 
@@ -265,11 +288,12 @@ void ViewPattern::onSaveViewAct()
         mTmpRects[id] = mViewRects[id];
         dispersedViewRects();
         mMouseRect = QRectF();
-        applyholeact->trigger();
     } else {
         mViewPoints[id].append(mapFromPointF(mMousePos));
-        mTmpPoints[id] = mViewPoints[id];
+        mTmpPoints[id] = mViewPoints[id]; // 需要重叠一定比例
+        mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
     }
+    applyholeact->trigger();
     update();
 }
 
@@ -355,6 +379,9 @@ void ViewPattern::dispersedViewRects()
         mViewMachinePoints.append(QPointF(pt.x()/(getCircleRadius()*2.0),pt.y()/(getCircleRadius()*2.0)));
     }
 
+    // 4. 重叠一定比例映射
+    mViewMachinePoints = overlap(mViewMachinePoints,overlapRate);
+
     LOG<<"ui count = "<<mViewRectDispersedPoints[id].count()
     <<" mask count = "<<mViewMachinePoints.count()<<points.count();
 }
@@ -400,7 +427,6 @@ void ViewPattern::paintEvent(QPaintEvent *event)
         painter.drawLine(p12,p22);
         painter.drawLine(p11,p12);
         painter.drawLine(p21,p22);
-        pen = painter.pen();
         pen.setWidth(1);
         pen.setColor(Qt::gray);
         painter.setPen(pen);
@@ -417,32 +443,34 @@ void ViewPattern::paintEvent(QPaintEvent *event)
             painter.drawLine(top,bottom);
         }
 
-        pen = painter.pen();
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::blue);
         painter.setPen(pen);
         // 鼠标单击生成的矩形框
         painter.drawRect(mapToSize(mMouseRect,p11,diameter,diameter));
+        pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
         painter.setPen(pen);
     } else { // 点模式
-        pen = painter.pen();
         pen.setWidth(DefaultDrawPointWidth);
+        pen.setColor(groupcolor);
         painter.setPen(pen);
         for(auto pt:mViewPoints[id]) {
             painter.drawPoint(mapToPointF(pt));
         }
-        painter.drawPoint(mMousePos);
+        pen.setColor(Qt::blue);
+        painter.setPen(pen);
+        if (mDrapRectF.isEmpty())
+            painter.drawPoint(mMousePos); // 绘制框不出现点
         pen = painter.pen();
         pen.setWidth(DefaultPainterPenWidth);
+        pen.setColor(Qt::black);
         painter.setPen(pen);
     }
-
     // 画圆
     painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
-
     // 鼠标拖拽生成的矩形框
-    pen = painter.pen();
+    pen.setWidth(DefaultPainterPenWidth);
     pen.setColor(Qt::blue);
     painter.setPen(pen);
     if (!mDrapRectF.isEmpty()) {
@@ -466,6 +494,12 @@ void ViewPattern::mouseReleaseEvent(QMouseEvent *event)
 void ViewPattern::mouseMoveEvent(QMouseEvent *event)
 {
     View::mouseMoveEvent(event);
+}
+
+void ViewPattern::setSelectMode(ViewPattern::ViewSelectMode mode)
+{ // 重置选点模式效果等于切换物镜(不是厂家)
+    mSelectMode = mode;
+    clearAllViewWindowCache(mSize,true);
 }
 
 ViewPattern::ViewPattern(QWidget *parent) : View(parent)

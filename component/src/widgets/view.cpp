@@ -44,6 +44,27 @@ void View::initDispersedMask()
     }
 }
 
+QPointFVector View::overlap(const QPointFVector &points, double rate)
+{
+    QPointFVector pts;
+    pts.append(points[0]);
+    auto x0 = points[0].x();
+    auto y0 = points[0].y();
+
+    for(int i = 1; i < points.count(); ++i) {
+        auto x = points[i].x();
+        auto y = points[i].y();
+
+        if (x >= x0) x *= (1.0-rate); // 在基点右侧,x应该减少才是靠近
+        else x *= (1.0+rate); // 基点左侧,x增加才是靠近
+        if (y < y0) y *= (1.0+rate); // 在基点上边,y应该增加是靠近
+        else y *= (1.0-rate);
+
+        pts.append(QPointF(x,y));
+    }
+    return pts;
+}
+
 QPointF View::mapFromPointF(const QPointF &point) const
 { // 把坐标归一化到0-1
     auto pos = point-getInnerRectTopLeftPoint();
@@ -111,7 +132,7 @@ ViewInfo View::viewInfo() const
 int View::holeID() const
 { // 每个孔双击打开视野窗口都是一对一的
     auto coordinate = mViewInfo[HoleCoordinateField].toPoint();
-    if (coordinate.isNull()) return -1;
+//    if (coordinate.isNull()) return -1;
 
     auto id = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
     return id;
@@ -125,7 +146,9 @@ int View::holeID(const QPoint& holePoint) const
 void View::mousePressEvent(QMouseEvent *event)
 {
     mMousePos = event->pos();
-    if (!getValidRect().contains(mMousePos)) // 如果不是有效区域的鼠标点击无效
+//    if (!getValidRect().contains(mMousePos)) // 如果不是有效区域的鼠标点击无效
+//        mMousePos = {-1.0,-1.0};
+    if (!isValidRect(mMousePos)) // 如果不是有效区域的鼠标点击无效
         mMousePos = {-1.0,-1.0};
 
     // 1.框选后随机点一下要清除框选框(只能拖拽生成),同时出现单击框
@@ -135,7 +158,12 @@ void View::mousePressEvent(QMouseEvent *event)
         auto diameter = width()>=height()?height():width();
         auto mouseRect_topleft = mMousePos-QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
         auto mouseRect_bottomright = mMousePos+QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
-        if (getValidRect().contains(mouseRect_topleft) && getValidRect().contains(mouseRect_topleft)) {
+//        if (getValidRect().contains(mouseRect_topleft) && getValidRect().contains(mouseRect_bottomright)) {
+//            mMouseRect = mapFromSize(QRectF(mouseRect_topleft,mouseRect_bottomright),
+//                                     getInnerRectTopLeftPoint(),diameter,diameter);
+//        }
+
+        if (isValidRect(QRectF(mouseRect_topleft,mouseRect_bottomright))) {
             mMouseRect = mapFromSize(QRectF(mouseRect_topleft,mouseRect_bottomright),
                                      getInnerRectTopLeftPoint(),diameter,diameter);
         }
@@ -172,7 +200,9 @@ void View::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton){
         auto end = event->pos(); // 鼠标停下的点
-        if (!getValidRect().contains(mMousePos) || !getValidRect().contains(end))
+//        if (!getValidRect().contains(mMousePos) || !getValidRect().contains(end))
+//            return; // 框选到无效区域
+        if (!isValidRect(QRectF(mMousePos,end)))
             return; // 框选到无效区域
         mMouseRect = QRectF();
         auto diameter = width()>=height()?height():width();
@@ -198,9 +228,33 @@ void View::paintEvent(QPaintEvent *event)
 }
 
 QRectF View::getValidRect() const
-{ //有效的区域是整个圆和外接正方形,点在外边不认为有效,防止用户把viewwindow窗口拉伸后点
+{ //有效的区域是整个圆内,其它都不认为有效,防止用户把viewwindow窗口拉伸后点,不过这里包含了圆和外界正方形的部分也不对
     return QRectF(getInnerRectTopLeftPoint(),QSize(getCircleRadius()*2.0,getCircleRadius()*2.0));
 }
+
+bool View::isValidRect(const QPointF &point) const
+{ // 判断点是否在圆内依赖于直径
+    auto center_x = width() / 2.0;
+    auto center_y = height() / 2.0;
+
+    if ((point.x()-center_x)*(point.x()-center_x) + (point.y()-center_y)*(point.y()-center_y)
+        > getCircleRadius()*getCircleRadius()) { // 距离大于半径认为在圆外
+        return false;
+    }
+    return true;
+}
+
+bool View::isValidRect(const QRectF &rect) const
+{ // 区域的话检测4个端点: 在圆外的充要条件: 4个顶点到圆心的距离最小的也大于半径
+    // 或者说4个端点都在圆内必定区域在圆内
+    QPointFVector points = {rect.topLeft(),rect.topRight(),rect.bottomLeft(),rect.bottomRight()};
+    for(auto pt: points) {
+        if (!isValidRect(pt))
+            return false;
+    }
+    return true; //
+}
+
 
 double View::getCircleRadius() const
 { // 视野圆半径

@@ -81,6 +81,12 @@ void WellPattern::setPatternSize(int rows, int cols)
     initHoleInfo();
 }
 
+void WellPattern::setSelectMode(WellPattern::ViewSelectMode mode)
+{
+    mSelectMode = mode;
+    clearAllHoleViewPoints(); // 切换模式后就和切换物镜一样,所有之前保存的信息(viewpattern的)丢掉
+}
+
 void WellPattern::initDrapPoints()
 { // 清除拖拽区域,pressEvent会调用1次
     mDrapRect = QRectF();
@@ -278,9 +284,8 @@ void WellPattern::clearAllHoleViewPoints()
     update();
 }
 
-void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize)
+void WellPattern::importHoleInfo(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize)
 { // 更新指定孔的信息,用于导入实验配置时逐孔更新
-
     // 1. viewpoints存储的时候是电机坐标,并非UI坐标,需要转换
     QPointFVector points;
     QRectFVector rects; // 基于电机坐标的等比例区域

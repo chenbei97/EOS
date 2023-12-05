@@ -309,7 +309,7 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
 
 void Preview::exportExperConfig(const QString& path)
 { // 导出实验配置
-    previewinfo[PreviewPatternField] = pattern->patternInfo();
+    previewinfo[PreviewPatternField] = wellpattern->patternInfo();
     previewinfo[PreviewToolField] = previewtool->toolInfo();
 #ifdef usetab
     previewinfo[ExperToolField] = expertool->toolInfo();
@@ -351,8 +351,8 @@ void Preview::importExperConfig(const QString& path)
             auto viewpoints = holeinfo[PointsField].value<QPointFVector>();
 
             // 把holePoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
-            pattern->updateHoleInfo(holepoint,group,viewpoints,viewsize);
-            viewpattern->updateViewWindowCache(holepoint,viewpoints,viewsize);
+            wellpattern->importHoleInfo(holepoint,group,viewpoints,viewsize);
+            viewpattern->importViewInfo(holepoint,viewpoints,viewsize);
         }
 
     }
@@ -361,7 +361,7 @@ void Preview::importExperConfig(const QString& path)
 
 void Preview::loadExper()
 {
-    auto patterninfo = pattern->patternInfo();
+    auto patterninfo = wellpattern->patternInfo();
     auto previewinfo = previewtool->toolInfo();
     previewinfo[PreviewPatternField] = patterninfo;
     previewinfo[PreviewToolField] = previewinfo;
@@ -376,7 +376,7 @@ void Preview::loadExper()
 #else
     auto channels = previewinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts)
 #endif
-    auto totalViews = pattern->numberOfViews();
+    auto totalViews = wellpattern->numberOfViews();
     auto totalChannels = channels.count("1"); // 为1的是勾选上的
     auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
     LOG<<"totalViews = "<<totalViews<<"totalChannels = "<<totalChannels<<" estimateSpace = "<<estimateSpace<<"MB";
