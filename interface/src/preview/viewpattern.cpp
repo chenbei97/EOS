@@ -210,7 +210,6 @@ void ViewPattern::onRemoveViewAct()
 {
     auto id = holeID();
     if (mSelectMode == RectMode) {
-
         // 不是原来的方式:删除添加flag为false,保存添加flag为true
         // 现在改为整体删除,那么只需要检测已有的矩形是否和框选的矩形有交集,直接删除之前保存的就可以
         int i = 0;
@@ -225,7 +224,6 @@ void ViewPattern::onRemoveViewAct()
                     break;
             }
         }
-
         // 已经没有了不能继续删,否则越界; 没有交集也不能删除,此时i变成mViewRects[id].count()
         if (!mViewRects[id].isEmpty() && i < mViewRects[id].count())
             mViewRects[id].remove(i);
@@ -235,8 +233,16 @@ void ViewPattern::onRemoveViewAct()
         mTmpRects[id] = mViewRects[id];
         applyholeact->trigger();
     } else {
-//            mUiSelectedPoints[id].append(mapMousePoints());
-//            mTmpUiSelectedPoints[id] = mUiSelectedPoints[id];
+        if (!mDrapRectF.isEmpty()) {
+            QPointFVector points;
+            for(auto pt: mViewPoints[id]) {
+                if (!mDrapRectF.contains(pt)) {
+                    points.append(pt);
+                }
+            }
+            mViewPoints[id] = points;
+            mTmpRects[id] = mViewRects[id];
+        }
     }
 
     update();
@@ -257,7 +263,6 @@ void ViewPattern::onSaveViewAct()
             else mViewRects[id][0] = mMouseRect; // 变为覆盖处理
         }
         mTmpRects[id] = mViewRects[id];
-
         dispersedViewRects();
         mMouseRect = QRectF();
         applyholeact->trigger();
@@ -267,7 +272,6 @@ void ViewPattern::onSaveViewAct()
     }
     update();
 }
-
 
 void ViewPattern::dispersedViewRects()
 { // 把保存的视野区域离散化得到离散区域的所有归一化视野坐标,以及电机坐标
@@ -417,14 +421,8 @@ void ViewPattern::paintEvent(QPaintEvent *event)
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::blue);
         painter.setPen(pen);
-
-        // 4. 鼠标单击生成的矩形框
+        // 鼠标单击生成的矩形框
         painter.drawRect(mapToSize(mMouseRect,p11,diameter,diameter));
-        // 5. 鼠标拖拽生成的矩形框
-        if (!mDrapRectF.isEmpty()) {
-            painter.drawRect(mapToSize(mDrapRectF,p11,diameter,diameter));
-        }
-
         pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
         painter.setPen(pen);
     } else { // 点模式
@@ -439,9 +437,19 @@ void ViewPattern::paintEvent(QPaintEvent *event)
         pen.setWidth(DefaultPainterPenWidth);
         painter.setPen(pen);
     }
+
     // 画圆
     painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
 
+    // 鼠标拖拽生成的矩形框
+    pen = painter.pen();
+    pen.setColor(Qt::blue);
+    painter.setPen(pen);
+    if (!mDrapRectF.isEmpty()) {
+        painter.drawRect(mapToSize(mDrapRectF,p11,diameter,diameter));
+    }
+    pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
+    painter.setPen(pen);
     event->accept();
 }
 
