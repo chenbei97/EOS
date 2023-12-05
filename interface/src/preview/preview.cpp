@@ -137,8 +137,8 @@ void Preview::updateViewWindow(const QVariantMap& m)
     auto nm = m;
     nm[HoleViewSizeField] = size;
     nm[HoleViewRectsField].setValue(QRectFVector());
-    nm[HoleViewUiPointsField].setValue(ViewPointVector());
-    nm[HoleViewPointsField].setValue(ViewPointVector());
+    nm[HoleViewUiPointsField].setValue(QPointFVector());
+    nm[HoleViewPointsField].setValue(QPointFVector());
 
     if (holepoint != QPoint(-1,-1))
         viewpattern->setViewInfo(nm);
@@ -162,32 +162,6 @@ void Preview::updateSetGroupWindow(const QVariantMap& m)
     int ret = groupinfo->exec();
     if (ret == QDialog::Accepted) {
         pattern->updateHoleInfoByGroupInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
-    }
-}
-
-void Preview::updateViewPatternUi()
-{// 弃用,切换厂家和切换物镜分开写
-    // 1.更新视野的尺寸
-    auto toolinfo = previewtool->toolInfo();
-    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
-    auto brand = toolinfo[BrandField].toUInt();
-    auto manufacturer = toolinfo[ManufacturerField].toUInt();
-    auto size = ViewCircleMapFields[manufacturer][brand][objective];
-    if (size > view_well_6_4x*10)
-        dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
-    else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
-    else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
-
-    // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
-    auto current_size = viewpattern->viewInfo()[HoleViewSizeField].toSize().width();
-    if (current_size != size) {
-        LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 需要清理";
-        viewpattern->clearAllViewWindowCache(size);
-        // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
-        dock->setWindowTitle(tr("Select Hole Inside View"));
-        pattern->clearAllHoleViewPoints();// 只需要清理视野信息,其它保留,切换厂家setPattenSize已经都清理完了
-    } else {
-        LOG<<"切换物镜前视野尺寸: "<<current_size<<" 切换物镜后尺寸: "<<size<<" 无需清理";
     }
 }
 

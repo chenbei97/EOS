@@ -423,9 +423,9 @@ void Preview::loadExper()
 
                 auto coordinate = holeinfo[HoleCoordinateField].toPoint();
                 auto viewsize = holeinfo[HoleViewSizeField].toInt();
-                auto viewpoints = holeinfo[HoleViewPointsField].value<ViewPointVector>();
-                auto uipoints = holeinfo[HoleViewUiPointsField].value<ViewPointVector>();
-                auto viewrects = holeinfo[HoleViewRectsField].value<ViewRectFVector>();
+                auto viewpoints = holeinfo[HoleViewPointsField].value<QPointFVector>();
+                auto uipoints = holeinfo[HoleViewUiPointsField].value<QPointFVector>();
+                auto viewrects = holeinfo[HoleViewRectsField].value<QRectFVector>();
 
                 auto expertype = holeinfo[HoleExperTypeField].toString();
                 auto medicine = holeinfo[HoleMedicineField].toString();

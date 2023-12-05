@@ -200,8 +200,12 @@ struct HoleInfo {
 
     // 视野窗口传递来的信息
     QRectFVector viewrects; // 本孔分配的视野区域信息
-    ViewPointVector uipoints; // 绘图使用(够用就行)
-    ViewPointVector viewpoints; // 本孔要扫描的视野坐标(电机坐标更精细)
+
+    ViewPointVector uipoints_v1; // 老接口
+    ViewPointVector viewpoints_v1;
+    QPointFVector uipoints; // 绘图使用(够用就行)
+    QPointFVector viewpoints; // 本孔要扫描的视野坐标(电机坐标更精细)
+
     int viewsize; // 本孔分配的视野尺寸
 
     // 每次打开分组窗口就会重新计算分过的组名和所有选中的孔坐标

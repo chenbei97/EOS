@@ -15,7 +15,7 @@
 #include "utilities.h"
 
 namespace obsoleteClass {
-    
+
     class COMPONENT_IMEXPORT WellPatternV1: public Pattern
     {
         Q_OBJECT

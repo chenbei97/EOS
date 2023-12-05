@@ -135,8 +135,8 @@ void WellPattern::updateHoleInfoByViewInfoApplyHole(QCVariantMap m)
     // HoleGroupCoordinatesField 该组的所有孔坐标不解析
     auto viewsize = m[HoleViewSizeField].toInt();
     auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
-    auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>();// 关键信息
-    auto uipoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
+    auto viewpoints = m[HoleViewPointsField].value<QPointFVector>();// 关键信息
+    auto uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
 
     // 2. 把信息更新到本孔
     auto holeinfo = mHoleInfo[coordinate.x()][coordinate.y()];
@@ -165,8 +165,8 @@ void WellPattern::updateHoleInfoByViewInfoApplyGroup(QCVariantMap m)
     auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
     auto viewsize = m[HoleViewSizeField].toInt();
     auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
-    auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>(); // 关键信息
-    auto uipoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
+    auto viewpoints = m[HoleViewPointsField].value<QPointFVector>(); // 关键信息
+    auto uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
 
     // 2. 根据视野窗口传来的组名 把coordinate对应的组(color+viewpoints,viewsize)都更新 (不需要更新group,allgroup,dose,medicine,unit,type)
     for(int row = 0 ; row < mrows; ++ row) {
@@ -199,8 +199,8 @@ void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
     auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
     auto viewsize = m[HoleViewSizeField].toInt();
     auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
-    auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>(); // 关键信息
-    auto uipoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
+    auto viewpoints = m[HoleViewPointsField].value<QPointFVector>(); // 关键信息
+    auto uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
 
     //切物镜时
     //LOG<<allcoordinates;
@@ -231,8 +231,8 @@ void WellPattern::onRemoveHoleAct()
     mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
     mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = 0;
     mHoleInfo[mMousePos.x()][mMousePos.y()].viewrects = QRectFVector();
-    mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = ViewPointVector();
-    mHoleInfo[mMousePos.x()][mMousePos.y()].uipoints = ViewPointVector();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointFVector();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].uipoints = QPointFVector();
     mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = false;
     mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = QPoint2DVector();
     mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = QSet<QString>();

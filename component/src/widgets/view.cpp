@@ -11,6 +11,7 @@
 
 View::View(QWidget *parent) : QWidget(parent)
 {
+    initDispersedMask();
     saveviewact = new QAction(tr("Selecting Points"));
     removeviewact = new QAction(tr("Remove Points"));
     applyholeact = new QAction(tr("Apply To Hole"));
@@ -28,6 +29,19 @@ View::View(QWidget *parent) : QWidget(parent)
     connect(applyholeact,&QAction::triggered,this,&View::onApplyHoleAct);
     connect(applygroupact,&QAction::triggered,this,&View::onApplyGroupAct);
     connect(applyallact,&QAction::triggered,this,&View::onApplyAllAct);
+}
+
+void View::initDispersedMask()
+{
+    mDispersedMask.clear();
+    for(int r = 0; r < mDispersedMaskSize; ++r)
+    {
+        QBoolVector vec;
+        for(int c = 0; c < mDispersedMaskSize; ++c) {
+            vec.append(false);
+        }
+        mDispersedMask.append(vec);
+    }
 }
 
 QPointF View::mapFromPointF(const QPointF &point) const
@@ -92,6 +106,20 @@ void View::setViewInfo(const ViewInfo &info)
 ViewInfo View::viewInfo() const
 {
     return mViewInfo;
+}
+
+int View::holeID() const
+{ // 每个孔双击打开视野窗口都是一对一的
+    auto coordinate = mViewInfo[HoleCoordinateField].toPoint();
+    if (coordinate.isNull()) return -1;
+
+    auto id = coordinate.x()*PointToIDCoefficient+coordinate.y();// 保证索引唯一不重叠2k+y,每个孔对应唯一的idx
+    return id;
+}
+
+int View::holeID(const QPoint& holePoint) const
+{
+    return holePoint.x() * PointToIDCoefficient + holePoint.y();
 }
 
 void View::mousePressEvent(QMouseEvent *event)

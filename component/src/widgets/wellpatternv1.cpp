@@ -250,8 +250,8 @@ namespace obsoleteClass {
 
                 info.viewsize = 0;
                 info.viewrects = QRectFVector();
-                info.viewpoints = ViewPointVector();
-                info.uipoints = ViewPointVector();
+                info.viewpoints_v1 = ViewPointVector();
+                info.uipoints_v1 = ViewPointVector();
 
                 info.isselected = false;
                 info.allgroup = QSet<QString>();
@@ -273,8 +273,8 @@ namespace obsoleteClass {
         for(int row = 0 ; row < mrows; ++ row) {
             for (int col = 0; col < mcols; ++col) {
                 mHoleInfo[row][col].viewrects = QRectFVector();
-                mHoleInfo[row][col].viewpoints = ViewPointVector();
-                mHoleInfo[row][col].uipoints = ViewPointVector();
+                mHoleInfo[row][col].viewpoints_v1 = ViewPointVector();
+                mHoleInfo[row][col].uipoints_v1 = ViewPointVector();
                 mHoleInfo[row][col].viewsize = 0;
             }
         }
@@ -323,8 +323,8 @@ namespace obsoleteClass {
 
         // 3.颜色不更新,默认就红色,不同组的颜色会一样,因为当初没有存不同的颜色
         mHoleInfo[point.x()][point.y()].group = group;
-        mHoleInfo[point.x()][point.y()].viewpoints = points;
-        mHoleInfo[point.x()][point.y()].uipoints = uipoints;
+        mHoleInfo[point.x()][point.y()].viewpoints_v1 = points;
+        mHoleInfo[point.x()][point.y()].uipoints_v1 = uipoints;
 
         mHoleInfo[point.x()][point.y()].viewsize = viewsize;
         mHoleInfo[point.x()][point.y()].isselected = true;
@@ -476,8 +476,8 @@ namespace obsoleteClass {
         holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
         holeinfo.viewrects = viewrects; // 本组应用的视野数量和位置信息
         holeinfo.viewsize = viewsize; // 本组应用的视野尺寸
-        holeinfo.viewpoints = viewpoints; // 本组应用的电机坐标
-        holeinfo.uipoints = uipoints; // 绘图使用的坐标
+        holeinfo.viewpoints_v1 = viewpoints; // 本组应用的电机坐标
+        holeinfo.uipoints_v1 = uipoints; // 绘图使用的坐标
         mHoleInfo[coordinate.x()][coordinate.y()] = holeinfo;
         update();
     }
@@ -509,8 +509,8 @@ namespace obsoleteClass {
                     holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
                     holeinfo.color = groupColor; // 本组应用的组颜色(有可能同组不同孔的颜色不同,帮助统一化)
                     holeinfo.viewrects = viewrects; // 本组应用的视野数量和位置信息
-                    holeinfo.viewpoints = viewpoints;
-                    holeinfo.uipoints = uipoints;
+                    holeinfo.viewpoints_v1 = viewpoints;
+                    holeinfo.uipoints_v1 = uipoints;
                     holeinfo.viewsize = viewsize; // 本组应用的视野尺寸
                     mHoleInfo[row][col] = holeinfo;
                 }
@@ -542,8 +542,8 @@ namespace obsoleteClass {
                 if (holeinfo.group == groupName) // 本组应用的组颜色,不同组的颜色不需要统一
                     holeinfo.color = groupColor;
                 holeinfo.viewrects = viewrects;
-                holeinfo.viewpoints = viewpoints;
-                holeinfo.uipoints = uipoints;
+                holeinfo.viewpoints_v1 = viewpoints;
+                holeinfo.uipoints_v1 = uipoints;
                 holeinfo.viewsize = viewsize;
                 mHoleInfo[hole.x()][hole.y()] = holeinfo;
             }
@@ -559,8 +559,8 @@ namespace obsoleteClass {
         mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
         mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = 0;
         mHoleInfo[mMousePos.x()][mMousePos.y()].viewrects = QRectFVector();
-        mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = ViewPointVector();
-        mHoleInfo[mMousePos.x()][mMousePos.y()].uipoints = ViewPointVector();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints_v1 = ViewPointVector();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].uipoints_v1 = ViewPointVector();
         mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = false;
         mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = QPoint2DVector();
         mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = QSet<QString>();

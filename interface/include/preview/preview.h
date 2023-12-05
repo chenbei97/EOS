@@ -100,7 +100,6 @@ private:
 private:
     void updateViewWindow(const QVariantMap& m);
     void updateSetGroupWindow(const QVariantMap& m);
-    void updateViewPatternUi();
 private:
     void onManufacturerChanged(int option);
     void onWellbrandChanged(int option);

@@ -104,51 +104,50 @@ void WellPattern::paintEvent(QPaintEvent *event)
                 painter.fillPath(path,mHoleInfo[row][col].color);
 
                 // (3.2) 第1种绘制法: 直接绘制视野区域
-                    auto rects = mHoleInfo[row][col].viewrects; // 视野选中区域不为空
-                    if (!rects.isEmpty()) {
-                        auto topleft = center-QPointF(radius*0.75,radius*0.75);// 圆孔内圆的外接正方形的左上角顶点
-                        for(auto rect: rects) { // 可对照ViewPattern::mapToSize的逻辑
-                            auto x = rect.topLeft().x() * radius * 1.5+ topleft.x();
-                            auto y = rect.topLeft().y() * radius * 1.5 + topleft.y();
-                            auto w = rect.size().width() * radius * 1.5;
-                            auto h = rect.size().height() * radius * 1.5;
+//                auto rects = mHoleInfo[row][col].viewrects; // 视野选中区域不为空
+//                if (!rects.isEmpty()) {
+//                    auto topleft = center-QPointF(radius*0.75,radius*0.75);// 圆孔内圆的外接正方形的左上角顶点
+//                    for(auto rect: rects) { // 可对照ViewPattern::mapToSize的逻辑
+//                        auto x = rect.topLeft().x() * radius * 1.5+ topleft.x();
+//                        auto y = rect.topLeft().y() * radius * 1.5 + topleft.y();
+//                        auto w = rect.size().width() * radius * 1.5;
+//                        auto h = rect.size().height() * radius * 1.5;
+//                        painter.fillRect(QRectF(x,y,w,h),Qt::black);
+//                    }
+//                }
+                // (3.3) 第2种绘制法: 只是绘制点,相比于第3种比较有效率,以点带面
+//                auto points = mHoleInfo[row][col].uipoints;
+//                if (!points.isEmpty()) {
+//                    auto pen = painter.pen();
+//                    pen.setWidth(4);
+//                    painter.setPen(pen);
+//                    auto topleft = center-QPointF(radius*0.75,radius*0.75);// 圆孔内圆的外接正方形的左上角顶点
+//                    for(auto point: points) {
+//                        auto x = point.x() * radius * 1.5 + topleft.x();
+//                        auto y = point.y() * radius * 1.5 + topleft.y();
+//                        painter.drawPoint(QPointF(x,y));
+//                    }
+//                    pen = painter.pen();
+//                    pen.setWidth(2);
+//                    painter.setPen(pen);
+//                }
+                // (3.4) 第3种绘制法: 把视野点整体缩放,单位小矩形的尺寸取决于viewPattern是怎么定义缩放比例的
+                auto points = mHoleInfo[row][col].uipoints;
+                if (!points.isEmpty()) {
+                    auto topleft = center-QPointF(radius*0.75,radius*0.75);// 圆孔内圆的外接正方形的左上角顶点
+                    if ((points.count() > mUiViewMaskSize*mUiViewMaskSize*0.2 && mrows == 16) // 384 视野上孔很小没必要做循环了,数量太多直接画个黑圆就得
+                         || (points.count() > mUiViewMaskSize*mUiViewMaskSize*0.9 && mrows == 8)) { // 96 这个可以超过9000太多时忽略掉,其他时候不卡正常绘制
+                        painter.fillRect(QRectF(topleft,QSizeF(radius*1.5,radius*1.5)),Qt::black);
+                    } else { // 对于384和96的一些优化,因为计算量比较大,而且wellpattern的孔很小时就没有必要按点画了,点特别多时看不出来直接画区域
+                        for(auto point: points) {
+                            auto x = point.x() * radius * 1.5 + topleft.x();
+                            auto y = point.y() * radius * 1.5 + topleft.y();
+                            auto w = 1.0 / mUiViewMaskSize * radius * 1.5; // viewPattern传来的坐标就是根据mViewMaskSize去缩放的
+                            auto h = 1.0 / mUiViewMaskSize * radius * 1.5; // 那么w,h也是根据这个倍数去缩放
                             painter.fillRect(QRectF(x,y,w,h),Qt::black);
                         }
                     }
-//                    // (3.3) 第2种绘制法: 只是绘制点,相比于第3种比较有效率,以点带面
-//                    auto points = mHoleInfo[row][col].uipoints;
-//                    if (!points.isEmpty()) {
-//                        auto pen = painter.pen();
-//                        pen.setWidth(4);
-//                        painter.setPen(pen);
-//                        auto topleft = center-QPointF(radius*0.75,radius*0.75);// 圆孔内圆的外接正方形的左上角顶点
-//                        for(auto point: points) {
-//                            auto x = point.x.toDouble() * radius * 1.5 + topleft.x();
-//                            auto y = point.y.toDouble() * radius * 1.5 + topleft.y();
-//                            painter.drawPoint(QPointF(x,y));
-//                        }
-//                        pen = painter.pen();
-//                        pen.setWidth(2);
-//                        painter.setPen(pen);
-//                    }
-//                }
-                // (3.4) 第3种绘制法: 把视野点整体缩放,单位小矩形的尺寸取决于viewPattern是怎么定义缩放比例的
-//                auto points = mHoleInfo[row][col].uipoints;
-//                if (!points.isEmpty()) {
-//                    auto topleft = center-QPointF(radius*0.75,radius*0.75);// 圆孔内圆的外接正方形的左上角顶点
-//                    if ((points.count() > mUiViewMaskSize*mUiViewMaskSize*0.2 && mrows == 16) // 384 视野上孔很小没必要做循环了,数量太多直接画个黑圆就得
-//                         || (points.count() > mUiViewMaskSize*mUiViewMaskSize*0.9 && mrows == 8)) { // 96 这个可以超过9000太多时忽略掉,其他时候不卡正常绘制
-//                        painter.fillRect(QRectF(topleft,QSizeF(radius*1.5,radius*1.5)),Qt::black);
-//                    } else { // 对于384和96的一些优化,因为计算量比较大,而且wellpattern的孔很小时就没有必要按点画了,点特别多时看不出来直接画区域
-//                        for(auto point: points) {
-//                            auto x = point.x.toDouble() * radius * 1.5 + topleft.x();
-//                            auto y = point.y.toDouble() * radius * 1.5 + topleft.y();
-//                            auto w = 1.0 / mUiViewMaskSize * radius * 1.5; // viewPattern传来的坐标就是根据mViewMaskSize去缩放的
-//                            auto h = 1.0 / mUiViewMaskSize * radius * 1.5; // 那么w,h也是根据这个倍数去缩放
-//                            painter.fillRect(QRectF(x,y,w,h),Qt::black);
-//                        }
-//                    }
-//                }
+                }
             }
 
             // (4) 绘制不可选置灰的点,将其高亮颜色变为灰色,并画个x

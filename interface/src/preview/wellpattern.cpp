@@ -247,8 +247,8 @@ void WellPattern::initHoleInfo()
 
             info.viewsize = 0;
             info.viewrects = QRectFVector();
-            info.viewpoints = ViewPointVector();
-            info.uipoints = ViewPointVector();
+            info.viewpoints = QPointFVector();
+            info.uipoints = QPointFVector();
 
             info.isselected = false;
             info.allgroup = QSet<QString>();
@@ -270,8 +270,8 @@ void WellPattern::clearAllHoleViewPoints()
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
             mHoleInfo[row][col].viewrects = QRectFVector();
-            mHoleInfo[row][col].viewpoints = ViewPointVector();
-            mHoleInfo[row][col].uipoints = ViewPointVector();
+            mHoleInfo[row][col].viewpoints = QPointFVector();
+            mHoleInfo[row][col].uipoints = QPointFVector();
             mHoleInfo[row][col].viewsize = 0;
         }
     }
@@ -282,17 +282,17 @@ void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointFVector vie
 { // 更新指定孔的信息,用于导入实验配置时逐孔更新
 
     // 1. viewpoints存储的时候是电机坐标,并非UI坐标,需要转换
-    ViewPointVector points;
+    QPointFVector points;
     QRectFVector rects; // 基于电机坐标的等比例区域
     for(auto pt: viewpoints)
     {
-        points.append(ViewPoint(pt.x(),pt.y())); // 当初电机坐标是按照1.0/viewsize去存的,现在的比例不变
+        points.append(QPointF(pt.x(),pt.y())); // 当初电机坐标是按照1.0/viewsize去存的,现在的比例不变
         auto rect = QRectF(pt.x(),pt.y(),1.0/viewsize,1.0/viewsize);
         rects.append(rect);
     }
 
     // 2. 转换ui坐标需要 UI区域和掩码矩阵
-    ViewPointVector uipoints; // 要转换的UI坐标
+    QPointFVector uipoints; // 要转换的UI坐标
     for(int r = 0; r < mUiViewMaskSize; ++r) {
         for (int c = 0; c < mUiViewMaskSize; ++c) {
             for(auto viewRect: rects) {
@@ -306,10 +306,7 @@ void WellPattern::updateHoleInfo(QCPoint point,QCString group,QCPointFVector vie
 
                 auto rect = QRectF(x,y,w,h); // 等比例放大尺寸到mUiViewMaskSize
                 if (rect.intersects(QRectF(c,r,1.0,1.0))) { // 掩码区域包含的点都视为UI点
-                    ViewPoint point;
-                    point.x = convertPrecision((r+0.5)/mUiViewMaskSize);
-                    point.y = convertPrecision((c+0.5)/mUiViewMaskSize);
-                    uipoints.append(point);
+                    uipoints.append(QPointF((r+0.5)/mUiViewMaskSize,(c+0.5)/mUiViewMaskSize));
                 }
             }  // end 3层for
         }

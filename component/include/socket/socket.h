@@ -251,8 +251,8 @@ static QByteArray assemblePreviewEvent(QCVariantMap m)
     auto viewpoint = m[ViewCoordinateField].toPointF();
     object[FieldPreviewEvent.hole_x] = holepoint.x();
     object[FieldPreviewEvent.hole_y] = holepoint.y();
-    object[FieldPreviewEvent.view_x] = convertPrecision(viewpoint.x()).toDouble(); // 浮点数保留6位需要变成字符串形式
-    object[FieldPreviewEvent.view_y] = convertPrecision(viewpoint.y()).toDouble(); // 又改回来了
+    object[FieldPreviewEvent.view_x] = viewpoint.x(); // 浮点数保留6位需要变成字符串形式
+    object[FieldPreviewEvent.view_y] = viewpoint.y(); // 又改回来了
     object[FieldPreviewEvent.ishole] = m[IsHoleField].toInt();
 
     TcpAssemblerDoc.setObject(object);
@@ -365,8 +365,8 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
 
             auto coordinate = holeinfo[HoleCoordinateField].toPoint();
             //auto viewsize = holeinfo[HoleViewSizeField].toInt();
-            //auto viewrects = holeinfo[HoleViewRectsField].value<ViewRectFVector>();
-            auto viewpoints = holeinfo[HoleViewPointsField].value<ViewPointVector>();//注意用电机坐标不是ui坐标
+            //auto viewrects = holeinfo[HoleViewRectsField].value<QRectFVector>();
+            auto viewpoints = holeinfo[HoleViewPointsField].value<QPointFVector>();//注意用电机坐标不是ui坐标
 
             //auto expertype = holeinfo[HoleExperTypeField].toString();
             //auto medicine = holeinfo[HoleMedicineField].toString();
@@ -383,12 +383,12 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
             QJsonArray pointValues; // point字段的值是个列表
             for(int viewcount = 0; viewcount<viewpoints.count(); ++viewcount) {
                 QJsonObject viewObject;
-                auto viewpoint_x = viewpoints[viewcount].x;
-                auto viewpoint_y = viewpoints[viewcount].y;
+                auto viewpoint_x = viewpoints[viewcount].x();
+                auto viewpoint_y = viewpoints[viewcount].y();
 
                 //viewObject[HoleCoordinateField] = QString("(%1,%2)").arg(viewpoint_x).arg(viewpoint_y);
-                viewObject[FieldLoadExperEvent.x] = viewpoint_x.toDouble();
-                viewObject[FieldLoadExperEvent.y] = viewpoint_y.toDouble();
+                viewObject[FieldLoadExperEvent.x] = viewpoint_x;
+                viewObject[FieldLoadExperEvent.y] = viewpoint_y;
                 pointValues.append(viewObject);
             }
 

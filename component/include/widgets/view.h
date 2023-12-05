@@ -18,8 +18,12 @@ class COMPONENT_IMEXPORT View: public QWidget
 public:
     enum ViewSelectMode {PointMode,RectMode};
     explicit View(QWidget*parent= nullptr);
+
     virtual void setViewInfo(const ViewInfo& info);
     ViewInfo viewInfo() const;
+    int holeID() const;
+    int holeID(const QPoint& holePoint) const;
+
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -29,9 +33,11 @@ public:
     void setDisablePoints(QCPointVector points, bool enable = true);
     void setDisablePoints(bool enable = true);
 protected:
-    ViewSelectMode mSelectMode = RectMode;
+    ViewSelectMode mSelectMode = PointMode;
     ViewInfo mViewInfo;
     int mSize = 0;
+    QBool2DVector mDispersedMask;
+    const int mDispersedMaskSize = DefaultUiMaskSize;
     QPointF mMousePos;
     QRectF mMouseRect;
     QRectF mDrapRectF;
@@ -46,6 +52,7 @@ protected:
     virtual void onApplyGroupAct();
     virtual void onApplyAllAct();
 protected:
+    void initDispersedMask();
     QPointF mapFromPointF(const QPointF& point) const;
     QPointF mapToPointF(const QPointF& point) const;
     QRectF mapToSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);
