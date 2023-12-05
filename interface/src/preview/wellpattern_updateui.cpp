@@ -134,7 +134,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyHole(QCVariantMap m)
     auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
     // HoleGroupCoordinatesField 该组的所有孔坐标不解析
     auto viewsize = m[HoleViewSizeField].toInt();
-    auto viewrects = m[HoleViewRectsField].value<ViewRectFVector>(); // 关键信息
+    auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
     auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>();// 关键信息
     auto uipoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
 
@@ -164,7 +164,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyGroup(QCVariantMap m)
     auto allgroup = m[WellAllGroupsField].value<QSet<QString>>();
     auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
     auto viewsize = m[HoleViewSizeField].toInt();
-    auto viewrects = m[HoleViewRectsField].value<ViewRectFVector>(); // 关键信息
+    auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
     auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>(); // 关键信息
     auto uipoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
 
@@ -198,7 +198,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
     auto groupColor = m[HoleGroupColorField].toString();
     auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
     auto viewsize = m[HoleViewSizeField].toInt();
-    auto viewrects = m[HoleViewRectsField].value<ViewRectFVector>(); // 关键信息
+    auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
     auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>(); // 关键信息
     auto uipoints = m[HoleViewUiPointsField].value<ViewPointVector>(); // 关键信息
 
@@ -230,7 +230,7 @@ void WellPattern::onRemoveHoleAct()
     mHoleInfo[mMousePos.x()][mMousePos.y()].color = Qt::red;
     mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
     mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = 0;
-    mHoleInfo[mMousePos.x()][mMousePos.y()].viewrects = ViewRectFVector();
+    mHoleInfo[mMousePos.x()][mMousePos.y()].viewrects = QRectFVector();
     mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = ViewPointVector();
     mHoleInfo[mMousePos.x()][mMousePos.y()].uipoints = ViewPointVector();
     mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = false;

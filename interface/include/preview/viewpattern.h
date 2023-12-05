@@ -27,8 +27,8 @@ private:
     ViewPointVector mViewMaskNormPoints;
     QMap<int,ViewPointVector> mUiViewMaskNormPoints;
     QMap<int,ViewPointVector> mTmpUiViewMaskNormPoints;
-    QMap<int,ViewRectFVector> mViewRects;
-    QMap<int,ViewRectFVector> mTmpRects;
+    QMap<int,QRectFVector> mViewRects;
+    QMap<int,QRectFVector> mTmpRects;
     // 点模式
     QMap<int,QPointFVector> mUiSelectedPoints;
     QMap<int,QPointFVector> mTmpUiSelectedPoints;

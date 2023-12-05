@@ -20,9 +20,11 @@
 enum class SQLType {Mysql,Sqlite};
 Q_ENUMS(SQLType)
 
-const int DefaultPrecisionBit = 6;
-const int DefaultDrawPointWidth = 8;
-const int DefaultPainterPenWidth = 2;
+static const int DefaultPrecisionBit = 6;
+static const int DefaultDrawPointWidth = 8;
+static const int DefaultPainterPenWidth = 2;
+static const int DefaultUiMaskSize = 100;
+#define PointToIDCoefficient 1000 // kx1+y1=kx2+y2=> k=(y2-y1)/(x1-x2),k取什么值?找不到这样的2个坐标能等于k,由于wellsize最大384,实际上k>384就能保证id唯一了
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 #define SqlExecFailedLOG (qDebug()<<"[" \
     <<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] sql exec failed! error is ")

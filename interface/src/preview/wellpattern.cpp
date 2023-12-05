@@ -246,7 +246,7 @@ void WellPattern::initHoleInfo()
             info.color = Qt::red;
 
             info.viewsize = 0;
-            info.viewrects = ViewRectFVector();
+            info.viewrects = QRectFVector();
             info.viewpoints = ViewPointVector();
             info.uipoints = ViewPointVector();
 
@@ -269,7 +269,7 @@ void WellPattern::clearAllHoleViewPoints()
 { // 切换物镜时调用,需要清理掉视野窗口映射的4个信息
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            mHoleInfo[row][col].viewrects = ViewRectFVector();
+            mHoleInfo[row][col].viewrects = QRectFVector();
             mHoleInfo[row][col].viewpoints = ViewPointVector();
             mHoleInfo[row][col].uipoints = ViewPointVector();
             mHoleInfo[row][col].viewsize = 0;

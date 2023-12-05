@@ -136,7 +136,7 @@ void Preview::updateViewWindow(const QVariantMap& m)
     // 3. ⭐⭐⭐⭐ 把图案的信息传给视野窗口,必须这里额外组装3个字段
     auto nm = m;
     nm[HoleViewSizeField] = size;
-    nm[HoleViewRectsField].setValue(ViewRectFVector());
+    nm[HoleViewRectsField].setValue(QRectFVector());
     nm[HoleViewUiPointsField].setValue(ViewPointVector());
     nm[HoleViewPointsField].setValue(ViewPointVector());
 

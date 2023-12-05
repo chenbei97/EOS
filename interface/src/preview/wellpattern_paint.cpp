@@ -108,15 +108,11 @@ void WellPattern::paintEvent(QPaintEvent *event)
                     if (!rects.isEmpty()) {
                         auto topleft = center-QPointF(radius*0.75,radius*0.75);// 圆孔内圆的外接正方形的左上角顶点
                         for(auto rect: rects) { // 可对照ViewPattern::mapToSize的逻辑
-                            auto x = rect.rect.topLeft().x() * radius * 1.5+ topleft.x();
-                            auto y = rect.rect.topLeft().y() * radius * 1.5 + topleft.y();
-                            auto w = rect.rect.size().width() * radius * 1.5;
-                            auto h = rect.rect.size().height() * radius * 1.5;
-                            if (rect.flag) { // rect.rect是0-1的,映射到圆孔需要基于当前的topleft,以及内圆的直径
-                                painter.fillRect(QRectF(x,y,w,h),Qt::black);
-                            } else {
-                                painter.fillRect(QRectF(x,y,w,h),mHoleInfo[row][col].color);
-                            }
+                            auto x = rect.topLeft().x() * radius * 1.5+ topleft.x();
+                            auto y = rect.topLeft().y() * radius * 1.5 + topleft.y();
+                            auto w = rect.size().width() * radius * 1.5;
+                            auto h = rect.size().height() * radius * 1.5;
+                            painter.fillRect(QRectF(x,y,w,h),Qt::black);
                         }
                     }
 //                    // (3.3) 第2种绘制法: 只是绘制点,相比于第3种比较有效率,以点带面

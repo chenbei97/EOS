@@ -25,7 +25,7 @@ void ViewPattern::clearViewWindowCache(const QPoint &holePoint)
     mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
     mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
     mViewInfo[WellAllGroupsField].setValue(QSet<QString>());
-    mViewInfo[HoleViewRectsField].setValue(ViewRectFVector());
+    mViewInfo[HoleViewRectsField].setValue(QRectFVector());
     mViewInfo[HoleViewUiPointsField].setValue(ViewPointVector());
     mViewInfo[HoleViewPointsField].setValue(ViewPointVector());
     checkField();
@@ -50,7 +50,7 @@ void ViewPattern::clearAllViewWindowCache(int viewSize,bool toggleObjective)
 
     if (viewSize != mViewInfo[HoleViewSizeField].toInt()) {
         mViewInfo[HoleViewSizeField] = viewSize;
-        mViewInfo[HoleViewRectsField].setValue(ViewRectFVector()); // 清空视野信息
+        mViewInfo[HoleViewRectsField].setValue(QRectFVector()); // 清空视野信息
         mViewInfo[HoleViewUiPointsField].setValue(ViewPointVector());
         mViewInfo[HoleViewPointsField].setValue(ViewPointVector());
     } // 其它与孔有关的信息只有setViewInfo时才会传递,如果清除了就会丢掉这些信息
@@ -82,7 +82,7 @@ void ViewPattern::updateViewWindowCache(QCPoint holePoint, QCPointFVector viewPo
     mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
 
     mViewInfo[HoleViewSizeField] = viewSize;
-    mViewInfo[HoleViewRectsField].setValue(ViewRectFVector());
+    mViewInfo[HoleViewRectsField].setValue(QRectFVector());
     mViewInfo[HoleViewUiPointsField].setValue(ViewPointVector());
     mViewInfo[HoleViewPointsField].setValue(ViewPointVector());
 
@@ -99,15 +99,15 @@ void ViewPattern::updateViewWindowCache(QCPoint holePoint, QCPointFVector viewPo
     mTmpRects[id].clear();
 
     for(auto pt: viewPoints) { // 电机坐标要转成UI区域,然后转成UI坐标
-        mViewRects[id].append(ViewRectF(QRectF(pt.x(),pt.y(),
-               1.0/mSize,1.0/mSize),true));// 这个坐标当初导出时根据每个小视野的尺寸为单位导出,小视野的比例就是1/mSize
+        mViewRects[id].append(QRectF(QRectF(pt.x(),pt.y(),
+               1.0/mSize,1.0/mSize)));// 这个坐标当初导出时根据每个小视野的尺寸为单位导出,小视野的比例就是1/mSize
     }
     mTmpRects[id] = mViewRects[id];
 
     for(int r = 0; r < mUiViewMaskSize; ++r) {
         for (int c = 0; c < mUiViewMaskSize; ++c) {
             for(auto viewRect: mViewRects[id]) {
-                auto rect = mapToSize(viewRect.rect,QPointF(0.0,0.0),
+                auto rect = mapToSize(viewRect,QPointF(0.0,0.0),
                                       mUiViewMaskSize,mUiViewMaskSize); // 等比例放大尺寸到mUiViewMaskSize
                 if (rect.intersects(QRectF(c,r,1.0,1.0))) {
                     ViewPoint point;
@@ -213,30 +213,18 @@ void ViewPattern::onRemoveViewAct()
 {
     auto id = holeID();
     if (mSelectMode == RectMode) {
-        ViewRectF info;
-        info.flag = false;// 表示是保存还是删除这个区域
 
-#ifdef notuse_remove_whole
-        // 框选的时候保存框选的矩形,不保存单击生成的矩形
-    if (!mDrapRectF.isEmpty()) {
-        info.rect = mDrapRectF;
-        mViewRects[id].append(info);
-    } else {
-        info.rect = mMouseRect;
-        mViewRects[id].append(info);
-    }
-#else
         // 不是原来的方式:删除添加flag为false,保存添加flag为true
         // 现在改为整体删除,那么只需要检测已有的矩形是否和框选的矩形有交集,直接删除之前保存的就可以
         int i = 0;
         if (!mDrapRectF.isEmpty()) {
             for(i = 0; i < mViewRects[id].count(); ++i) {
-                if (mViewRects[id][i].rect.intersects(mDrapRectF))
+                if (mViewRects[id][i].intersects(mDrapRectF))
                     break;
             }
         } else {
             for(i = 0; i < mViewRects[id].count(); ++i) {
-                if (mViewRects[id][i].rect.intersects(mMouseRect))
+                if (mViewRects[id][i].intersects(mMouseRect))
                     break;
             }
         }
@@ -244,7 +232,6 @@ void ViewPattern::onRemoveViewAct()
         // 已经没有了不能继续删,否则越界; 没有交集也不能删除,此时i变成mViewRects[id].count()
         if (!mViewRects[id].isEmpty() && i < mViewRects[id].count())
             mViewRects[id].remove(i);
-#endif
 
         viewRectsMapToViewMask();
         mMouseRect = QRectF();
@@ -263,25 +250,20 @@ void ViewPattern::onSaveViewAct()
 {
     auto id = holeID();
     if(mSelectMode == RectMode) {
-        ViewRectF info;
-        info.flag = true;// 表示是保存还是删除这个区域
-
         // 框选的时候保存框选的矩形,不保存单击生成的矩形
         if (!mDrapRectF.isEmpty()) {
-            info.rect = mDrapRectF;
 #ifdef use_save_cover  // 变为覆盖处理,也就是说flag其实不再需要了
             if (mViewRects[id].isEmpty())
-                mViewRects[id].append(info);
-            else mViewRects[id][0] = info; // 但是懒得改以前的代码设计,兼容一下
+                mViewRects[id].append(mDrapRectF);
+            else mViewRects[id][0] = mDrapRectF; // 但是懒得改以前的代码设计,兼容一下
 #else
             mViewRects[id].append(info);
 #endif
         } else {
-            info.rect = mMouseRect;
 #ifdef use_save_cover
             if (mViewRects[id].isEmpty())
-                mViewRects[id].append(info);
-            else mViewRects[id][0] = info; // 变为覆盖处理
+                mViewRects[id].append(mMouseRect);
+            else mViewRects[id][0] = mMouseRect; // 变为覆盖处理
 #else
             mViewRects[id].append(info);
 #endif
@@ -290,7 +272,7 @@ void ViewPattern::onSaveViewAct()
 
         viewRectsMapToViewMask();
         mMouseRect = QRectF();
-
+        LOG<<mViewMaskNormPoints;
         applyholeact->trigger();
     } else {
         mUiSelectedPoints[id].append(mapFromPointF(mMousePos));
@@ -344,12 +326,11 @@ void ViewPattern::viewRectsMapToViewMask()
         for(int c = 0; c < mUiViewMaskSize; ++c) {
             mUiViewMask[r][c] = false; // 先清理掉否则重复添加
             for(auto viewRect: viewRects) {
-                auto flag = viewRect.flag; // 对于位置[r][c] 3层的for结束后,就知道这个位置是否被选中
-                auto rect = mapToSize(viewRect.rect,QPointF(0.0,0.0),
+                auto rect = mapToSize(viewRect,QPointF(0.0,0.0),
                                       mUiViewMaskSize,mUiViewMaskSize); // 等比例放大尺寸到mUiViewMaskSize
                 if (rect.intersects(QRectF(c,r,1.0,1.0))) {
                     //mUiViewMask[id][r][c] = flag; //掩码对应位置根据flag标记是保存还是删除的区域
-                    mUiViewMask[r][c] = flag; //掩码对应位置根据flag标记是保存还是删除的区域
+                    mUiViewMask[r][c] = true; //掩码对应位置根据flag标记是保存还是删除的区域
                 }
             }  // end 2层for
 
@@ -367,8 +348,7 @@ void ViewPattern::viewRectsMapToViewMask()
     auto view_w = qCeil(getInnerRectWidth());
     auto view_h = qCeil(getInnerRectHeight());
     for(auto viewRect: viewRects) {
-        auto flag = viewRect.flag;
-        auto rect = mapToSize(viewRect.rect,QPointF(0.0,0.0),
+        auto rect = mapToSize(viewRect,QPointF(0.0,0.0),
                               getCircleRadius()*2.0,getCircleRadius()*2.0);
         auto x0 = qCeil(rect.topLeft().x()); // 像上取整
         auto y0 = qCeil(rect.topLeft().y());
@@ -382,7 +362,7 @@ void ViewPattern::viewRectsMapToViewMask()
                 auto center_y = x+view_w/2.0;
                 auto center_x = y+view_h/2.0;
                 auto threshold = view_w*view_w/4.0+view_h*view_h/4.0;//这个可以改
-                if (flag) { // 如果是标记为保存的区域,2个小矩形的中心距离小于阈值就认为是靠近,只保留原来的
+                if (true) { // 如果是标记为保存的区域,2个小矩形的中心距离小于阈值就认为是靠近,只保留原来的
                     bool hasSaved = false;
                     for(int i = 0; i < points.count(); ++i) {
                         auto pt = points[i];
@@ -520,37 +500,6 @@ void ViewPattern::paintEvent(QPaintEvent *event)
 void ViewPattern::mousePressEvent(QMouseEvent *event)
 {
     View::mousePressEvent(event);
-
-//                auto rectinfo = mViewRects[holeID()];
-//                if (rectinfo.isEmpty()) {
-//                    removeviewact->setEnabled(false);
-//                } else {
-//                    for(auto viewRect: rectinfo) {
-//                        if (viewRect.flag) { // 保存的区域
-//                            if (viewRect.rect.contains(mDrapRectF)) { // 已经包含了
-//                                saveviewact->setEnabled(false);
-//                                removeviewact->setEnabled(true);
-//                            } else if (!viewRect.rect.intersects(mDrapRectF)){ // 无交集
-//                                saveviewact->setEnabled(true); // 不是已经保存的可以保存
-//                                removeviewact->setEnabled(true);
-//                            } else { // 有交集
-//                                saveviewact->setEnabled(true);
-//                                removeviewact->setEnabled(true);
-//                            }
-//                        } else {
-//                            if (viewRect.rect.contains(mDrapRectF)) { // 已经是完全删除的
-//                                saveviewact->setEnabled(true); //可以保存但是不可以删
-//                                removeviewact->setEnabled(false);
-//                            } else if (!viewRect.rect.intersects(mDrapRectF)){ // 不是删除的
-//                                saveviewact->setEnabled(false);
-//                                removeviewact->setEnabled(true);// 不是已经删除的去删除
-//                            } else {
-//                                saveviewact->setEnabled(true);
-//                                removeviewact->setEnabled(true);
-//                            }
-//                        }
-//                    }
-//                }
 }
 
 void ViewPattern::mouseReleaseEvent(QMouseEvent *event)

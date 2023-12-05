@@ -199,7 +199,7 @@ struct HoleInfo {
     QPoint coordinate; // 本孔坐标
 
     // 视野窗口传递来的信息
-    ViewRectFVector viewrects; // 本孔分配的视野区域信息
+    QRectFVector viewrects; // 本孔分配的视野区域信息
     ViewPointVector uipoints; // 绘图使用(够用就行)
     ViewPointVector viewpoints; // 本孔要扫描的视野坐标(电机坐标更精细)
     int viewsize; // 本孔分配的视野尺寸
