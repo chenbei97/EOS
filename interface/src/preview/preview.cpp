@@ -28,6 +28,8 @@ void Preview::setSelectMode(int mode)
             wellpattern->setSelectMode(WellPattern::RectMode);
             break;
         case 2:
+            wellview->setSelectMode(WellView::WholeMode);
+            wellpattern->setSelectMode(WellPattern::WholeMode);
             break;
     }
 }

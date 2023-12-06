@@ -60,6 +60,7 @@ find_package(Qt5 COMPONENTS
         OpenGL
         Quick
         Qml
+        QuickWidgets
         REQUIRED)
 add_library(${DLLNAME} SHARED
         ${INTERFACE_SOURCES}
@@ -95,6 +96,7 @@ target_link_libraries(${DLLNAME}
         Qt5::OpenGL
         Qt5::Quick
         Qt5::Qml
+        Qt5::QuickWidgets
         component
         ${TOUPCAM_LIB_PATH}
         ${Test_LIB_PATH}

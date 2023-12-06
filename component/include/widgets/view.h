@@ -16,7 +16,7 @@ class COMPONENT_IMEXPORT View: public QWidget
 {
     Q_OBJECT
 public:
-    enum ViewSelectMode {PointMode,RectMode};
+    enum ViewSelectMode {PointMode,RectMode,WholeMode};
     explicit View(QWidget*parent= nullptr);
 
     virtual void setViewInfo(const ViewInfo& info);
@@ -29,14 +29,20 @@ public:
     void mouseMoveEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
-    void setDisablePoint(QCPoint point, bool enable = true);
+    void setDisablePoint(Qt::Alignment direction,double rate);
     void setDisablePoints(QCPointVector points, bool enable = true);
     void setDisablePoints(bool enable = true);
+    QRectF getLeftDisableRect() const;
+    QRectF getRightDisableRect() const;
+    QRectF getTopDisableRect() const;
+    QRectF getBottomDisableRect() const;
+    void drawDisableLines(QPainter& painter,const QRectF& rect,const QColor& color,Qt::Orientation oriention);
 protected:
     ViewSelectMode mSelectMode = PointMode;
     ViewInfo mViewInfo;
     int mSize = 0;
     double overlapRate = 0.1;
+    QMap<Qt::Alignment,double> mDisableRectRates;
     QBool2DVector mDispersedMask;
     const int mDispersedMaskSize = DefaultUiMaskSize;
     QPointF mMousePos;

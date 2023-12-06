@@ -31,5 +31,6 @@ void ViewSelect::setEnabled(int option)
     wholeMode->setEnabled(!option);
     if (option) {
         rectMode->setChecked(true);
+        rectMode->click(); // 这样才能触发信号
     }
 }

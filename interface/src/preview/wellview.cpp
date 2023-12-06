@@ -451,7 +451,7 @@ void WellView::paintEvent(QPaintEvent *event)
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
         painter.setPen(pen);
-    } else { // 点模式
+    } else if (mSelectMode == PointMode){ // 点模式
         pen.setWidth(DefaultDrawPointWidth);
         pen.setColor(groupcolor);
         painter.setPen(pen);
@@ -466,6 +466,10 @@ void WellView::paintEvent(QPaintEvent *event)
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::black);
         painter.setPen(pen);
+    } else { // wholeMode
+        auto grayc = QColor(Qt::gray);
+        grayc.setAlpha(DefaultColorAlpha);
+        painter.fillRect(QRectF(getInnerRectTopLeftPoint(),QSize(diameter,diameter)),grayc);
     }
     // 画圆
     painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
@@ -500,6 +504,9 @@ void WellView::setSelectMode(WellView::ViewSelectMode mode)
 { // 重置选点模式效果等于切换物镜(不是厂家)
     mSelectMode = mode;
     toggleBrandObjective(mSize,true);
+    if (mode == WholeMode)
+        setEnabled(false);
+    else setEnabled(true);
 }
 
 WellView::WellView(QWidget *parent) : View(parent)

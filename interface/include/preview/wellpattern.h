@@ -15,7 +15,7 @@ class INTERFACE_IMEXPORT WellPattern: public Pattern
 {
     Q_OBJECT
 public:
-    enum ViewSelectMode {PointMode,RectMode};
+    enum ViewSelectMode {PointMode,RectMode,WholeMode};
     explicit WellPattern(int rows,int cols,QWidget*parent= nullptr);
 
     PreviewPatternInfo patternInfo() const;

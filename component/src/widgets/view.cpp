@@ -11,6 +11,10 @@
 
 View::View(QWidget *parent) : QWidget(parent)
 {
+    mDisableRectRates[Qt::AlignLeft] = 0.1;
+    mDisableRectRates[Qt::AlignRight] = 0.2;
+    mDisableRectRates[Qt::AlignTop] = 0.3;
+    mDisableRectRates[Qt::AlignBottom] = 0.4;
     initDispersedMask();
     saveviewact = new QAction(tr(SaveViewActTitle));
     removeviewact = new QAction(tr(RemoveViewActTitle));
@@ -224,10 +228,95 @@ void View::paintEvent(QPaintEvent *event)
     auto pen = painter.pen();
     pen.setWidth(DefaultPainterPenWidth);
     painter.setPen(pen);
-    //painter.drawRect(rect());
+    auto gc = QColor(Qt::gray);
+    gc.setAlpha(DefaultColorAlpha);
+    painter.fillRect(rect(),gc);
+
     auto radius = width()>=height()?height()/2.0:width()/2.0;
-    painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
+    QPainterPath path;
+    path.addEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
+    painter.drawPath(path);
+    painter.fillPath(path,DefaultNativeColor);
+
+    drawDisableLines(painter,getLeftDisableRect(),gc,Qt::Horizontal);
+    drawDisableLines(painter,getRightDisableRect(),gc,Qt::Horizontal);
+    drawDisableLines(painter,getTopDisableRect(),gc,Qt::Vertical);
+    drawDisableLines(painter,getBottomDisableRect(),gc,Qt::Vertical);
+
+
     event->accept();
+}
+
+QRectF View::getLeftDisableRect() const
+{
+    auto topleft = getInnerRectTopLeftPoint();
+    auto diameter = getCircleRadius() * 2.0;
+    auto rect = QRectF(topleft,QSizeF(diameter*mDisableRectRates[Qt::AlignLeft],diameter));
+    return rect;
+}
+
+QRectF View::getRightDisableRect() const
+{
+    auto diameter = getCircleRadius() * 2.0;
+    auto topleft = getInnerRectTopRightPoint()-QPointF(diameter*mDisableRectRates[Qt::AlignRight],0.0);
+    auto right_disable_rect = QRectF(topleft,QSizeF(diameter*mDisableRectRates[Qt::AlignRight],diameter));
+    return right_disable_rect;
+}
+
+QRectF View::getTopDisableRect() const
+{
+    auto diameter = getCircleRadius() * 2.0;
+    auto topleft = getInnerRectTopLeftPoint();
+    auto top_disable_rect = QRectF(topleft,QSizeF(diameter,diameter*mDisableRectRates[Qt::AlignTop]));
+    return top_disable_rect;
+}
+
+QRectF View::getBottomDisableRect() const
+{
+    auto diameter = getCircleRadius() * 2.0;
+    auto topleft = getInnerRectBottomLeftPoint() - QPointF(0.0,diameter*mDisableRectRates[Qt::AlignBottom]);
+    auto bottom_disable_rect = QRectF(topleft,QSizeF(diameter,diameter*mDisableRectRates[Qt::AlignBottom]));
+    return bottom_disable_rect;
+}
+
+void View::drawDisableLines(QPainter& painter,const QRectF& rect,const QColor& color,Qt::Orientation oriention)
+{
+    auto diameter = getCircleRadius() * 2.0;
+    painter.fillRect(rect,color);
+
+//    if (!rect.isEmpty()) { // 画8条斜线+3条直线
+//            if (oriention == Qt::Horizontal)  {
+//                for(int i = 0; i < 4; ++i ){
+//                    painter.drawLine(rect.topRight()+QPointF(0.0,diameter/4.0 * i),rect.topLeft()+QPointF(0.0,diameter/4.0*(i+1)));
+//                    painter.drawLine(rect.topLeft()+QPointF(0.0,diameter/4.0 * i),rect.topRight()+QPointF(0.0,diameter/4.0*(i+1)));
+//                    if (i > 0) {
+//                        painter.drawLine(rect.topLeft()+QPointF(0.0,diameter/4.0 * i),rect.topRight()+QPointF(0.0,diameter/4.0*i));
+//                    }
+//                }
+//            } else {
+//                for(int i = 0; i < 4; ++i) {
+//                    painter.drawLine(rect.topRight()-QPointF(diameter/4.0 * i,0.0),rect.bottomRight()-QPointF(diameter/4.0*(i+1),0.0));
+//                    painter.drawLine(rect.topLeft() + QPointF(diameter / 4.0 * i, 0.0),
+//                                     rect.bottomLeft() + QPointF(diameter / 4.0 * (i + 1), 0.0));
+//                    if (i > 0) {
+//                        painter.drawLine(rect.topLeft()+QPointF(diameter/4.0 * i,0.0),rect.bottomLeft()+QPointF(diameter/4.0 * i,0.0));
+//                    }
+//                }
+//            }
+//        painter.drawLine(rect.topRight()+QPointF(0.0,diameter/4.0 * 0.0),rect.topLeft()+QPointF(0.0,diameter/4.0*1.0));
+//        painter.drawLine(rect.topRight()+QPointF(0.0,diameter/4.0 * 1.0),rect.topLeft()+QPointF(0.0,diameter/4.0*2.0));
+//        painter.drawLine(rect.topRight()+QPointF(0.0,diameter/4.0 * 2.0),rect.topLeft()+QPointF(0.0,diameter/4.0*3.0));
+//        painter.drawLine(rect.topRight()+QPointF(0.0,diameter/4.0 * 3.0),rect.topLeft()+QPointF(0.0,diameter/4.0*4.0));
+//
+//        painter.drawLine(rect.topLeft()+QPointF(0.0,diameter/4.0 * 0.0),rect.topRight()+QPointF(0.0,diameter/4.0*1.0));
+//        painter.drawLine(rect.topLeft()+QPointF(0.0,diameter/4.0 * 1.0),rect.topRight()+QPointF(0.0,diameter/4.0*2.0));
+//        painter.drawLine(rect.topLeft()+QPointF(0.0,diameter/4.0 * 2.0),rect.topRight()+QPointF(0.0,diameter/4.0*3.0));
+//        painter.drawLine(rect.topLeft()+QPointF(0.0,diameter/4.0 * 3.0),rect.topRight()+QPointF(0.0,diameter/4.0*4.0));
+//
+//        painter.drawLine(rect.topLeft()+QPointF(0.0,diameter/4.0 * 1.0),rect.topRight()+QPointF(0.0,diameter/4.0*1.0));
+//        painter.drawLine(rect.topLeft()+QPointF(0.0,diameter/4.0 * 2.0),rect.topRight()+QPointF(0.0,diameter/4.0*2.0));
+//        painter.drawLine(rect.topLeft()+QPointF(0.0,diameter/4.0 * 3.0),rect.topRight()+QPointF(0.0,diameter/4.0*3.0));
+//    }
 }
 
 QRectF View::getValidRect() const
@@ -236,12 +325,18 @@ QRectF View::getValidRect() const
 }
 
 bool View::isValidRect(const QPointF &point) const
-{ // 判断点是否在圆内依赖于直径
+{ // 判断点是否在圆内依赖于直径,且不在禁止区域
     auto center_x = width() / 2.0;
     auto center_y = height() / 2.0;
 
     if ((point.x()-center_x)*(point.x()-center_x) + (point.y()-center_y)*(point.y()-center_y)
         > getCircleRadius()*getCircleRadius()) { // 距离大于半径认为在圆外
+        return false;
+    }
+
+    // 点在禁止区域内也无效
+    if (getLeftDisableRect().contains(point) || getRightDisableRect().contains(point)
+        || getTopDisableRect().contains(point) || getBottomDisableRect().contains(point)) {
         return false;
     }
     return true;
@@ -254,6 +349,12 @@ bool View::isValidRect(const QRectF &rect) const
     for(auto pt: points) {
         if (!isValidRect(pt))
             return false;
+    }
+
+    // 和禁止区域有交集也无效
+    if (getLeftDisableRect().intersects(rect) || getRightDisableRect().intersects(rect)
+        || getTopDisableRect().intersects(rect) || getBottomDisableRect().intersects(rect)) {
+        return false;
     }
     return true; //
 }
@@ -336,10 +437,15 @@ bool View::checkField() const
     return r1&&r2&&r3&&r4&&r5&&r6&&r7&&r8&&r9&&ra;
 }
 
-void View::setDisablePoint(QCPoint point, bool enable)
+void View::setDisablePoint(Qt::Alignment direction,double rate)
 {
+    if (direction != Qt::AlignBottom && direction != Qt::AlignTop
+        && direction != Qt::AlignLeft && direction != Qt::AlignRight) {
+        return;
+    }
 
-
+    mDisableRectRates[direction] = rate;
+    update();
 }
 
 void View::setDisablePoints(QCPointVector points, bool enable)
@@ -351,7 +457,6 @@ void View::setDisablePoints(bool enable)
 {
 
 }
-
 
 void View::onApplyAllAct()
 {

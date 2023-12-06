@@ -2,6 +2,7 @@
 
 #include "teatlibnew_global.h"
 #include "qquickview.h"
+#include "qquickwidgets.h"
 #include "qwidget.h"
 
 class TEATLIBNEW_EXPORT teatLibNew : public QWidget
