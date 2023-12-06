@@ -9,6 +9,7 @@ class INTERFACE_IMEXPORT ViewSelect: public GroupBox
     Q_OBJECT
 public:
     explicit ViewSelect(QWidget*parent= nullptr);
+    void setEnabled(int option);
 private:
     QRadioButton * pointMode;
     QRadioButton * rectMode;

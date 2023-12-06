@@ -213,7 +213,7 @@ void Preview::takingPhoto()
 
 }
 
-void Preview::previewViewByClickView(const QPointF &viewpoint)
+void Preview::previewViewEvent(const QPointF &viewpoint)
 {
     auto toolinfo = previewtool->toolInfo();
 
@@ -223,7 +223,7 @@ void Preview::previewViewByClickView(const QPointF &viewpoint)
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto wellsize = toolinfo[WellsizeField].toUInt();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
-    auto holecoordinate = viewpattern->viewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
+    auto holecoordinate = wellview->viewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
     //auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     auto bright = current_info[BrightField];
@@ -260,7 +260,7 @@ void Preview::previewViewByClickView(const QPointF &viewpoint)
     }
 }
 
-void Preview::previewViewByClickHole(const QPoint &holepoint)
+void Preview::previewHoleEvent(const QPoint &holepoint)
 {
     if (holepoint == QPoint(-1,-1)) return;
 
@@ -272,7 +272,7 @@ void Preview::previewViewByClickHole(const QPoint &holepoint)
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto wellsize = toolinfo[WellsizeField].toUInt();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
-    //auto holecoordinate = viewpattern->currentViewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
+    //auto holecoordinate = wellview->currentViewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
     auto holecoordinate = holepoint; // 所以才为什么只能分成previewViewByClickHole和previewViewByClickView 2个函数写了
     //auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
@@ -352,7 +352,7 @@ void Preview::importExperConfig(const QString& path)
 
             // 把holePoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
             wellpattern->importHoleInfo(holepoint,group,viewpoints,viewsize);
-            viewpattern->importViewInfo(holepoint,viewpoints,viewsize);
+            wellview->importViewInfo(holepoint,viewpoints,viewsize);
         }
 
     }

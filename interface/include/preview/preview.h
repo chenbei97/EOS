@@ -14,7 +14,7 @@
 #include "cameramode.h"
 #include "photocanvastriangle.h"
 #include "wellpattern.h"
-#include "viewpattern.h"
+#include "wellview.h"
 #include "summarydialog.h"
 #include "videowidget.h"
 #include "slidepattern.h"
@@ -50,27 +50,32 @@ public:
 private:
     PreviewInfo previewinfo;
     CameraMode * cameramode;
+    GroupInfo * groupinfo;
     QTimer timer;
 #ifdef uselabelcanvas
     LabelTriangle * livecanvas;
 #else
     PhotoCanvasTriangle * livecanvas;
 #endif
+    PhotoCanvas * photocanvas;
+    VideoWidget * videocanvas;
+    QStackedWidget * stackcanvas;
+
+    WellPattern * wellpattern;
+    SlidePattern * slidepattern;
+    QStackedWidget * stackpattern;
+
+    WellView * wellview;
+    SlidePattern * slideview;
+    QStackedWidget * stackview;
+    DockWidget * dock;
+    QMainWindow * dockcanvas;
+
 #ifdef usetab
     QTabWidget * tab;
     ExperTool * expertool;
 #endif
-    PhotoCanvas * photocanvas;
-    ViewPattern * viewpattern;
-    VideoWidget * videocanvas;
-    QStackedWidget * stackcanvas;
     PreviewTool * previewtool;
-    WellPattern * wellpattern;
-    SlidePattern * slidepattern;
-    QStackedWidget * patterncanvas;
-    DockWidget * dock;
-    QMainWindow * dockcanvas;
-    GroupInfo * groupinfo;
     QScrollArea * scrollarea;
 private:
 #ifdef notusetoupcamera
@@ -101,10 +106,12 @@ private:
     void initLayout();
     void initConnections();
 private:
-    void updateViewWindow(const QVariantMap& m);
-    void updateSetGroupWindow(const QVariantMap& m);
+    void openWellViewWindow(const QVariantMap& m);
+    void openSlideViewWindow();
+    void openWellGroupWindow(const QVariantMap& m);
 private:
     void setSelectMode(int mode);
+    void toggleStack(int option);
     void toggleManufacturer(int option);
     void toggleBrand(int option);
     void onObjectiveChanged(const QString& obj);
@@ -118,8 +125,8 @@ private:
     void adjustLens(int option);
     void manualFocus(double val);
     void toggleChannel(int option);
-    void previewViewByClickView(const QPointF& viewPoint);
-    void previewViewByClickHole(const QPoint& holePoint);
+    void previewViewEvent(const QPointF& viewPoint);
+    void previewHoleEvent(const QPoint& holePoint);
     void exportExperConfig(const QString& path);
     void importExperConfig(const QString& path);
     void loadExper();

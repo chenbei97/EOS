@@ -17,9 +17,38 @@ class INTERFACE_IMEXPORT SlidePattern : public QWidget
     Q_OBJECT
 public:
     explicit SlidePattern(QWidget*parent= nullptr);
+    void updateRect(const QRectF& rect);
+    void updateSize(int viewsize);
+    QPointFVector viewPoints() const;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 private:
-
-
+    double overlapRate = 0.1;
+    double gapRate = 0.1;
+    int mSize = 0;
+    QPointF mMousePos;
+    QRectF mDrapRectF;
+    QRectF mSaveRectF;
+private:
+    bool isValidPoint(const QPointF& point) const;
+    bool isValidRect(const QRectF& rect) const;
+    QRectF getValidRect() const;
+    QPointF getReferencePoint() const;
+    double getReferenceWidth() const;
+    double getReferenceHeight() const;
+    QPointF norm(const QPointF& point) const;
+    QRectF norm(const QRectF& rect) const;
+    QPointFVector overlap(const QPointFVector &points, double rate) const;
+private:
+    QAction * saveviewact;
+    QAction * removeviewact;
+    void onRemoveViewAct();
+    void onSaveViewAct();
+signals:
+    void doubleClicked();
+    void rectUpdated(const QRectF& rect);
+    void previewEvent(const QPointF& point);
 };
 #endif //EOS_SLIDEPATTERN_H

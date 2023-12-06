@@ -109,10 +109,10 @@ enum class WellSizeType {
     20x: 10*10
     40x: 24*24
 */
-#define view_well_96_4x 4
-#define view_well_96_10x 14
-#define view_well_96_20x 20
-#define view_well_96_40x 45
+#define view_well_96_4x 2
+#define view_well_96_10x 5
+#define view_well_96_20x 10
+#define view_well_96_40x 24
 
 /*  384孔板
     4x: 1*1，
@@ -125,13 +125,24 @@ enum class WellSizeType {
 #define view_well_384_20x 5
 #define view_well_384_40x 12
 
+/* Slide载玻片
+    4x: *，
+    10x: *
+    20x: *
+    40x: *
+ * */
+#define view_slide_4x 3
+#define view_slide_10x 5
+#define view_slide_20x 7
+#define view_slide_40x 10
+
 const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
         {//不同的厂家
                 {view_well_6_4x,view_well_6_10x,view_well_6_20x,view_well_6_40x},// 品牌1
                 {view_well_24_4x,view_well_24_10x,view_well_24_20x,view_well_24_40x},// 品牌2
                 {view_well_96_4x,view_well_96_10x,view_well_96_20x,view_well_96_40x},// 品牌3
                 {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌4
-                {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌5
+                {view_slide_4x,view_slide_10x,view_slide_20x,view_slide_40x},// slide
         },
 
         {
@@ -139,7 +150,7 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
                 {view_well_24_4x,view_well_24_10x,view_well_24_20x,view_well_24_40x},// 品牌2
                 {view_well_96_4x,view_well_96_10x,view_well_96_20x,view_well_96_40x},// 品牌3
                 {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌4
-                {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌5
+                {view_slide_4x,view_slide_10x,view_slide_20x,view_slide_40x},// slide
         },
 
         {
@@ -147,7 +158,7 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
                 {view_well_24_4x,view_well_24_10x,view_well_24_20x,view_well_24_40x},// 品牌2
                 {view_well_96_4x,view_well_96_10x,view_well_96_20x,view_well_96_40x},// 品牌3
                 {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌4
-                {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌5
+                {view_slide_4x,view_slide_10x,view_slide_20x,view_slide_40x},// slide
         },
 
         {
@@ -155,7 +166,7 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
                 {view_well_24_4x,view_well_24_10x,view_well_24_20x,view_well_24_40x},// 品牌2
                 {view_well_96_4x,view_well_96_10x,view_well_96_20x,view_well_96_40x},// 品牌3
                 {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌4
-                {view_well_384_4x,view_well_384_10x,view_well_384_20x,view_well_384_40x},// 品牌5
+                {view_slide_4x,view_slide_10x,view_slide_20x,view_slide_40x},// slide
         },
 };
 

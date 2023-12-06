@@ -7,9 +7,9 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved.
  */
 
-#include "viewpattern.h"
+#include "wellview.h"
 
-void ViewPattern::clearViewWindowCache(const QPoint &holePoint)
+void WellView::removeHole(const QPoint &holePoint)
 {// 删孔时清除该孔对应的视野信息
     auto id = holeID(holePoint);
     mDrapRectF = QRectF();
@@ -40,7 +40,7 @@ void ViewPattern::clearViewWindowCache(const QPoint &holePoint)
     update();
 }
 
-void ViewPattern::clearAllViewWindowCache(int viewSize,bool toggleObjective)
+void WellView::toggleBrandObjective(int viewSize,bool toggleObjective)
 {// 切换厂家或者物镜倍数时把所有的区域信息都要清空,对于mViewInfo只需要清理视野相关的2个信息
     mDrapRectF = QRectF();
     mViewRects.clear();
@@ -76,7 +76,7 @@ void ViewPattern::clearAllViewWindowCache(int viewSize,bool toggleObjective)
     update();
 }
 
-void ViewPattern::importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
+void WellView::importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
 {// 导入实验配置时去更新view的ui信息(和setViewInfo初始化的代码差不多)
     mViewInfo[HoleCoordinateField] = holePoint;
     mViewInfo[HoleGroupNameField] = "";
@@ -126,7 +126,7 @@ void ViewPattern::importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,in
     update();
 }
 
-void ViewPattern::onApplyAllAct()
+void WellView::onApplyAllAct()
 {
     checkField();
     if (mViewInfo[HoleGroupNameField].toString().isEmpty())
@@ -167,7 +167,7 @@ void ViewPattern::onApplyAllAct()
     update();
 }
 
-void ViewPattern::onApplyGroupAct()
+void WellView::onApplyGroupAct()
 {
     checkField();
     if (mViewInfo[HoleGroupNameField].toString().isEmpty())
@@ -206,7 +206,7 @@ void ViewPattern::onApplyGroupAct()
     update();
 }
 
-void ViewPattern::onApplyHoleAct()
+void WellView::onApplyHoleAct()
 {
     checkField();
     if (mViewInfo[HoleGroupNameField].toString().isEmpty())
@@ -229,7 +229,7 @@ void ViewPattern::onApplyHoleAct()
     emit applyHoleEvent(m);
 }
 
-void ViewPattern::onRemoveViewAct()
+void WellView::onRemoveViewAct()
 {
     auto id = holeID();
     if (mSelectMode == RectMode) {
@@ -271,7 +271,7 @@ void ViewPattern::onRemoveViewAct()
     update();
 }
 
-void ViewPattern::onSaveViewAct()
+void WellView::onSaveViewAct()
 {
     auto id = holeID();
     if(mSelectMode == RectMode) {
@@ -297,7 +297,7 @@ void ViewPattern::onSaveViewAct()
     update();
 }
 
-void ViewPattern::dispersedViewRects()
+void WellView::dispersedViewRects()
 { // 把保存的视野区域离散化得到离散区域的所有归一化视野坐标,以及电机坐标
   // 区别在于离散电机的掩码尺寸取决于mSize,离散视野的掩码尺寸固定是DefaultUiMaskSize,后者更精细用于绘图
     auto id = holeID();
@@ -386,7 +386,7 @@ void ViewPattern::dispersedViewRects()
     <<" mask count = "<<mViewMachinePoints.count()<<points.count();
 }
 
-void ViewPattern::paintEvent(QPaintEvent *event)
+void WellView::paintEvent(QPaintEvent *event)
 {
     View::paintEvent(event);
     QPainter painter(this);
@@ -430,17 +430,17 @@ void ViewPattern::paintEvent(QPaintEvent *event)
         pen.setWidth(1);
         pen.setColor(Qt::gray);
         painter.setPen(pen);
-        auto hor_offset = getInnerRectWidth();
+        auto hor_offset = getInnerRectWidth();// 绘制垂直线,2个y坐标固定
         for (int i = 1; i <= mSize-1; ++i) {
             auto top = p11 + QPointF(i*hor_offset,0);
             auto bottom = p21 + QPointF(i*hor_offset,0);
             painter.drawLine(top,bottom);
         }
-        auto ver_offset = getInnerRectHeight();
+        auto ver_offset = getInnerRectHeight();// 绘制水平线,2个x坐标固定
         for (int i = 1; i <= mSize-1; ++i){
-            auto top = p11 + QPointF(0,ver_offset*i);
-            auto bottom = p12 + QPointF(0,ver_offset*i);
-            painter.drawLine(top,bottom);
+            auto left = p11 + QPointF(0,ver_offset*i);
+            auto right = p12 + QPointF(0,ver_offset*i);
+            painter.drawLine(left,right);
         }
 
         pen.setWidth(DefaultPainterPenWidth);
@@ -481,28 +481,28 @@ void ViewPattern::paintEvent(QPaintEvent *event)
     event->accept();
 }
 
-void ViewPattern::mousePressEvent(QMouseEvent *event)
+void WellView::mousePressEvent(QMouseEvent *event)
 {
     View::mousePressEvent(event);
 }
 
-void ViewPattern::mouseReleaseEvent(QMouseEvent *event)
+void WellView::mouseReleaseEvent(QMouseEvent *event)
 {
     View::mouseReleaseEvent(event);
 }
 
-void ViewPattern::mouseMoveEvent(QMouseEvent *event)
+void WellView::mouseMoveEvent(QMouseEvent *event)
 {
     View::mouseMoveEvent(event);
 }
 
-void ViewPattern::setSelectMode(ViewPattern::ViewSelectMode mode)
+void WellView::setSelectMode(WellView::ViewSelectMode mode)
 { // 重置选点模式效果等于切换物镜(不是厂家)
     mSelectMode = mode;
-    clearAllViewWindowCache(mSize,true);
+    toggleBrandObjective(mSize,true);
 }
 
-ViewPattern::ViewPattern(QWidget *parent) : View(parent)
+WellView::WellView(QWidget *parent) : View(parent)
 {
 
 }

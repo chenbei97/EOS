@@ -20,7 +20,7 @@
 #include "preview.h"
 #include "cameramode.h"
 #include "recordbox.h"
-#include "viewpattern.h"
+#include "wellview.h"
 #include "wellpattern.h"
 #include "previewtool.h"
 #include "historybox.h"

@@ -47,9 +47,9 @@ public:
     int numberOfViews(const QPoint& holepoint); // 这个孔的视野数
     QSet<QString> getAllWellGroupNames() const;// 返回所有分过的组,不重复
     void updateHoleInfoByGroupInfo(QCVariantMap m);// 右击打开分组窗口的信息(color+name)拿去更新孔数据
-    void updateHoleInfoByViewInfoApplyHole(QCVariantMap m); // 删点保存点的映射
-    void updateHoleInfoByViewInfoApplyGroup(QCVariantMap m); // 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
-    void updateHoleInfoByViewInfoApplyAll(QCVariantMap m);
+    void applyHoleEvent(QCVariantMap m); // 删点保存点的映射
+    void applyGroupEvent(QCVariantMap m); // 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
+    void applyAllEvent(QCVariantMap m);
 
 protected:
     ViewSelectMode mSelectMode = PointMode;
@@ -68,8 +68,8 @@ protected:
     QPointVector getHoleGroupCoordinates(const QString& groupName) const;// 获取组内的所有孔坐标传递给视野窗口在应用到本组时可以更新其它孔的视野数据区信息
     QPoint2DVector getAllWellHoleCoordinates() const;
 signals:
-    void openSetGroupWindow(const QVariantMap& m); // 打开分组窗口事件,分组动作触发传递当前孔的color+group
-    void openViewWindow(const QVariantMap& m); // 打开视野窗口的信号
-    void clearViewWindowCache(const QPoint& holepoint); // 删孔需要清除视野窗口对应的缓存信息
+    void openWellGroupWindow(const QVariantMap& m); // 打开分组窗口事件,分组动作触发传递当前孔的color+group
+    void openWellViewWindow(const QVariantMap& m); // 打开视野窗口的信号
+    void removeHole(const QPoint& holepoint); // 删孔需要清除视野窗口对应的缓存信息
 };
 #endif //EOSI_WELLPATTERN_H

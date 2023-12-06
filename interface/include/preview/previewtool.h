@@ -44,6 +44,7 @@ private:
     SaveBox * savebox;
     QVBoxLayout * lay;
 signals:
+    void welltypeChanged(int option);
     void wellbrandChanged(int option);// wellbox的信息
     void manufacturerChanged(int option);
     void objectiveChanged(const QString& obj);

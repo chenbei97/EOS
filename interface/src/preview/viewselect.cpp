@@ -23,3 +23,13 @@ ViewSelect::ViewSelect(QWidget *parent) : GroupBox(parent)
 
     connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this, &ViewSelect::modeSelected);
 }
+
+void ViewSelect::setEnabled(int option)
+{ // 0表示孔板类型,1表示载玻片类型
+    pointMode->setEnabled(!option);
+    rectMode->setEnabled(true);
+    wholeMode->setEnabled(!option);
+    if (option) {
+        rectMode->setChecked(true);
+    }
+}

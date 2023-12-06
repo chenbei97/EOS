@@ -26,7 +26,7 @@ void WellPattern::onSetGroupAct()
     m[HoleDoseField] = dose;
     m[HoleMedicineField] = medicine;
 
-    emit openSetGroupWindow(m);
+    emit openWellGroupWindow(m);
 }
 
 // (2) 被分组对话框的信息反过来更新孔信息
@@ -119,12 +119,12 @@ void WellPattern::onOpenViewAct()
         mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = getAllWellHoleCoordinates();
         m[WellAllHolesField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate);
         //LOG<<"well send info to view is "<<m[HoleGroupNameField].toString()<<m[HoleGroupColorField].toString();//ViewPattern::setStrategy接收
-        emit openViewWindow(m);
+        emit openWellViewWindow(m);
     }
 }
 
 // (4) 保存或删除视野的应用到孔事件
-void WellPattern::updateHoleInfoByViewInfoApplyHole(QCVariantMap m)
+void WellPattern::applyHoleEvent(QCVariantMap m)
 {
     // 1. 关键信息: 视野区域-绘图 视野坐标-电机坐标
     auto groupName = m[HoleGroupNameField].toString();
@@ -155,7 +155,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyHole(QCVariantMap m)
 }
 
 // (5) 应用到组事件
-void WellPattern::updateHoleInfoByViewInfoApplyGroup(QCVariantMap m)
+void WellPattern::applyGroupEvent(QCVariantMap m)
 {
     // 1. 关键信息: 视野区域
     auto groupName = m[HoleGroupNameField].toString();
@@ -192,7 +192,7 @@ void WellPattern::updateHoleInfoByViewInfoApplyGroup(QCVariantMap m)
 }
 
 // (6) 应用到所有事件
-void WellPattern::updateHoleInfoByViewInfoApplyAll(QCVariantMap m)
+void WellPattern::applyAllEvent(QCVariantMap m)
 {
     auto groupName = m[HoleGroupNameField].toString();
     auto groupColor = m[HoleGroupColorField].toString();
@@ -243,7 +243,7 @@ void WellPattern::onRemoveHoleAct()
     mHoleInfo[mMousePos.x()][mMousePos.y()].dose = QString();
 
     // 清除视野窗口的缓存信息
-    emit clearViewWindowCache(mMousePos);
+    emit removeHole(mMousePos);
     openviewact->trigger(); // 重新刷新一下
     update();
 }

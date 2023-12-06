@@ -3,17 +3,17 @@
 
 #include "window.h"
 
-class INTERFACE_IMEXPORT ViewPattern: public View
+class INTERFACE_IMEXPORT WellView: public View
 {
     Q_OBJECT
 public:
-    explicit ViewPattern(QWidget*parent= nullptr);
+    explicit WellView(QWidget*parent= nullptr);
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
-    void clearViewWindowCache(const QPoint &holePoint);
-    void clearAllViewWindowCache(int viewSize,bool toggleObjective = true);
+    void removeHole(const QPoint &holePoint);
+    void toggleBrandObjective(int viewSize,bool toggleObjective = true);
     void importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
     void setSelectMode(ViewSelectMode mode);
 private:

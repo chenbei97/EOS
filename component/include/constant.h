@@ -136,6 +136,10 @@ static const char* StopExperField = "stop exper";
 static const char* Z_StackField = "z_stack";
 static const char* StitchImageField = "stitch_image";
 
+static const char* PreviewDockHoleTitle = "Select Hole Inside View";
+static const char* PreviewDockSlideTitle = "Select Slide Inside View";
+static const char* PreviewWellDockTitle = "Select Hole Inside View(%1,%2)-Group(%3)";
+static const char* PreviewNoGroupWellDockTitle = "Group not set";
 static const char* ViewSelectBoxTitle = "View Mode";
 static const char* WellBoxTitle = "WellSize";
 static const char* ChannelBoxTitle = "Channel";
@@ -146,6 +150,12 @@ static const char * ObjectiveBoxTitle = "Objective";
 static const char * SaveBoxTitle = "Save";
 static const char * ExperimentBoxTitle = "Experiment";
 static const char* OtherBoxField = "Other";
+
+static const char*  SaveViewActTitle = "Select View";
+static const char*  RemoveViewActTitle = "Remove View";
+static const char*  ApplyHoleActTitle = "Apply To Hole";
+static const char*  ApplyGroupActTitle = "Apply To Group";
+static const char*  ApplyAllActTitle = "Apply To All";
 
 #define AppendField(s,field) (s+field)
 #define AppendSeparateField(s) (s+SeparateField)

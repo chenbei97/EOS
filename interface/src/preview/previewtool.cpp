@@ -38,6 +38,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
 
     // 1. 信号直连
     connect(wellbox,&WellBox::wellbrandChanged,this,&PreviewTool::wellbrandChanged);
+    connect(wellbox,&WellBox::welltypeChanged,this,&PreviewTool::welltypeChanged);
     connect(wellbox,&WellBox::manufacturerChanged,this,&PreviewTool::manufacturerChanged);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&PreviewTool::objectiveChanged);
     connect(objectivebox,&ObjectiveBox::objectiveToggled,this,&PreviewTool::objectiveToggled);
@@ -62,6 +63,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(channelbox,&ChannelBoxx::channelChanged,camerabox,&CameraBox::setChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBoxx::disableChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,timebox,&TimeBox::disableChannel);
+    connect(wellbox,&WellBox::welltypeChanged,selectbox,&ViewSelect::setEnabled);
     // 3.外部信号
     connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
     connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage); // 当前通道的图像

@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-12-05 09:15:24
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-12-05 09:15:40
+ * @LastEditTime: 2023-12-06 10:24:18
  * @FilePath: \EOS\component\src\widgets\view.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -12,11 +12,11 @@
 View::View(QWidget *parent) : QWidget(parent)
 {
     initDispersedMask();
-    saveviewact = new QAction(tr("Selecting Points"));
-    removeviewact = new QAction(tr("Remove Points"));
-    applyholeact = new QAction(tr("Apply To Hole"));
-    applygroupact = new QAction(tr("Apply To Group"));
-    applyallact = new QAction(tr("Apply To All"));
+    saveviewact = new QAction(tr(SaveViewActTitle));
+    removeviewact = new QAction(tr(RemoveViewActTitle));
+    applyholeact = new QAction(tr(ApplyHoleActTitle));
+    applygroupact = new QAction(tr(ApplyGroupActTitle));
+    applyallact = new QAction(tr(ApplyAllActTitle));
     addAction(saveviewact);
     addAction(removeviewact);
     //addAction(applyholeact); // 不显式添加
@@ -257,7 +257,6 @@ bool View::isValidRect(const QRectF &rect) const
     }
     return true; //
 }
-
 
 double View::getCircleRadius() const
 { // 视野圆半径

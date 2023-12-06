@@ -22,7 +22,9 @@ private:
     ComboBox * wellbrandCombo;
     ComboBox * manufacturerCombo;
     void onManufacturerChange(int option);
+    void onWellbrandChanged(int option);
 signals:
+    void welltypeChanged(int option);
     void wellbrandChanged(int option);
     void manufacturerChanged(int option);
 };
