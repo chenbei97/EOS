@@ -79,7 +79,7 @@ void Preview::toggleBrand(int option)
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
-    LOG<<size;
+
     if (stackpattern->currentWidget() == wellpattern) {
         Q_ASSERT(stackview->currentWidget() == wellview);
         if (size > view_well_6_4x*10)
@@ -110,7 +110,7 @@ void Preview::toggleBrand(int option)
             wellview->setDisablePoints(NA20x08DisablePoints);
         else wellview->setDisablePoints(false);
     } else if (stackpattern->currentWidget() == slidepattern) {
-        LOG<<size;
+
         Q_ASSERT(stackview->currentWidget() == slideview);
         slideview->updateSize(size);
         slidepattern->updateSize(size);

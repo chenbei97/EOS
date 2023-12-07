@@ -48,7 +48,7 @@ set(SQLDRIVERS_PATH "${CMAKE_PREFIX_PATH}/plugins/sqldrivers")
 set(IMAGEFORMATS_PATH "${CMAKE_PREFIX_PATH}/plugins/imageformats")
 set(MEDIA_PATH "${CMAKE_PREFIX_PATH}/plugins/mediaservice")
 set(ICONENGINE_PATH "${CMAKE_PREFIX_PATH}/plugins/iconengines")
-
+set(QML_PATH "${CMAKE_PREFIX_PATH}/qml")
 #set(USE_PYTHON 0)
 #if (${USE_PYTHON})
 #set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
@@ -143,6 +143,10 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E remove_directory
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/iconengines"
         )
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove_directory
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/qml"
+        )
 # 2. copy_directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -163,6 +167,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${ICONENGINE_PATH}"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/iconengines"
+        )
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${QML_PATH}"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/qml"
         )
 # 3. mysql软件的2个文件必须复制
 #if (${USE_MYSQL})

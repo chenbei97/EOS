@@ -8,6 +8,8 @@
 
 dataWidget::dataWidget(QWidget* parent) : QWidget(parent)
 {
+//    QQmlApplicationEngine engine;
+//    engine.addImportPath("qrc:/");
     //QQuickView quickView;
 
     //mMainView = new QQuickView;
@@ -21,7 +23,7 @@ dataWidget::dataWidget(QWidget* parent) : QWidget(parent)
 
 QQuickView* dataWidget::GetMainQuickView()
 {
-    mMainView.setSource(QUrl::fromLocalFile("C:\\Users\\22987\\Desktop\\EOS\\data\\qml\\main.qml"));       //¼ÓÔØQML
+    mMainView.setSource(QUrl("qrc:/main.qml"));       //¼ÓÔØQML
     mMainView.setResizeMode(QQuickView::SizeRootObjectToView);
     mMainView.show();
 
@@ -31,7 +33,7 @@ QQuickView* dataWidget::GetMainQuickView()
 QQuickWidget* dataWidget::ShowMainView()
 {
     mMainWidget = new QQuickWidget;
-    mMainWidget->setSource(QUrl::fromLocalFile("C:\\Users\\22987\\Desktop\\EOS\\data\\qml\\main1.qml"));
+    mMainWidget->setSource(QUrl::fromLocalFile("qrc: /main1.qml"));
     mMainWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
     QQuickWindow* mainView = mMainWidget->quickWindow();
     qint32 childIndex = 0;
@@ -58,7 +60,7 @@ QWidget* dataWidget::ShowView()
     auto s = new QVBoxLayout;
 
     mMainWidget = new QQuickWidget;
-    mMainWidget->setSource(QUrl::fromLocalFile("C:\\Users\\22987\\Desktop\\EOS\\data\\qml\\main.qml"));
+    mMainWidget->setSource(QUrl::fromLocalFile("qrc: /main.qml"));
     mMainWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
     QQuickWindow* mainView = mMainWidget->quickWindow();
     qint32 childIndex = 0;

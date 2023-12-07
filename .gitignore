@@ -1,4 +1,6 @@
 
+build
+.vs
 *.idb
 *.ilk
 *.pdb
@@ -10,6 +12,9 @@
 *.log
 *.ax
 
+qml
+cmakePresets.json
+cmakeUserPresets.json
 cmake-build-debug
 python310
 eos_I

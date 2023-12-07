@@ -4,6 +4,7 @@
 #include <QQuickView>
 #include <QWidget>
 #include <QQuickWidget>
+#include "qqmlapplicationengine.h"
 
 class DATA_EXPORT dataWidget : public QWidget
 {
