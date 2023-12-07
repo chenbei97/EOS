@@ -25,8 +25,9 @@ set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
 set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
 set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
 
-set(Test_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/teatLibNew.lib")
-set(Test_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/testLibNew")
+set(DATA_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/data.lib")
+set(DATA_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/data)
+set(DATA_QML_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/data/qml)
 
 #set(USE_OPENCV 1) # 要和window.h的use_opencv2一致,如果引入这里要设置1
 #if (${USE_OPENCV})
@@ -64,7 +65,9 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 add_library(${DLLNAME} SHARED
         ${INTERFACE_SOURCES}
-        ${INTERFACE_HEADERS})
+        ${INTERFACE_HEADERS}
+
+        )
 set_target_properties(${DLLNAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${DLLNAME}
@@ -75,7 +78,8 @@ target_include_directories(${DLLNAME}
         ${PROJECT_SOURCE_DIR}/interface/include/setting
         ${PROJECT_SOURCE_DIR}/interface/include/mainwindow
         ${TOUPCAM_INCLUDE_PATH}
-        ${Test_INCLUDE_PATH}
+        ${DATA_INCLUDE_PATH}
+        ${DATA_QML_INCLUDE_PATH}
         )
 #if (${USE_PYTHON})
 #target_include_directories(${DLLNAME} PUBLIC ${PYTHON310_INCLUDE_PATH})
@@ -99,7 +103,7 @@ target_link_libraries(${DLLNAME}
         Qt5::QuickWidgets
         component
         ${TOUPCAM_LIB_PATH}
-        ${Test_LIB_PATH}
+        ${DATA_LIB_PATH}
         )
 #if (${USE_PYTHON})
 #target_link_libraries(${DLLNAME}

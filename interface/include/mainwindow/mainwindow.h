@@ -32,6 +32,7 @@ private:
     Preview * preview;
     Setting * setting;
     QStackedWidget * stack;
+    QWidget* mDataWidget;
 private:
     void navigbarSelect(int id);
 };

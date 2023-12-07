@@ -7,6 +7,7 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "mainwindow.h"
+#include "dataWidget.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
@@ -15,12 +16,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     preview = new Preview;
     setting = new Setting;
     stack = new QStackedWidget;
-
+    // 加载数据页面
+    dataWidget dataW;
+    mDataWidget = dataW.ShowView();
     navigbar->setMinimumHeight(NavigBarHeight);
 
     stack->addWidget(appselect);
     stack->addWidget(preview);
-    stack->addWidget(new QWidget);
+    stack->addWidget(mDataWidget);
     stack->addWidget(new QWidget);
     stack->addWidget(setting);
 

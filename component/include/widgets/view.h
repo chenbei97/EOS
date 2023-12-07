@@ -74,6 +74,7 @@ protected:
     QPointF getInnerRectBottomLeftPoint() const;// 外接正方形左下角顶点
     QPointF getInnerRectBottomRightPoint() const;// 外接正方形右下角顶点
     QRectF getValidRect() const;
+    QRectF getInnerRect() const;
     bool isValidRect(const QPointF& point) const;
     bool isValidRect(const QRectF& rect) const;
 signals:

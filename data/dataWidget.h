@@ -1,15 +1,15 @@
 #pragma once
 
-#include "teatlibnew_global.h"
-#include "qquickview.h"
-#include "qquickwidgets.h"
-#include "qwidget.h"
+#include "data_global.h"
+#include <QQuickView>
+#include <QWidget>
+#include <QQuickWidget>
 
-class TEATLIBNEW_EXPORT teatLibNew : public QWidget
+class DATA_EXPORT dataWidget : public QWidget
 {
     Q_OBJECT
 public:
-    teatLibNew(QWidget* parent = nullptr);
+    dataWidget(QWidget* parent = nullptr);
 
     QQuickView* GetMainQuickView();
 

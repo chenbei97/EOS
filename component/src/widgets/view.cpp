@@ -12,9 +12,9 @@
 View::View(QWidget *parent) : QWidget(parent)
 {
     mDisableRectRates[Qt::AlignLeft] = 0.1;
-    mDisableRectRates[Qt::AlignRight] = 0.2;
-    mDisableRectRates[Qt::AlignTop] = 0.3;
-    mDisableRectRates[Qt::AlignBottom] = 0.4;
+    mDisableRectRates[Qt::AlignRight] = 0.0;
+    mDisableRectRates[Qt::AlignTop] = 0.0;
+    mDisableRectRates[Qt::AlignBottom] = 0.0;
     initDispersedMask();
     saveviewact = new QAction(tr(SaveViewActTitle));
     removeviewact = new QAction(tr(RemoveViewActTitle));
@@ -243,7 +243,15 @@ void View::paintEvent(QPaintEvent *event)
     drawDisableLines(painter,getTopDisableRect(),gc,Qt::Vertical);
     drawDisableLines(painter,getBottomDisableRect(),gc,Qt::Vertical);
 
-
+//    auto diameter = getCircleRadius() * 2.0;
+//    auto topleft = getInnerRectTopLeftPoint()+QPointF(mDisableRectRates[Qt::AlignLeft]*diameter,mDisableRectRates[Qt::AlignTop]*diameter);
+//    auto validSize = QSizeF(diameter*(1.0-mDisableRectRates[Qt::AlignLeft]-mDisableRectRates[Qt::AlignRight]),
+//                            diameter*(1.0-mDisableRectRates[Qt::AlignTop]-mDisableRectRates[Qt::AlignBottom]));
+//    auto validRect = QRectF(topleft,validSize);
+//    auto innerRect = getInnerRect(); // 圆内接正方形
+//    if (innerRect.contains(validRect))
+//        painter.drawRect(validRect);
+//    else painter.drawRect(innerRect);
     event->accept();
 }
 
@@ -322,6 +330,15 @@ void View::drawDisableLines(QPainter& painter,const QRectF& rect,const QColor& c
 QRectF View::getValidRect() const
 { //有效的区域是整个圆内,其它都不认为有效,防止用户把viewwindow窗口拉伸后点,不过这里包含了圆和外界正方形的部分也不对
     return QRectF(getInnerRectTopLeftPoint(),QSize(getCircleRadius()*2.0,getCircleRadius()*2.0));
+}
+
+QRectF View::getInnerRect() const
+{ // 圆内接正方形
+    auto radius = getCircleRadius();
+    auto center = QPointF(width()/2.0,height()/2.0);
+    auto topleft = center - QPointF(sqrt(2)/2*radius, sqrt(2)/2*radius);
+
+    return QRectF(topleft,QSizeF(sqrt(2)*radius, sqrt(2)*radius));
 }
 
 bool View::isValidRect(const QPointF &point) const
