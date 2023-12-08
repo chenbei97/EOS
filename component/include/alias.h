@@ -238,6 +238,8 @@ struct HoleInfo {
         return debug;
     }
 };
+
+Q_DECLARE_METATYPE(HoleInfo);
 typedef QVector<HoleInfo> QHoleInfoVector;
 typedef const QVector<HoleInfo>& QCHoleInfoVector;
 typedef QVector<QVector<HoleInfo>> QHoleInfo2DVector;

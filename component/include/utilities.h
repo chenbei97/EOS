@@ -23,6 +23,129 @@
 //#include "sysinfoapi.h"
 //#include <windows.h>
 
+/*拆分特定字符串转为坐标/区域函数*/
+static QPointF convertToPointF(const QString& text)
+{ // (0.835,0.33),(0,1)这样的字符串
+    Q_ASSERT(text.count(",") == 1);
+    Q_ASSERT(text.count("(") == 1);
+    Q_ASSERT(text.count(")") == 1);
+
+    auto tmp = text;
+    tmp.remove(0,1);
+    tmp.chop(1);
+
+    auto x = tmp.section(",",0,0,QString::SectionSkipEmpty).toDouble();
+    auto y = tmp.section(",",1,1,QString::SectionSkipEmpty).toDouble();
+
+    return {x,y};
+}
+
+static QRectF convertToRectF(const QString& text)
+{ // (0.71,0.205,0.1725,0.35)
+    Q_ASSERT(text.count(",") == 3);
+    Q_ASSERT(text.count("(") == 1);
+    Q_ASSERT(text.count(")") == 1);
+
+    auto tmp = text;
+    tmp.remove(0,1);
+    tmp.chop(1);
+
+    auto values = tmp.split(",",QString::SkipEmptyParts);
+    Q_ASSERT(values.count() == 4);
+
+    return {values[0].toDouble(),values[1].toDouble(),
+            values[2].toDouble(),values[3].toDouble()};
+}
+
+static QSet<QString> convertToSet(const QString& text)
+{ // a,b,c
+    QSet<QString> set;
+    auto tmp = text;
+
+    auto values = tmp.split(",",QString::SkipEmptyParts);
+    for(auto val: values)
+        set.insert(val);
+    return set;
+}
+
+static QPointFVector convertToPointFVector(const QString& text)
+{ // "(0.3075,0.4075),(0.27675,0.59175),(0.50175,0.36675),(0.50175,0.59175)"
+    Q_ASSERT(text.count(",") % 2 == 1); //一定是奇数个
+    QPointFVector points;
+
+    int count = 0;
+    for(int i = 0; i < text.count(); ++i) {
+        if(text[i] == ",") {
+            count++;
+            if (count % 2 == 1) { // 奇数位置的","是2个数字之间的
+                int s1 = i,s2 = i;
+                while (text[s1] != "(") {
+                    s1--;
+                } //匹配时的s1就是"("的索引
+                while (text[s2] != ")") {
+                    s2++;
+                }//匹配时的s2就是")"的索引
+                auto x = text.mid(s1+1,i-s1-1).toDouble();
+                auto y = text.mid(i+1,s2-i-1).toDouble();
+                points.append(QPointF(x,y));
+            }
+        }
+    }
+
+    return points;
+}
+
+static QPointVector convertToPointVector(const QString& text)
+{ // "(1,2),(4,5),(7,8),(3,9)"
+    Q_ASSERT(text.count(",") % 2 == 1); //一定是奇数个
+    QPointVector points;
+
+    int count = 0;
+    for(int i = 0; i < text.count(); ++i) {
+        if(text[i] == ",") {
+            count++;
+            if (count % 2 == 1) { // 奇数位置的","是2个数字之间的
+                int s1 = i,s2 = i;
+                while (text[s1] != "(") {
+                    s1--;
+                } //匹配时的s1就是"("的索引
+                while (text[s2] != ")") {
+                    s2++;
+                }//匹配时的s2就是")"的索引
+                auto x = text.mid(s1+1,i-s1-1).toInt();
+                auto y = text.mid(i+1,s2-i-1).toInt();
+                points.append(QPoint(x,y));
+            }
+        }
+    }
+
+    return points;
+}
+
+static QPointF2DVector convertTo2DPointFVector(const QString& text)
+{ // "(0,2),(1,2)|(0,0),(0,1),(1,0),(1,1)"
+    Q_ASSERT(text.contains("|"));
+    QPointF2DVector points;
+
+    auto section = text.split("|",QString::SkipEmptyParts);
+    for(auto sec: section)
+        points.append(convertToPointFVector(sec));
+
+    return points;
+}
+
+static QPoint2DVector convertTo2DPointVector(const QString& text)
+{ // "(0,2),(1,2)|(0,0),(0,1),(1,0),(1,1)"
+    Q_ASSERT(text.contains("|"));
+    QPoint2DVector points;
+
+    auto section = text.split("|",QString::SkipEmptyParts);
+    for(auto sec: section)
+        points.append(convertToPointVector(sec));
+
+    return points;
+}
+
 /*精度转换函数*/
 static QString convertPrecision(const QString& s,int precision = 6)
 {

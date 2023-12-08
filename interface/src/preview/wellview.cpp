@@ -76,8 +76,8 @@ void WellView::toggleBrandObjective(int viewSize,bool toggleObjective)
     update();
 }
 
-void WellView::importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
-{// 导入实验配置时去更新view的ui信息(和setViewInfo初始化的代码差不多)
+void WellView::importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
+{// 导入实验配置时去更新view的ui信息(和setViewInfo初始化的代码差不多) 完全弃用
     mViewInfo[HoleCoordinateField] = holePoint;
     mViewInfo[HoleGroupNameField] = "";
     mViewInfo[HoleGroupColorField] = QColor(Qt::red);
@@ -124,6 +124,11 @@ void WellView::importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,int v
     mTmpRectDispersedPoints[id] = mViewRectDispersedPoints[id];
     applyholeact->trigger();
     update();
+}
+
+void WellView::importViewInfo()
+{
+
 }
 
 void WellView::onApplyAllAct()

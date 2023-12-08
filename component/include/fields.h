@@ -324,6 +324,7 @@ static const char* ViewYCoordinateField = "view_y";
 static const char* HoleXCoordinateField = "hole_x";
 static const char* HoleYCoordinateField = "hole_y";
 static const char* ViewSizeField = "viewsize";
+static const char* HoleSizeField = "holesize";
 static const char* HoleExperTypeField = "hole_expertype"; // 本孔所属实验类型
 static const char* HoleMedicineField = "hole_medicine"; // 本孔的药物信息
 static const char* HoleDoseField = "hole_dose"; // 本孔的剂量信息

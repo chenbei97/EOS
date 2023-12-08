@@ -14,7 +14,8 @@ public:
     void paintEvent(QPaintEvent *event) override;
     void removeHole(const QPoint &holePoint);
     void toggleBrandObjective(int viewSize,bool toggleObjective = true);
-    void importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
+    void importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
+    void importViewInfo();
     void setSelectMode(ViewSelectMode mode);
 private:
     // 区域模式: 电机坐标!=UI离散坐标

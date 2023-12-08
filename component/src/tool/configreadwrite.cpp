@@ -53,7 +53,7 @@ void ConfigReadWrite::parseCameraChannelField(const QJsonValue &key, const QJson
     auto arr = value.toArray(); // 字段的值是个列表[],有多个{},{}对象
 
     QVariantMap m;
-    foreach(auto obj, arr) {
+    for(auto obj: arr) {
         auto object = obj.toObject();//obj是个jsonValue需要先转换
         QVariantMap tmp;
         tmp[BrightField] = object[BrightField].toString();
@@ -72,39 +72,62 @@ void ConfigReadWrite::parseGroupField(const QJsonValue &key, const QJsonValue &v
 {
     Q_ASSERT(key == GroupField);
 
-    auto arr = value.toArray(); // 字段的值是个列表[],有多个{},{}对象
+    auto arr = value.toArray(); // group字段的值是个列表[],有多个{},{}对象,每个{}对象是1个组别的信息
 
     QVariantMap m;
-    foreach(auto obj, arr) {
-        auto object = obj.toObject();
+    for(auto obj: arr) {
+        auto object = obj.toObject(); // 组信息的{}对象,只有1个关键字,是以组名命名
+
         Q_ASSERT(object.keys().count() == 1);
+        auto groupName = object.keys().at(0); // 用户的组名称
+        auto groupHoleInfo = object[groupName].toArray();// "A组"的值是个列表,列表的每个值都是该组的所有孔信息
 
-        QVariantMap  grouptmp;
-        auto groupname = object.keys().at(0); // 用户的组名称
+        WellGroupInfo groupInfoMap;
+        for(int i = 0; i < groupHoleInfo.count(); ++i) {
+            auto holeInfoObject = groupHoleInfo[i].toObject();
+//            WellHoleInfo holeInfoMap;
+//            holeInfoMap[HoleExperTypeField] = holeInfoObject[HoleExperTypeField].toString();
+//            holeInfoMap[HoleMedicineField] = holeInfoObject[HoleMedicineField].toString();
+//            holeInfoMap[HoleDoseField] = holeInfoObject[HoleDoseField].toString();
+//            holeInfoMap[HoleDoseUnitField] = holeInfoObject[HoleDoseUnitField].toString();
+//
+//            holeInfoMap[HoleCoordinateField] = holeInfoObject[HoleCoordinateField].toString();
+//            holeInfoMap[HoleGroupColorField] = holeInfoObject[HoleGroupColorField].toString();
+//            holeInfoMap[HoleGroupNameField] = holeInfoObject[HoleGroupNameField].toString();
+//            // holeInfoMap[HoleGroupCoordinatesField] = holeInfoObject[HoleGroupCoordinatesField].toString();
+//            holeInfoMap[HoleAllCoordinatesField] = holeInfoObject[HoleAllCoordinatesField].toString();
+//            holeInfoMap[HoleAllGroupsField] = holeInfoObject[HoleAllGroupsField].toString();
+//
+//            holeInfoMap[HoleViewSizeField] = holeInfoObject[HoleViewSizeField].toInt();
+//            holeInfoMap[HoleViewRectsField] = holeInfoObject[HoleViewRectsField].toString();
+//            holeInfoMap[HoleViewPointsField] = holeInfoObject[HoleViewPointsField].toString(); //没有uipoints
+//
+//            groupInfoMap[holeInfoObject[HoleCoordinateField].toString()] = holeInfoMap; // 用坐标做关键字
 
-        // "A组"的值是个列表,里边的值都是{},{},{},每个{}都有3个key:points,x,y代表孔坐标和孔指定的视野坐标
-        auto groupvalue = object[groupname].toArray();
+            HoleInfo holeInfo;
+            holeInfo.type = holeInfoObject[HoleExperTypeField].toString();
+            holeInfo.medicine = holeInfoObject[HoleMedicineField].toString();
+            holeInfo.dose = holeInfoObject[HoleDoseField].toString();
+            holeInfo.doseunit = holeInfoObject[HoleDoseUnitField].toString();
 
-        // A组的每个孔需要解析2个信息,孔坐标和视野坐标列表
-        for(int i = 0; i < groupvalue.count(); ++i) {
-            auto holeobject = groupvalue[i].toObject();
-            auto viewpointsArr = holeobject[PointsField].toArray(); // viewpoints是个列表
+            holeInfo.coordinate = convertToPointF(holeInfoObject[HoleCoordinateField].toString()).toPoint();
+            holeInfo.color = holeInfoObject[HoleGroupColorField].toString();
+            holeInfo.group = holeInfoObject[HoleGroupNameField].toString();
+            Q_ASSERT(holeInfo.group == groupName);
+            //auto groupHoles = convertToPointFVector(holeInfoObject[HoleGroupCoordinatesField].toString()); // 不提供组坐标的写入和解析
+            holeInfo.allcoordinate = convertTo2DPointVector(holeInfoObject[HoleAllCoordinatesField].toString());
+            holeInfo.allgroup = convertToSet(holeInfoObject[HoleAllGroupsField].toString());
 
-            auto holepoint = QPoint(holeobject[XField].toInt(),holeobject[YField].toInt());
-            QPointFVector holeviewpoints;
-            foreach(auto ptVal,viewpointsArr) {
-                auto pt = ptVal.toObject();
-                holeviewpoints<<QPointF(pt[XField].toDouble(),pt[YField].toDouble());
-            }
+            holeInfo.viewsize = holeInfoObject[HoleViewSizeField].toInt();
+            auto rect_str = holeInfoObject[HoleViewRectsField].toString();
+            if (rect_str.isEmpty()) holeInfo.viewrects = QRectFVector(); // 点模式下可能为空
+            else holeInfo.viewrects = QRectFVector()<<convertToRectF(rect_str);
+            holeInfo.viewpoints = convertToPointFVector(holeInfoObject[HoleViewPointsField].toString()); //没有uipoints
 
-            QVariantMap holetmp;
-            holetmp[PointsField].setValue(holeviewpoints);
-            holetmp[HoleCoordinateField] = holepoint;
-
-            grouptmp[QString::number(i)] = holetmp;
+            groupInfoMap[holeInfoObject[HoleCoordinateField].toString()].setValue(holeInfo); // 用坐标做关键字
         }
 
-        m[groupname] = grouptmp;
+        m[groupName] = groupInfoMap;
     }
 
     parseData[GroupField] = m;

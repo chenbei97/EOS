@@ -178,6 +178,7 @@ struct FieldExportExperEvent{
     const QString app = AppSelectField;
     // wellpattern
     const QString group = GroupField;
+    const QString holesize = HoleSizeField;
     // other
     const QString capture_channel = CaptureChannelField;//配置过相机参数的所有通道
 };
@@ -311,6 +312,8 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
 {// 启动实验
     auto toolinfo = m[PreviewToolField].value<PreviewToolInfo>();
     auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
+    auto wellpatternsize = wellpatterninfo[HoleSizeField].toSize();
+    auto wellgroupinfo = wellpatterninfo[GroupField].value<WellPatternInfo>();
 #ifdef usetab
     auto experinfo = m[ExperToolField].value<ExperToolInfo>();
 #endif
@@ -391,11 +394,11 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
 
     // 组-孔-视野的信息
     QJsonArray arr; // "group"的值是个列表 arr group=[{},{},{}]
-    for(auto groupName: wellpatterninfo.keys()) {
+    for(auto groupName: wellgroupinfo.keys()) {
         QJsonObject groupObject; // arr有多个groupObject对象,表示每个组的信息,"a组","b组" 每个小{}
         QJsonArray groupValues; // groupObject的值是个列表,也就是"a组"的值是个列表,包含孔信息
 
-        auto groupinfo = wellpatterninfo[groupName].value<WellGroupInfo>();
+        auto groupinfo = wellgroupinfo[groupName].value<WellGroupInfo>();
 
         for(auto holekey: groupinfo.keys()) {
             auto holeinfo = groupinfo[holekey].value<WellHoleInfo>();
@@ -436,6 +439,8 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
 {// 导出实验配置(不参与tcp通讯),和启动实验相比多了一些组装的东西: 组颜色,组的一些信息,视野尺寸等,是全部的信息都导出
     auto toolinfo = m[PreviewToolField].value<PreviewToolInfo>();
     auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
+    auto wellpatternsize = wellpatterninfo[HoleSizeField].toSize();
+    auto wellgroupinfo = wellpatterninfo[GroupField].value<WellPatternInfo>();
 #ifdef usetab
     auto experinfo = m[ExperToolField].value<ExperToolInfo>();
 #endif
@@ -516,10 +521,11 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
 
     // 组-孔-视野的信息
     QJsonArray arr; // "group"的值是个列表 arr group=[{},{},{}]
-    for(auto groupName: wellpatterninfo.keys()) {
+    for(auto groupName: wellgroupinfo.keys()) {
+
         QJsonObject groupObject; // arr有多个groupObject对象,表示每个组的信息,"a组","b组" 每个小{}
         QJsonArray groupValues; // groupObject的值是个列表,也就是"a组"的值是个列表,包含孔信息
-        auto groupinfo = wellpatterninfo[groupName].value<WellGroupInfo>();
+        auto groupinfo = wellgroupinfo[groupName].value<WellGroupInfo>();
 
         for(auto holekey: groupinfo.keys()) {
             QJsonObject holeObject;
@@ -538,11 +544,11 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
             auto groupholes = holeinfo[HoleGroupCoordinatesField].value<QPointVector>();
             auto allgroups = holeinfo[HoleAllGroupsField].value<QSet<QString>>();
             auto allholes = holeinfo[HoleAllCoordinatesField].value<QPoint2DVector>();
-            for(auto pt: groupholes) {
-                tmpStr += QString("(%1,%2),").arg(pt.x()).arg(pt.y());
-            }
-            tmpStr.chop(1);
-            holeObject[HoleGroupCoordinatesField] = tmpStr;
+//            for(auto pt: groupholes) { // 组的所有孔坐标也没有意义,这个信息可以被其他信息推断,另外HoleInfo也没有这个字段,所以也不提供写入
+//                tmpStr += QString("(%1,%2),").arg(pt.x()).arg(pt.y());
+//            }
+//            tmpStr.chop(1);
+//            holeObject[HoleGroupCoordinatesField] = tmpStr;
 
             tmpStr.clear();
             for(auto n: allgroups.values()) {
@@ -596,6 +602,8 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
         arr.append(groupObject);
     }
     object[FieldExportExperEvent.group] = arr;
+    object[FieldExportExperEvent.holesize] =
+            QString("(%1,%2)").arg(wellpatternsize.width()).arg(wellpatternsize.height());
     TcpAssemblerDoc.setObject(object);
     return TcpAssemblerDoc.toJson();
 }

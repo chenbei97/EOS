@@ -31,7 +31,8 @@ public:
     int drapHoleCount() const; // 计算拖拽区域包含的孔个数
     void initHoleInfo(); // 初始化孔信息
     void clearViewInfo();
-    void importHoleInfo(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize);
+    void importHoleInfoV1(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize);
+    void importHoleInfo(const QHoleInfoVector& vec);
 
     void paintEvent(QPaintEvent *event) override;
     QRectF2DVector getHoleRectsOnViewSize(QCPoint coordinate) const; // 拿到某个孔基于视野窗口尺寸来划分的所有小矩形区域

@@ -344,16 +344,21 @@ void Preview::exportExperConfig(const QString& path)
     auto json = assembleExportExperEvent(previewinfo);
     JsonReadWrite m; // 借助工具类写到文件内
     m.writeJson(path,json);
+
+    // 存数据库,直接存整个json文件是最简单的
 }
 
-void Preview::importExperConfig(const QString& path)
+void Preview::importExperConfigV1(const QString& path)
 {// 导入实验配置,对于camera_channel和group字段要特殊解析
 
-    ConfigReadWrite m; // 借助工具类读取文件内
+    ConfigReadWrite m; // 借助工具类读取文件
     auto json = m.readJson(path);
 
     m.parseJson(json);
     auto result = m.map();
+
+    LOG<<result[GroupField];
+
     previewtool->importExperConfig(result);
 #ifdef usetab
     expertool->importExperConfig(result);
@@ -365,7 +370,7 @@ void Preview::importExperConfig(const QString& path)
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];
 
     auto info = result[GroupField].value<QVariantMap>();
-    foreach(auto group,info.keys()){
+    for(auto group:info.keys()){
         auto groupinfo = info[group].value<QVariantMap>();
         foreach(auto hole,groupinfo.keys()) {
             auto holeinfo = groupinfo[hole].value<QVariantMap>();
@@ -374,12 +379,31 @@ void Preview::importExperConfig(const QString& path)
             auto viewpoints = holeinfo[PointsField].value<QPointFVector>();
 
             // 把holePoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
-            wellpattern->importHoleInfo(holepoint,group,viewpoints,viewsize);
-            wellview->importViewInfo(holepoint,viewpoints,viewsize);
+            wellpattern->importHoleInfoV1(holepoint,group,viewpoints,viewsize);
+            wellview->importViewInfoV1(holepoint,viewpoints,viewsize);
         }
 
     }
+}
 
+void Preview::importExperConfig(const QString &path)
+{
+    ConfigReadWrite m; // 借助工具类读取文件
+    auto json = m.readJson(path);
+
+    m.parseJson(json);
+    auto result = m.map();
+
+    QHoleInfoVector holeInfoVec;
+    for(auto var1: result[GroupField].value<QVariantMap>().values()) {
+        auto groupInfo = var1.value<WellGroupInfo>();
+        for(auto var2: groupInfo.values()) {
+            auto holeInfo = var2.value<HoleInfo>();
+            holeInfoVec.append(holeInfo);
+        }
+    }
+    wellpattern->importHoleInfo(holeInfoVec);
+    LOG<<result[GroupField];
 }
 
 void Preview::loadExper()

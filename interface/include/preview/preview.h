@@ -129,6 +129,7 @@ private:
     void previewViewEvent(const QPointF& viewPoint);
     void previewHoleEvent(const QPoint& holePoint);
     void exportExperConfig(const QString& path);
+    void importExperConfigV1(const QString& path);
     void importExperConfig(const QString& path);
     void loadExper();
     void stopExper();

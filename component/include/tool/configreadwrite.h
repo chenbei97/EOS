@@ -12,6 +12,7 @@
 
 #include "jsonreadwrite.h"
 #include "fields.h"
+#include "utilities.h"
 
 class COMPONENT_IMEXPORT ConfigReadWrite: public JsonReadWrite
 {
