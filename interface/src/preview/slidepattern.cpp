@@ -37,6 +37,12 @@ void SlidePattern::updateRect(const QRectF &rect)
     update();
 }
 
+void SlidePattern::refreshRect()
+{
+    emit rectUpdated(mSaveRectF);
+    emit normRectUpdated(norm(mSaveRectF));
+}
+
 void SlidePattern::updateSize(int viewsize)
 {
     mSize = viewsize;
@@ -46,6 +52,11 @@ void SlidePattern::updateSize(int viewsize)
 bool SlidePattern::haveSlide() const
 {
     return !mSaveRectF.isEmpty();
+}
+
+QRectF SlidePattern::slideRect() const
+{
+    return mSaveRectF;
 }
 
 QPointFVector SlidePattern::viewPoints(bool overlap_) const

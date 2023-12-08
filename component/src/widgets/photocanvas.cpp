@@ -78,7 +78,14 @@ void PhotoCanvas::drawGridImage(QPainter &painter)
         }
     }
 
-    // 3. 绘制图的中心和虚线框
+    // 3. 绘制框线
+    pen.setStyle(Qt::DashLine);
+    pen.setColor(Qt::blue);
+    pen.setWidth(DefaultPainterPenWidth);
+    painter.setPen(pen);
+    painter.drawRect(mBoundingRect);
+
+    // 4. 绘制图的中心和虚线框
     if (!mGridCenterPoints.isEmpty()) {
         pen.setColor(PurpleEA3FF7);
         pen.setWidth(DefaultPainterPenWidth*2);
@@ -95,12 +102,6 @@ void PhotoCanvas::drawGridImage(QPainter &painter)
         }
     }
 
-    // 4. 绘制框线
-    pen.setStyle(Qt::DashLine);
-    pen.setColor(Qt::blue);
-    pen.setWidth(DefaultPainterPenWidth);
-    painter.setPen(pen);
-    painter.drawRect(mBoundingRect);
     pen.setStyle(Qt::SolidLine);
     pen.setColor(Qt::black);
     painter.setPen(pen);
@@ -186,7 +187,6 @@ void PhotoCanvas::clearGridImage()
 
 void PhotoCanvas::appendImage(const QImage &img, const QPointF &point)
 { // point是归一化的中心坐标
-
     Q_ASSERT(mStrategy == GridPixmap);
     auto w = getInnerRectWidth();
     auto h = getInnerRectHeight();
@@ -275,6 +275,22 @@ void PhotoCanvas::updateRect(const QRectF &rect)
     auto w = rect.width() * width();
     auto h = rect.height() * height();
     mBoundingRect = QRectF(x,y,w,h);
+
+    mGridCenterPoints.clear();
+    auto ref_w = getInnerRectWidth();
+    auto ref_h = getInnerRectHeight();
+    auto x0 = qCeil(x);// 电机坐标起点
+    auto y0 = qCeil(y);
+    auto step_x = qCeil(width() / mGridSize); // 遍历的整数步进
+    auto step_y = qCeil(height() / mGridSize);
+
+    for(int x = x0; x < x0 + w; x += step_x) {
+        for(int y = y0; y < y0 + h; y += step_y) {
+            auto center_x = x+step_x/2.0;
+            auto center_y = y+step_y/2.0;
+            mGridCenterPoints.append(QPointF(center_x,center_y));
+        }
+    }
     update();
 }
 

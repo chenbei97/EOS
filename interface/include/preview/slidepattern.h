@@ -18,8 +18,10 @@ class INTERFACE_IMEXPORT SlidePattern : public QWidget
 public:
     explicit SlidePattern(QWidget*parent= nullptr);
     void updateRect(const QRectF& rect);
+    void refreshRect();
     void updateSize(int viewsize);
     bool haveSlide() const;
+    QRectF slideRect() const;
     QPointFVector viewPoints(bool overlap = true) const;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

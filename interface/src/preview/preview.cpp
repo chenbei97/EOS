@@ -124,6 +124,7 @@ void Preview::toggleBrand(int option)
         photocanvas->setStrategy(PhotoCanvas::GridPixmap);
         photocanvas->setGridSize(size);
         photocanvas->clearGridImage();
+        slidepattern->refreshRect();
     }
 }
 
@@ -177,6 +178,7 @@ void Preview::onObjectiveChanged(const QString& obj)
     {
         photocanvas->setGridSize(size);
         photocanvas->clearGridImage();
+        slidepattern->refreshRect();// 切物镜后把slidepattern的矩形重新刷新到photocanvas上
     }
 }
 
