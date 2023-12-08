@@ -22,7 +22,7 @@ namespace obsoleteClass {
     public:
         explicit WellPatternV1(int rows,int cols,QWidget*parent= nullptr);
 
-        PreviewPatternInfo patternInfo() const;
+        WellPatternInfo patternInfo() const;
 
         void setPatternSize(int rows,int cols) override;
         void initDrapPoints(); // 清除拖拽区域
@@ -55,7 +55,7 @@ namespace obsoleteClass {
         void updateHoleInfoByViewInfoApplyAll(QCVariantMap m);
 
         protected:
-        const int mUiViewMaskSize = DefaultUiMaskSize;
+        const int mUiViewMaskSize = DefaultDispersedMaskSize;
         QRectF mDrapRect; // 鼠标拖动生成的矩形
         QBool2DVector mDrapPoints; // 拖拽矩形内选中的点赋值true
         QBool2DVector mDisablePoints; // 置灰区域,不可选的区域

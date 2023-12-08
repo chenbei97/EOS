@@ -89,7 +89,7 @@ QPointF View::mapToPointF(const QPointF &point) const
     return pos;
 }
 
-QRectF View::mapToSize(const QRectF &source,const QPointF&ref_point,int ref_w,int ref_h)
+QRectF View::mapToSize(const QRectF &source,const QPointF&ref_point,int ref_w,int ref_h) const
 { // source已经是0-1的等比例缩放了
     auto topleft = source.topLeft();
     auto size = source.size();
@@ -102,7 +102,7 @@ QRectF View::mapToSize(const QRectF &source,const QPointF&ref_point,int ref_w,in
     return QRectF(x,y,w,h);
 }
 
-QRectF View::mapFromSize(const QRectF &source,const QPointF&ref_point,int ref_w,int ref_h)
+QRectF View::mapFromSize(const QRectF &source,const QPointF&ref_point,int ref_w,int ref_h) const
 { //source非标准,将其标准化到0-1
     auto topleft = source.topLeft();
     auto size = source.size();
@@ -155,7 +155,7 @@ void View::mousePressEvent(QMouseEvent *event)
     mMousePos = event->pos();
 //    if (!getValidRect().contains(mMousePos)) // 如果不是有效区域的鼠标点击无效
 //        mMousePos = {-1.0,-1.0};
-    if (!isValidRect(mMousePos)) // 如果不是有效区域的鼠标点击无效
+    if (!isValidPoint(mMousePos)) // 如果不是有效区域的鼠标点击无效
         mMousePos = {-1.0,-1.0};
 
     // 1.框选后随机点一下要清除框选框(只能拖拽生成),同时出现单击框
@@ -341,7 +341,7 @@ QRectF View::getInnerRect() const
     return QRectF(topleft,QSizeF(sqrt(2)*radius, sqrt(2)*radius));
 }
 
-bool View::isValidRect(const QPointF &point) const
+bool View::isValidPoint(const QPointF &point) const
 { // 判断点是否在圆内依赖于直径,且不在禁止区域
     auto center_x = width() / 2.0;
     auto center_y = height() / 2.0;
@@ -364,7 +364,7 @@ bool View::isValidRect(const QRectF &rect) const
     // 或者说4个端点都在圆内必定区域在圆内
     QPointFVector points = {rect.topLeft(),rect.topRight(),rect.bottomLeft(),rect.bottomRight()};
     for(auto pt: points) {
-        if (!isValidRect(pt))
+        if (!isValidPoint(pt))
             return false;
     }
 
@@ -454,7 +454,7 @@ bool View::checkField() const
     return r1&&r2&&r3&&r4&&r5&&r6&&r7&&r8&&r9&&ra;
 }
 
-void View::setDisablePoint(Qt::Alignment direction,double rate)
+void View::setDisableRect(Qt::Alignment direction, double rate)
 {
     if (direction != Qt::AlignBottom && direction != Qt::AlignTop
         && direction != Qt::AlignLeft && direction != Qt::AlignRight) {
@@ -465,14 +465,39 @@ void View::setDisablePoint(Qt::Alignment direction,double rate)
     update();
 }
 
-void View::setDisablePoints(QCPointVector points, bool enable)
+void View::setDisableRect(double rate)
 {
-
+    Q_ASSERT(rate<1.0);
+    Q_ASSERT(rate>=0.0);
+    mDisableRectRates[Qt::AlignLeft] = rate;
+    mDisableRectRates[Qt::AlignRight] = rate;
+    mDisableRectRates[Qt::AlignBottom] = rate;
+    mDisableRectRates[Qt::AlignTop] = rate;
+    update();
 }
 
-void View::setDisablePoints(bool enable)
-{
+void View::setDisableRect(const QMap<Qt::Alignment, double> &map)
+{ // 外部有义务传递正确的map
+    Q_ASSERT(map.keys().count() == 4);
+    Q_ASSERT(map.keys().contains(Qt::AlignTop));
+    Q_ASSERT(map.keys().contains(Qt::AlignLeft));
+    Q_ASSERT(map.keys().contains(Qt::AlignBottom));
+    Q_ASSERT(map.keys().contains(Qt::AlignRight));
+    for(auto key: map.keys()) {
+        Q_ASSERT(map[key]<1.0);
+        Q_ASSERT(map[key]>=0.0);
+    }
+    mDisableRectRates = map;
+    update();
+}
 
+void View::clearDisableRect()
+{
+    mDisableRectRates[Qt::AlignLeft] = 0.0;
+    mDisableRectRates[Qt::AlignRight] = 0.0;
+    mDisableRectRates[Qt::AlignBottom] = 0.0;
+    mDisableRectRates[Qt::AlignTop] = 0.0;
+    update();
 }
 
 void View::onApplyAllAct()

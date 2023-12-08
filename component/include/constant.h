@@ -23,7 +23,7 @@ Q_ENUMS(SQLType)
 static const int DefaultPrecisionBit = 6;
 static const int DefaultDrawPointWidth = 8;
 static const int DefaultPainterPenWidth = 2;
-static const int DefaultUiMaskSize = 100;
+static const int DefaultDispersedMaskSize = 100;
 #define PointToIDCoefficient 1000 // kx1+y1=kx2+y2=> k=(y2-y1)/(x1-x2),k取什么值?找不到这样的2个坐标能等于k,由于wellsize最大384,实际上k>384就能保证id唯一了
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 #define SqlExecFailedLOG (qDebug()<<"[" \
@@ -56,6 +56,7 @@ static const int DefaultUiMaskSize = 100;
 #define RecordVideoDefaultTempPath (CURRENT_PATH+"/temp/video/")
 #define AutoFocusTempPath (CURRENT_PATH+"/temp/focus/")
 
+static const char* PurpleEA3FF7 = "#EA3FF7";
 static const char* PointModeField = "Point Mode";
 static const char* RectModeField = "Rect Mode";
 static const char* WholeModeField = "Whole Mode";
@@ -106,6 +107,7 @@ static const char* JPGSuffix = ".jpg";
 static const char* JPGField = "jpg";
 static const char* StateField = "state";
 static const char* ImageField = "image";
+static const char* GridSizeField = "gridsize";
 static const char* StopField = "stop";
 static const char* ActivateCodeField = "activate_code";
 static const char* TurnOffLight = "turnoff_light";
@@ -141,7 +143,7 @@ static const char* PreviewDockSlideTitle = "Select Slide Inside View";
 static const char* PreviewWellDockTitle = "Select Hole Inside View(%1,%2)-Group(%3)";
 static const char* PreviewNoGroupWellDockTitle = "Group not set";
 static const char* ViewSelectBoxTitle = "View Mode";
-static const char* WellBoxTitle = "WellSize";
+static const char* WellBoxTitle = "Well";
 static const char* ChannelBoxTitle = "Channel";
 static const char* RecordBoxTitle = "Record";
 static const char* CameraBoxTitle ="Camera";

@@ -17,6 +17,7 @@ void SlidePattern::onSaveViewAct()
     }
     update();
     emit rectUpdated(mSaveRectF);
+    emit normRectUpdated(norm(mSaveRectF));
 }
 
 void SlidePattern::onRemoveViewAct()
@@ -27,6 +28,7 @@ void SlidePattern::onRemoveViewAct()
     }
     update();
     emit rectUpdated(mSaveRectF);
+    emit normRectUpdated(norm(mSaveRectF));
 }
 
 void SlidePattern::updateRect(const QRectF &rect)
@@ -41,13 +43,19 @@ void SlidePattern::updateSize(int viewsize)
     update();
 }
 
-QPointFVector SlidePattern::viewPoints() const
+bool SlidePattern::haveSlide() const
+{
+    return !mSaveRectF.isEmpty();
+}
+
+QPointFVector SlidePattern::viewPoints(bool overlap_) const
 { // 依据视野尺寸和保存的视野来得到电机坐标
     QPointFVector points;
     if (mSaveRectF.isEmpty()) return points;
 
     auto ref_w = qCeil(getReferenceWidth());
     auto ref_h = qCeil(getReferenceHeight());
+    auto ref = getReferencePoint();
 
     // 1. 将要扫描的矩形取整
     auto x0 = qCeil(mSaveRectF.topLeft().x());// 电机坐标起点
@@ -61,15 +69,18 @@ QPointFVector SlidePattern::viewPoints() const
     // 2. 得到离散的电机坐标并归一化
     for(int x = x0; x < x0 + w; x += step_x) {
         for(int y = y0; y < y0 + h; y += step_y) {
-            auto center_y = x+step_x/2.0;
-            auto center_x = y+step_y/2.0;
-            points.append(QPointF(center_x/ref_w,center_y/ref_h));
+            //auto rect = QRectF(x,y,step_x,step_y);
+            auto center_x = x+step_x/2.0;
+            auto center_y = y+step_y/2.0;
+            if (isValidPoint(QPointF(center_x,center_y)))
+                points.append(QPointF((center_x - ref.x())/ref_w,(center_y - ref.y())/ref_h));
         }
     }
 
     // 3. 电机坐标重叠一定比例
-    points = overlap(points,overlapRate);
-    LOG<<points.count()<<mSize;
+    if (overlap_)
+        points = overlap(points,overlapRate);
+    //LOG<<points.count();
     return points;
 }
 
@@ -93,7 +104,7 @@ void SlidePattern::paintEvent(QPaintEvent *event)
         auto topright = topleft + QPointF(ref_w,0.0);
 
         auto hor_offset = ref_w / mSize;
-        pen.setWidth(1);
+        pen.setWidth(DefaultPainterPenWidth/2);
         pen.setColor(Qt::gray);
         painter.setPen(pen);
         for (int i = 1; i <= mSize-1; ++i) { // 绘制垂直线,2个y坐标固定
@@ -107,8 +118,45 @@ void SlidePattern::paintEvent(QPaintEvent *event)
             auto right = topright + QPointF(0,ver_offset*i);
             painter.drawLine(left,right);
         }
+
+        // 方便比对电机坐标是否正确
+        auto x0 = qCeil(mSaveRectF.topLeft().x());// 电机坐标起点
+        auto y0 = qCeil(mSaveRectF.topLeft().y());
+        auto w = qCeil(mSaveRectF.width());
+        auto h = qCeil(mSaveRectF.height());
+
+        auto step_x = qCeil(ref_w / mSize); // 遍历的整数步进
+        auto step_y = qCeil(ref_h / mSize);
+
+        for(int x = x0; x < x0 + w; x += step_x) {
+            for(int y = y0; y < y0 + h; y += step_y) {
+                auto rect = QRectF(x,y,step_x,step_y);
+                auto center_x = x+step_x/2.0;
+                auto center_y = y+step_y/2.0;
+
+                pen.setWidth(DefaultPainterPenWidth);
+                pen.setStyle(Qt::DashLine);
+                pen.setColor(PurpleEA3FF7);
+                painter.setPen(pen);
+                painter.drawRect(rect);
+
+//                pen.setWidth(DefaultPainterPenWidth*2);
+//                painter.setPen(pen);
+//                if (isValidPoint(QPointF(center_x,center_y)))
+//                    painter.drawPoint(center_x,center_y); // 无效的点不会被绘制和选中
+            }
+        }
+        // 这里画点正确证明viewPoints计算没有问题
+        auto viewpts = viewPoints(false);
+        for(auto pt: viewpts) {
+            pen.setWidth(DefaultPainterPenWidth*2);
+            painter.setPen(pen);
+            painter.drawPoint(pt.x()*ref_w+topleft.x(),pt.y()*ref_h+topleft.y());
+        }
     }
 
+    pen.setWidth(DefaultPainterPenWidth);
+    pen.setStyle(Qt::SolidLine);
     pen.setColor(Qt::blue);
     painter.setPen(pen);
     painter.drawRect(mDrapRectF);

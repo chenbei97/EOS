@@ -19,7 +19,8 @@ public:
     explicit SlidePattern(QWidget*parent= nullptr);
     void updateRect(const QRectF& rect);
     void updateSize(int viewsize);
-    QPointFVector viewPoints() const;
+    bool haveSlide() const;
+    QPointFVector viewPoints(bool overlap = true) const;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
@@ -49,6 +50,7 @@ private:
 signals:
     void doubleClicked();
     void rectUpdated(const QRectF& rect);
+    void normRectUpdated(const QRectF& rect);
     void previewEvent(const QPointF& point);
 };
 #endif //EOS_SLIDEPATTERN_H

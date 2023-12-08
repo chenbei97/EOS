@@ -100,6 +100,9 @@ typedef const QVector<QPair<bool,QColor>>& QCBoolColorPairVector;
 typedef QVector<QVector<QBoolColorPair>> QBoolColorPair2DVector;
 typedef const QVector<QVector<QBoolColorPair>>& QCBoolColorPair2DVector;
 
+typedef QPair<QRectF,QImage> QPairImage;
+typedef QVector<QPair<QRectF,QImage>> QPairImageVector;
+
 struct ViewPoint {
     QString x;
     QString y;
@@ -245,6 +248,7 @@ typedef QMap<QString,QString> TimeInfo;
 typedef QMap<QString,QString> LensInfo;
 typedef QMap<QString,QString> ZStackInfo;
 typedef QMap<QString,QString> WellInfo;
+typedef QMap<QString,QString> FocusInfo;
 typedef QMap<QString,QString> ObjectiveInfo;
 typedef QMap<QString,QString> ChannelInfo;
 typedef QMap<QString,QString> CameraInfo;
@@ -253,7 +257,8 @@ typedef QMap<QString,CameraInfo> MultiCameraInfo;
 typedef QMap<QString,QImage> ChannelImageInfo;
 typedef QVariantMap PreviewToolInfo;
 typedef QVariantMap ExperToolInfo;
-typedef QVariantMap PreviewPatternInfo;
+typedef QVariantMap WellPatternInfo;
+typedef QVariantMap SlidePatternInfo;
 typedef QVariantMap PreviewInfo;
 typedef QVariantMap ViewInfo;
 typedef QVariantMap IniVariable;

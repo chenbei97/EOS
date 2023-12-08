@@ -32,7 +32,7 @@ namespace obsoleteClass { // 过时,开发了新版本
         private:
             //QMap<int,QBool2DVector> mUiViewMask;
             QBool2DVector mUiViewMask;
-            const int mUiViewMaskSize = DefaultUiMaskSize; // 用于绘图 50-100就可以了
+            const int mUiViewMaskSize = DefaultDispersedMaskSize; // 用于绘图 50-100就可以了
             void initUiViewMask();
             void viewRectsMapToViewMask();
         private:

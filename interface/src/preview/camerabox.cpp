@@ -15,6 +15,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     savebtn = new PushButton(tr(SaveCurrentChannelSettingLabelField));
     combinebtn = new PushButton(tr(MergeField));
     capturebtn = new PushButton(tr(CaptureField));
+    stitchbtn = new PushButton(tr(StitchField));
     capturebtn->setBackGroundColor(Qt::yellow);
     setEnabled(false); // 初始没开灯不能使用
 
@@ -22,6 +23,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     blay->addStretch();
     blay->addWidget(currentchannel);
     blay->addWidget(capturebtn);
+    blay->addWidget(stitchbtn);
     blay->addWidget(combinebtn);
     blay->addWidget(savebtn);
 
@@ -35,6 +37,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     connect(savebtn,&PushButton::clicked,this,&CameraBox::onSaveBtn);
     connect(combinebtn,&PushButton::clicked,this,&CameraBox::onCombineBtn);
     connect(capturebtn,&PushButton::clicked,this,&CameraBox::photoTaking);
+    connect(stitchbtn,&PushButton::clicked,this,&CameraBox::slideStitching);
     connect(cameratool,&CameraTool::exposureChanged,this,&CameraBox::adjustCamera);
     connect(cameratool,&CameraTool::gainChanged,this,&CameraBox::adjustCamera);
     connect(cameratool,&CameraTool::brightChanged,this,&CameraBox::adjustCamera);
@@ -78,7 +81,7 @@ void CameraBox::onSaveBtn()
     auto channel = currentchannel->text().remove(ChannelFieldLabel);
     if (channel == NoneField) return;
 
-    camerainfo[channel] = saveInfo();
+    camerainfo[channel] = cameraInfo();
     emit cameraInfoChanged(camerainfo);
 }
 
@@ -114,7 +117,7 @@ void CameraBox::captureImage(const QImage &img, const QString &channel)
 void CameraBox::captureExposureGain(unsigned int exp, unsigned int gain)
 {
     {
-        LOG<<"回显值: "<<exp<<gain;
+        //LOG<<"回显值: "<<exp<<gain;
         const QSignalBlocker blocker(cameratool);
         cameratool->setExposure(exp);
         cameratool->setGain(gain);
@@ -126,7 +129,8 @@ void CameraBox::setEnabled(bool enabled)
     cameratool->setEnabled(enabled);
     savebtn->setEnabled(enabled);
     currentchannel->setEnabled(enabled);
-    capturebtn->setEnabled(enabled);
+//    capturebtn->setEnabled(enabled);
+//    stitchbtn->setEnabled(enabled);
 }
 
 void CameraBox::setChannel(int option)
@@ -157,12 +161,12 @@ void CameraBox::setChannel(int option)
     cameratool->blockSignals(false);
 }
 
-MultiCameraInfo CameraBox::cameraInfo() const
+MultiCameraInfo CameraBox::multiCameraInfo() const
 {
     return camerainfo;
 }
 
-CameraInfo CameraBox::saveInfo() const
+CameraInfo CameraBox::cameraInfo() const
 {
     CameraInfo info;
     info[BrightField] = cameratool->bright();

@@ -328,7 +328,22 @@ void WellView::dispersedViewRects()
     mTmpRectDispersedPoints[id] = mViewRectDispersedPoints[id];
 
     // 2. 获取离散电机坐标
+    auto points = getViewPoints();
+
+    // 3. 重叠一定比例映射
+    mViewMachinePoints = overlap(mViewMachinePoints,overlapRate);
+
+    LOG<<"ui count = "<<mViewRectDispersedPoints[id].count()
+    <<" mask count = "<<mViewMachinePoints.count()<<points.count();
+}
+
+QPointFVector WellView::getViewPoints() const
+{
+    auto id = holeID();
+    auto viewRects = mViewRects[id];
     QPointFVector points;
+
+    auto ref = getInnerRectTopLeftPoint();
     auto view_w = qCeil(getInnerRectWidth());
     auto view_h = qCeil(getInnerRectHeight());
     for(auto viewRect: viewRects) {
@@ -343,8 +358,8 @@ void WellView::dispersedViewRects()
         // 现在要使用view_w,view_h(1个小视野)来遍历rect,得到所有遍历后的中心坐标
         for(int x = x0; x < x0+w ; x += view_w) {
             for(int y = y0; y < y0+h; y += view_h) {
-                auto center_y = x+view_w/2.0;
-                auto center_x = y+view_h/2.0;
+                auto center_x = x+view_w/2.0;
+                auto center_y = y+view_h/2.0;
                 auto threshold = view_w*view_w/4.0+view_h*view_h/4.0;//这个可以改
                 if (true) { // 如果是标记为保存的区域,2个小矩形的中心距离小于阈值就认为是靠近,只保留原来的
                     bool hasSaved = false;
@@ -356,8 +371,8 @@ void WellView::dispersedViewRects()
                             break;
                         }
                     }
-                    if (!hasSaved) { // 如果超过阈值认为是新的要保存的小矩形
-                        points.append(QPointF(center_x,center_y));
+                    if (isValidPoint(QPointF(center_x,center_y)) &&!hasSaved) { // 如果超过阈值认为是新的要保存的小矩形
+                        points.append(QPointF(center_x-ref.x(),center_y-ref.y())); // 注意电机坐标要减去参考点
                     }
                 } else { // 如果标记为要删除的点(现在改了写法,没有移除区域了,else不会执行不需要删除)
                     QPointFVector holdPoints; // 保留的点
@@ -373,17 +388,13 @@ void WellView::dispersedViewRects()
             }
         }
     }
-
-    // 3. 离散电机坐标归一化
+    //LOG<<points;
+    // 离散电机坐标归一化
+    QPointFVector normPoints;
     for(auto pt: points) {
-        mViewMachinePoints.append(QPointF(pt.x()/(getCircleRadius()*2.0),pt.y()/(getCircleRadius()*2.0)));
+        normPoints.append(QPointF(pt.x()/(getCircleRadius()*2.0),pt.y()/(getCircleRadius()*2.0)));
     }
-
-    // 4. 重叠一定比例映射
-    mViewMachinePoints = overlap(mViewMachinePoints,overlapRate);
-
-    LOG<<"ui count = "<<mViewRectDispersedPoints[id].count()
-    <<" mask count = "<<mViewMachinePoints.count()<<points.count();
+    return normPoints;
 }
 
 void WellView::paintEvent(QPaintEvent *event)
@@ -396,10 +407,12 @@ void WellView::paintEvent(QPaintEvent *event)
     // 1. 变量准备
     auto radius = width()>=height()?height()/2.0:width()/2.0;
     auto diameter = 2.0 * radius;
-    auto p11 = getInnerRectTopLeftPoint();
-    auto p12 = getInnerRectTopRightPoint();
-    auto p21 = getInnerRectBottomLeftPoint();
-    auto p22 = getInnerRectBottomRightPoint();
+    auto topleft = getInnerRectTopLeftPoint();
+    auto topright = getInnerRectTopRightPoint();
+    auto bottomleft = getInnerRectBottomLeftPoint();
+    auto bottomright = getInnerRectBottomRightPoint();
+    auto rh = getInnerRectHeight();
+    auto rw = getInnerRectWidth();
     auto groupcolor = mViewInfo[HoleGroupColorField].toString();
     auto id = holeID();
 
@@ -409,7 +422,7 @@ void WellView::paintEvent(QPaintEvent *event)
         // 1. 直接绘制视野区域 对应wellpattern的(3.2)画法
         if (!mViewRects[id].isEmpty()) {
             for(auto viewRect: mViewRects[id]) {
-                painter.fillRect(mapToSize(viewRect,p11,diameter,diameter),groupcolor);
+                painter.fillRect(mapToSize(viewRect,topleft,diameter,diameter),groupcolor);
             }
         }
 
@@ -422,32 +435,53 @@ void WellView::paintEvent(QPaintEvent *event)
 //            painter.fillRect(mapToSize(viewRect,p11,diameter,diameter),groupcolor);
 //        }
 
-        // 3. 绘制圆,外接正方形和便于区分的灰色网格线
-        painter.drawLine(p11,p21);
-        painter.drawLine(p12,p22);
-        painter.drawLine(p11,p12);
-        painter.drawLine(p21,p22);
-        pen.setWidth(1);
+        // 3. 绘制电机坐标中心和矩形区域,方便查看是否正确
+        auto points = getViewPoints();
+        if (!points.isEmpty()) {
+            pen.setWidth(DefaultPainterPenWidth*2);
+            pen.setColor(PurpleEA3FF7);
+            painter.setPen(pen);
+            for(auto pt: points) { // 注意: 要按比例放大后加上参考点
+                painter.drawPoint(pt.x()*diameter+topleft.x(),pt.y()*diameter+topleft.y());
+            }
+
+            pen.setWidth(DefaultPainterPenWidth);
+            pen.setStyle(Qt::DashLine);
+            painter.setPen(pen);
+            for(auto pt: points) { // 注意: 要按比例放大后加上参考点
+                auto rec = QRectF(pt.x()*diameter+topleft.x()-rw/2.0,
+                                  pt.y()*diameter+topleft.y()-rh/2.0,rw,rh);
+                painter.drawRect(rec);
+            }
+        }
+
+        // 4. 绘制圆,外接正方形和便于区分的灰色网格线
+        painter.drawLine(topleft,bottomleft);
+        painter.drawLine(topright,bottomright);
+        painter.drawLine(topleft,topright);
+        painter.drawLine(bottomleft,bottomright);
+        pen.setStyle(Qt::SolidLine);
+        pen.setWidth(DefaultPainterPenWidth/2);
         pen.setColor(Qt::gray);
         painter.setPen(pen);
         auto hor_offset = getInnerRectWidth();// 绘制垂直线,2个y坐标固定
         for (int i = 1; i <= mSize-1; ++i) {
-            auto top = p11 + QPointF(i*hor_offset,0);
-            auto bottom = p21 + QPointF(i*hor_offset,0);
+            auto top = topleft + QPointF(i*hor_offset,0);
+            auto bottom = bottomleft + QPointF(i*hor_offset,0);
             painter.drawLine(top,bottom);
         }
         auto ver_offset = getInnerRectHeight();// 绘制水平线,2个x坐标固定
         for (int i = 1; i <= mSize-1; ++i){
-            auto left = p11 + QPointF(0,ver_offset*i);
-            auto right = p12 + QPointF(0,ver_offset*i);
+            auto left = topleft + QPointF(0,ver_offset*i);
+            auto right = topright + QPointF(0,ver_offset*i);
             painter.drawLine(left,right);
         }
 
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::blue);
         painter.setPen(pen);
-        // 鼠标单击生成的矩形框
-        painter.drawRect(mapToSize(mMouseRect,p11,diameter,diameter));
+        // 5.鼠标单击生成的矩形框
+        painter.drawRect(mapToSize(mMouseRect,topleft,diameter,diameter));
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
         painter.setPen(pen);
@@ -478,7 +512,7 @@ void WellView::paintEvent(QPaintEvent *event)
     pen.setColor(Qt::blue);
     painter.setPen(pen);
     if (!mDrapRectF.isEmpty()) {
-        painter.drawRect(mapToSize(mDrapRectF,p11,diameter,diameter));
+        painter.drawRect(mapToSize(mDrapRectF,topleft,diameter,diameter));
     }
     pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
     painter.setPen(pen);

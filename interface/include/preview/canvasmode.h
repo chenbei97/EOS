@@ -6,25 +6,25 @@
  * @FilePath: \EOS\interface\include\preview\cameramode.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#ifndef EOSI_CAMERAMODE_H
-#define EOSI_CAMERAMODE_H
+#ifndef EOSI_CANVASMODE_H
+#define EOSI_CANVASMODE_H
 
 #include "window.h"
 
-class INTERFACE_IMEXPORT CameraMode: public QWidget
+class INTERFACE_IMEXPORT CanvasMode: public QWidget
 {
     Q_OBJECT
 public:
-    enum cameraMode {LiveMode,PhotoMode,VideoMode};
-    explicit CameraMode(QWidget*parent= nullptr);
-    void changeMode(cameraMode mode);
+    enum canvasMode {LiveMode,PhotoMode,VideoMode};
+    explicit CanvasMode(QWidget*parent= nullptr);
+    void changeMode(canvasMode mode);
     void paintEvent(QPaintEvent*event) override;
     QSize sizeHint() const override;
     QSize  minimumSizeHint() const override;
     void mousePressEvent(QMouseEvent *event) override;
 private:
-    cameraMode cameramode = LiveMode;
+    canvasMode canvasmode = LiveMode;
 signals:
     void cameraModeChanged(int option);
 };
-#endif //EOSI_CAMERAMODE_H
+#endif //EOSI_CANVASMODE_H

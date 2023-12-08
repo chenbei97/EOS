@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-12-05 09:14:23
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-12-05 09:15:46
+ * @LastEditTime: 2023-12-07 13:36:19
  * @FilePath: \EOS\component\include\widgets\view.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -29,9 +29,10 @@ public:
     void mouseMoveEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
-    void setDisablePoint(Qt::Alignment direction,double rate);
-    void setDisablePoints(QCPointVector points, bool enable = true);
-    void setDisablePoints(bool enable = true);
+    void setDisableRect(Qt::Alignment direction,double rate);
+    void setDisableRect(double rate);
+    void setDisableRect(const QMap<Qt::Alignment,double> &map);
+    void clearDisableRect();
     QRectF getLeftDisableRect() const;
     QRectF getRightDisableRect() const;
     QRectF getTopDisableRect() const;
@@ -44,7 +45,7 @@ protected:
     double overlapRate = 0.1;
     QMap<Qt::Alignment,double> mDisableRectRates;
     QBool2DVector mDispersedMask;
-    const int mDispersedMaskSize = DefaultUiMaskSize;
+    const int mDispersedMaskSize = DefaultDispersedMaskSize;
     QPointF mMousePos;
     QRectF mMouseRect;
     QRectF mDrapRectF;
@@ -63,8 +64,8 @@ protected:
     void initDispersedMask();
     QPointF mapFromPointF(const QPointF& point) const;
     QPointF mapToPointF(const QPointF& point) const;
-    QRectF mapToSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);
-    QRectF mapFromSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h);
+    QRectF mapToSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h) const;
+    QRectF mapFromSize(const QRectF& source,const QPointF&ref_point,int ref_w,int ref_h) const;
     virtual bool checkField() const;
     double getCircleRadius() const; // 视野圆半径
     double getInnerRectWidth() const; // 小矩形区域的宽度
@@ -75,7 +76,7 @@ protected:
     QPointF getInnerRectBottomRightPoint() const;// 外接正方形右下角顶点
     QRectF getValidRect() const;
     QRectF getInnerRect() const;
-    bool isValidRect(const QPointF& point) const;
+    bool isValidPoint(const QPointF& point) const;
     bool isValidRect(const QRectF& rect) const;
 signals:
     void previewEvent(const QPointF& point);

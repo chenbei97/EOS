@@ -8,6 +8,34 @@
  */
 #include "preview.h"
 
+void Preview::stitchSlide()
+{
+    auto brand = previewtool->boxInfo(WellBoxTitle)[BrandField].toUInt();
+    if(brand == SlideIndexInBrand) {
+        canvasmode->changeMode(CanvasMode::PhotoMode);
+        photocanvas->setStrategy(PhotoCanvas::GridPixmap);
+
+        // photocanvas的边界矩形的出现和删除只和slidepattern有关,是同步的
+        Q_ASSERT(slidepattern->haveSlide() == photocanvas->hasBoundingRect());
+        if (slidepattern->haveSlide()) { // 确实选中一部分区域
+            auto points = slidepattern->viewPoints(false); // 载玻片框选区域的离散归一化中心坐标
+            photocanvas->clearGridImage(); // 清除可能的上次拼图缓存
+            // 1.逐坐标发给下位机,让其移动电机
+            for(auto pt: points) {
+
+                // 2.获取照片实现拼图效果
+                auto pix = ToupCameraPointer->capture();
+
+                // 3.phtotcanvas内部绘制网格图
+                photocanvas->appendImage(pix,pt);
+            }
+
+
+
+        }
+    }
+}
+
 void Preview::manualFocus(double val)
 { // 手动调焦,来自focusslider的信号,目前是移动滑动条时就会触发,点击2个细调按钮也会触发
     //LOG<<"focus = "<<val;
@@ -159,7 +187,6 @@ void Preview::showCapturedImage(const QImage& image)
 void Preview::takingPhoto()
 {
     auto toolinfo = previewtool->toolInfo();
-
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     int exp = current_info[ExposureField].toUInt();
     int ga = current_info[GainField].toUInt();
@@ -201,7 +228,7 @@ void Preview::takingPhoto()
        <<" 曝光和增益为 "<<exposure()<<gain();
 #endif
 
-        cameramode->changeMode(CameraMode::PhotoMode);
+        canvasmode->changeMode(CanvasMode::PhotoMode);
         photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
         photocanvas->setImage(pix);
 

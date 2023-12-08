@@ -11,9 +11,9 @@
 
 namespace obsoleteClass {
 
-    PreviewPatternInfo WellPatternV1::patternInfo() const
+    WellPatternInfo WellPatternV1::patternInfo() const
     {
-        PreviewPatternInfo info;
+        WellPatternInfo info;
 
         auto allgroups = getAllWellGroupNames();
 

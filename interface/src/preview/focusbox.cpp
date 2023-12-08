@@ -68,6 +68,14 @@ double FocusBox::focusStep() const
     return step->value();
 }
 
+FocusInfo FocusBox::focusInfo() const
+{
+    FocusInfo info;
+    info[FocusField] = QString::number(focus());
+    info[FocusStepField] = QString::number(focusStep());
+    return info;
+}
+
 void FocusBox::initLayout()
 {
     // 1. focus的2个按钮细调

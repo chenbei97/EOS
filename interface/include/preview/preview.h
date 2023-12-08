@@ -11,7 +11,7 @@
 
 #include "window.h"
 #include "previewtool.h"
-#include "cameramode.h"
+#include "canvasmode.h"
 #include "photocanvastriangle.h"
 #include "wellpattern.h"
 #include "wellview.h"
@@ -38,7 +38,7 @@ class INTERFACE_IMEXPORT Preview : public QWidget
 public:
     explicit Preview(QWidget*parent= nullptr);
     void setAppInfo(int app);// 用于appselect传递当前app信息
-    PreviewPatternInfo patternInfo() const; // WellPattern的数据
+    WellPatternInfo patternInfo() const; // WellPattern的数据
     PreviewToolInfo toolInfo() const;
 #ifdef notusetoupcamera
     bool isCameraOpen() const;
@@ -49,7 +49,7 @@ public:
 #endif
 private:
     PreviewInfo previewinfo;
-    CameraMode * cameramode;
+    CanvasMode * canvasmode;
     GroupInfo * groupinfo;
     QTimer timer;
 #ifdef uselabelcanvas
@@ -119,6 +119,7 @@ private:
     void stopVideo();
     void pauseVideo();
     void takingPhoto();
+    void stitchSlide();
     void toggleObjective(int objective,int objective_loc,int isPh);
     void adjustCamera(int exp,int gain,int br);
     void onAdjustCamera(const QString &f,const QVariant & d);

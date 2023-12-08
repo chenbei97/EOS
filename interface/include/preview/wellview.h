@@ -23,6 +23,7 @@ private:
     QMap<int,QRectFVector> mViewRects; // UI离散区域=>UI离散坐标
     QMap<int,QRectFVector> mTmpRects;
     void dispersedViewRects();
+    QPointFVector getViewPoints() const;
     // 点模式: 电机坐标=UI离散坐标
     QMap<int,QPointFVector> mViewPoints;
     QMap<int,QPointFVector> mTmpPoints;

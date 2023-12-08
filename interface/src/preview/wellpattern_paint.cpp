@@ -76,7 +76,7 @@ void WellPattern::paintEvent(QPaintEvent *event)
             //启用了鼠标事件mMousePos才会被赋值,否则是(-1,-1),所以这里不用再判断是否启用了鼠标事件
             if (mMousePos.x() == row && mMousePos.y() == col
                 && !mHoleInfo[row][col].isselected// 已绘制的点不要绘制鼠标选中高亮
-                && !mDisablePoints[row][col]) { // 置灰不可选的点不要绘制鼠标高亮
+                && !mDisableHoles[row][col]) { // 置灰不可选的点不要绘制鼠标高亮
                 path.clear();
                 path.moveTo(center);
                 path.addEllipse(center, radius * 0.75, radius * 0.75);
@@ -84,9 +84,9 @@ void WellPattern::paintEvent(QPaintEvent *event)
             }
 
             // (2) 绘制框选的所有孔
-            if (mDrapPoints[row][col]
+            if (mDrapHoles[row][col]
                 // && !mHoleInfo[row][col].isSelected //绘制拖拽临时的点,如果有已被选中的不需要再绘制,不过这样取消选中时不能绘制拖拽的点感受不好,还是恢复
-                && !mDisablePoints[row][col]) {  // 不可选的孔不允许绘制
+                && !mDisableHoles[row][col]) {  // 不可选的孔不允许绘制
                 path.clear(); //
                 path.moveTo(center);
                 path.addEllipse(center, radius * 0.75, radius * 0.75);
@@ -94,7 +94,7 @@ void WellPattern::paintEvent(QPaintEvent *event)
             }
 
             // (3) 绘制确实选中的孔和绘制孔内选中的点
-            if (mHoleInfo[row][col].isselected && !mDisablePoints[row][col]) //  绘制确定选中的点,不可选的孔不允许绘制
+            if (mHoleInfo[row][col].isselected && !mDisableHoles[row][col]) //  绘制确定选中的点,不可选的孔不允许绘制
             {
                 // (3.1) 绘制确实选中的孔
                 path.clear();
@@ -136,15 +136,15 @@ void WellPattern::paintEvent(QPaintEvent *event)
                     auto points = mHoleInfo[row][col].uipoints;
                     if (!points.isEmpty()) {
                         auto topleft = center-QPointF(radius*0.75,radius*0.75);// 圆孔内圆的外接正方形的左上角顶点
-                        if ((points.count() > mUiViewMaskSize*mUiViewMaskSize*0.2 && mrows == 16) // 384 视野上孔很小没必要做循环了,数量太多直接画个黑圆就得
-                            || (points.count() > mUiViewMaskSize*mUiViewMaskSize*0.9 && mrows == 8)) { // 96 这个可以超过9000太多时忽略掉,其他时候不卡正常绘制
+                        if ((points.count() > mDispersedMaskSize*mDispersedMaskSize*0.2 && mrows == 16) // 384 视野上孔很小没必要做循环了,数量太多直接画个黑圆就得
+                            || (points.count() > mDispersedMaskSize*mDispersedMaskSize*0.9 && mrows == 8)) { // 96 这个可以超过9000太多时忽略掉,其他时候不卡正常绘制
                             painter.fillRect(QRectF(topleft,QSizeF(radius*1.5,radius*1.5)),Qt::black);
                         } else { // 对于384和96的一些优化,因为计算量比较大,而且wellpattern的孔很小时就没有必要按点画了,点特别多时看不出来直接画区域
                             for(auto point: points) {
                                 auto x = point.x() * radius * 1.5 + topleft.x();
                                 auto y = point.y() * radius * 1.5 + topleft.y();
-                                auto w = 1.0 / mUiViewMaskSize * radius * 1.5; // viewPattern传来的坐标就是根据mViewMaskSize去缩放的
-                                auto h = 1.0 / mUiViewMaskSize * radius * 1.5; // 那么w,h也是根据这个倍数去缩放
+                                auto w = 1.0 / mDispersedMaskSize * radius * 1.5; // viewPattern传来的坐标就是根据mViewMaskSize去缩放的
+                                auto h = 1.0 / mDispersedMaskSize * radius * 1.5; // 那么w,h也是根据这个倍数去缩放
                                 painter.fillRect(QRectF(x,y,w,h),Qt::black);
                             }
                         }
@@ -169,7 +169,7 @@ void WellPattern::paintEvent(QPaintEvent *event)
             }
 
             // (4) 绘制不可选置灰的点,将其高亮颜色变为灰色,并画个x
-            if (mDisablePoints[row][col]) {
+            if (mDisableHoles[row][col]) {
                 path.clear();
                 path.moveTo(center);
                 path.addEllipse(center,radius,radius);

@@ -29,6 +29,7 @@ class INTERFACE_IMEXPORT PreviewTool : public QWidget
 public:
     explicit PreviewTool(QWidget*parent= nullptr);
     PreviewToolInfo toolInfo() const;
+    QMap<QString,QString> boxInfo(const QString& box) const;
     void importExperConfig(const QVariantMap& m);
 private:
     HistoryBox * historybox;
@@ -59,6 +60,7 @@ signals:
     void exportFilePath(const QString&path); // 导出文件配置的路径
     void importFilePath(const QString&path); // 导入文件配置的路径
     void photoTaking();// 只有camerabox的拍照会触发该信号
+    void slideStitching(); // slide下允许拼图
     void directionMove(int option); // 移动镜头
     void focusChanged(double val);
     void focusSliderPressed();

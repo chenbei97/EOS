@@ -13,7 +13,7 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     auto pen = painter.pen();
-    pen.setWidth(2);
+    pen.setWidth(DefaultPainterPenWidth);
     painter.setPen(pen);
 
     /*高频率绘图的注意事项:
@@ -23,7 +23,7 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
      * 4. 所以现在最好就是调用setImage直接传递数据,没有QVariantMap到QImage
      * 5. 使用定时器定时的刷新减少重绘频率也可以降低cpu占用
      * */
-    switch (strategy) {
+    switch (mStrategy) {
         case NoStrategy:
             break;
         case SinglePixmap:
@@ -32,20 +32,78 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
             //painter.drawPixmap(targetRect,QPixmap::fromImage(mimage));
             break;
         case GridPixmap:
-            drawGridLine(painter);
+            drawGridImage(painter);
             break;
     }
     // 绘制框
-    if (!mDrapRect.isNull()) {
-        auto pen = painter.pen();
-        pen.setColor(Qt::blue);
-        painter.setPen(pen);
-        painter.drawRect(mDrapRect);
-        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
-        painter.setPen(pen);
-    }
+//    if (!mDrapRect.isNull()) {
+//        auto pen = painter.pen();
+//        pen.setColor(Qt::blue);
+//        painter.setPen(pen);
+//        painter.drawRect(mDrapRect);
+//        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
+//        painter.setPen(pen);
+//    }
 
     event->accept();
+}
+
+void PhotoCanvas::drawGridImage(QPainter &painter)
+{
+    if (mGridSize == 0) return;
+
+    // 1. 绘制网格线
+    auto pen = painter.pen();
+    painter.drawRect(0,0,width(),height());
+    auto rw = getInnerRectWidth();
+    auto rh = getInnerRectHeight();
+    pen.setColor(Qt::darkGray);
+    pen.setWidth(1);
+    painter.setPen(pen);
+    for(int i = 0; i < mGridSize; i++) {
+        auto left = QPointF(0.0,rh) + QPointF(0.0,rh*i);
+        auto right = QPointF(width(),rh) + QPointF(width(),rh*i);
+        auto top =QPointF(rw,0.0)+QPointF(rw*i,0.0);
+        auto bottom =QPointF(rw,height())+QPointF(rw*i,height());
+        painter.drawLine(left,right);
+        painter.drawLine(top,bottom);
+    }
+
+//    // 2. 绘制图列表
+    if (!mGridImageVector.isEmpty()) {
+        for(auto gridimage: mGridImageVector) {
+            auto rect = gridimage.first;
+            auto img = gridimage.second;
+            painter.drawImage(rect,img);
+        }
+    }
+
+    // 3. 绘制图的中心和虚线框
+    if (!mGridCenterPoints.isEmpty()) {
+        pen.setColor(PurpleEA3FF7);
+        pen.setWidth(DefaultPainterPenWidth*2);
+        painter.setPen(pen);
+        for(auto pt: mGridCenterPoints) {
+            painter.drawPoint(pt);
+        }
+        pen.setStyle(Qt::DashLine);
+        pen.setWidth(DefaultPainterPenWidth);
+        painter.setPen(pen);
+        for(auto pt: mGridCenterPoints) {
+            auto rect = QRectF(pt.x()-rw/2,pt.y()-rh/2,rw,rh);
+            painter.drawRect(rect);
+        }
+    }
+
+    // 4. 绘制框线
+    pen.setStyle(Qt::DashLine);
+    pen.setColor(Qt::blue);
+    pen.setWidth(DefaultPainterPenWidth);
+    painter.setPen(pen);
+    painter.drawRect(mBoundingRect);
+    pen.setStyle(Qt::SolidLine);
+    pen.setColor(Qt::black);
+    painter.setPen(pen);
 }
 
 void PhotoCanvas::mousePressEvent(QMouseEvent *event)
@@ -85,30 +143,65 @@ void PhotoCanvas::mouseReleaseEvent(QMouseEvent *event)
 }
 
 void PhotoCanvas::setStrategy(PhotoCanvas::DrawStrategy s, const QVariantMap& m)
-{ //
+{ // 对于SinglePixmap模式快捷方法是setImage
     // 1. 初始化通用信息
-    strategy = s;
+    mStrategy = s;
     mMousePoint = {-1,-1};
     mLastPos = {-1,-1};
     mDrapRect = QRectF();
 
     // 2. 初始化xx策略需要的信息
-    mStrategyInfo = m; // 目前这个设计用不上,直接使用setImage/setData比较快捷,setImage最快捷
+    mStrategyInfo = m;
+    if (!m.isEmpty()) {
+        // paintEvent避免做QVariantMap=>QImage转换,提前转换好
+        if (mStrategy == SinglePixmap) { // 使用setData外部要传递ImageField字段
+            if(m.keys().contains(ImageField)) {
+                mimage = m[ImageField].value<QImage>()
+                        .scaled(width(),height(),
+                                Qt::KeepAspectRatio,Qt::FastTransformation);
+            }
+        } else if (mStrategy == GridPixmap){
+            if(m.keys().contains(GridSizeField)) {
+                mGridSize = m[GridSizeField].toInt();
+            }
+        }
+    }
     update();
 }
 
-void PhotoCanvas::setData(const QVariantMap &m)
+void PhotoCanvas::setGridSize(int gridsize)
 {
-    mStrategyInfo = m;
-    // paintEvent避免做QVariantMap=>QImage转换,提前转换好
-    mimage = m[ImageField].value<QImage>()
-        .scaled(width(),height(),
-        Qt::KeepAspectRatio,Qt::FastTransformation);
-    //update();
+    Q_ASSERT(mStrategy == GridPixmap);
+    mGridSize = gridsize;
+    update();
+}
+
+void PhotoCanvas::clearGridImage()
+{
+    Q_ASSERT(mStrategy == GridPixmap);
+    mGridImageVector.clear();
+    mGridCenterPoints.clear();
+    update();
+}
+
+void PhotoCanvas::appendImage(const QImage &img, const QPointF &point)
+{ // point是归一化的中心坐标
+
+    Q_ASSERT(mStrategy == GridPixmap);
+    auto w = getInnerRectWidth();
+    auto h = getInnerRectHeight();
+    auto x = point.x() * width()-w/2.0; // 中心坐标变成左上角顶点坐标
+    auto y = point.y() * height()-h/2.0;
+    auto rect = QRectF(x,y,w,h);
+    mGridImageVector.append(qMakePair(rect,img));
+    mGridCenterPoints.append(QPointF(x+w/2.0,y+h/2.0));
+    //LOG<<mGridCenterPoints.count()<<mGridImageVector.count();
+    update();
 }
 
 void PhotoCanvas::setImage(const QImage &img, int duration)
 {
+    Q_ASSERT(mStrategy == SinglePixmap);
     static long long count = 0;
     static long c = 0;
     if (count % duration == 0) { // 不能能用count % 10取非好像long会有问题
@@ -118,7 +211,7 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
         else
             mimage = QImage();
         //LOG<<count<<c;
-        //update();// 这是定时器来帮助刷新
+        update();// 这是定时器来帮助刷新
         ++c;
     }
     count++;
@@ -131,6 +224,7 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
 
 void PhotoCanvas::setImage(const QImage &img)
 {
+    Q_ASSERT(mStrategy == SinglePixmap);
     if (!img.isNull())
         mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
     else
@@ -153,10 +247,16 @@ QPixmap PhotoCanvas::pixmap() const
     return QPixmap::fromImage(mimage);
 }
 
+PhotoCanvas::DrawStrategy PhotoCanvas::strategy() const
+{
+    return mStrategy;
+}
+
 PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
 {
-    strategy = NoStrategy;
+    mStrategy = NoStrategy;
     mDrapRect = QRect();
+    mBoundingRect = QRectF();
     mMousePoint = QPoint(-1,-1);
     mLastPos = {-1,-1};
     mMouseClickColor.setAlpha(DefaultColorAlpha);
@@ -167,6 +267,22 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
     connect(&timer,&QTimer::timeout,[this]{update();});
 }
 
+void PhotoCanvas::updateRect(const QRectF &rect)
+{
+    Q_ASSERT(mStrategy == GridPixmap);
+    auto x = rect.topLeft().x() * width();
+    auto y = rect.topLeft().y() * height();
+    auto w = rect.width() * width();
+    auto h = rect.height() * height();
+    mBoundingRect = QRectF(x,y,w,h);
+    update();
+}
+
+bool PhotoCanvas::hasBoundingRect() const
+{
+    return !mBoundingRect.isEmpty();
+}
+
 void PhotoCanvas::optimizePaint(int ms)
 {
     timer.start(ms);
@@ -175,23 +291,6 @@ void PhotoCanvas::optimizePaint(int ms)
 void PhotoCanvas::stopOptimizePaint()
 {
     timer.stop();
-}
-
-void PhotoCanvas::drawGridLine(QPainter &painter)
-{
-    mGridSize = 10;
-    if (mGridSize == 0) return;
-    painter.drawRect(0,0,width(),height());
-    auto rw = getInnerRectWidth();
-    auto rh = getInnerRectHeight();
-    for(int i = 0; i < mGridSize; i++) {
-        auto left = QPointF(0.0,rh) + QPointF(0.0,rh*i);
-        auto right = QPointF(width(),rh) + QPointF(width(),rh*i);
-        auto top =QPointF(rw,0.0)+QPointF(rw*i,0.0);
-        auto bottom =QPointF(rw,height())+QPointF(rw*i,height());
-        painter.drawLine(left,right);
-        painter.drawLine(top,bottom);
-    }
 }
 
 double PhotoCanvas::getInnerRectWidth() const

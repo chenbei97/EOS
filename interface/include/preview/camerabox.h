@@ -47,13 +47,14 @@ public:
     void captureExposureGain(unsigned exp,unsigned gain);
     void setEnabled(bool enabled);
     void setChannel(int option);
-    MultiCameraInfo cameraInfo() const;
-    CameraInfo saveInfo() const;
+    MultiCameraInfo multiCameraInfo() const;
+    CameraInfo cameraInfo() const;
 private:
     CameraTool * cameratool;
     Label * currentchannel;
     PushButton * savebtn;
     PushButton * capturebtn;
+    PushButton * stitchbtn;
     PushButton * combinebtn;
     MultiCameraInfo camerainfo;
     ChannelImageInfo imageinfo;
@@ -64,6 +65,7 @@ private slots:
 signals:
     void cameraInfoChanged(const MultiCameraInfo &);
     void photoTaking();
+    void slideStitching();
     void cameraAdjusted(int exposure,int gain, int bright);
 };
 #endif //EOSI_CAMERABOX_H

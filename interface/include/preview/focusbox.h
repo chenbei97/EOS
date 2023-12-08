@@ -20,6 +20,7 @@ public:
     void setEnabled(bool enabled);
     double focus() const;
     double focusStep() const;
+    FocusInfo focusInfo() const;
 private:
     void initObjects();
     void initAttributes();

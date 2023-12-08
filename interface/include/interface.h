@@ -18,7 +18,7 @@
 #include "toupcamera.h"
 
 #include "preview.h"
-#include "cameramode.h"
+#include "canvasmode.h"
 #include "recordbox.h"
 #include "wellview.h"
 #include "wellpattern.h"

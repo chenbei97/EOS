@@ -44,6 +44,7 @@ static const QFieldList Brand3Fields = {
 static const QFieldList Brand4Fields = {
         "brand4_6","brand4_24","brand4_96","brand4_384","slide"
 };
+static const int SlideIndexInBrand = 4;
 enum class ManufacturerType {
     Manufacturer1 = 0,
     Manufacturer2 = 1,

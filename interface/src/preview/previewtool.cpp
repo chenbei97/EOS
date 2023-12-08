@@ -44,6 +44,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(objectivebox,&ObjectiveBox::objectiveToggled,this,&PreviewTool::objectiveToggled);
     connect(camerabox,&CameraBox::cameraInfoChanged,this,&PreviewTool::cameraInfoChanged);
     connect(camerabox,&CameraBox::photoTaking,this,&PreviewTool::photoTaking);
+    connect(camerabox,&CameraBox::slideStitching,this,&PreviewTool::slideStitching);
     connect(camerabox,&CameraBox::cameraAdjusted,this,&PreviewTool::cameraAdjusted);
     connect(channelbox,&ChannelBoxx::channelChanged,this,&PreviewTool::channelChanged);
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
@@ -78,6 +79,31 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
 #endif
 }
 
+QMap<QString,QString> PreviewTool::boxInfo(const QString &box) const
+{
+    QMap<QString,QString> info;
+
+    if (box == WellBoxTitle) {
+        return wellbox->wellInfo();
+    } else if (box == ObjectiveBoxTitle) {
+        return objectivebox->objectiveInfo();
+    } else if (box == ChannelBoxTitle) {
+        return channelbox->channelInfo();
+    } else if (box == CameraBoxTitle) {
+        return camerabox->cameraInfo(); // 注意: 这里只提供当前Ui的信息而不是5个通道的
+    } else if (box == FocusBoxTitle) {
+        return focusbox->focusInfo();
+    } else if (box == OtherBoxField) {
+        return zstackbox->zstackInfo();
+    } else if (box == RecordBoxTitle) {
+        return recordbox->recordInfo();
+    } else if (box == ExperimentBoxTitle) {
+        return timebox->timeInfo();
+    }
+
+    return info;
+}
+
 PreviewToolInfo PreviewTool::toolInfo() const
 {
     PreviewToolInfo info;
@@ -102,8 +128,8 @@ PreviewToolInfo PreviewTool::toolInfo() const
     info[CurrentChannelField] = channelinfo[CurrentChannelField]; // 实际字符串BR,PH,如果都没开灯是空字符串
 
     // 4. camerainfo,分不同通道,保存了gain,exposure,bright
-    auto camerainfo = camerabox->cameraInfo();
-    info[CurrentInfoField].setValue(camerabox->saveInfo());
+    auto camerainfo = camerabox->multiCameraInfo();
+    info[CurrentInfoField].setValue(camerabox->cameraInfo());
 
     QStringList channels;//所有保存过相机配置的通道
     if (!camerainfo.isEmpty()) { // 有保存过的通道参数

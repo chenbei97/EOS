@@ -40,10 +40,17 @@ void Preview::toggleManufacturer(int option)
 }
 
 void Preview::toggleStack(int option) 
-{
+{ // 切换孔板和载玻片,0-plate,1-slide
     stackpattern->setCurrentIndex(option);
     stackview->setCurrentIndex(option);
-    if (option) dock->setFloating(false);
+    if (option) {
+        dock->setFloating(false);
+        canvasmode->changeMode(CanvasMode::PhotoMode);
+        photocanvas->setStrategy(PhotoCanvas::GridPixmap);
+    } else {
+        canvasmode->changeMode(CanvasMode::LiveMode);
+        photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
+    }
 }
 
 void Preview::toggleBrand(int option)
@@ -61,11 +68,11 @@ void Preview::toggleBrand(int option)
         case 3:
             wellpattern->setPatternSize(16,24);
             break;
-        case 4:
+        case SlideIndexInBrand:
             break;
     }
 
-    if (option == 4) { // 切换到slide会发现这里其实还是well
+    if (option == SlideIndexInBrand) { // 切换到slide会发现这里其实还是well
         stackpattern->setCurrentWidget(slidepattern);
         stackview->setCurrentWidget(slideview);
     } else {
@@ -99,21 +106,24 @@ void Preview::toggleBrand(int option)
         // 5. 对NA物镜的特殊处理放最后,因为viewpattern->clearAllViewWindowCache被调用在前
         auto objective_descrip = toolinfo[ObjectiveDescripField].toString();
         if (objective_descrip == NA40x095Field) { // 只能选择1个孔
-            wellpattern->setDisablePoints();
-            wellpattern->setDisablePoint(QPoint(0,0),false);//默认只允许(0,0)可选
+            wellpattern->setDisableHoles();
+            wellpattern->setDisableHole(QPoint(0,0),false);//默认只允许(0,0)可选
         } else {
-            wellpattern->setDisablePoints(false);
+            wellpattern->setDisableHoles(false);
         }
         if (objective_descrip == NA20x05Field)
-            wellview->setDisablePoints(NA20x05DisablePoints);
+            wellview->setDisableRect(0.1);
         else if (objective_descrip == NA20x08Field)
-            wellview->setDisablePoints(NA20x08DisablePoints);
-        else wellview->setDisablePoints(false);
-    } else if (stackpattern->currentWidget() == slidepattern) {
-
+            wellview->setDisableRect(0.2);
+        else wellview->clearDisableRect();
+    }
+    else if (stackpattern->currentWidget() == slidepattern) {
         Q_ASSERT(stackview->currentWidget() == slideview);
         slideview->updateSize(size);
         slidepattern->updateSize(size);
+        photocanvas->setStrategy(PhotoCanvas::GridPixmap);
+        photocanvas->setGridSize(size);
+        photocanvas->clearGridImage();
     }
 }
 
@@ -138,29 +148,36 @@ void Preview::onObjectiveChanged(const QString& obj)
     auto oldViewSize = wellview->viewInfo()[HoleViewSizeField].toInt();
 
     if (oldViewSize != size) { // 如果视野尺寸前后没发生变化,不需要清理
-        LOG<<"切换物镜前视野尺寸: "<<oldViewSize<<" 切换物镜后尺寸: "<<size<<" 需要清理";
+        LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" need clear";
         wellview->toggleBrandObjective(size,true); // 清理ViewPattern
-        dock->setWindowTitle(tr("Select Hole Inside View"));
-        wellpattern->clearAllHoleViewPoints();// 只需要孔关于视野的信息,其它保留
+        dock->setWindowTitle(tr(PreviewDockHoleTitle));
+        wellpattern->clearViewInfo();// 只需要孔关于视野的信息,其它保留
     } else {
-        LOG<<"切换物镜前视野尺寸: "<<oldViewSize<<" 切换物镜后尺寸: "<<size<<" 无需清理";
+        LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" not clear";
     }
 
     // 3. 对NA物镜的特殊处理要放在最后,因为上边的代码viewpattern->clearAllViewWindowCache会重新初始化视野尺寸
     if (obj == NA40x095Field) { // 只能选择1个孔
-        wellpattern->setDisablePoints();
-        wellpattern->setDisablePoint(QPoint(0,0),false);//默认只允许(0,0)可选
-    } else  wellpattern->setDisablePoints(false);
+        wellpattern->setDisableHoles();
+        wellpattern->setDisableHole(QPoint(0,0),false);//默认只允许(0,0)可选
+    } else  wellpattern->setDisableHoles(false);
 
     if (obj == NA20x05Field)
-        wellview->setDisablePoints(NA20x05DisablePoints);
+        wellview->setDisableRect(0.1);
     else if (obj == NA20x08Field)
-        wellview->setDisablePoints(NA20x08DisablePoints);
-    else wellview->setDisablePoints(false);
+        wellview->setDisableRect(0.2);
+    else wellview->clearDisableRect();
     
     // (2) 更新slidepattern
     slideview->updateSize(size);
     slidepattern->updateSize(size);
+
+    // (3) 对于slide而言photocanvas的拼图模式不同,在网格策略下需要更新尺寸
+    if (photocanvas->strategy() == PhotoCanvas::GridPixmap)
+    {
+        photocanvas->setGridSize(size);
+        photocanvas->clearGridImage();
+    }
 }
 
 // 打开wellview
@@ -197,14 +214,14 @@ void Preview::openWellViewWindow(const QVariantMap& m)
 
     if (holepoint != QPoint(-1,-1))
         wellview->setViewInfo(nm);
-//
-//    // 6. 对NA物镜的特殊处理要放在最后,setStrategy会重新初始化视野尺寸
-//    auto objective_descrip = toolinfo[ObjectiveDescripField].toString();
-//    if (objective_descrip == NA20x05Field)
-//        wellview->setDisablePoints(NA20x05DisablePoints);
-//    else if (objective_descrip == NA20x08Field)
-//        wellview->setDisablePoints(NA20x08DisablePoints);
-//    else wellview->setDisablePoints(false);
+
+    // 6. 对NA物镜的特殊处理要放在最后,setViewInfo会重新初始化视野尺寸
+    auto objective_descrip = toolinfo[ObjectiveDescripField].toString();
+    if (objective_descrip == NA20x05Field)
+        wellview->setDisableRect(0.1);
+    else if (objective_descrip == NA20x08Field)
+        wellview->setDisableRect(0.2);
+    else wellview->clearDisableRect();
 }
 
 // 打开slideview
@@ -227,7 +244,7 @@ void Preview::openWellGroupWindow(const QVariantMap &m)
     // 2. 分组窗口设置的组信息去更新孔的数据
     int ret = groupinfo->exec();
     if (ret == QDialog::Accepted) {
-        wellpattern->updateHoleInfoByGroupInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
+        wellpattern->updateHoleInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
     }
 }
 
@@ -236,7 +253,7 @@ void Preview::setAppInfo(int app)
     previewinfo[AppSelectField] = QString::number(app);
 }
 
-PreviewPatternInfo Preview::patternInfo() const
+WellPatternInfo Preview::patternInfo() const
 {
     return wellpattern->patternInfo();
 }
@@ -249,7 +266,7 @@ PreviewToolInfo Preview::toolInfo() const
 void Preview::playVideo(const QString& path)
 {
     LOG<<"video path = "<<path;
-    cameramode->changeMode(CameraMode::VideoMode);
+    canvasmode->changeMode(CanvasMode::VideoMode);
     if (path.isEmpty()) return;
 
     videocanvas->setMedia(path);
@@ -258,13 +275,13 @@ void Preview::playVideo(const QString& path)
 
 void Preview::stopVideo()
 {
-    cameramode->changeMode(CameraMode::VideoMode);
+    canvasmode->changeMode(CanvasMode::VideoMode);
     videocanvas->stop();
 }
 
 void Preview::pauseVideo()
 {
-    cameramode->changeMode(CameraMode::VideoMode);
+    canvasmode->changeMode(CanvasMode::VideoMode);
     videocanvas->pause();
 }
 
@@ -287,7 +304,7 @@ void Preview::initLayout()
 
     // 2.左侧布局
     auto llay = new QVBoxLayout;
-    llay->addWidget(cameramode);
+    llay->addWidget(canvasmode);
     llay->addWidget(stackcanvas);
     auto lbox = new GroupBox;
     lbox->setLayout(llay);
@@ -307,8 +324,7 @@ void Preview::initLayout()
 
 void Preview::initAttributes()
 {
-    //photocanvas->setStrategy(PhotoCanvas::SinglePixmap);// 默认单图模式
-    photocanvas->setStrategy(PhotoCanvas::GridPixmap);
+    photocanvas->setStrategy(PhotoCanvas::SinglePixmap);// 默认单图模式
 #ifdef uselabelcanvas
     livecanvas->setAlignment(Qt::AlignCenter);
     livecanvas->setScaledContents(true);
@@ -341,7 +357,7 @@ void Preview::initAttributes()
 
 void Preview::initObjects()
 {
-    cameramode = new CameraMode;
+    canvasmode = new CanvasMode;
     groupinfo = new GroupInfo;
 
 #ifdef uselabelcanvas
@@ -386,6 +402,7 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::pauseVideo,this,&Preview::pauseVideo);
     connect(previewtool,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
     connect(previewtool,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
+    connect(previewtool,&PreviewTool::slideStitching,this,&Preview::stitchSlide);
     connect(previewtool,&PreviewTool::directionMove,this,&Preview::adjustLens);
     connect(previewtool,&PreviewTool::focusChanged,this,&Preview::manualFocus);
     connect(previewtool,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
@@ -402,7 +419,7 @@ void Preview::initConnections()
 #endif
 
     // (2) preview内部信号-槽函数
-    connect(cameramode,&CameraMode::cameraModeChanged,this,[=](int option){stackcanvas->setCurrentIndex(option);});
+    connect(canvasmode,&CanvasMode::cameraModeChanged,this,[=](int option){stackcanvas->setCurrentIndex(option);});
 #ifdef uselabelcanvas
     connect(livecanvas,&LabelTriangle::triangleClicked,this,&Preview::adjustLens);
 #else
@@ -415,6 +432,7 @@ void Preview::initConnections()
     connect(wellpattern,&WellPattern::removeHole,wellview,&WellView::removeHole);//删孔时清除该孔的缓存信息
     //connect(slidepattern,&SlidePattern::doubleClicked,this,&Preview::openSlideViewWindow);
     connect(slidepattern,&SlidePattern::rectUpdated,slideview,&SlidePattern::updateRect);
+    connect(slidepattern,&SlidePattern::normRectUpdated,photocanvas,&PhotoCanvas::updateRect);
 
     connect(wellview,&WellView::applyHoleEvent,wellpattern,&WellPattern::applyHoleEvent);//删点或者保存点就应用到本孔
     connect(wellview,&WellView::applyGroupEvent,wellpattern,&WellPattern::applyGroupEvent); // 按组更新孔窗口的信息

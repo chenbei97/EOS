@@ -30,7 +30,7 @@ void WellPattern::onSetGroupAct()
 }
 
 // (2) 被分组对话框的信息反过来更新孔信息
-void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
+void WellPattern::updateHoleInfo(QCVariantMap m)
 {
     // 1. 更新分组对话框提供的信息
     auto gtype = m[HoleExperTypeField].toString();
@@ -43,8 +43,8 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
 
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col){
-            auto pt = mDrapPoints[row][col]; // 右击分组时当前拖拽区域内的点是一组
-            if (pt && !mDisablePoints[row][col]){ // 是拖拽区域的(拖拽区域已经不会包含置灰的不可选的孔,mouseMoveEvent已经对其限制),不过多一层保护没坏处
+            auto pt = mDrapHoles[row][col]; // 右击分组时当前拖拽区域内的点是一组
+            if (pt && !mDisableHoles[row][col]){ // 是拖拽区域的(拖拽区域已经不会包含置灰的不可选的孔,mouseMoveEvent已经对其限制),不过多一层保护没坏处
                 mHoleInfo[row][col].isselected = true;//框选内对应的点都设为选中
                 mHoleInfo[row][col].group = gname; // 名称是分组窗口设置的分组
                 mHoleInfo[row][col].color = gcolor; // 颜色跟随分组窗口设置的颜色
@@ -53,7 +53,7 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
                 mHoleInfo[row][col].medicine = medicine; // 本孔分配的样品
                 mHoleInfo[row][col].dose = dose; // 本孔分配的剂量
                 mHoleInfo[row][col].doseunit = unit; // 本孔分配的剂量单位
-                mDrapPoints[row][col] = false; // 拖拽区域内的点也要更新为false,不然还会绘制这个区域
+                mDrapHoles[row][col] = false; // 拖拽区域内的点也要更新为false,不然还会绘制这个区域
 
                 // 视野的2个信息无需更新,只更新分组对话框提供的信息
                 //mHoleInfo[row][col].viewpoints = QPointVector(); //每次分组就把视野坐标信息要清除掉
@@ -64,7 +64,7 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
     }
 
     // 2. 框选的时候会遗漏鼠标当前选中的点
-    if (mMousePos != QPoint(-1,-1) && !mDisablePoints[mMousePos.x()][mMousePos.y()]) {// 没启用鼠标事件或者点击外围,这是{-1,-1}会越界
+    if (mMousePos != QPoint(-1,-1) && !mDisableHoles[mMousePos.x()][mMousePos.y()]) {// 没启用鼠标事件或者点击外围,这是{-1,-1}会越界
         // 注意2个判断先后顺序,如果是-1,-1就返回了,编译器不会执行后边的判断也就不会越界
         mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = true; // 鼠标点击的这个
         mHoleInfo[mMousePos.x()][mMousePos.y()].color = gcolor;
@@ -74,14 +74,14 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
         mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = medicine; // 本孔分配的样品
         mHoleInfo[mMousePos.x()][mMousePos.y()].dose = dose; // 本孔分配的剂量
         mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = unit; // 本孔分配的剂量单位
-        mDrapPoints[mMousePos.x()][mMousePos.y()] = false;
+        mDrapHoles[mMousePos.x()][mMousePos.y()] = false;
         //mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointVector();
         //mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = QSize(-1,-1);
         //emit clearViewWindowCache(mMousePos);
     }
 
     // 3. 更新已有的组信息(要在上边的group更新过以后再重新计算)
-    auto gnames = getAllWellGroupNames();//有可能分了a,b组,b改名a,只有a了,所以要总是重新根据group算
+    auto gnames = getAllGroups();//有可能分了a,b组,b改名a,只有a了,所以要总是重新根据group算
     //LOG<<"current well all groups = "<<gnames;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
@@ -91,7 +91,7 @@ void WellPattern::updateHoleInfoByGroupInfo(QCVariantMap m)
     mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = gnames;
 
     // 4. 更新已有的所有选中的孔信息
-    auto holes = getAllWellHoleCoordinates();// 所有按组得到的二维孔向量
+    auto holes = getAllHoles();// 所有按组得到的二维孔向量
     //LOG<<"current well all coordinates = "<<holes;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
@@ -113,10 +113,10 @@ void WellPattern::onOpenViewAct()
         m[HoleGroupNameField] = mHoleInfo[mMousePos.x()][mMousePos.y()].group; // 所在组
         m[HoleGroupColorField] = mHoleInfo[mMousePos.x()][mMousePos.y()].color; // 组的颜色
         // 所有组只在打开分组对话框更新,但可能没打开分组对话框此时allgroup就没有被赋值会出现错误 在204行的设定可能会错误
-        mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = getAllWellGroupNames();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = getAllGroups();
         m[WellAllGroupsField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup); // 已有的所有组(每次设置分组信息时会更新)
-        m[HoleGroupCoordinatesField].setValue(getHoleGroupCoordinates(mHoleInfo[mMousePos.x()][mMousePos.y()].group));
-        mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = getAllWellHoleCoordinates();
+        m[HoleGroupCoordinatesField].setValue(getGroupHoles(mHoleInfo[mMousePos.x()][mMousePos.y()].group));
+        mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = getAllHoles();
         m[WellAllHolesField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate);
         //LOG<<"well send info to view is "<<m[HoleGroupNameField].toString()<<m[HoleGroupColorField].toString();//ViewPattern::setStrategy接收
         emit openWellViewWindow(m);
@@ -205,7 +205,7 @@ void WellPattern::applyAllEvent(QCVariantMap m)
     //切物镜时
     //LOG<<allcoordinates;
     //LOG<<getAllWellHoleCoordinates();
-    Q_ASSERT(allcoordinates == getAllWellHoleCoordinates());
+    Q_ASSERT(allcoordinates == getAllHoles());
 
     foreach(auto holes, allcoordinates) {
         foreach(auto hole, holes) {
