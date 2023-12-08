@@ -23,9 +23,9 @@ namespace obsoleteClass {
 
         // 颜色+当前孔坐标+当前视野尺寸 无需清理（以下代码其实不清理也行,wellpattern删孔逻辑内重新触发了openviewwindow刷新了）
         mViewInfo[HoleGroupNameField] = "";
-        mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
+        mViewInfo[HoleAllGroupsField].setValue(QPoint2DVector());
         mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
-        mViewInfo[WellAllGroupsField].setValue(QSet<QString>());
+        mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
         mViewInfo[HoleViewRectsField].setValue(QRectFVector());
         mViewInfo[HoleViewUiPointsField].setValue(ViewPointVector());
         mViewInfo[HoleViewPointsField].setValue(ViewPointVector());
@@ -60,13 +60,13 @@ namespace obsoleteClass {
         if (!toggleObjective) {
             mViewInfo[HoleGroupColorField] = QColor(Qt::red);
             mViewInfo[HoleGroupNameField] = "";
-            mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
+            mViewInfo[HoleAllGroupsField].setValue(QPoint2DVector());
             mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
-            mViewInfo[WellAllGroupsField].setValue(QSet<QString>());
+            mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
         }
 
         //m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
-        //m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
+        //m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有组名信息顺带组装
         // HoleGroupCoordinatesField 该组的所有孔坐标不组装
         mSize = viewSize;
         update();
@@ -79,8 +79,8 @@ namespace obsoleteClass {
         mViewInfo[HoleGroupColorField] = QColor(Qt::red);
 
         mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
-        mViewInfo[WellAllGroupsField].setValue(QSet<QString>());
-        mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
+        mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
+        mViewInfo[HoleAllGroupsField].setValue(QPoint2DVector());
 
         mViewInfo[HoleViewSizeField] = viewSize;
         mViewInfo[HoleViewRectsField].setValue(QRectFVector());
@@ -139,13 +139,13 @@ namespace obsoleteClass {
         m[HoleViewPointsField].setValue(mViewMaskNormPoints);
         m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以把所有组颜色统一(可能没分过组默认颜色红色,无所谓)
         m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名信息(应用到所有组时只有同组的组颜色需要覆盖)
-        m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
+        m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有选择的孔坐标信息顺带组装
         //m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
-        //m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
+        //m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有组名信息顺带组装
         // HoleGroupCoordinatesField 该组的所有孔坐标不组装
         emit applyAllEvent(m);// 5个信息足够
 
-        auto allholes = mViewInfo[WellAllHolesField].value<QPoint2DVector>();//拿到所有分过组的孔坐标
+        auto allholes = mViewInfo[HoleAllGroupsField].value<QPoint2DVector>();//拿到所有分过组的孔坐标
                 foreach(auto holes, allholes) {
                         foreach (auto hole, holes) {
                         auto pt_idx = hole.x()*PointToIDCoefficient+hole.y(); // 所有其他孔的临时数据区更新为当前孔的视野信息
@@ -169,8 +169,8 @@ namespace obsoleteClass {
         m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名称,方便pattern依据组名查找所有孔
         m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
         m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
-        m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
-        m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
+        m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有组名信息顺带组装
+        m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有选择的孔坐标信息顺带组装
         m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
         // HoleGroupCoordinatesField 该组的所有孔坐标不组装
         m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
@@ -200,8 +200,8 @@ namespace obsoleteClass {
         m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名称,方便pattern依据组名查找所有孔
         m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
         m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
-        m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
-        m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
+        m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有组名信息顺带组装
+        m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有选择的孔坐标信息顺带组装
         m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
         // HoleGroupCoordinatesField 该组的所有孔坐标不组装
         m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息

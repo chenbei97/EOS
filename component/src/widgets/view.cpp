@@ -431,9 +431,9 @@ bool View::checkField() const
 
     bool r1 = fields.contains(HoleGroupNameField); // 组名称
     bool r2 = fields.contains(HoleGroupColorField);// 组颜色
-    bool r3 = fields.contains(WellAllGroupsField); // 所有组名
+    bool r3 = fields.contains(HoleAllGroupsField); // 所有组名
     bool r4 = fields.contains(HoleCoordinateField); // 当前孔坐标
-    bool r5 = fields.contains(WellAllHolesField); // 所有孔坐标
+    bool r5 = fields.contains(HoleAllCoordinatesField); // 所有孔坐标
     bool r6 = fields.contains(HoleGroupCoordinatesField); // 本组的所有孔坐标
     bool r7 = fields.contains(HoleViewSizeField);// 视野内部划分尺寸
     bool r8 = fields.contains(HoleViewRectsField); // 视野区域

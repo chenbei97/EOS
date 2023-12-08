@@ -24,9 +24,9 @@ void WellView::removeHole(const QPoint &holePoint)
 
     // 颜色+当前孔坐标+当前视野尺寸 无需清理（以下代码其实不清理也行,wellpattern删孔逻辑内重新触发了openviewwindow刷新了）
     mViewInfo[HoleGroupNameField] = "";
-    mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
+    mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
     mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
-    mViewInfo[WellAllGroupsField].setValue(QSet<QString>());
+    mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
     mViewInfo[HoleViewRectsField].setValue(QRectFVector());
     mViewInfo[HoleViewUiPointsField].setValue(QPointFVector());
     mViewInfo[HoleViewPointsField].setValue(QPointFVector());
@@ -64,13 +64,13 @@ void WellView::toggleBrandObjective(int viewSize,bool toggleObjective)
     if (!toggleObjective) {
         mViewInfo[HoleGroupColorField] = QColor(Qt::red);
         mViewInfo[HoleGroupNameField] = "";
-        mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
+        mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
         mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
-        mViewInfo[WellAllGroupsField].setValue(QSet<QString>());
+        mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
     }
 
     //m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
-    //m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
+    //m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有组名信息顺带组装
     // HoleGroupCoordinatesField 该组的所有孔坐标不组装
     mSize = viewSize;
     update();
@@ -83,8 +83,8 @@ void WellView::importViewInfo(QCPoint holePoint, QCPointFVector viewPoints,int v
     mViewInfo[HoleGroupColorField] = QColor(Qt::red);
 
     mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
-    mViewInfo[WellAllGroupsField].setValue(QSet<QString>());
-    mViewInfo[WellAllHolesField].setValue(QPoint2DVector());
+    mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
+    mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
 
     mViewInfo[HoleViewSizeField] = viewSize;
     mViewInfo[HoleViewRectsField].setValue(QRectFVector());
@@ -142,13 +142,13 @@ void WellView::onApplyAllAct()
     m[HoleViewPointsField].setValue(mViewMachinePoints);
     m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以把所有组颜色统一(可能没分过组默认颜色红色,无所谓)
     m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名信息(应用到所有组时只有同组的组颜色需要覆盖)
-    m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
+    m[HoleAllCoordinatesField] = mViewInfo[HoleAllCoordinatesField]; // 孔板所有选择的孔坐标信息顺带组装
     //m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
-    //m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
+    //m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有组名信息顺带组装
     // HoleGroupCoordinatesField 该组的所有孔坐标不组装
     emit applyAllEvent(m);// 5个信息足够
 
-    auto allholes = mViewInfo[WellAllHolesField].value<QPoint2DVector>();//拿到所有分过组的孔坐标
+    auto allholes = mViewInfo[HoleAllCoordinatesField].value<QPoint2DVector>();//拿到所有分过组的孔坐标
     foreach(auto holes, allholes) {
         foreach (auto hole, holes) {
             auto pt_idx = holeID(hole);// 所有其他孔的临时数据区更新为当前孔的视野信息
@@ -178,8 +178,8 @@ void WellView::onApplyGroupAct()
     m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名称,方便pattern依据组名查找所有孔
     m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
     m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
-    m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
-    m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
+    m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有组名信息顺带组装
+    m[HoleAllCoordinatesField] = mViewInfo[HoleAllCoordinatesField]; // 孔板所有选择的孔坐标信息顺带组装
     m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
     // HoleGroupCoordinatesField 该组的所有孔坐标不组装
     if (mSelectMode == RectMode) {
@@ -217,8 +217,8 @@ void WellView::onApplyHoleAct()
     m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名称,方便pattern依据组名查找所有孔
     m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
     m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
-    m[WellAllGroupsField] = mViewInfo[WellAllGroupsField]; // 孔板所有组名信息顺带组装
-    m[WellAllHolesField] = mViewInfo[WellAllHolesField]; // 孔板所有选择的孔坐标信息顺带组装
+    m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有组名信息顺带组装
+    m[HoleAllCoordinatesField] = mViewInfo[HoleAllCoordinatesField]; // 孔板所有选择的孔坐标信息顺带组装
     m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
     // HoleGroupCoordinatesField 该组的所有孔坐标不组装
     if (mSelectMode == RectMode) {
@@ -331,7 +331,7 @@ void WellView::dispersedViewRects()
     auto points = getViewPoints();
 
     // 3. 重叠一定比例映射
-    mViewMachinePoints = overlap(mViewMachinePoints,overlapRate);
+    mViewMachinePoints = overlap(points,overlapRate);
 
     LOG<<"ui count = "<<mViewRectDispersedPoints[id].count()
     <<" mask count = "<<mViewMachinePoints.count()<<points.count();
@@ -360,31 +360,36 @@ QPointFVector WellView::getViewPoints() const
             for(int y = y0; y < y0+h; y += view_h) {
                 auto center_x = x+view_w/2.0;
                 auto center_y = y+view_h/2.0;
-                auto threshold = view_w*view_w/4.0+view_h*view_h/4.0;//这个可以改
-                if (true) { // 如果是标记为保存的区域,2个小矩形的中心距离小于阈值就认为是靠近,只保留原来的
-                    bool hasSaved = false;
-                    for(int i = 0; i < points.count(); ++i) {
-                        auto pt = points[i];
-                        if ((pt.x()-center_x)*(pt.x()-center_x) + (pt.y()-center_y)*(pt.y()-center_y)<threshold) {
-                            // 如果 2个点的距离没有超过指定阈值,认为要保存的这个点已经被保存过了
-                            hasSaved = true;
-                            break;
-                        }
-                    }
-                    if (isValidPoint(QPointF(center_x,center_y)) &&!hasSaved) { // 如果超过阈值认为是新的要保存的小矩形
-                        points.append(QPointF(center_x-ref.x(),center_y-ref.y())); // 注意电机坐标要减去参考点
-                    }
-                } else { // 如果标记为要删除的点(现在改了写法,没有移除区域了,else不会执行不需要删除)
-                    QPointFVector holdPoints; // 保留的点
-                    for(int i = 0; i < points.count(); ++i) {
-                        auto pt = points[i];
-                        if (!((pt.x()-center_x)*(pt.x()-center_x) + (pt.y()-center_y)*(pt.y()-center_y)<threshold)) {
-                            // 如果 2个矩形中心的距离没有超过指定阈值,认为要删除这个中心点,取反也就是中心仍然要保留
-                            holdPoints.append(pt);
-                        }
-                    }
-                    points = holdPoints; // 覆盖更新
+
+                if (isValidPoint(QPointF(center_x,center_y))) { // 如果超过阈值认为是新的要保存的小矩形
+                    points.append(QPointF(center_x-ref.x(),center_y-ref.y())); // 注意电机坐标要减去参考点
                 }
+
+//                auto threshold = view_w*view_w/4.0+view_h*view_h/4.0;//这个可以改
+//                if (true) { // 如果是标记为保存的区域,2个小矩形的中心距离小于阈值就认为是靠近,只保留原来的
+//                    bool hasSaved = false;
+//                    for(int i = 0; i < points.count(); ++i) {
+//                        auto pt = points[i];
+//                        if ((pt.x()-center_x)*(pt.x()-center_x) + (pt.y()-center_y)*(pt.y()-center_y)<threshold) {
+//                            // 如果 2个点的距离没有超过指定阈值,认为要保存的这个点已经被保存过了
+//                            hasSaved = true;
+//                            break;
+//                        }
+//                    }
+//                    if (isValidPoint(QPointF(center_x,center_y)) && !hasSaved) { // 如果超过阈值认为是新的要保存的小矩形
+//                        points.append(QPointF(center_x-ref.x(),center_y-ref.y())); // 注意电机坐标要减去参考点
+//                    }
+//                } else { // 如果标记为要删除的点(现在改了写法,没有移除区域了,else不会执行不需要删除)
+//                    QPointFVector holdPoints; // 保留的点
+//                    for(int i = 0; i < points.count(); ++i) {
+//                        auto pt = points[i];
+//                        if (!((pt.x()-center_x)*(pt.x()-center_x) + (pt.y()-center_y)*(pt.y()-center_y)<threshold)) {
+//                            // 如果 2个矩形中心的距离没有超过指定阈值,认为要删除这个中心点,取反也就是中心仍然要保留
+//                            holdPoints.append(pt);
+//                        }
+//                    }
+//                    points = holdPoints; // 覆盖更新
+//                }
             }
         }
     }
@@ -419,7 +424,7 @@ void WellView::paintEvent(QPaintEvent *event)
     // 2. 绘制选中的区域,区域模式绘制区域,点模式绘制点
     if (mSelectMode == RectMode) { // 区域模式
         // 以下2种绘制法都可以,和wellpattern绘制对应,wellpattern也是2种绘制法
-        // 1. 直接绘制视野区域 对应wellpattern的(3.2)画法
+        // 1. 直接绘制视野区域 对应wellpattern的(3.2)画法 最有效率
         if (!mViewRects[id].isEmpty()) {
             for(auto viewRect: mViewRects[id]) {
                 painter.fillRect(mapToSize(viewRect,topleft,diameter,diameter),groupcolor);
@@ -427,6 +432,7 @@ void WellView::paintEvent(QPaintEvent *event)
         }
 
         // 2. 使用掩码矩阵点的缩放区域绘制,和wellpattern的mViewMaskSize一致就可 对应(3.4)画法
+        // 没有效率不采用,导入实验配置时也是通过hole_viewrects来绘制区域而不是uipoints
 //        for(auto pt: mViewRectDispersedPoints[id]) {
 //            auto w = 1.0 / mDispersedMaskSize;
 //            auto h = 1.0 / mDispersedMaskSize;

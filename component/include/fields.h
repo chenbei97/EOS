@@ -332,8 +332,8 @@ static const char* HoleViewSizeField = "hole_viewsize"; // 孔的视野尺寸
 static const char* HoleViewRectsField = "hole_viewrects";// 孔选择的视野区域
 static const char* HoleViewUiPointsField = "hole_uiviewpoints"; // 孔选择的视野坐标
 static const char* HoleViewPointsField = "hole_viewpoints"; // 孔选择的电机坐标,更精细
-static const char* WellAllGroupsField = "wellallgroups"; // 孔板已分过的所有组名称
-static const char* WellAllHolesField = "wellallholes"; // 孔板已选过的所有孔坐标
+static const char* HoleAllGroupsField = "hole_allgroups"; // 孔板已分过的所有组名称
+static const char* HoleAllCoordinatesField = "hole_allcoordinates"; // 孔板已选过的所有孔坐标
 static const char* IsHoleField = "ishole"; // 是孔坐标触发还是视野坐标触发
 
 static const QStringList GroupDoseUnitFields =  {

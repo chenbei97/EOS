@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-27 08:53:17
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-16 11:51:17
+ * @LastEditTime: 2023-12-08 13:19:38
  * @FilePath: \EOS\interface\src\preview\wellpattern.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -14,41 +14,43 @@ WellPatternInfo WellPattern::patternInfo() const
 
     auto allgroups = getAllGroups();
 
-    foreach(auto group,allgroups) {
+    for(auto groupName: allgroups) {
+            WellGroupInfo groupInfoMap;
+            auto groupHoles = getGroupHoles(groupName);
 
-            QVariantMap groupInfo;
-            auto holes = getGroupHoles(group);
-
-            foreach(auto hole,holes)
+            for(auto hole: groupHoles)
                 {
-                    QVariantMap holeInfo; // 这个孔存储的所有信息都在这里保存
+                    WellHoleInfo holeInfoMap; // 这个孔存储的所有信息都在这里保存
 
-                    holeInfo[HoleGroupCoordinatesField].setValue(holes); // 0. 每个孔都会存储本组所有的孔坐标信息
+                    auto holeInfo = mHoleInfo[hole.x()][hole.y()];
+                    
+                    Q_ASSERT(holeInfo.group == groupName); 
+                    Q_ASSERT(holeInfo.coordinate == hole); 
+                    Q_ASSERT(holeInfo.isselected == true); // isselected不装,已有的孔坐标就是true
+                    Q_ASSERT(holeInfo.allgroup == allgroups);
 
-                    auto currentholeinfo = mHoleInfo[hole.x()][hole.y()];
-                    Q_ASSERT(currentholeinfo.group == group); // group,color,isselected,allgroup,allcoordinate不用装
-                    Q_ASSERT(currentholeinfo.coordinate == hole);
-                    //currentholeinfo.color 颜色没用
-                    Q_ASSERT(currentholeinfo.isselected == true);
-                    Q_ASSERT(currentholeinfo.allgroup == allgroups);// 5条信息无需装
+                    holeInfoMap[HoleCoordinateField] = holeInfo.coordinate; // 1. 孔信息
+                    holeInfoMap[HoleGroupColorField] = holeInfo.color;
+                    holeInfoMap[HoleGroupNameField] = holeInfo.group;
+                    holeInfoMap[HoleGroupCoordinatesField].setValue(groupHoles);
+                    holeInfoMap[HoleAllGroupsField].setValue(holeInfo.allgroup);
+                    holeInfoMap[HoleAllCoordinatesField].setValue(holeInfo.allcoordinate);
 
-                    holeInfo[HoleCoordinateField] = hole; // 1. 坐标信息
-                    holeInfo[HoleViewSizeField] = currentholeinfo.viewsize; // 2. 视野信息
-                    holeInfo[HoleViewRectsField].setValue(currentholeinfo.viewrects);
-                    holeInfo[HoleViewUiPointsField].setValue(currentholeinfo.uipoints);
-                    holeInfo[HoleViewPointsField].setValue(currentholeinfo.viewpoints);
+                    holeInfoMap[HoleViewSizeField] = holeInfo.viewsize; // 2. 视野信息
+                    holeInfoMap[HoleViewRectsField].setValue(holeInfo.viewrects);
+                    holeInfoMap[HoleViewUiPointsField].setValue(holeInfo.uipoints);
+                    holeInfoMap[HoleViewPointsField].setValue(holeInfo.viewpoints);
 
-                    holeInfo[HoleExperTypeField] = currentholeinfo.type; // 3.备忘录信息
-                    holeInfo[HoleMedicineField] = currentholeinfo.medicine;
-                    holeInfo[HoleDoseField] = currentholeinfo.dose;
-                    holeInfo[HoleDoseUnitField] = currentholeinfo.doseunit;
+                    holeInfoMap[HoleExperTypeField] = holeInfo.type; // 3.备忘录信息
+                    holeInfoMap[HoleMedicineField] = holeInfo.medicine;
+                    holeInfoMap[HoleDoseField] = holeInfo.dose;
+                    holeInfoMap[HoleDoseUnitField] = holeInfo.doseunit;
 
-                    auto holename = QString("(%1,%2)").arg(hole.x()).arg(hole.y());
-                    groupInfo[holename] = holeInfo;
-                    //LOG<<groupInfo;
+                    auto groupInfoKey = QString("(%1,%2)").arg(hole.x()).arg(hole.y());
+                    groupInfoMap[groupInfoKey] = holeInfoMap;
                 }
-            //LOG<<group<<"'s hole count = "<<groupInfo.keys().count();
-            info[group] = groupInfo; // 存储了每个组的信息
+            //LOG<<groupName<<"'s hole count = "<<groupInfoMap.keys().count();
+            info[groupName] = groupInfoMap; // 存储了每个组的信息
         }
     //LOG<<"group's count = "<<info.keys().count();
     return info;
@@ -57,9 +59,9 @@ WellPatternInfo WellPattern::patternInfo() const
 WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,cols,parent)
 {
     mMouseEvent = true;
-    opengroupact = new QAction(tr("Grouping"));
-    openviewact = new QAction(tr("Select Holes"));
-    removeholeact = new QAction(tr("Remove Hole"));
+    opengroupact = new QAction(tr(GroupHoleActTitle));
+    openviewact = new QAction(tr(SelectHoleActTitle));
+    removeholeact = new QAction(tr(RemoveHoleActTitle));
     addAction(opengroupact);
     addAction(openviewact);
     addAction(removeholeact);

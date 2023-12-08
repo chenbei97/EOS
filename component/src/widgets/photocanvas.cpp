@@ -58,7 +58,7 @@ void PhotoCanvas::drawGridImage(QPainter &painter)
     auto rw = getInnerRectWidth();
     auto rh = getInnerRectHeight();
     pen.setColor(Qt::darkGray);
-    pen.setWidth(1);
+    pen.setWidth(DefaultPainterPenWidth/2);
     painter.setPen(pen);
     for(int i = 0; i < mGridSize; i++) {
         auto left = QPointF(0.0,rh) + QPointF(0.0,rh*i);

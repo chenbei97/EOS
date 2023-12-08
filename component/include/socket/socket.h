@@ -143,6 +143,44 @@ struct FieldLoadExperEvent{
     const QString points = PointsField;
 };
 
+struct FieldExportExperEvent{
+    // wellbox
+    const QString manufacturer = ManufacturerField;
+    const QString wellbrand = BrandField;
+    const QString wellsize = WellsizeField;
+    // objective
+    const QString objective_location = ObjectiveLocationField;
+    const QString objective = ObjectiveField;
+    const QString objective_descrip = ObjectiveDescripField;
+    const QString objective_type = ObjectiveTypeField;
+    // channel
+    const QString ph = PHField;
+    const QString gfp = GFPField;
+    const QString rfp = RFPField;
+    const QString dapi = DAPIField;
+    // camera
+    const QString exposure = ExposureField;
+    const QString gain = GainField;
+    const QString bright = BrightField;
+    // zstack
+    const QString zstack = ZStackField;
+    const QString stitch = StitchField;
+    // focus
+    const QString focus = FocusField;
+    const QString focus_step = FocusStepField;
+    // exper
+    const QString total_time = TotalTimeField;
+    const QString duration_time = DurationTimeField;
+    const QString start_time = StartTimeField;
+    const QString is_schedule = IsScheduleField;
+    const QString channel = ChannelField;
+    // global
+    const QString app = AppSelectField;
+    // wellpattern
+    const QString group = GroupField;
+    // other
+    const QString capture_channel = CaptureChannelField;//配置过相机参数的所有通道
+};
 struct FieldAskConnectedStateEvent {
     const QString state = StateField; // 程序启动时发送命令询问是否连接上了
 };
@@ -200,6 +238,7 @@ struct FieldManualFocusEvent {
 typedef struct {
     FieldPreviewEvent fieldPreviewEvent;
     FieldLoadExperEvent fieldLoadExperEvent;
+    FieldExportExperEvent fieldExportExperEvent;
     FieldAskConnectedStateEvent fieldAskConnectedStateEvent;
     FieldAskActivateCodeEvent fieldAskActivateCodeEvent;
     FieldAdjustBrightEvent fieldAdjustBrightEvent;
@@ -218,6 +257,7 @@ static const TcpFieldList TcpFieldPool;
 
 #define FieldPreviewEvent TcpFieldPool.fieldPreviewEvent
 #define FieldLoadExperEvent TcpFieldPool.fieldLoadExperEvent
+#define FieldExportExperEvent TcpFieldPool.fieldExportExperEvent
 #define FieldAskConnectedStateEvent TcpFieldPool.fieldAskConnectedStateEvent
 #define FieldAskActivateCodeEvent TcpFieldPool.fieldAskActivateCodeEvent
 #define FieldAdjustBrightEvent TcpFieldPool.fieldAdjustBrightEvent
@@ -269,10 +309,10 @@ static QVariant parseLoadExperEvent(QCVariantMap m)
 
 static QByteArray assembleLoadExperEvent(QCVariantMap m)
 {// 启动实验
-    auto toolinfo = m[PreviewToolField].value<QVariantMap>();
-    auto patterninfo = m[PreviewPatternField].value<QVariantMap>();
+    auto toolinfo = m[PreviewToolField].value<PreviewToolInfo>();
+    auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
 #ifdef usetab
-    auto experinfo = m[ExperToolField].value<QVariantMap>();
+    auto experinfo = m[ExperToolField].value<ExperToolInfo>();
 #endif
     QJsonObject object;
     object[FrameField] = LoadExperEvent;
@@ -295,7 +335,7 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
 
         QJsonArray channelInfoArr; // 保存所有通道信息的列表,这个是"PH"/"BR"等通道字段的值
 
-        foreach(auto currentChannel, capture_channels) {
+        for(auto currentChannel: capture_channels) {
             // 通道信息用QVarintMap保存的,有4个key,channel,exposure,gain,bright
             auto channelInfo = toolinfo[currentChannel].value<QVariantMap>();
 
@@ -331,7 +371,7 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
     object[FieldLoadExperEvent.duration_time] = experinfo[FieldLoadExperEvent.duration_time].toInt();
     object[FieldLoadExperEvent.start_time] = experinfo[FieldLoadExperEvent.start_time].toString();
     object[FieldLoadExperEvent.channel] = experinfo[FieldLoadExperEvent.channel].toString();
-    LOG<<experinfo[FieldLoadExperEvent.channel];
+    //LOG<<experinfo[FieldLoadExperEvent.channel];
     object[FieldLoadExperEvent.is_schedule] = experinfo[FieldLoadExperEvent.is_schedule].toInt();
 #else
     // zstackbox
@@ -351,29 +391,17 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
 
     // 组-孔-视野的信息
     QJsonArray arr; // "group"的值是个列表 arr group=[{},{},{}]
-    foreach(auto group, patterninfo.keys()) {
+    for(auto groupName: wellpatterninfo.keys()) {
         QJsonObject groupObject; // arr有多个groupObject对象,表示每个组的信息,"a组","b组" 每个小{}
         QJsonArray groupValues; // groupObject的值是个列表,也就是"a组"的值是个列表,包含孔信息
 
-        auto groupinfo = patterninfo[group].value<QVariantMap>();
+        auto groupinfo = wellpatterninfo[groupName].value<WellGroupInfo>();
 
-        //LOG<<"hole keys = "<<groupinfo.keys();
-        foreach(auto holename,groupinfo.keys()) {
-            auto holeinfo = groupinfo[holename].value<QVariantMap>();
-
-            //auto grouppoints = holeinfo[HoleGroupCoordinatesField].value<QPointVector>();
+        for(auto holekey: groupinfo.keys()) {
+            auto holeinfo = groupinfo[holekey].value<WellHoleInfo>();
 
             auto coordinate = holeinfo[HoleCoordinateField].toPoint();
-            //auto viewsize = holeinfo[HoleViewSizeField].toInt();
-            //auto viewrects = holeinfo[HoleViewRectsField].value<QRectFVector>();
             auto viewpoints = holeinfo[HoleViewPointsField].value<QPointFVector>();//注意用电机坐标不是ui坐标
-
-            //auto expertype = holeinfo[HoleExperTypeField].toString();
-            //auto medicine = holeinfo[HoleMedicineField].toString();
-            //auto dose = holeinfo[HoleDoseField].toString();
-            //auto unit = holeinfo[HoleDoseUnitField].toString();
-
-            //LOG<<coordinate<<viewsize<<viewpoints<<expertype<<medicine<<dose<<unit<<holename<<group<<grouppoints;
 
             QJsonObject holeObject;// "a组"=[{},{},{}],是每个小的{}
             //holeObject[HoleCoordinateField] = QString("(%1,%2)").arg(QChar(coordinate.x()+65)).arg(coordinate.y());
@@ -395,14 +423,181 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
             holeObject[FieldLoadExperEvent.points] = pointValues;
             groupValues.append(holeObject);
         }
-        groupObject[group] = groupValues;
+        groupObject[groupName] = groupValues;
         arr.append(groupObject);
     }
     object[FieldLoadExperEvent.group] = arr;
-    //LOG<<object;
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
+}
+
+static QByteArray assembleExportExperEvent(QCVariantMap m)
+{// 导出实验配置(不参与tcp通讯),和启动实验相比多了一些组装的东西: 组颜色,组的一些信息,视野尺寸等,是全部的信息都导出
+    auto toolinfo = m[PreviewToolField].value<PreviewToolInfo>();
+    auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
+#ifdef usetab
+    auto experinfo = m[ExperToolField].value<ExperToolInfo>();
+#endif
+    QJsonObject object;
+
+    {
+        // wellbox
+        object[FieldExportExperEvent.manufacturer] = toolinfo[FieldExportExperEvent.manufacturer].toInt();
+        object[FieldExportExperEvent.wellbrand] = toolinfo[FieldExportExperEvent.wellbrand].toInt();
+        object[FieldExportExperEvent.wellsize] = toolinfo[FieldExportExperEvent.wellsize].toInt();
+
+        // objectivebox
+        object[FieldExportExperEvent.objective_location] = toolinfo[FieldExportExperEvent.objective_location].toInt();
+        object[FieldExportExperEvent.objective_descrip] = toolinfo[FieldExportExperEvent.objective_descrip].toString();//就是传递原字符串不需要改
+        object[FieldExportExperEvent.objective] = getIndexFromFields(toolinfo[FieldExportExperEvent.objective].toString()).toInt();
+        object[FieldExportExperEvent.objective_type] = toolinfo[FieldExportExperEvent.objective_type].toInt();
+
+        // camerabox
+        auto capture_channels = toolinfo[FieldExportExperEvent.capture_channel].toStringList(); // 设置过相机参数的所有通道
+        QJsonArray channelCameraInfo; // 组列表
+        if (!capture_channels.isEmpty()) { // 例如channels= {"PH","GFP"}
+
+            QJsonArray channelInfoArr; // 保存所有通道信息的列表,这个是"PH"/"BR"等通道字段的值
+
+            for(auto currentChannel: capture_channels) {
+                // 通道信息用QVarintMap保存的,有4个key,channel,exposure,gain,bright
+                auto channelInfo = toolinfo[currentChannel].value<QVariantMap>();
+
+                Q_ASSERT(currentChannel == channelInfo[ChannelField]);
+                auto exposure = channelInfo[ExposureField].toInt();
+                auto gain = channelInfo[GainField].toInt();
+                auto bright = channelInfo[BrightField].toInt();
+                //LOG<<exposure<<gain<<bright;
+
+                QJsonObject currentChannelInfoObject; // 每个通道的3个信息
+                currentChannelInfoObject[ChannelField] = getIndexFromFields(currentChannel).toInt(); // 如PH转为0
+                currentChannelInfoObject[ExposureField] = exposure;
+                currentChannelInfoObject[GainField] = gain;
+                currentChannelInfoObject[BrightField] = bright;
+
+                channelInfoArr.append(currentChannelInfoObject); // 所有通道的信息组成列表,这个列表是camera_channel字段的值
+            }
+
+            object[CameraChannelField] = channelInfoArr; // camera_channel字段,存储了所有通道的配置信息
+        }
+
+        // focusbox
+        object[FieldExportExperEvent.focus] = toolinfo[FieldExportExperEvent.focus].toDouble();
+        object[FieldExportExperEvent.focus_step] = toolinfo[FieldExportExperEvent.focus_step].toDouble();
+
+#ifdef usetab
+        // zstackbox
+        object[FieldExportExperEvent.zstack] = experinfo[FieldExportExperEvent.zstack].toInt();
+        object[FieldExportExperEvent.stitch] = experinfo[FieldExportExperEvent.stitch].toInt();
+
+        // experbox
+        object[FieldExportExperEvent.total_time] = experinfo[FieldExportExperEvent.total_time].toInt();
+        object[FieldExportExperEvent.duration_time] = experinfo[FieldExportExperEvent.duration_time].toInt();
+        object[FieldExportExperEvent.start_time] = experinfo[FieldExportExperEvent.start_time].toString();
+        object[FieldExportExperEvent.channel] = experinfo[FieldExportExperEvent.channel].toString();
+        object[FieldExportExperEvent.is_schedule] = experinfo[FieldExportExperEvent.is_schedule].toInt();
+#else
+        // zstackbox
+        object[FieldExportExperEvent.zstack] = toolinfo[FieldExportExperEvent.zstack].toInt();
+        object[FieldExportExperEvent.stitch] = toolinfo[FieldExportExperEvent.stitch].toInt();
+
+        // experbox
+        object[FieldExportExperEvent.total_time] = toolinfo[FieldExportExperEvent.total_time].toInt();
+        object[FieldExportExperEvent.duration_time] = toolinfo[FieldExportExperEvent.duration_time].toInt();
+        object[FieldExportExperEvent.start_time] = toolinfo[FieldExportExperEvent.start_time].toString();
+        object[FieldExportExperEvent.channel] = toolinfo[FieldExportExperEvent.channel].toString();
+        object[FieldExportExperEvent.is_schedule] = toolinfo[FieldExportExperEvent.is_schedule].toInt();
+#endif
+
+        // 其它全局信息
+        object[FieldExportExperEvent.app] = m[FieldExportExperEvent.app].toInt();
+    }
+
+    // 组-孔-视野的信息
+    QJsonArray arr; // "group"的值是个列表 arr group=[{},{},{}]
+    for(auto groupName: wellpatterninfo.keys()) {
+        QJsonObject groupObject; // arr有多个groupObject对象,表示每个组的信息,"a组","b组" 每个小{}
+        QJsonArray groupValues; // groupObject的值是个列表,也就是"a组"的值是个列表,包含孔信息
+        auto groupinfo = wellpatterninfo[groupName].value<WellGroupInfo>();
+
+        for(auto holekey: groupinfo.keys()) {
+            QJsonObject holeObject;
+            QString tmpStr;
+            auto holeinfo = groupinfo[holekey].value<WellHoleInfo>();
+
+            holeObject[HoleExperTypeField] = holeinfo[HoleExperTypeField].toString();
+            holeObject[HoleMedicineField] = holeinfo[HoleMedicineField].toString();
+            holeObject[HoleDoseField] = holeinfo[HoleDoseField].toString();
+            holeObject[HoleDoseUnitField] = holeinfo[HoleDoseUnitField].toString();
+
+            auto coordinate = holeinfo[HoleCoordinateField].toPoint();
+            holeObject[HoleCoordinateField] = QString("(%1,%2)").arg(coordinate.x()).arg(coordinate.y());
+            holeObject[HoleGroupColorField] = holeinfo[HoleGroupColorField].toString();
+            holeObject[HoleGroupNameField] = holeinfo[HoleGroupNameField].toString();
+            auto groupholes = holeinfo[HoleGroupCoordinatesField].value<QPointVector>();
+            auto allgroups = holeinfo[HoleAllGroupsField].value<QSet<QString>>();
+            auto allholes = holeinfo[HoleAllCoordinatesField].value<QPoint2DVector>();
+            for(auto pt: groupholes) {
+                tmpStr += QString("(%1,%2),").arg(pt.x()).arg(pt.y());
+            }
+            tmpStr.chop(1);
+            holeObject[HoleGroupCoordinatesField] = tmpStr;
+
+            tmpStr.clear();
+            for(auto n: allgroups.values()) {
+                tmpStr += QString("%1,").arg(n);
+            }
+            tmpStr.chop(1);
+            holeObject[HoleAllGroupsField] = tmpStr;
+
+            tmpStr.clear();
+            for(auto pts: allholes) {
+                for(auto pt: pts)
+                    tmpStr += QString("(%1,%2),").arg(pt.x()).arg(pt.y());
+                tmpStr.chop(1);
+                tmpStr += "|";
+            }
+            tmpStr.chop(1);
+            holeObject[HoleAllCoordinatesField] = tmpStr;
+
+            holeObject[HoleViewSizeField] = holeinfo[HoleViewSizeField].toInt();
+            auto viewrects = holeinfo[HoleViewRectsField].value<QRectFVector>();//
+            auto viewuipoints = holeinfo[HoleViewUiPointsField].value<QPointFVector>();
+            auto viewpoints = holeinfo[HoleViewPointsField].value<QPointFVector>();
+            if (viewuipoints.isEmpty()) //注意:如果是点模式这里是空的,viewrects也是空的
+                viewuipoints = viewpoints; // 因为点模式下电机坐标也是离散坐标
+
+            tmpStr.clear();
+            for(auto rect: viewrects) {
+                tmpStr += QString("(%1,%2,%3,%4),").arg(rect.x()).arg(rect.y()).arg(rect.width()).arg( rect.height());
+            }
+            tmpStr.chop(1);
+            holeObject[HoleViewRectsField] = tmpStr;
+
+            // wellpattern/wellview统一只使用viewrect绘制比较有效率,不提供uipoints的写入了
+//            tmpStr.clear();
+//            for(auto pt: viewuipoints) {
+//                tmpStr += QString("(%1,%2),").arg(pt.x()).arg(pt.y());
+//            }
+//            tmpStr.chop(1);
+//            holeObject[HoleViewUiPointsField] = tmpStr;
+
+            tmpStr.clear();
+            for(auto pt: viewpoints) {
+                tmpStr += QString("(%1,%2),").arg(pt.x()).arg(pt.y());
+            }
+            tmpStr.chop(1);
+            holeObject[HoleViewPointsField] = tmpStr;
+
+            groupValues.append(holeObject);
+        }
+        groupObject[groupName] = groupValues;
+        arr.append(groupObject);
+    }
+    object[FieldExportExperEvent.group] = arr;
+    TcpAssemblerDoc.setObject(object);
+    return TcpAssemblerDoc.toJson();
 }
 
 static QVariant parseAskConnectedStateEvent(QCVariantMap m)

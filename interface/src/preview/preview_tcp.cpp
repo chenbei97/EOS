@@ -341,12 +341,8 @@ void Preview::exportExperConfig(const QString& path)
 #ifdef usetab
     previewinfo[ExperToolField] = expertool->toolInfo();
 #endif
-    AssemblerPointer->assemble(TcpFramePool.loadExperEvent,previewinfo);
-    auto json = AssemblerPointer->message();
-
-    json.chop(QString(SeparateField).count());//删掉尾缀@@@
-
-    JsonReadWrite m; // 借助工具类写到文件内(注意导出时有的信息没有导出,例如每个分组的颜色)
+    auto json = assembleExportExperEvent(previewinfo);
+    JsonReadWrite m; // 借助工具类写到文件内
     m.writeJson(path,json);
 }
 
@@ -436,29 +432,6 @@ void Preview::loadExper()
 #endif
         photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
         photocanvas->setImage(QImage());
-    }
-
-        // 组孔的信息要写到数据库,待写
-        foreach(auto group, patterninfo.keys())
-        {
-            auto groupinfo = patterninfo[group].value<QVariantMap>();
-            foreach(auto holename,groupinfo.keys())
-            {
-                auto holeinfo = groupinfo[holename].value<QVariantMap>();
-
-                auto grouppoints = holeinfo[HoleGroupCoordinatesField].value<QPointVector>();
-
-                auto coordinate = holeinfo[HoleCoordinateField].toPoint();
-                auto viewsize = holeinfo[HoleViewSizeField].toInt();
-                auto viewpoints = holeinfo[HoleViewPointsField].value<QPointFVector>();
-                auto uipoints = holeinfo[HoleViewUiPointsField].value<QPointFVector>();
-                auto viewrects = holeinfo[HoleViewRectsField].value<QRectFVector>();
-
-                auto expertype = holeinfo[HoleExperTypeField].toString();
-                auto medicine = holeinfo[HoleMedicineField].toString();
-                auto dose = holeinfo[HoleDoseField].toString();
-                auto unit = holeinfo[HoleDoseUnitField].toString();
-        }
     }
 }
 

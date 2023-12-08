@@ -442,10 +442,10 @@ namespace obsoleteClass {
             m[HoleGroupColorField] = mHoleInfo[mMousePos.x()][mMousePos.y()].color; // 组的颜色
             // 所有组只在打开分组对话框更新,但可能没打开分组对话框此时allgroup就没有被赋值会出现错误 在204行的设定可能会错误
             mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = getAllWellGroupNames();
-            m[WellAllGroupsField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup); // 已有的所有组(每次设置分组信息时会更新)
+            m[HoleAllGroupsField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup); // 已有的所有组(每次设置分组信息时会更新)
             m[HoleGroupCoordinatesField].setValue(getHoleGroupCoordinates(mHoleInfo[mMousePos.x()][mMousePos.y()].group));
             mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = getAllWellHoleCoordinates();
-            m[WellAllHolesField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate);
+            m[HoleAllCoordinatesField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate);
             //LOG<<"well send info to view is "<<m[HoleGroupNameField].toString()<<m[HoleGroupColorField].toString();//ViewPattern::setStrategy接收
             emit openViewWindow(m);
         }
@@ -458,8 +458,8 @@ namespace obsoleteClass {
         auto groupName = m[HoleGroupNameField].toString();
         auto groupColor = m[HoleGroupColorField].toString();
         auto coordinate = m[HoleCoordinateField].toPoint();
-        auto allgroup = m[WellAllGroupsField].value<QSet<QString>>();
-        auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
+        auto allgroup = m[HoleAllGroupsField].value<QSet<QString>>();
+        auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
         // HoleGroupCoordinatesField 该组的所有孔坐标不解析
         auto viewsize = m[HoleViewSizeField].toInt();
         auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
@@ -489,8 +489,8 @@ namespace obsoleteClass {
         auto groupName = m[HoleGroupNameField].toString();
         auto groupColor = m[HoleGroupColorField].toString();
         auto coordinate = m[HoleCoordinateField].toPoint();
-        auto allgroup = m[WellAllGroupsField].value<QSet<QString>>();
-        auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
+        auto allgroup = m[HoleAllGroupsField].value<QSet<QString>>();
+        auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
         auto viewsize = m[HoleViewSizeField].toInt();
         auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
         auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>(); // 关键信息
@@ -524,7 +524,7 @@ namespace obsoleteClass {
     {
         auto groupName = m[HoleGroupNameField].toString();
         auto groupColor = m[HoleGroupColorField].toString();
-        auto allcoordinates = m[WellAllHolesField].value<QPoint2DVector>();
+        auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
         auto viewsize = m[HoleViewSizeField].toInt();
         auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
         auto viewpoints = m[HoleViewPointsField].value<ViewPointVector>(); // 关键信息

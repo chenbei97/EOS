@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-16 13:27:27
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-14 13:28:14
+ * @LastEditTime: 2023-12-08 13:08:41
  * @FilePath: \EOS\component\include\alias.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -189,10 +189,10 @@ struct ValueRangeUnSigned{
 struct HoleInfo {
     // 分组窗口去更新的信息
     QString type; // 本孔分配的实验类型
-    QString group; // 本孔分配的组名
     QString medicine; // 本孔分配的药物
     QString dose; // 本孔分配的剂量
     QString doseunit; // 本孔分配的剂量单位
+    QString group; // 本孔分配的组名
     QColor color; // 本孔分配的组颜色
 
     // 拖拽区域控制的
@@ -258,6 +258,8 @@ typedef QMap<QString,QImage> ChannelImageInfo;
 typedef QVariantMap PreviewToolInfo;
 typedef QVariantMap ExperToolInfo;
 typedef QVariantMap WellPatternInfo;
+typedef QVariantMap WellGroupInfo;
+typedef QVariantMap WellHoleInfo;
 typedef QVariantMap SlidePatternInfo;
 typedef QVariantMap PreviewInfo;
 typedef QVariantMap ViewInfo;

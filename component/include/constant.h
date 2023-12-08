@@ -155,6 +155,9 @@ static const char* OtherBoxField = "Other";
 
 static const char*  SaveViewActTitle = "Select View";
 static const char*  RemoveViewActTitle = "Remove View";
+static const char*  SelectHoleActTitle = "Select Hole";
+static const char*  RemoveHoleActTitle = "Remove Hole";
+static const char*  GroupHoleActTitle = "Grouping Hole";
 static const char*  ApplyHoleActTitle = "Apply To Hole";
 static const char*  ApplyGroupActTitle = "Apply To Group";
 static const char*  ApplyAllActTitle = "Apply To All";
