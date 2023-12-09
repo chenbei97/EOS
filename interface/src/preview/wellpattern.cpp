@@ -56,7 +56,7 @@ WellPatternInfo WellPattern::patternInfo() const
     //LOG<<"group's count = "<<info.keys().count();
     allinfo[HoleSizeField] = patternSize();
     allinfo[GroupField] = info;
-    return info;
+    return allinfo;
 }
 
 WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,cols,parent)

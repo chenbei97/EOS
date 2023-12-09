@@ -440,12 +440,12 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
     auto toolinfo = m[PreviewToolField].value<PreviewToolInfo>();
     auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
     auto wellpatternsize = wellpatterninfo[HoleSizeField].toSize();
+    LOG<<wellpatternsize;
     auto wellgroupinfo = wellpatterninfo[GroupField].value<WellPatternInfo>();
 #ifdef usetab
     auto experinfo = m[ExperToolField].value<ExperToolInfo>();
 #endif
     QJsonObject object;
-
     {
         // wellbox
         object[FieldExportExperEvent.manufacturer] = toolinfo[FieldExportExperEvent.manufacturer].toInt();

@@ -17,7 +17,7 @@ message(STATUS "FAMILYPC = $ENV{MY_ENV_VAR}")
 if (MSVC)
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-    set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.14.2/5.14.2/msvc2017_64") # 这个目录取决于电脑Qt的安装目录,每台电脑不同,只能使用绝对路径编译
+    set(CMAKE_PREFIX_PATH "E:/Qt5.14.2/5.14.2/msvc2017_64") # 这个目录取决于电脑Qt的安装目录,每台电脑不同,只能使用绝对路径编译
 else(GNU)  # 再者,cmake使用绝对路径也不影响打包的结果,cmake不是真实的业务代码只是用于编译,业务代码当然不能使用绝对路径
     set(CMAKE_PREFIX_PATH "E:/Qt5.14.2/5.14.2/mingw73_64") # 这也是为何cmake种我想要把Qt安装目录下的一些文件复制到bin下这样可以使用相对路径,但是我不可能知道Qt安装目录本身
 endif () # qmake的编译配置也是用的个人的安装目录,只不过qtcreator帮用户做好了,cmake需要自己修改而已
@@ -112,6 +112,7 @@ link_directories(${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib
 
 # （5）查找包 // C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\include
 find_package(Qt5 COMPONENTS Core Gui Widgets Sql Network
+        Qml QuickWidgets Quick QmlModels QuickControls2 QuickTemplates2 QmlWorkerScript
         Concurrent Multimedia MultimediaWidgets OpenGL REQUIRED)
 
 add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES}) # ${THEME_PATH}
@@ -265,6 +266,7 @@ endif ()
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets Qt5::Core Qt5::Gui Qt5::Sql Qt5::Network Qt5::Concurrent
         Qt5::Multimedia Qt5::MultimediaWidgets Qt5::OpenGL
+        Qt5::QuickTemplates2 Qt5::Qml Qt5::QuickWidgets Qt5::Quick Qt5::QmlModels Qt5::QuickControls2 Qt5::QmlWorkerScript
         component interface  # mingw必须显示指定python310,msvc指定与否都可
         ${TOUPCAM_LIB_PATH}# opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
 
@@ -298,7 +300,9 @@ if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
                 "${QT_INSTALL_PATH}/plugins/platforms/qwindows${DEBUG_SUFFIX}.dll"
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
     endif ()
-    foreach (QT_LIB Core Gui Widgets Sql Network Concurrent Multimedia MultimediaWidgets OpenGl)
+    foreach (QT_LIB Core Gui Widgets Sql Network
+            Qml QuickWidgets Quick QmlModels QuickControls2 QuickTemplates2 QmlWorkerScript
+            Concurrent Multimedia MultimediaWidgets OpenGl)
         if(MSVC)
             add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
