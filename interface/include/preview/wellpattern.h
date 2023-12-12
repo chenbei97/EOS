@@ -51,6 +51,7 @@ public:
     void applyHoleEvent(QCVariantMap m); // 删点保存点的映射
     void applyGroupEvent(QCVariantMap m); // 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
     void applyAllEvent(QCVariantMap m);
+    void selectModeChangedEvent(QCVariantMap m);
 
 protected:
     ViewSelectMode mSelectMode = PointMode;

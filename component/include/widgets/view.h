@@ -95,6 +95,7 @@ signals:
     void applyHoleEvent(const QVariantMap&m);
     void applyGroupEvent(const QVariantMap&m);
     void applyAllEvent(const QVariantMap&m);
+    void selectModeChangedEvent(const QVariantMap&m);
     void leftTriangleClicked();
     void rightTriangleClicked();
     void topTriangleClicked();

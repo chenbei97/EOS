@@ -134,10 +134,9 @@ void WellPattern::applyHoleEvent(QCVariantMap m)
     auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
     // HoleGroupCoordinatesField 该组的所有孔坐标不解析
     auto viewsize = m[HoleViewSizeField].toInt();
-    auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
     auto viewpoints = m[HoleViewPointsField].value<QPointFVector>();// 关键信息
-    auto uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
 
+    //LOG<<"coord: "<<coordinate<<"viewpoint count = "<<viewpoints.count()<<" viewrect count = "<<viewrects.count();
     // 2. 把信息更新到本孔
     auto holeinfo = mHoleInfo[coordinate.x()][coordinate.y()];
     Q_ASSERT(holeinfo.coordinate == coordinate); // 孔坐标和当前传递的孔坐标相同
@@ -145,11 +144,19 @@ void WellPattern::applyHoleEvent(QCVariantMap m)
     //Q_ASSERT(holeinfo.isselected == true); // 不肯定是被选中的孔,切换objective时会更新holeinfo,此时isselected可能false
     //Q_ASSERT(holeinfo.allgroup == allgroup);// 这个是一定相等(导入实验配置这不一定相等因为不导入)
     //Q_ASSERT(holeinfo.allcoordinate == allcoordinates); // 同理
+    holeinfo.allgroup = getAllGroups();
+    holeinfo.allcoordinate = getAllHoles();
     holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
-    holeinfo.viewrects = viewrects; // 本组应用的视野数量和位置信息
     holeinfo.viewsize = viewsize; // 本组应用的视野尺寸
     holeinfo.viewpoints = viewpoints; // 本组应用的电机坐标
-    holeinfo.uipoints = uipoints; // 绘图使用的坐标
+
+    if (mSelectMode == RectMode) { // 区域模式下才会有这2个信息,点模式下不要获取,这样得到的是空向量把已有的覆盖了
+        auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
+        auto uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
+        holeinfo.viewrects = viewrects; // 本组应用的视野数量和位置信息
+        holeinfo.uipoints = uipoints; // 绘图使用的坐标
+    }
+
     mHoleInfo[coordinate.x()][coordinate.y()] = holeinfo;
     update();
 }
@@ -164,9 +171,14 @@ void WellPattern::applyGroupEvent(QCVariantMap m)
     auto allgroup = m[HoleAllGroupsField].value<QSet<QString>>();
     auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
     auto viewsize = m[HoleViewSizeField].toInt();
-    auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
     auto viewpoints = m[HoleViewPointsField].value<QPointFVector>(); // 关键信息
-    auto uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
+
+    QRectFVector viewrects;
+    QPointFVector uipoints;
+    if (mSelectMode == RectMode) {
+        viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
+        uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
+    }
 
     // 2. 根据视野窗口传来的组名 把coordinate对应的组(color+viewpoints,viewsize)都更新 (不需要更新group,allgroup,dose,medicine,unit,type)
     for(int row = 0 ; row < mrows; ++ row) {
@@ -180,9 +192,11 @@ void WellPattern::applyGroupEvent(QCVariantMap m)
                 Q_ASSERT(holeinfo.allcoordinate == allcoordinates); // 同理
                 holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
                 holeinfo.color = groupColor; // 本组应用的组颜色(有可能同组不同孔的颜色不同,帮助统一化)
-                holeinfo.viewrects = viewrects; // 本组应用的视野数量和位置信息
+                if (mSelectMode == RectMode) {
+                    holeinfo.viewrects = viewrects; // 本组应用的视野数量和位置信息
+                    holeinfo.uipoints = uipoints;
+                }
                 holeinfo.viewpoints = viewpoints;
-                holeinfo.uipoints = uipoints;
                 holeinfo.viewsize = viewsize; // 本组应用的视野尺寸
                 mHoleInfo[row][col] = holeinfo;
             }
@@ -198,24 +212,30 @@ void WellPattern::applyAllEvent(QCVariantMap m)
     auto groupColor = m[HoleGroupColorField].toString();
     auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
     auto viewsize = m[HoleViewSizeField].toInt();
-    auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
     auto viewpoints = m[HoleViewPointsField].value<QPointFVector>(); // 关键信息
-    auto uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
+    QRectFVector viewrects;
+    QPointFVector uipoints;
+    if (mSelectMode == RectMode) {
+        viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
+        uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
+    }
 
     //切物镜时
     //LOG<<allcoordinates;
     //LOG<<getAllWellHoleCoordinates();
     Q_ASSERT(allcoordinates == getAllHoles());
 
-    foreach(auto holes, allcoordinates) {
-        foreach(auto hole, holes) {
+    for(auto holes: allcoordinates) {
+        for(auto hole: holes) {
             auto holeinfo = mHoleInfo[hole.x()][hole.y()];
             holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
             if (holeinfo.group == groupName) // 本组应用的组颜色,不同组的颜色不需要统一
                 holeinfo.color = groupColor;
-            holeinfo.viewrects = viewrects;
+            if (mSelectMode == RectMode) {
+                holeinfo.viewrects = viewrects;
+                holeinfo.uipoints = uipoints;
+            }
             holeinfo.viewpoints = viewpoints;
-            holeinfo.uipoints = uipoints;
             holeinfo.viewsize = viewsize;
             mHoleInfo[hole.x()][hole.y()] = holeinfo;
         }
@@ -245,5 +265,16 @@ void WellPattern::onRemoveHoleAct()
     // 清除视野窗口的缓存信息
     emit removeHole(mMousePos);
     openviewact->trigger(); // 重新刷新一下
+    update();
+}
+
+// (8) 切换点模式-区域模式
+void WellPattern::selectModeChangedEvent(QCVariantMap m)
+{
+    auto coordinate = m[HoleCoordinateField].toPoint();
+    auto viewpoints = m[HoleViewPointsField].value<QPointFVector>();// 电机坐标
+    auto holeinfo = mHoleInfo[coordinate.x()][coordinate.y()];
+    holeinfo.viewpoints = viewpoints;
+    mHoleInfo[coordinate.x()][coordinate.y()] = holeinfo;
     update();
 }

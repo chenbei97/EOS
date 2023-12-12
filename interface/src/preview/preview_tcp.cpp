@@ -283,8 +283,8 @@ void Preview::previewViewEvent(const QPointF &viewpoint)
     auto msg = AssemblerPointer->message();
     SocketPointer->exec(TcpFramePool.previewEvent,msg, true);
     if (ParserResult.toBool()) {
-        LOG<<QString("move to view point (%1,%2)").arg(convertPrecision(viewpoint.x()))
-        .arg(convertPrecision(viewpoint.y()));
+//        LOG<<QString("move to view point (%1,%2)").arg(convertPrecision(viewpoint.x()))
+//        .arg(convertPrecision(viewpoint.y()));
     }
 }
 
@@ -331,7 +331,7 @@ void Preview::previewHoleEvent(const QPoint &holepoint)
     auto msg = AssemblerPointer->message();
     SocketPointer->exec(TcpFramePool.previewEvent,msg, true);
     if (ParserResult.toBool()) {
-        LOG<<"move to hole point "<<holepoint;
+//        LOG<<"move to hole point "<<holepoint;
     }
 }
 

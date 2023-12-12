@@ -440,6 +440,7 @@ void Preview::initConnections()
     connect(wellview,&WellView::applyHoleEvent,wellpattern,&WellPattern::applyHoleEvent);//删点或者保存点就应用到本孔
     connect(wellview,&WellView::applyGroupEvent,wellpattern,&WellPattern::applyGroupEvent); // 按组更新孔窗口的信息
     connect(wellview,&WellView::applyAllEvent,wellpattern,&WellPattern::applyAllEvent); // 不按组更新孔窗口的信息
+    connect(wellview,&WellView::selectModeChangedEvent,wellpattern,&WellPattern::selectModeChangedEvent);
     connect(wellview,&WellView::previewEvent,this,&Preview::previewViewEvent); // 点击视野预览
     connect(wellview,&WellView::triangleClicked,this,&Preview::adjustLens); // 点模式微调
     connect(slideview,&SlidePattern::rectUpdated,slidepattern,&SlidePattern::updateRect);

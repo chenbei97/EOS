@@ -42,6 +42,7 @@ View::View(QWidget *parent) : QWidget(parent)
 
 void View::initDispersedMask()
 {
+
     mDispersedMask.clear();
     for(int r = 0; r < mDispersedMaskSize; ++r)
     {
@@ -170,7 +171,6 @@ int View::holeID(const QPoint& holePoint) const
 void View::mousePressEvent(QMouseEvent *event)
 {
     // 1.框选后随机点一下要清除框选框(只能拖拽生成),同时出现单击框
-
     if (event->button() == Qt::LeftButton) {
         mMousePos = event->pos();
         if (isValidPoint(mMousePos))
@@ -203,7 +203,7 @@ void View::mousePressEvent(QMouseEvent *event)
     }
     // 将鼠标坐标映射为相对圆外接正方形左上角的相对坐标,并将其归一化
     if (isValidPoint(mValidMousePos)) {
-        auto pos = mapFromPointF(mMousePos);
+        auto pos = mapFromPointF(mValidMousePos);
         emit previewEvent(pos);
     }
     update();
@@ -222,7 +222,7 @@ void View::mouseMoveEvent(QMouseEvent *event)
         if (!isValidRect(QRectF(mValidMousePos,end)))
             return; // 框选到无效区域
         mMouseRect = QRectF();
-        auto diameter = width()>=height()?height():width();
+        auto diameter = getCircleRadius()*2.0;
         // 鼠标形成的矩形框将其等比例缩放到0-1
         mDrapRectF = mapFromSize(QRectF(mValidMousePos,end),
                                  getExternalRectTopLeftPoint(),diameter,diameter);
@@ -242,7 +242,10 @@ void View::paintEvent(QPaintEvent *event)
     gc.setAlpha(DefaultColorAlpha);
     painter.fillRect(rect(),gc);
 
+
+    mSelectMode == PointMode? trianglen = ViewTriangleLength: trianglen = 0;
     auto radius = getCircleRadius();
+    auto diameter = radius * 2.0;
     QPainterPath path;
     path.addEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
     painter.drawPath(path);
@@ -253,12 +256,12 @@ void View::paintEvent(QPaintEvent *event)
     drawDisableLines(painter,getTopDisableRect(),gc,Qt::Vertical);
     drawDisableLines(painter,getBottomDisableRect(),gc,Qt::Vertical);
 
-//    auto diameter = getCircleRadius() * 2.0;
+
 //    auto topleft = getExternalRectTopLeftPoint()+QPointF(mDisableRectRates[Qt::AlignLeft]*diameter,mDisableRectRates[Qt::AlignTop]*diameter);
 //    auto validSize = QSizeF(diameter*(1.0-mDisableRectRates[Qt::AlignLeft]-mDisableRectRates[Qt::AlignRight]),
 //                            diameter*(1.0-mDisableRectRates[Qt::AlignTop]-mDisableRectRates[Qt::AlignBottom]));
 //    auto validRect = QRectF(topleft,validSize);
-//    auto innerRect = getInnerRect(); // 圆内接正方形
+//    auto innerRect = getCircleInnerRect(); // 圆内接正方形
 //    if (innerRect.contains(validRect))
 //        painter.drawRect(validRect);
 //    else painter.drawRect(innerRect);

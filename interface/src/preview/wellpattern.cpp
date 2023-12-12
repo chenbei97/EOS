@@ -89,7 +89,8 @@ void WellPattern::setPatternSize(int rows, int cols)
 void WellPattern::setSelectMode(WellPattern::ViewSelectMode mode)
 {
     mSelectMode = mode;
-    clearViewInfo(); // 切换模式后就和切换物镜一样,所有之前保存的信息(viewpattern的)丢掉
+    update();
+    //clearViewInfo(); // 不清除任何信息
 }
 
 void WellPattern::initDrapHoles()
