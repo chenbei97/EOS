@@ -100,7 +100,6 @@ void Preview::toggleChannel(int option)
 
 void Preview::adjustLens(int option)
 { // 0-left,1-rop,2-right,3-bottom
-
     // 点调节镜头
     QJsonObject object;
     object[FrameField] = TcpFramePool.adjustLensEvent;
@@ -114,6 +113,8 @@ void Preview::adjustLens(int option)
     if (ParserResult.toBool()) {
         LOG<<"移动镜头方向: "<<option;
     }
+
+    wellview->adjustViewPoint(option);
 }
 
 void Preview::adjustCamera(int exp,int gain,int br)
@@ -393,17 +394,20 @@ void Preview::importExperConfig(const QString &path)
 
     m.parseJson(json);
     auto result = m.map();
+    auto groupInfos = result[GroupField].value<QVariantMap>();
+    auto patterSize = convertToPointF(result[HoleSizeField].toString());
 
     QHoleInfoVector holeInfoVec;
-    for(auto var1: result[GroupField].value<QVariantMap>().values()) {
+    for(auto var1: groupInfos.values()) {
         auto groupInfo = var1.value<WellGroupInfo>();
         for(auto var2: groupInfo.values()) {
             auto holeInfo = var2.value<HoleInfo>();
             holeInfoVec.append(holeInfo);
         }
     }
+    wellpattern->setPatternSize(patterSize.x(),patterSize.y());
     wellpattern->importHoleInfo(holeInfoVec);
-    LOG<<result[GroupField];
+    wellview->importViewInfo(holeInfoVec);
 }
 
 void Preview::loadExper()

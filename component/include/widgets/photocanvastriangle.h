@@ -20,6 +20,7 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent*event) override;
+    void drawTriangle(bool isDraw = true);
 private:
     QPolygonF getLeftTrianglePoints() const;
     QPolygonF getRightTrianglePoints() const;
@@ -29,6 +30,7 @@ private:
     double trianglen = PhotoCanvasTriangleLength; // 三角的边长
     double trianggap = PhotoCanvasTriangleGap; // 三角形到边缘的距离
     QColor highcolor  = Qt::green;
+    bool isDraw = true;
 signals:
     void leftTriangleClicked();
     void rightTriangleClicked();

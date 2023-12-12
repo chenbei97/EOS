@@ -143,8 +143,8 @@ void WellPattern::applyHoleEvent(QCVariantMap m)
     Q_ASSERT(holeinfo.coordinate == coordinate); // 孔坐标和当前传递的孔坐标相同
     Q_ASSERT(holeinfo.color == groupColor); // 孔颜色相同
     //Q_ASSERT(holeinfo.isselected == true); // 不肯定是被选中的孔,切换objective时会更新holeinfo,此时isselected可能false
-    Q_ASSERT(holeinfo.allgroup == allgroup);// 这个是一定相等
-    Q_ASSERT(holeinfo.allcoordinate == allcoordinates); // 同理
+    //Q_ASSERT(holeinfo.allgroup == allgroup);// 这个是一定相等(导入实验配置这不一定相等因为不导入)
+    //Q_ASSERT(holeinfo.allcoordinate == allcoordinates); // 同理
     holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
     holeinfo.viewrects = viewrects; // 本组应用的视野数量和位置信息
     holeinfo.viewsize = viewsize; // 本组应用的视野尺寸

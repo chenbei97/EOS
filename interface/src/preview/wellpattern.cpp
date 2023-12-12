@@ -342,10 +342,20 @@ void WellPattern::importHoleInfoV1(QCPoint point,QCString group,QCPointFVector v
 
 void WellPattern::importHoleInfo(const QHoleInfoVector& vec)
 {
-//    setPatternSize();
+    setSelectMode(WellPattern::RectMode);
     for(auto holeInfo: vec) {
         auto x = holeInfo.coordinate.x();
         auto y = holeInfo.coordinate.y();
+        mHoleInfo[x][y] = holeInfo; // importHoleInfo之前已经调用setPatternSize不会越界
+    }
+    auto allgroups = getAllGroups();
+    auto allholes = getAllHoles();
+    for(int row = 0 ; row < mrows; ++ row) {
+        for (int col = 0; col < mcols; ++col) {
+            mHoleInfo[row][col].allcoordinate = allholes;
+            mHoleInfo[row][col].allgroup = allgroups;
+        }
     }
     update();
+    //openviewact->trigger(); // 把组信息等传给viewpattern
 }

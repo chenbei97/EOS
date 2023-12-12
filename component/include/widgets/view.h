@@ -21,6 +21,8 @@ public:
 
     virtual void setViewInfo(const ViewInfo& info);
     ViewInfo viewInfo() const;
+    void setViewSize(int size);
+    int viewSize() const;
     int holeID() const;
     int holeID(const QPoint& holePoint) const;
 
@@ -47,6 +49,7 @@ protected:
     QBool2DVector mDispersedMask;
     const int mDispersedMaskSize = DefaultDispersedMaskSize;
     QPointF mMousePos;
+    QPointF mValidMousePos;
     QRectF mMouseRect;
     QRectF mDrapRectF;
     QAction * saveviewact;
@@ -70,19 +73,33 @@ protected:
     double getCircleRadius() const; // 视野圆半径
     double getInnerRectWidth() const; // 小矩形区域的宽度
     double getInnerRectHeight() const; // 小矩形区域的高度
-    QPointF getInnerRectTopLeftPoint() const; // 外接正方形左上角顶点
-    QPointF getInnerRectTopRightPoint() const;// 外接正方形右上角顶点
-    QPointF getInnerRectBottomLeftPoint() const;// 外接正方形左下角顶点
-    QPointF getInnerRectBottomRightPoint() const;// 外接正方形右下角顶点
-    QRectF getValidRect() const;
-    QRectF getInnerRect() const;
+    QPointF getExternalRectTopLeftPoint() const; // 外接正方形左上角顶点
+    QPointF getExternalRectTopRightPoint() const;// 外接正方形右上角顶点
+    QPointF getExternalRectBottomLeftPoint() const;// 外接正方形左下角顶点
+    QPointF getExternalRectBottomRightPoint() const;// 外接正方形右下角顶点
+    QRectF getCircleInnerRect() const;
+    QRectF getCircleExternalRect() const;
     bool isValidPoint(const QPointF& point) const;
     bool isValidRect(const QRectF& rect) const;
+protected:
+    bool isHighlight = false;
+    double trianglen = ViewTriangleLength; // 三角的边长
+    QColor highcolor  = Qt::green;
+    QRectF getTriangleInnerRect() const;
+    QPolygonF getLeftTrianglePoints() const;
+    QPolygonF getRightTrianglePoints() const;
+    QPolygonF getTopTrianglePoints() const;
+    QPolygonF getBottomTrianglePoints() const;
 signals:
     void previewEvent(const QPointF& point);
     void applyHoleEvent(const QVariantMap&m);
     void applyGroupEvent(const QVariantMap&m);
     void applyAllEvent(const QVariantMap&m);
+    void leftTriangleClicked();
+    void rightTriangleClicked();
+    void topTriangleClicked();
+    void bottomTriangleClicked();
+    void triangleClicked(int option);
 };
 
 #endif //EOS_VIEW_H

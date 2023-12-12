@@ -161,6 +161,7 @@ static const char*  GroupHoleActTitle = "Grouping Hole";
 static const char*  ApplyHoleActTitle = "Apply To Hole";
 static const char*  ApplyGroupActTitle = "Apply To Group";
 static const char*  ApplyAllActTitle = "Apply To All";
+static const char*  MoveMachineActTitle = "Move Machine";
 
 #define AppendField(s,field) (s+field)
 #define AppendSeparateField(s) (s+SeparateField)

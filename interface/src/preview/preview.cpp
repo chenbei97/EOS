@@ -331,6 +331,7 @@ void Preview::initAttributes()
     livecanvas->setAlignment(Qt::AlignCenter);
     livecanvas->setScaledContents(true);
 #else
+    livecanvas->drawTriangle(false);
     livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
     livecanvas->optimizePaint(50);
 #endif
@@ -440,6 +441,7 @@ void Preview::initConnections()
     connect(wellview,&WellView::applyGroupEvent,wellpattern,&WellPattern::applyGroupEvent); // 按组更新孔窗口的信息
     connect(wellview,&WellView::applyAllEvent,wellpattern,&WellPattern::applyAllEvent); // 不按组更新孔窗口的信息
     connect(wellview,&WellView::previewEvent,this,&Preview::previewViewEvent); // 点击视野预览
+    connect(wellview,&WellView::triangleClicked,this,&Preview::adjustLens); // 点模式微调
     connect(slideview,&SlidePattern::rectUpdated,slidepattern,&SlidePattern::updateRect);
 
     // (3) 外部信号=>preview/previewtool

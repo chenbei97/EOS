@@ -412,10 +412,10 @@ namespace obsoleteClass {
         // 1. 变量准备
         auto radius = width()>=height()?height()/2.0:width()/2.0;
         auto diameter = 2.0 * radius;
-        auto p11 = getInnerRectTopLeftPoint();
-        auto p12 = getInnerRectTopRightPoint();
-        auto p21 = getInnerRectBottomLeftPoint();
-        auto p22 = getInnerRectBottomRightPoint();
+        auto p11 = getExternalRectTopLeftPoint();
+        auto p12 = getExternalRectTopRightPoint();
+        auto p21 = getExternalRectBottomLeftPoint();
+        auto p22 = getExternalRectBottomRightPoint();
         auto groupcolor = mViewInfo[HoleGroupColorField].toString();
         auto id = holeID();
 

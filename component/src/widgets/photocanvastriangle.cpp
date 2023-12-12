@@ -62,6 +62,8 @@ void PhotoCanvasTriangle::paintEvent(QPaintEvent *event)
 {
     PhotoCanvas::paintEvent(event);
 
+    if (!isDraw) return;
+
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     auto pen = painter.pen();
@@ -91,6 +93,11 @@ void PhotoCanvasTriangle::paintEvent(QPaintEvent *event)
         path.addPolygon(bottom);
 
     painter.fillPath(path,highcolor);
+}
+
+void PhotoCanvasTriangle::drawTriangle(bool isDraw)
+{
+    this->isDraw = isDraw;
 }
 
 QPolygonF PhotoCanvasTriangle::getLeftTrianglePoints() const

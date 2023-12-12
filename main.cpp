@@ -66,7 +66,7 @@ void initApp(QApplication& a)
 #else
     auto * process = new QProcess;
     // 22987 Lenovo
-    process->start("C:\\Users\\Lenovo\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    process->start("C:\\Users\\22987\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
                    QStringList()<<"../test/test_socket.py");
     process->waitForStarted();
     QObject::connect(qApp, &QCoreApplication::aboutToQuit, [process]() {

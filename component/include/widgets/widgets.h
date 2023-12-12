@@ -84,6 +84,7 @@
 #define TriangleMinWidth (TriangleMinHeight/0.618)
 #define PhotoCanvasTriangleLength 100
 #define PhotoCanvasTriangleGap 10
+#define ViewTriangleLength 50
 #define PictureDescriptionMaxHeight 30
 #define ChannelPictureLabelMinHeight 100
 #define ChannelPictureLabelMaxWidth 150

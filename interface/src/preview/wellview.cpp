@@ -76,6 +76,23 @@ void WellView::toggleBrandObjective(int viewSize,bool toggleObjective)
     update();
 }
 
+void WellView::adjustViewPoint(int option)
+{
+    Q_ASSERT(mSelectMode == PointMode);
+
+    switch (option) {
+        case 0: mValidMousePos += QPointF(-1.0,0.0);
+            break;
+        case 1: mValidMousePos += QPointF(0.0,-1.0);
+            break;
+        case 2: mValidMousePos += QPointF(1.0,0.0);
+            break;
+        case 3: mValidMousePos += QPointF(0.0,1.0);
+            break;
+    }
+    update();
+}
+
 void WellView::importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
 {// 导入实验配置时去更新view的ui信息(和setViewInfo初始化的代码差不多) 完全弃用
     mViewInfo[HoleCoordinateField] = holePoint;
@@ -126,9 +143,46 @@ void WellView::importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int
     update();
 }
 
-void WellView::importViewInfo()
-{
+void WellView::importViewInfo(const QHoleInfoVector& vec)
+{ // 如果是区域模式: rect,viewpoints都有意义,但viewpoints可以通过rect得到,且更简便,不使用viewpoints
+    // 如果是点模式,rect为空,使用viewpoints
+    setSelectMode(ViewSelectMode::RectMode);
+    mMousePos = {-1.0,-1.0};
+    mValidMousePos = {-1.0,-1.0};
+    mMouseRect = QRectF();
+    mDrapRectF = QRectF();
 
+    if (mSelectMode == RectMode) {
+        for(auto holeInfo: vec) {
+
+            mViewInfo[HoleCoordinateField] = holeInfo.coordinate;
+            mViewInfo[HoleGroupNameField] = holeInfo.group;
+            mViewInfo[HoleGroupColorField] = holeInfo.color;
+            mViewInfo[HoleViewRectsField].setValue(holeInfo.viewrects);
+            mViewInfo[HoleViewPointsField].setValue(holeInfo.viewpoints);
+            mViewInfo[HoleViewSizeField] = holeInfo.viewsize;
+
+            // 这3行代码只是单纯过checkField()函数,没有特定含义
+            mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
+            mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
+            mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
+            // uipoints,allgroups,allholes,groupholes都无需更新,特点都是可以自行更新
+            // 其中uipoints是通过mViewRectDispersedPoints更新的
+            // 在dispersedViewRects()已经完成mViewRects,mViewRectDispersedPoints,mMachinePoints的更新
+
+            mSize = holeInfo.viewsize;
+            Q_ASSERT(holeInfo.viewrects.count() == 1);
+            mDrapRectF = holeInfo.viewrects[0];
+            saveviewact->trigger(); // 去更新mViewRects从而绘图,同时还能映射到wellPattern
+        }
+    }
+    else if (mSelectMode == PointMode) {
+
+    }
+
+
+
+    update();
 }
 
 void WellView::onApplyAllAct()
@@ -294,7 +348,7 @@ void WellView::onSaveViewAct()
         dispersedViewRects();
         mMouseRect = QRectF();
     } else {
-        mViewPoints[id].append(mapFromPointF(mMousePos));
+        mViewPoints[id].append(mapFromPointF(mValidMousePos));
         mTmpPoints[id] = mViewPoints[id]; // 需要重叠一定比例
         mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
     }
@@ -342,18 +396,19 @@ void WellView::dispersedViewRects()
     <<" mask count = "<<mViewMachinePoints.count()<<points.count();
 }
 
-QPointFVector WellView::getViewPoints() const
+QPointFVector WellView::getViewPoints(bool norm) const
 {
     auto id = holeID();
     auto viewRects = mViewRects[id];
+    auto diameter = getCircleRadius() * 2.0;
     QPointFVector points;
 
-    auto ref = getInnerRectTopLeftPoint();
+    auto ref = getExternalRectTopLeftPoint();
     auto view_w = qCeil(getInnerRectWidth());
     auto view_h = qCeil(getInnerRectHeight());
+
     for(auto viewRect: viewRects) {
-        auto rect = mapToSize(viewRect,QPointF(0.0,0.0),
-                              getCircleRadius()*2.0,getCircleRadius()*2.0);
+        auto rect = mapToSize(viewRect,ref,diameter,diameter);
         auto x0 = qCeil(rect.topLeft().x()); // 像上取整
         auto y0 = qCeil(rect.topLeft().y());
         auto w = qCeil(rect.width());
@@ -382,7 +437,7 @@ QPointFVector WellView::getViewPoints() const
 //                        }
 //                    }
 //                    if (isValidPoint(QPointF(center_x,center_y)) && !hasSaved) { // 如果超过阈值认为是新的要保存的小矩形
-//                        points.append(QPointF(center_x-ref.x(),center_y-ref.y())); // 注意电机坐标要减去参考点
+//                        points.append(QPointF(center_x,center_y)); // 注意电机坐标要减去参考点
 //                    }
 //                } else { // 如果标记为要删除的点(现在改了写法,没有移除区域了,else不会执行不需要删除)
 //                    QPointFVector holdPoints; // 保留的点
@@ -400,9 +455,11 @@ QPointFVector WellView::getViewPoints() const
     }
     //LOG<<points;
     // 离散电机坐标归一化
+    if (!norm) return points;
+
     QPointFVector normPoints;
     for(auto pt: points) {
-        normPoints.append(QPointF(pt.x()/(getCircleRadius()*2.0),pt.y()/(getCircleRadius()*2.0)));
+        normPoints.append(QPointF(pt.x()/diameter,pt.y()/diameter));
     }
     return normPoints;
 }
@@ -415,12 +472,12 @@ void WellView::paintEvent(QPaintEvent *event)
     auto pen = painter.pen();
 
     // 1. 变量准备
-    auto radius = width()>=height()?height()/2.0:width()/2.0;
+    auto radius = getCircleRadius();
     auto diameter = 2.0 * radius;
-    auto topleft = getInnerRectTopLeftPoint();
-    auto topright = getInnerRectTopRightPoint();
-    auto bottomleft = getInnerRectBottomLeftPoint();
-    auto bottomright = getInnerRectBottomRightPoint();
+    auto topleft = getExternalRectTopLeftPoint();
+    auto topright = getExternalRectTopRightPoint();
+    auto bottomleft = getExternalRectBottomLeftPoint();
+    auto bottomright = getExternalRectBottomRightPoint();
     auto rh = getInnerRectHeight();
     auto rw = getInnerRectWidth();
     auto groupcolor = mViewInfo[HoleGroupColorField].toString();
@@ -433,6 +490,9 @@ void WellView::paintEvent(QPaintEvent *event)
         if (!mViewRects[id].isEmpty()) {
             for(auto viewRect: mViewRects[id]) {
                 painter.fillRect(mapToSize(viewRect,topleft,diameter,diameter),groupcolor);
+                painter.drawText(mapToPointF(viewRect.topLeft())-QPointF(2,2),
+                                 QString("(%1,%2,%3,%4)").arg(viewRect.x()).arg(viewRect.y())
+                                 .arg(viewRect.width()).arg(viewRect.height()));
             }
         }
 
@@ -449,17 +509,20 @@ void WellView::paintEvent(QPaintEvent *event)
         // 3. 绘制电机坐标中心和矩形区域,方便查看是否正确
         auto points = getViewPoints();
         if (!points.isEmpty()) {
+
             pen.setWidth(DefaultPainterPenWidth*2);
             pen.setColor(PurpleEA3FF7);
             painter.setPen(pen);
-            for(auto pt: points) { // 注意: 要按比例放大后加上参考点
-                painter.drawPoint(pt.x()*diameter+topleft.x(),pt.y()*diameter+topleft.y());
+            for(auto pt: points) { // 注意: 要按比例放大加上参考点
+                auto pt_x = pt.x()*diameter+topleft.x();
+                auto pt_y = pt.y()*diameter+topleft.y();
+                painter.drawPoint(pt_x,pt_y);
             }
 
             pen.setWidth(DefaultPainterPenWidth);
             pen.setStyle(Qt::DashLine);
             painter.setPen(pen);
-            for(auto pt: points) { // 注意: 要按比例放大后加上参考点
+            for(auto pt: points) { // 注意: 要按比例放大
                 auto rec = QRectF(pt.x()*diameter+topleft.x()-rw/2.0,
                                   pt.y()*diameter+topleft.y()-rh/2.0,rw,rh);
                 painter.drawRect(rec);
@@ -496,17 +559,26 @@ void WellView::paintEvent(QPaintEvent *event)
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
         painter.setPen(pen);
-    } else if (mSelectMode == PointMode){ // 点模式
+    }
+    else if (mSelectMode == PointMode){ // 点模式
         pen.setWidth(DefaultDrawPointWidth);
         pen.setColor(groupcolor);
         painter.setPen(pen);
         for(auto pt:mViewPoints[id]) {
-            painter.drawPoint(mapToPointF(pt));
+            auto mpt = mapToPointF(pt);
+            painter.drawPoint(mpt);
+            painter.drawText(mpt.x()+3,mpt.y()-3,
+                             QString("(%1,%2)").arg(pt.x()).arg(pt.y()));
         }
         pen.setColor(Qt::blue);
         painter.setPen(pen);
-        if (mDrapRectF.isEmpty())
-            painter.drawPoint(mMousePos); // 绘制框不出现点
+        if (mDrapRectF.isEmpty()) { // 绘制拖拽框不绘制点
+            auto pt = mapFromPointF(mValidMousePos);
+            painter.drawPoint(mValidMousePos);
+            painter.drawText(mValidMousePos.x()+3,mValidMousePos.y()-3,
+                             QString("(%1,%2)").arg(pt.x()).arg(pt.y()));
+        }
+
         pen = painter.pen();
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::black);
@@ -514,10 +586,13 @@ void WellView::paintEvent(QPaintEvent *event)
     } else { // wholeMode
         auto grayc = QColor(Qt::gray);
         grayc.setAlpha(DefaultColorAlpha);
-        painter.fillRect(QRectF(getInnerRectTopLeftPoint(),QSize(diameter,diameter)),grayc);
+        painter.fillRect(QRectF(getExternalRectTopLeftPoint(),QSize(diameter,diameter)),grayc);
     }
     // 画圆
     painter.drawEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
+    painter.drawRect(getTriangleInnerRect()); // 三角内的矩形区域
+    //painter.drawRect(getCircleInnerRect()); // 圆内接正方形
+    painter.drawRect(getCircleExternalRect());// 圆外接正方形
     // 鼠标拖拽生成的矩形框
     pen.setWidth(DefaultPainterPenWidth);
     pen.setColor(Qt::blue);
@@ -533,11 +608,40 @@ void WellView::paintEvent(QPaintEvent *event)
 void WellView::mousePressEvent(QMouseEvent *event)
 {
     View::mousePressEvent(event);
+    if (mSelectMode == PointMode) {
+        if (event->button() == Qt::LeftButton) {
+            if (!mViewInfo[HoleGroupNameField].toString().isEmpty()) {
+                if (getLeftTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)){
+                    isHighlight = true;
+                    emit leftTriangleClicked();
+                    emit triangleClicked(0);
+                    LOG<<"left triangle is clicked";
+                } else if (getRightTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
+                    isHighlight = true;
+                    emit rightTriangleClicked();
+                    emit triangleClicked(2);
+                    LOG<<"right triangle is clicked";
+                } else if (getTopTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
+                    isHighlight = true;
+                    emit topTriangleClicked();
+                    emit triangleClicked(1);
+                    LOG<<"top triangle is clicked";
+                } else if (getBottomTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
+                    isHighlight = true;
+                    emit bottomTriangleClicked();
+                    emit triangleClicked(3);
+                    LOG<<"bottom triangle is clicked";
+                }
+            }
+        }
+    }
 }
 
 void WellView::mouseReleaseEvent(QMouseEvent *event)
 {
     View::mouseReleaseEvent(event);
+    isHighlight = false;
+    update();
 }
 
 void WellView::mouseMoveEvent(QMouseEvent *event)
@@ -556,5 +660,5 @@ void WellView::setSelectMode(WellView::ViewSelectMode mode)
 
 WellView::WellView(QWidget *parent) : View(parent)
 {
-
+    connect(this,&WellView::triangleClicked,this,&WellView::adjustViewPoint);
 }

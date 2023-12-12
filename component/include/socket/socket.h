@@ -440,7 +440,6 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
     auto toolinfo = m[PreviewToolField].value<PreviewToolInfo>();
     auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
     auto wellpatternsize = wellpatterninfo[HoleSizeField].toSize();
-    LOG<<wellpatternsize;
     auto wellgroupinfo = wellpatterninfo[GroupField].value<WellPatternInfo>();
 #ifdef usetab
     auto experinfo = m[ExperToolField].value<ExperToolInfo>();
@@ -550,22 +549,22 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
 //            tmpStr.chop(1);
 //            holeObject[HoleGroupCoordinatesField] = tmpStr;
 
-            tmpStr.clear();
-            for(auto n: allgroups.values()) {
-                tmpStr += QString("%1,").arg(n);
-            }
-            tmpStr.chop(1);
-            holeObject[HoleAllGroupsField] = tmpStr;
+//            tmpStr.clear(); // allgroups可以导入时自行重新计算,无需写入
+//            for(auto n: allgroups.values()) {
+//                tmpStr += QString("%1,").arg(n);
+//            }
+//            tmpStr.chop(1);
+//            holeObject[HoleAllGroupsField] = tmpStr;
 
-            tmpStr.clear();
-            for(auto pts: allholes) {
-                for(auto pt: pts)
-                    tmpStr += QString("(%1,%2),").arg(pt.x()).arg(pt.y());
-                tmpStr.chop(1);
-                tmpStr += "|";
-            }
-            tmpStr.chop(1);
-            holeObject[HoleAllCoordinatesField] = tmpStr;
+//            tmpStr.clear();
+//            for(auto pts: allholes) {// allholes可以导入时自行重新计算,无需写入
+//                for(auto pt: pts)
+//                    tmpStr += QString("(%1,%2),").arg(pt.x()).arg(pt.y());
+//                tmpStr.chop(1);
+//                tmpStr += "|";
+//            }
+//            tmpStr.chop(1);
+//            holeObject[HoleAllCoordinatesField] = tmpStr;
 
             holeObject[HoleViewSizeField] = holeinfo[HoleViewSizeField].toInt();
             auto viewrects = holeinfo[HoleViewRectsField].value<QRectFVector>();//

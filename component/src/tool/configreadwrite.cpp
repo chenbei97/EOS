@@ -115,8 +115,8 @@ void ConfigReadWrite::parseGroupField(const QJsonValue &key, const QJsonValue &v
             holeInfo.group = holeInfoObject[HoleGroupNameField].toString();
             Q_ASSERT(holeInfo.group == groupName);
             //auto groupHoles = convertToPointFVector(holeInfoObject[HoleGroupCoordinatesField].toString()); // 不提供组坐标的写入和解析
-            holeInfo.allcoordinate = convertTo2DPointVector(holeInfoObject[HoleAllCoordinatesField].toString());
-            holeInfo.allgroup = convertToSet(holeInfoObject[HoleAllGroupsField].toString());
+            //holeInfo.allcoordinate = convertTo2DPointVector(holeInfoObject[HoleAllCoordinatesField].toString()); // 组信息和所有点信息可以自行计算也无需导入
+            //holeInfo.allgroup = convertToSet(holeInfoObject[HoleAllGroupsField].toString());
 
             holeInfo.viewsize = holeInfoObject[HoleViewSizeField].toInt();
             auto rect_str = holeInfoObject[HoleViewRectsField].toString();

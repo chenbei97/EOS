@@ -11,7 +11,11 @@
 
 View::View(QWidget *parent) : QWidget(parent)
 {
-    mDisableRectRates[Qt::AlignLeft] = 0.1;
+    highcolor  = Qt::green;
+    highcolor.setAlpha(DefaultColorAlpha);
+    trianglen = ViewTriangleLength;
+
+    mDisableRectRates[Qt::AlignLeft] = 0.0;
     mDisableRectRates[Qt::AlignRight] = 0.0;
     mDisableRectRates[Qt::AlignTop] = 0.0;
     mDisableRectRates[Qt::AlignBottom] = 0.0;
@@ -21,6 +25,7 @@ View::View(QWidget *parent) : QWidget(parent)
     applyholeact = new QAction(tr(ApplyHoleActTitle));
     applygroupact = new QAction(tr(ApplyGroupActTitle));
     applyallact = new QAction(tr(ApplyAllActTitle));
+
     addAction(saveviewact);
     addAction(removeviewact);
     //addAction(applyholeact); // 不显式添加
@@ -74,8 +79,8 @@ QPointFVector View::overlap(const QPointFVector &points, double rate)
 
 QPointF View::mapFromPointF(const QPointF &point) const
 { // 把坐标归一化到0-1
-    auto pos = point-getInnerRectTopLeftPoint();
-    //LOG<<point<<getInnerRectTopLeftPoint()<<pos;
+    auto pos = point-getExternalRectTopLeftPoint();
+    //LOG<<point<<getExternalRectTopLeftPoint()<<pos;
     pos = pos / (getCircleRadius() * 2.0);
     return pos;
 }
@@ -85,7 +90,7 @@ QPointF View::mapToPointF(const QPointF &point) const
     auto pos = QPointF(point.x() * getCircleRadius() * 2.0,
                        point.y() * getCircleRadius() * 2.0);
 
-    pos = pos+getInnerRectTopLeftPoint();
+    pos = pos+getExternalRectTopLeftPoint();
     return pos;
 }
 
@@ -122,6 +127,7 @@ void View::setViewInfo(const ViewInfo &info)
     checkField();
 
     mMousePos = {-1.0,-1.0};
+    mValidMousePos = {-1.0,-1.0};
     mMouseRect = QRectF();
     mDrapRectF = QRectF();
 
@@ -134,6 +140,17 @@ void View::setViewInfo(const ViewInfo &info)
 ViewInfo View::viewInfo() const
 {
     return mViewInfo;
+}
+
+void View::setViewSize(int size)
+{
+    mSize = size;
+    update();
+}
+
+int View::viewSize() const
+{
+    return mSize;
 }
 
 int View::holeID() const
@@ -152,32 +169,27 @@ int View::holeID(const QPoint& holePoint) const
 
 void View::mousePressEvent(QMouseEvent *event)
 {
-    mMousePos = event->pos();
-//    if (!getValidRect().contains(mMousePos)) // 如果不是有效区域的鼠标点击无效
-//        mMousePos = {-1.0,-1.0};
-    if (!isValidPoint(mMousePos)) // 如果不是有效区域的鼠标点击无效
-        mMousePos = {-1.0,-1.0};
-
     // 1.框选后随机点一下要清除框选框(只能拖拽生成),同时出现单击框
+
     if (event->button() == Qt::LeftButton) {
+        mMousePos = event->pos();
+        if (isValidPoint(mMousePos))
+            mValidMousePos = mMousePos;
+
         mDrapRectF = QRectF();
 
         auto diameter = width()>=height()?height():width();
-        auto mouseRect_topleft = mMousePos-QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
-        auto mouseRect_bottomright = mMousePos+QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
-//        if (getValidRect().contains(mouseRect_topleft) && getValidRect().contains(mouseRect_bottomright)) {
-//            mMouseRect = mapFromSize(QRectF(mouseRect_topleft,mouseRect_bottomright),
-//                                     getInnerRectTopLeftPoint(),diameter,diameter);
-//        }
+        auto mouseRect_topleft = mValidMousePos-QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
+        auto mouseRect_bottomright = mValidMousePos+QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
 
         if (isValidRect(QRectF(mouseRect_topleft,mouseRect_bottomright))) {
             mMouseRect = mapFromSize(QRectF(mouseRect_topleft,mouseRect_bottomright),
-                                     getInnerRectTopLeftPoint(),diameter,diameter);
+                                     getExternalRectTopLeftPoint(),diameter,diameter);
         }
         update();
     } else if (event->button() == Qt::RightButton) {
         if (mViewInfo[HoleGroupNameField].toString().isEmpty()
-            || mMousePos == QPointF(-1.0, -1.0)) {
+            || !isValidPoint(mValidMousePos)) {
             applyallact->setEnabled(false);
             applygroupact->setEnabled(false);
             saveviewact->setEnabled(false);
@@ -190,7 +202,7 @@ void View::mousePressEvent(QMouseEvent *event)
         }
     }
     // 将鼠标坐标映射为相对圆外接正方形左上角的相对坐标,并将其归一化
-    if (mMousePos != QPointF(-1.0,-1.0)) {
+    if (isValidPoint(mValidMousePos)) {
         auto pos = mapFromPointF(mMousePos);
         emit previewEvent(pos);
     }
@@ -200,22 +212,20 @@ void View::mousePressEvent(QMouseEvent *event)
 
 void View::mouseReleaseEvent(QMouseEvent *event)
 {
-   event->accept();
+    event->accept();
 }
 
 void View::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton){
         auto end = event->pos(); // 鼠标停下的点
-//        if (!getValidRect().contains(mMousePos) || !getValidRect().contains(end))
-//            return; // 框选到无效区域
-        if (!isValidRect(QRectF(mMousePos,end)))
+        if (!isValidRect(QRectF(mValidMousePos,end)))
             return; // 框选到无效区域
         mMouseRect = QRectF();
         auto diameter = width()>=height()?height():width();
         // 鼠标形成的矩形框将其等比例缩放到0-1
-        mDrapRectF = mapFromSize(QRectF(mMousePos,end),
-                                 getInnerRectTopLeftPoint(),diameter,diameter);
+        mDrapRectF = mapFromSize(QRectF(mValidMousePos,end),
+                                 getExternalRectTopLeftPoint(),diameter,diameter);
     }
     update();
     event->accept();
@@ -232,7 +242,7 @@ void View::paintEvent(QPaintEvent *event)
     gc.setAlpha(DefaultColorAlpha);
     painter.fillRect(rect(),gc);
 
-    auto radius = width()>=height()?height()/2.0:width()/2.0;
+    auto radius = getCircleRadius();
     QPainterPath path;
     path.addEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
     painter.drawPath(path);
@@ -244,7 +254,7 @@ void View::paintEvent(QPaintEvent *event)
     drawDisableLines(painter,getBottomDisableRect(),gc,Qt::Vertical);
 
 //    auto diameter = getCircleRadius() * 2.0;
-//    auto topleft = getInnerRectTopLeftPoint()+QPointF(mDisableRectRates[Qt::AlignLeft]*diameter,mDisableRectRates[Qt::AlignTop]*diameter);
+//    auto topleft = getExternalRectTopLeftPoint()+QPointF(mDisableRectRates[Qt::AlignLeft]*diameter,mDisableRectRates[Qt::AlignTop]*diameter);
 //    auto validSize = QSizeF(diameter*(1.0-mDisableRectRates[Qt::AlignLeft]-mDisableRectRates[Qt::AlignRight]),
 //                            diameter*(1.0-mDisableRectRates[Qt::AlignTop]-mDisableRectRates[Qt::AlignBottom]));
 //    auto validRect = QRectF(topleft,validSize);
@@ -252,12 +262,46 @@ void View::paintEvent(QPaintEvent *event)
 //    if (innerRect.contains(validRect))
 //        painter.drawRect(validRect);
 //    else painter.drawRect(innerRect);
+
+    auto left = getLeftTrianglePoints();
+    auto right = getRightTrianglePoints();
+    auto top = getTopTrianglePoints();
+    auto bottom = getBottomTrianglePoints();
+
+    painter.drawPolygon(left);
+    painter.drawPolygon(right);
+    painter.drawPolygon(top);
+    painter.drawPolygon(bottom);
+
+    if (!mViewInfo[HoleGroupNameField].toString().isEmpty()) {
+        if (isHighlight) {
+            path.clear();
+            if (left.containsPoint(mMousePos,Qt::WindingFill))
+                path.addPolygon(left);
+            else if (right.containsPoint(mMousePos,Qt::WindingFill))
+                path.addPolygon(right);
+            else if (top.containsPoint(mMousePos,Qt::WindingFill))
+                path.addPolygon(top);
+            else if (bottom.containsPoint(mMousePos,Qt::WindingFill))
+                path.addPolygon(bottom);
+
+            painter.fillPath(path,highcolor);
+        }
+    }
+    else {
+        path.clear();
+        path.addPolygon(left);
+        path.addPolygon(right);
+        path.addPolygon(bottom);
+        path.addPolygon(top);
+        painter.fillPath(path,gc);
+    }
     event->accept();
 }
 
 QRectF View::getLeftDisableRect() const
 {
-    auto topleft = getInnerRectTopLeftPoint();
+    auto topleft = getExternalRectTopLeftPoint();
     auto diameter = getCircleRadius() * 2.0;
     auto rect = QRectF(topleft,QSizeF(diameter*mDisableRectRates[Qt::AlignLeft],diameter));
     return rect;
@@ -266,7 +310,7 @@ QRectF View::getLeftDisableRect() const
 QRectF View::getRightDisableRect() const
 {
     auto diameter = getCircleRadius() * 2.0;
-    auto topleft = getInnerRectTopRightPoint()-QPointF(diameter*mDisableRectRates[Qt::AlignRight],0.0);
+    auto topleft = getExternalRectTopRightPoint()-QPointF(diameter*mDisableRectRates[Qt::AlignRight],0.0);
     auto right_disable_rect = QRectF(topleft,QSizeF(diameter*mDisableRectRates[Qt::AlignRight],diameter));
     return right_disable_rect;
 }
@@ -274,7 +318,7 @@ QRectF View::getRightDisableRect() const
 QRectF View::getTopDisableRect() const
 {
     auto diameter = getCircleRadius() * 2.0;
-    auto topleft = getInnerRectTopLeftPoint();
+    auto topleft = getExternalRectTopLeftPoint();
     auto top_disable_rect = QRectF(topleft,QSizeF(diameter,diameter*mDisableRectRates[Qt::AlignTop]));
     return top_disable_rect;
 }
@@ -282,7 +326,7 @@ QRectF View::getTopDisableRect() const
 QRectF View::getBottomDisableRect() const
 {
     auto diameter = getCircleRadius() * 2.0;
-    auto topleft = getInnerRectBottomLeftPoint() - QPointF(0.0,diameter*mDisableRectRates[Qt::AlignBottom]);
+    auto topleft = getExternalRectBottomLeftPoint() - QPointF(0.0,diameter*mDisableRectRates[Qt::AlignBottom]);
     auto bottom_disable_rect = QRectF(topleft,QSizeF(diameter,diameter*mDisableRectRates[Qt::AlignBottom]));
     return bottom_disable_rect;
 }
@@ -327,18 +371,18 @@ void View::drawDisableLines(QPainter& painter,const QRectF& rect,const QColor& c
 //    }
 }
 
-QRectF View::getValidRect() const
-{ //有效的区域是整个圆内,其它都不认为有效,防止用户把viewwindow窗口拉伸后点,不过这里包含了圆和外界正方形的部分也不对
-    return QRectF(getInnerRectTopLeftPoint(),QSize(getCircleRadius()*2.0,getCircleRadius()*2.0));
-}
-
-QRectF View::getInnerRect() const
+QRectF View::getCircleInnerRect() const
 { // 圆内接正方形
     auto radius = getCircleRadius();
     auto center = QPointF(width()/2.0,height()/2.0);
     auto topleft = center - QPointF(sqrt(2)/2*radius, sqrt(2)/2*radius);
 
     return QRectF(topleft,QSizeF(sqrt(2)*radius, sqrt(2)*radius));
+}
+
+QRectF View::getCircleExternalRect() const
+{ // 圆外接正方形
+    return QRectF(getExternalRectTopLeftPoint(),QSizeF(2*getCircleRadius(),2*getCircleRadius()));
 }
 
 bool View::isValidPoint(const QPointF &point) const
@@ -378,7 +422,8 @@ bool View::isValidRect(const QRectF &rect) const
 
 double View::getCircleRadius() const
 { // 视野圆半径
-    return width()>=height()?height()/2.0:width()/2.0;
+    return width()>=height()?(height()-trianglen*2)/2.0:(width()-trianglen*2)/2.0;
+    //return width()>=height()?height()/2.0:width()/2.0;
 }
 
 double View::getInnerRectWidth() const
@@ -391,36 +436,89 @@ double View::getInnerRectHeight() const
     return 2.0 * getCircleRadius() / mSize *1.0;
 }
 
-QPointF View::getInnerRectTopLeftPoint() const
+QPointF View::getExternalRectTopLeftPoint() const
 {// 外接正方形左上角顶点
     if (width()>=height())
-        return QPointF(width()/2.0-getCircleRadius(),0.0);
+        return QPointF(width()/2.0-getCircleRadius(),trianglen);
     else
-        return QPointF(0.0,height()/2.0-getCircleRadius()); // 左上角x=0
+        return QPointF(trianglen,height()/2.0-getCircleRadius()); // 左上角x=0
 }
 
-QPointF View::getInnerRectTopRightPoint() const
+QPointF View::getExternalRectTopRightPoint() const
 {// 外接正方形右上角顶点
     if (width()>=height())
-        return QPointF(width()/2.0+getCircleRadius(),0.0);
+        return QPointF(width()/2.0+getCircleRadius(),trianglen);
     else
-        return QPointF(width(),height()/2.0-getCircleRadius());
+        return QPointF(width()-trianglen,height()/2.0-getCircleRadius());
 }
 
-QPointF View::getInnerRectBottomLeftPoint() const
+QPointF View::getExternalRectBottomLeftPoint() const
 {// 外接正方形左下角顶点
     if (width()>=height())
-        return QPointF(width()/2.0-getCircleRadius(),height());
+        return QPointF(width()/2.0-getCircleRadius(),height()-trianglen);
     else
-        return QPointF(0,height()/2.0+getCircleRadius());
+        return QPointF(trianglen,height()/2.0+getCircleRadius());
 }
 
-QPointF View::getInnerRectBottomRightPoint() const
+QPointF View::getExternalRectBottomRightPoint() const
 {// 外接正方形右下角顶点
     if (width()>=height())
-        return QPointF(width()/2.0+getCircleRadius(),height());
+        return QPointF(width()/2.0+getCircleRadius(),height()-trianglen);
     else
-        return QPointF(width(),height()/2.0+getCircleRadius());
+        return QPointF(width()-trianglen,height()/2.0+getCircleRadius());
+}
+
+QRectF View::getTriangleInnerRect() const
+{
+    return QRectF(trianglen,trianglen,width()-2*trianglen,height()-2*trianglen);
+}
+
+QPolygonF View::getLeftTrianglePoints() const
+{
+    //auto ref_pt = getTriangleInnerRect().topLeft();
+    auto ref_pt = getExternalRectTopLeftPoint();
+
+    auto vertex = QPointF(ref_pt.x()-trianglen*sqrt(3)/2,height()/2);
+    auto p_top = QPointF(ref_pt.x(),height()/2-trianglen/2);
+    auto p_bottom = QPointF(ref_pt.x(),height()/2+trianglen/2);
+
+    return QPolygonF(QPointFVector()<<vertex<<p_top<<p_bottom);
+}
+
+QPolygonF View::getRightTrianglePoints() const
+{
+    //auto ref_pt = getTriangleInnerRect().topRight();
+    auto ref_pt = getExternalRectTopRightPoint();
+
+    auto vertex = QPointF(ref_pt.x()+trianglen*sqrt(3)/2,height()/2);
+    auto p_top = QPointF(ref_pt.x(),height()/2-trianglen/2);
+    auto p_bottom = QPointF(ref_pt.x(),height()/2+trianglen/2);
+
+    return QPolygonF(QPointFVector()<<vertex<<p_top<<p_bottom);
+}
+
+QPolygonF View::getTopTrianglePoints() const
+{
+    //auto ref_pt = getTriangleInnerRect().topLeft();
+    auto ref_pt = getExternalRectTopLeftPoint();
+
+    auto vertex = QPointF(width()/2,ref_pt.y()-trianglen*sqrt(3)/2);
+    auto p_left = QPointF(width()/2-trianglen/2,ref_pt.y());
+    auto p_right = QPointF(width()/2+trianglen/2,ref_pt.y());
+
+    return QPolygonF(QPointFVector()<<vertex<<p_left<<p_right);
+}
+
+QPolygonF View::getBottomTrianglePoints() const
+{
+    //auto ref_pt = getTriangleInnerRect().bottomLeft();
+    auto ref_pt = getExternalRectBottomLeftPoint();
+
+    auto vertex = QPointF(width()/2,ref_pt.y()+trianglen*sqrt(3)/2);
+    auto p_left = QPointF(width()/2-trianglen/2,ref_pt.y());
+    auto p_right = QPointF(width()/2+trianglen/2,ref_pt.y());
+
+    return QPolygonF(QPointFVector()<<vertex<<p_left<<p_right);
 }
 
 bool View::checkField() const
