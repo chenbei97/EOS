@@ -38,8 +38,8 @@ void ParserControl::async(QCString f,QCVariant d)
  * */
     fram=f;res=d;
     //LOG<<"frame = "<<fram<<" d = "<<res; // 从结果打印是正确的
-    parseresult.clear();
     parseresult[fram]=d;
+    //LOG<<fram<<d;
     emit parseResult(f,d); // 外部使用这个信号纯异步写法也可以,绑定好这个信号就行
 }
 
@@ -47,6 +47,7 @@ QVariant ParserControl::result()
 {
     auto r = res;
     res = QVariant();//取走后要清除上次的内容防止下次被使用
+    //LOG<<r;
     return r;
 }
 

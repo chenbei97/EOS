@@ -53,7 +53,7 @@ protected:
     QPoint mMousePos = QPoint(-1,-1); // 鼠标点击的坐标,不是真实物理坐标
     QPoint mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
 signals:
-    void mouseClicked(const QPoint& point);
+    void holeClicked(const QPoint& point);
     void doubleClicked(const QPoint& point);
 };
 

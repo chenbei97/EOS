@@ -52,6 +52,7 @@
 #include "inscribedrect.h"
 #include "trianglemove.h"
 #include "lensbox.h"
+#include "waitmessagebox.h"
 #include "label.h"
 #include "checkbox.h"
 #include "progressbar.h"

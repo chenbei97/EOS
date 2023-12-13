@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-11-01 15:08:16
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-08 10:36:47
+ * @LastEditTime: 2023-12-13 15:54:24
  * @FilePath: \EOS\component\include\constant.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -24,6 +24,7 @@ static const int DefaultPrecisionBit = 6;
 static const int DefaultDrawPointWidth = 8;
 static const int DefaultPainterPenWidth = 2;
 static const int DefaultDispersedMaskSize = 100;
+static const int DefaultImageQuality = 100;
 #define PointToIDCoefficient 1000 // kx1+y1=kx2+y2=> k=(y2-y1)/(x1-x2),k取什么值?找不到这样的2个坐标能等于k,由于wellsize最大384,实际上k>384就能保证id唯一了
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 #define SqlExecFailedLOG (qDebug()<<"[" \
@@ -48,7 +49,7 @@ static const int DefaultDispersedMaskSize = 100;
 #define DefaultColorAlpha 125
 #define SocketPort 3000
 #define LocalHost "localhost"
-#define SocketWaitTime 3000
+#define SocketWaitTime 60000
 #define DefaultNativeColor QColor("#F0F0F0")
 //#define UseSqlcipher true
 #define TakePhotoTempPath (CURRENT_PATH+"/temp/photo/")
@@ -97,7 +98,7 @@ static const char* FrameField = "frame";
 static const char* SeparateField = "@@@";
 static const char* PathField = "path";
 static const char* EquipField = "equip";
-static const char* EstimatedSpace = "estimateSpace";
+static const char* EstimatedSpaceField = "estimateSpace";
 static const char* OkField = "ok";
 static const char* HourField = "hour";
 static const char* MinuteField = "minute";

@@ -21,14 +21,6 @@ int main(int argc, char *argv[]) {
     MainWindow w;
     setWindowAlignCenter(&w);
     w.show();
-
-    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
-    QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
-    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
-    else LOG<<"socket is connect failed!";
-    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
-    QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
-    LOG<<"activate code is "<<ParserResult.toString();
 #endif
     return QApplication::exec();
 }
@@ -75,6 +67,17 @@ void initApp(QApplication& a)
         LOG<<"python process is kill? "<<!process->isOpen();
     });
     SocketInit;
-    LOG<<"is connect? "<<SocketPointer->isConnected()<<SocketPointer->socketState();
+    //LOG<<"is connect? "<<SocketPointer->isConnected()<<SocketPointer->socketState();
+
+    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
+    //SocketPointer->exec_queue(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()));
+    //QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
+    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
+    else LOG<<"socket is connect failed!";
+
+    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
+    //SocketPointer->exec_queue(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()));
+    //QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
+    LOG<<"activate code is "<<ParserResult.toString();
 #endif
 }

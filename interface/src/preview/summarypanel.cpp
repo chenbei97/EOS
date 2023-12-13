@@ -27,7 +27,7 @@ void SummaryPanel::setData(const QVariantMap &m)
 #ifdef usetab
     auto experinfo = m[ExperToolField].value<QVariantMap>();
 #endif
-    auto estimatedSpace = m[EstimatedSpace].toString();
+    auto estimatedSpace = m[EstimatedSpaceField].toString();
     edit->clear();
     QString indent = "      ";
     QString indent2x = indent+indent;
@@ -183,15 +183,16 @@ void SummaryPanel::setData(const QVariantMap &m)
 
         // 7.孔组视野信息
         edit->append("");
-        if (patterninfo.keys().isEmpty()) {
+        auto patternGroupInfo = patterninfo[GroupField].value<WellPatternInfo>();
+        if (patternGroupInfo.keys().isEmpty()) {
             edit->append(tr("<strong><font color = #20A848>[2]Hole Info:No grouping</font></strong>"));
         }else {
             edit->append(tr("<strong><font color = #20A848>[2]Hole Info:</font></strong>"));
 
             int count = 0;
-            foreach(auto group, patterninfo.keys()) {
+            for(auto group: patternGroupInfo.keys()) {
                 count++;
-                auto groupinfo = patterninfo[group].value<QVariantMap>();
+                auto groupinfo = patternGroupInfo[group].value<QVariantMap>();
                 // 每个组拿第1个孔的信息就可以了,至少1个孔
                 auto holeinfo = groupinfo.value(groupinfo.firstKey()).value<QVariantMap>();
 

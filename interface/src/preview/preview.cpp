@@ -250,6 +250,19 @@ void Preview::openWellGroupWindow(const QVariantMap &m)
     }
 }
 
+#ifndef notusetoupcamera // 如果使用照相机指针类,preview内部直接使用相机
+void Preview::showCapturedImage(const QImage& image)
+{ // 来自照相机的捕捉图像事件传来的live图像显示
+#ifdef uselabelcanvas
+    auto pix = QPixmap::fromImage(image).scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
+    livecanvas->setPixmap(pix);
+    livecanvas->repaint();
+#else
+    livecanvas->setImage(image,10);
+#endif
+}
+#endif
+
 void Preview::setAppInfo(int app)
 { // 用于appselect传递当前app信息
     previewinfo[AppSelectField] = QString::number(app);
@@ -404,9 +417,10 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::stopVideo,this,&Preview::stopVideo);
     connect(previewtool,&PreviewTool::pauseVideo,this,&Preview::pauseVideo);
     connect(previewtool,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
+    connect(previewtool,&PreviewTool::brightAdjusted,this,&Preview::adjustBright);
     connect(previewtool,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
     connect(previewtool,&PreviewTool::slideStitching,this,&Preview::stitchSlide);
-    connect(previewtool,&PreviewTool::directionMove,this,&Preview::adjustLens);
+    //connect(previewtool,&PreviewTool::directionMove,this,&Preview::adjustLens);
     connect(previewtool,&PreviewTool::focusChanged,this,&Preview::manualFocus);
     connect(previewtool,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
     connect(previewtool,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
@@ -426,14 +440,15 @@ void Preview::initConnections()
 #ifdef uselabelcanvas
     connect(livecanvas,&LabelTriangle::triangleClicked,this,&Preview::adjustLens);
 #else
-    connect(livecanvas,&PhotoCanvasTriangle::triangleClicked,this,&Preview::adjustLens);
+    //connect(livecanvas,&PhotoCanvasTriangle::triangleClicked,this,&Preview::adjustLens);
 #endif
 
     connect(wellpattern,&WellPattern::openWellViewWindow,this,&Preview::openWellViewWindow); // 打开和更新视野窗口
     connect(wellpattern,&WellPattern::openWellGroupWindow,this,&Preview::openWellGroupWindow);// 打开分组窗口
-    connect(wellpattern,&WellPattern::mouseClicked,this,&Preview::previewHoleEvent); // 点击孔也触发预览
+    connect(wellpattern,&WellPattern::holeClicked,this,&Preview::previewHoleEvent); // 点击孔也触发预览
     connect(wellpattern,&WellPattern::removeHole,wellview,&WellView::removeHole);//删孔时清除该孔的缓存信息
     //connect(slidepattern,&SlidePattern::doubleClicked,this,&Preview::openSlideViewWindow);
+    connect(slidepattern,&SlidePattern::previewEvent,this,&Preview::previewSlideEvent);
     connect(slidepattern,&SlidePattern::rectUpdated,slideview,&SlidePattern::updateRect);
     connect(slidepattern,&SlidePattern::normRectUpdated,photocanvas,&PhotoCanvas::updateRect);
 
@@ -446,7 +461,7 @@ void Preview::initConnections()
     connect(slideview,&SlidePattern::rectUpdated,slidepattern,&SlidePattern::updateRect);
 
     // (3) 外部信号=>preview/previewtool
-    connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustCamera);
+    connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustBright);
 #ifdef notusetoupcamera
     connect(this, &Preview::evtCallback, this, &Preview::processCallback);
 #else

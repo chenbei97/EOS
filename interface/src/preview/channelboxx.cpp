@@ -98,9 +98,9 @@ void ChannelBoxx::clickBr()
         m[CurrentChannelField] = 0;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
         if (ParserResult.toBool()) {
-            LOG<<"关闭BR";
+            LOG<<"close BR";
         }
     }
 }
@@ -118,7 +118,7 @@ void ChannelBoxx::clickPh()
         m[CurrentChannelField] = 1;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
         if (ParserResult.toBool()) {
             LOG<<"close PH";
         }
@@ -138,7 +138,7 @@ void ChannelBoxx::clickGfp()
         m[CurrentChannelField] = 2;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
         if (ParserResult.toBool()) {
             LOG<<"close GFP";
         }
@@ -158,7 +158,7 @@ void ChannelBoxx::clickRfp()
         m[CurrentChannelField] = 3;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
         if (ParserResult.toBool()) {
             LOG<<"close RFP";
         }
@@ -179,7 +179,7 @@ void ChannelBoxx::clickDapi()
         m[CurrentChannelField] = 4;
         m[TurnOffLight] = 1;
         m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
+        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
         if (ParserResult.toBool()) {
             LOG<<"close DAPI";
         }
@@ -197,7 +197,7 @@ void ChannelBoxx::takePhoto(const QImage &img, const QString &channel)
 
 void ChannelBoxx::disableChannel(const QString &obj)
 { // obj = br10x, ph4x是兼容的老式字符串
-    LOG<<"objective = "<<obj;
+    //LOG<<"objective = "<<obj;
     if (obj.contains(ObjectiveBR) || obj.contains(NAField)) {
         phbtn->setEnabled(false);
         phbtn->resetBackGroundColor();

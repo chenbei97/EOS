@@ -173,8 +173,9 @@ void View::mousePressEvent(QMouseEvent *event)
     // 1.框选后随机点一下要清除框选框(只能拖拽生成),同时出现单击框
     if (event->button() == Qt::LeftButton) {
         mMousePos = event->pos();
-        if (isValidPoint(mMousePos))
+        if (isValidPoint(mMousePos)) {
             mValidMousePos = mMousePos;
+        }
 
         mDrapRectF = QRectF();
 
@@ -201,17 +202,17 @@ void View::mousePressEvent(QMouseEvent *event)
             removeviewact->setEnabled(true);
         }
     }
-    // 将鼠标坐标映射为相对圆外接正方形左上角的相对坐标,并将其归一化
-    if (isValidPoint(mValidMousePos)) {
-        auto pos = mapFromPointF(mValidMousePos);
-        emit previewEvent(pos);
-    }
     update();
     event->accept();
 }
 
 void View::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (mDrapRectF.isEmpty() && event->button() == Qt::LeftButton) { // 释放时判断如果是拖动事件或者是右键不发射移动电机
+        auto pos = mapFromPointF(mMousePos);
+        emit previewEvent(pos);//注意:这里不能用mValidMousePos,他可能没变,鼠标点击无效区域也触发了,另外只能左键
+    }
+    update();
     event->accept();
 }
 

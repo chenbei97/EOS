@@ -117,7 +117,7 @@ void TcpSocket::processRequestQueue()
         frame = requestQueue.head().first;
         auto request = requestQueue.head().second;
         requestQueue.dequeue();
-        //LOG<<"process request "<<request;
+        LOG<<"process request "<<request;
         socket->write(request);
         //LOG<<"before loop is running? "<<loop.isRunning();//可以看出每次调用前exec已经退出
         loop.exec();
@@ -125,66 +125,96 @@ void TcpSocket::processRequestQueue()
     }
 }
 
-#define user_v2_exec 0
 void TcpSocket::exec(const QString& f,const QByteArray& c,bool use_sync)
-{
+{  // 本函数适用于：1.服务回复消息无明显延迟的同步;2.非短时调用;3.异步;
+    // 1.询问激活码; 2.询问连接状态; 3.切换通道开关灯
     //LOG<<"request msg = "<<c;
-    /* v1写法: 对于使用同步,如果exec在慢速被调用时没有任何问题,如果被快速的高频调用(目前只有滑动条的情况)
+    /* v1写法: 对于使用同步,如果exec在慢速被调用时没有任何问题,如果被快速的高频调用(目前有滑动条的情况,4个三角快速微调镜头,预览事件等,后2者经实际测试也是反应过来的不需要请求队列)
      * 以下代码写法会出现 0x7ffeab390740 has already called exec()这样的警告,也就是提升loop已经被调用,尚未退出又被调用,因为loop作用域是类内部只有1个实例
      * 其实这个警告不会影响实际功能,只是系统压入栈需要时间处理频繁的loop被调用然后释放本地循环
-     * 下方新代码的写法是针对请求消息可以使用队列机制就可以避免loop被频繁调用,1条条处理队列的请求消息
+     * exec_queue的写法是针对请求消息可以使用队列机制就可以避免loop被频繁调用,1条条处理队列的请求消息(一般情况用exec就可以)
      * 或者说是客户端有责任和义务避免多条命令或者不完整的命令同时写入套接字造成服务端粘包
-     frame = f;
-     socket->write(c);
-    LOG<<"loop is running? "<<loop.isRunning(); // 快速滑slider会出现 "loop is running?  true"
-     if (use_sync) // 使用同步
-        loop.exec(); // 阻塞直到解析完,此时TcpSocket或者ParsePointer拿到结果
+     * ※※※※ 如果服务端回复消息有明显延迟,例如预览事件点击孔电机尚未移动到位又点击不适用本函数 ※※※※
+     * 除了造成has already called exec(),同时PareseResult.toBool()消息会错乱
+        [ "14:11:27:307" Preview::previewHoleEvent ]  exec  QPoint(1,0) 这里点了1下
+        [ "14:11:29:171" Preview::previewHoleEvent ]  exec  QPoint(1,1) 电机不到位还没回复又点了一下
+        QEventLoop::exec: instance 0x7ffd75d63c90 has already called exec() 弹出警告
+        [ "14:11:29:172" Preview::previewHoleEvent ]  move to hole point  QPoint(1,1)  failed! 其实这里应该是(1,0)失败
+        [ "14:11:32:332" Preview::previewHoleEvent ]  move to hole point  QPoint(1,1)  successful! 然后(1,1)成功是对的
+     * loop是个比较"软"的阻塞而不是"强"阻塞,因为可以二次被调用,所以这不适用有明显延迟的情况,另一个版本的exec使用对话框的exec来强阻塞代替loop
      * */
 
-#ifdef user_v1_exec
     frame = f;
     socket->write(c);
-    LOG<<"loop is running? "<<loop.isRunning(); // 快速滑slider会出现 "loop is running?  true"
+    //LOG<<"loop is running? "<<loop.isRunning(); // 使用本函数快速滑slider会出现 "loop is running?  true"
     if (use_sync) // 使用同步
         loop.exec(); // 阻塞直到解析完,此时TcpSocket或者ParsePointer拿到结果
-#else
-    /*v2写法: 如果是同步则引入请求消息队列*/
-    if (!use_sync) {
-        frame = f;
-        socket->write(c); // 如果使用异步不需要队列,结果需要根据Parse类的异步信号去拿结果
-    } else {
-        //LOG<<"request msg = "<<c;
-        //LOG<<"before = "<<requestQueue.count();
-        requestQueue.enqueue(qMakePair(f,c));
-        //LOG<<"after = "<<requestQueue.count();
-        /*
-         *  放入队列,快速滑slider时队列会逐个去请求,不会重复调用loop.exec
-         *  然后定时器触发processRequestQueue逐个的去处理,并且从loop的running打印结果可以看出服务端收到解析信号就及时退出了loop
-         *  下次调用不会出现loop已经处于running的状态,也就不会出现V1写法的警告 has already called exec()
-            [ "11:34:38:348" TcpSocket::exec ]  before =  3 // 快速滑动时processRequestQueue的执行晚于exec,故请求队列开始增加,积累请求
-            [ "11:34:38:348" TcpSocket::exec ]  after =  4
-            [ "11:34:38:349" TcpSocket::exec ]  before =  4
-            [ "11:34:38:350" TcpSocket::exec ]  after =  5
-            [ "11:34:38:352" TcpSocket::exec ]  before =  5
-            [ "11:34:38:352" TcpSocket::exec ]  after =  6
-            [ "11:34:38:354" TcpSocket::exec ]  before =  6
-            [ "11:34:38:355" TcpSocket::exec ]  after =  7
-            .... // 之后定时器异步的起作用逐个处理,请求队列减少
-            [ "11:37:47:596" TcpSocket::processRequestQueue ]  requestQueue's count =  12 //这里看出loop下次exec前已经quit
-            [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
-            [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
-            [ "11:37:47:598" TcpSocket::processRequestQueue ]  requestQueue's count =  11
-            [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
-            [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
-            [ "11:37:47:599" TcpSocket::processRequestQueue ]  requestQueue's count =  10
-            [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
-            [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
-            [ "11:37:47:600" TcpSocket::processRequestQueue ]  requestQueue's count =  9
-            [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
-            [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
-         * */
+}
+
+void TcpSocket::exec(const QString& f,const QByteArray& c)
+{ // 本函数只适用于: 有弹窗需求的硬同步,服务侧有明显延迟;
+    // 适用于:1.预览孔/视野/载玻片事件;2.微调镜头事件; 3切换物镜同时动电机;4.setting单纯动电机到某个位置; 5.启动实验
+    frame = f;
+    socket->write(c);
+    looptimer.start(SocketWaitTime);
+    if (f == TcpFramePool.previewEvent || f == TcpFramePool.adjustLensEvent || f == TcpFramePool.toggleObjectiveEvent
+     || f == TcpFramePool.moveMachineEvent) {
+        waitdlg->setWaitText(tr(WaitMessageBoxMoveMachineMsg));
+    } else if (f == TcpFramePool.loadExperEvent) {
+        waitdlg->setWaitText(tr(WaitMessageBoxStartExperimentMsg));
+    } else if ( f == TcpFramePool.stopExperEvent) {
+        waitdlg->setWaitText(tr(WaitMessageBoxStopExperimentMsg));
     }
-#endif
+    waitdlg->wait(); // 弹窗形式的硬同步
+}
+
+void TcpSocket::exec_queue(const QString &f, const QByteArray &c)
+{//使用请求消息队列的方式: 本函数用于滑动条或者短时发送大量请求消息的同步操作,而且不需要弹窗硬同步
+    // 1.调节br,gain,exp; 2.focus滑动条的操作使用
+    //LOG<<"request msg = "<<c;
+    //LOG<<"before = "<<requestQueue.count();
+    requestQueue.enqueue(qMakePair(f,c));
+    //LOG<<"after = "<<requestQueue.count();
+    /*
+     *  使用本函数放入队列,快速滑slider时队列会逐个去请求,不会重复调用loop.exec
+     *  然后定时器触发processRequestQueue逐个的去处理,并且从loop的running打印结果可以看出服务端收到解析信号就及时退出了loop
+     *  下次调用不会出现loop已经处于running的状态,也就不会出现V1写法的警告 has already called exec()
+     *  不过要注意: loop.exec是在定时器的异步操作内执行的,而不是在exec_queue上下问函数立即执行的
+     *  所以会出现:如果只调用1次exec_queue时ParseResult没有立即同步的现象,例如main.cpp询问是否连接和激活码
+     *  所以如果只需要执行1次的操作请使用exec而不是exec_queue,或者使用exec_queue后立即调用下方语句才可
+     *  QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
+     *  main.cpp询问是否连接和激活码的代码,使用2种方式均可
+     *  SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
+        SocketPointer->exec_queue(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()));
+        QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
+        if (ParserResult.toBool()) LOG<<"socket is connect successful!";
+        else LOG<<"socket is connect failed!";
+     *  SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
+        SocketPointer->exec_queue(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()));
+        QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
+        LOG<<"activate code is "<<ParserResult.toString();
+        [ "11:34:38:348" TcpSocket::exec ]  before =  3 // 快速滑动时processRequestQueue的执行晚于exec,故请求队列开始增加,积累请求
+        [ "11:34:38:348" TcpSocket::exec ]  after =  4
+        [ "11:34:38:349" TcpSocket::exec ]  before =  4
+        [ "11:34:38:350" TcpSocket::exec ]  after =  5
+        [ "11:34:38:352" TcpSocket::exec ]  before =  5
+        [ "11:34:38:352" TcpSocket::exec ]  after =  6
+        [ "11:34:38:354" TcpSocket::exec ]  before =  6
+        [ "11:34:38:355" TcpSocket::exec ]  after =  7
+        .... // 之后定时器异步的起作用逐个处理,请求队列减少
+        [ "11:37:47:596" TcpSocket::processRequestQueue ]  requestQueue's count =  12 //这里看出loop下次exec前已经quit
+        [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
+        [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
+        [ "11:37:47:598" TcpSocket::processRequestQueue ]  requestQueue's count =  11
+        [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
+        [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
+        [ "11:37:47:599" TcpSocket::processRequestQueue ]  requestQueue's count =  10
+        [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
+        [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
+        [ "11:37:47:600" TcpSocket::processRequestQueue ]  requestQueue's count =  9
+        [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
+        [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
+     * */
 }
 
 QVariantMap TcpSocket::result() const
@@ -220,19 +250,25 @@ QTcpSocket::SocketState TcpSocket::socketState() const
 TcpSocket::TcpSocket(QObject *parent):QObject(parent)
 {
     socket = new QTcpSocket;
+    waitdlg = getWaitMessageBox(tr(WaitMessageBoxMoveMachineMsg),false);
     socket->setReadBufferSize(0);// 默认就是0,也就是缓冲不受限制,有多少就接受多少
     socket->setSocketOption(QAbstractSocket::LowDelayOption, true); // 尽可能低延迟,但是不能避免,还是会粘包
 
     looptimer.setSingleShot(true);
     looptimer.setInterval(SocketWaitTime);
-    // loop只要执行就启动定时器,如果一直没有回复也不能卡着,定时器超时就退出loop
+
+    // 软同步: loop只要执行就启动定时器,如果一直没有回复也不能卡着,定时器超时就退出loop
     connect(&looptimer,&QTimer::timeout,&loop,&EventLoop::quit);
     connect(&loop,&EventLoop::started,this,[=]{looptimer.start(SocketWaitTime);});
+    //拿到同步后的结果,外接可以从TcpSocket.result也可以直接从ParserResult拿结果,这2个都已经是同步的
+    connect(ParserPointer,&ParserControl::parseResult,&loop,&EventLoop::quit);
+
+    // 硬同步: 超时就
+    connect(ParserPointer,&ParserControl::parseResult,waitdlg,&QMessageBox::accept);
+    connect(&looptimer,&QTimer::timeout,waitdlg,&QMessageBox::accept);
 
     connect(socket,&QTcpSocket::readyRead,this,&TcpSocket::onReadyReadSlot);
     connect(socket,&QTcpSocket::readyRead,this,&TcpSocket::processMsgQueue);
-    //拿到同步后的结果,外接可以从TcpSocket.result也可以直接从ParserResult拿结果,这2个都已经是同步的
-    connect(ParserPointer,&ParserControl::parseResult,&loop,&EventLoop::quit);
 
     connect(&requesttimer,&QTimer::timeout,this,&TcpSocket::processRequestQueue);
     requesttimer.start(0);

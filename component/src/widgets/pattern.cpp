@@ -31,15 +31,22 @@ void Pattern::drawHighlight(QPainter&painter)
 void Pattern::mousePressEvent(QMouseEvent *event)
 {
     if (mMouseEvent) {
-        mMousePos = QPoint(-1,-1);
-        mLastPos = event->pos();
-        auto rects = getChildRects(); // 所有小正方形区域匹配这个坐标
-        for(int row = 0; row < mrows; ++row)
-            for(int col = 0; col < mcols; ++col)
-                if (rects[row][col].contains(mLastPos))
-                    mMousePos = {row,col};
-        update();
-        emit mouseClicked(mMousePos);
+        if (event->button() == Qt::LeftButton) { // 改为左键才会变化,防止右击也动电机
+            //mMousePos = QPoint(-1,-1);
+            QPoint tmp;
+            mLastPos = event->pos();
+            auto rects = getChildRects(); // 所有小正方形区域匹配这个坐标
+            for(int row = 0; row < mrows; ++row)
+                for(int col = 0; col < mcols; ++col)
+                    if (rects[row][col].contains(mLastPos))
+                        tmp = {row,col};
+            //LOG<<mLastPos<<mMousePos;
+            update();
+            if (tmp != mMousePos) { // 电机已经在这个位置了无需移动
+                mMousePos = tmp;
+                emit holeClicked(mMousePos);
+            }
+        }
     }
 
     event->accept();

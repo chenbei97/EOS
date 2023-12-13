@@ -50,6 +50,7 @@ Slider::Slider(const QString &p, const QString &s, int min, int max, QWidget *pa
 
     connect(slider,&QSlider::sliderMoved,this,&Slider::onSliderChanged);
     connect(slider,&QSlider::sliderMoved,this,&Slider::valueChanged);
+    connect(slider,&QSlider::sliderReleased,[=]{emit sliderReleased(currentValue);});
 
     //setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
 }

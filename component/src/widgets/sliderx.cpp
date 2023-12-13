@@ -49,10 +49,14 @@ void Sliderx::mousePressEvent(QMouseEvent *event)
         emit valueChanged(value);
         emit sliderMoved(value); // 这个信号也要发送
         emit sliderPressed();
-        emit sliderReleased();
-
         QSlider::mousePressEvent(event);
     }
+}
+
+void Sliderx::mouseReleaseEvent(QMouseEvent *event)
+{
+    emit sliderReleased();
+    QSlider::mouseReleaseEvent(event);
 }
 
 void Sliderx::setMouseEvent(bool enabled)
@@ -75,5 +79,7 @@ void Sliderx::wheelEvent(QWheelEvent *event)
         else setValue(minimum());
     }
     emit sliderMoved(sliderPosition()); // 这个信号也要发送
+    emit sliderPressed();
+    emit sliderReleased();
     QSlider::wheelEvent(event);
 }

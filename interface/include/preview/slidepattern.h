@@ -24,6 +24,7 @@ public:
     QRectF slideRect() const;
     QPointFVector viewPoints(bool overlap = true) const;
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;

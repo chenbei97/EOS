@@ -56,6 +56,8 @@
 #include "qpainter.h"
 #include "qevent.h"
 #include "qaction.h"
+#include "qelapsedtimer.h"
+#include "qtimer.h"
 #include "qmenu.h"
 #include "qmath.h"
 #include "qpropertyanimation.h"

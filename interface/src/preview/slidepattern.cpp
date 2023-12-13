@@ -100,9 +100,15 @@ void SlidePattern::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     auto pen = painter.pen();
+
+    if (mDrapRectF.isEmpty()) {
+        pen.setWidth(DefaultPainterPenWidth*2);
+        painter.setPen(pen);
+        painter.drawPoint(mMousePos);
+    }
+
     pen.setWidth(DefaultPainterPenWidth);
     painter.setPen(pen);
-
     painter.drawRect(0,0,width(),height());
     painter.drawRect(getValidRect());
     painter.fillRect(mSaveRectF,Qt::green);
@@ -177,12 +183,11 @@ void SlidePattern::paintEvent(QPaintEvent *event)
 
 void SlidePattern::mousePressEvent(QMouseEvent *event)
 {
-    mMousePos = event->pos();
-    if (!isValidPoint(mMousePos)) {
-        mMousePos = {-1.0,-1.0};
-    }
-
     if (event->button() == Qt::LeftButton) {
+        mMousePos = event->pos();
+        if (!isValidPoint(mMousePos)) {
+            mMousePos = {-1.0,-1.0};
+        }
         mDrapRectF = QRectF();
     } else if (event->button() == Qt::RightButton) {
         if (mMousePos == QPointF(-1.0,-1.0)) {
@@ -193,9 +198,15 @@ void SlidePattern::mousePressEvent(QMouseEvent *event)
             removeviewact->setEnabled(true);
         }
     }
-    if (mMousePos != QPointF(-1.0,-1.0)) {
+    update();
+    event->accept();
+}
+
+void SlidePattern::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (mMousePos != QPointF(-1.0,-1.0) && event->button() == Qt::LeftButton && mDrapRectF.isEmpty()) {
         auto pos = norm(mMousePos);
-        LOG<<"slide preview event point: "<<pos;
+        //LOG<<"slide preview event point: "<<pos;
         emit previewEvent(pos);
     }
     update();

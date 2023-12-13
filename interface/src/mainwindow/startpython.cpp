@@ -31,10 +31,10 @@ void StartPython::start(const QString &path, const QString &file, const QString 
 
     if (!thread->isRunning())
         thread->start();
-    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()));
+    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
     if (ParserResult.toBool()) LOG<<"socket is connect successful!";
     else LOG<<"socket is connect failed!";
-    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()));
+    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
     LOG<<"activate code is "<<ParserResult.toString();
 }
 

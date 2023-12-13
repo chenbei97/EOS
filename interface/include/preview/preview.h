@@ -121,13 +121,15 @@ private:
     void takingPhoto();
     void stitchSlide();
     void toggleObjective(int objective,int objective_loc,int isPh);
-    void adjustCamera(int exp,int gain,int br);
-    void onAdjustCamera(const QString &f,const QVariant & d);
+    void adjustCamera(int exp,int gain);
+    void adjustBright(int br);
+    void onAdjustBright(const QString &f,const QVariant & d);
     void adjustLens(int option);
     void manualFocus(double val);
     void toggleChannel(int option);
     void previewViewEvent(const QPointF& viewPoint);
     void previewHoleEvent(const QPoint& holePoint);
+    void previewSlideEvent(const QPointF& point);
     void exportExperConfig(const QString& path);
     void importExperConfigV1(const QString& path);
     void importExperConfig(const QString& path);

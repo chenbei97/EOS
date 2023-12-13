@@ -8,8 +8,13 @@
  */
 #include "preview.h"
 
-void Preview::stitchSlide()
+void Preview::previewSlideEvent(const QPointF& point)
 {
+    LOG<<"slide point: "<<point;
+}
+
+void Preview::stitchSlide()
+{ // slide 拼图功能
     auto brand = previewtool->boxInfo(WellBoxTitle)[BrandField].toUInt();
     if(brand == SlideIndexInBrand) {
         canvasmode->changeMode(CanvasMode::PhotoMode);
@@ -37,13 +42,15 @@ void Preview::stitchSlide()
 }
 
 void Preview::manualFocus(double val)
-{ // 手动调焦,来自focusslider的信号,目前是移动滑动条时就会触发,点击2个细调按钮也会触发
+{ // 手动调焦,来自focus_slider的信号,目前是移动滑动条时就会触发,点击2个细调按钮也会触发
     //LOG<<"focus = "<<val;
     QVariantMap m;
     m[FocusField] = val;
     m[FrameField] = TcpFramePool.manualFocusEvent;
     auto msg = assembleManualFocusEvent(m);
-    SocketPointer->exec(TcpFramePool.manualFocusEvent,msg, true);
+    //SocketPointer->exec(TcpFramePool.manualFocusEvent,msg, true);
+    SocketPointer->exec_queue(TcpFramePool.manualFocusEvent,msg);
+    // 对于滑动条用请求队列防止重复调用exec,QEventLoop::exec: instance 0x7ffd85fdbab8 has already called exec()
     if (ParserResult.toBool()) {
         LOG<<"adjust focus to "<<val<<"successful!";
     }
@@ -51,8 +58,8 @@ void Preview::manualFocus(double val)
 
 void Preview::toggleObjective(int objective,int objective_loc,int isPh)
 { // objective: 物镜倍数代号 objective_loc: 切到的物镜位置代号 isPH:指示是否为PH类型
-    // 这个初始化setting时会初始化4个位置的物镜,从而会触发本函数,在mainwindow没构造完成就发了命令,故需要invokeMethod立即处理
-    // 其它的函数不需要invokeMethod,本函数特殊
+    // 切换物镜同时动电机事件,setting更改物镜设置时也会触发
+    // 这个初始化setting时会初始化4个位置的物镜,从而会触发本函数,在mainwindow没构造完成就发了命令
     //LOG<<"objective = "<<objective<<" loc = "<<objective_loc<<" isph = "<<isPh;
     QVariantMap m;
     m[ObjectiveField] = objective;
@@ -62,10 +69,9 @@ void Preview::toggleObjective(int objective,int objective_loc,int isPh)
     AssemblerPointer->assemble(TcpFramePool.toggleObjectiveEvent,m);
     auto msg = AssemblerPointer->message();
 
-    SocketPointer->exec(TcpFramePool.toggleObjectiveEvent,msg, true);
-    QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
+    SocketPointer->exec(TcpFramePool.toggleObjectiveEvent,msg);
     if (ParserResult.toBool()) {
-        LOG<<"toggle objective successful! magnification ="<<ObjectiveMagnificationFields[objective]<<"isPH? "<<isPh;
+        LOG<<"toggle objective successful! magnification ="<<ObjectiveMagnificationFields[objective]<<"isPH?"<<bool(isPh);
     } else {LOG<<"toggle objective failed!";}
 }
 
@@ -99,25 +105,22 @@ void Preview::toggleChannel(int option)
 }
 
 void Preview::adjustLens(int option)
-{ // 0-left,1-rop,2-right,3-bottom
-    // 点调节镜头
+{ // 0-left,1-rop,2-right,3-bottom 微调节镜头
     QJsonObject object;
     object[FrameField] = TcpFramePool.adjustLensEvent;
     object[DirectionField] = option;
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
 
-    //LOG<<msg;
-    SocketPointer->exec(TcpFramePool.adjustLensEvent,msg, true);
+    SocketPointer->exec(TcpFramePool.adjustLensEvent,msg);
 
     if (ParserResult.toBool()) {
-        LOG<<"移动镜头方向: "<<option;
+        LOG<<"move direction: "<<option;
+        wellview->adjustViewPoint(option);
     }
-
-    wellview->adjustViewPoint(option);
 }
 
-void Preview::adjustCamera(int exp,int gain,int br)
+void Preview::adjustBright(int br)
 {
     auto toolinfo = previewtool->toolInfo();
 
@@ -127,20 +130,7 @@ void Preview::adjustCamera(int exp,int gain,int br)
         LOG<<"没有通道的灯被打开,不执行滑动条的参数调整!";
         return; // 如果通道无效,没有开灯,调节参数没有意义,不发给下位机
     }
-#ifndef notusetoupcamera
-    LOG<<"exposureOption = "<<ToupCameraPointer->exposureOption();
-    if (!ToupCameraPointer->exposureOption()) {
-        ToupCameraPointer->setExposure(exp);
-        ToupCameraPointer->setGain(gain);
-    }
-;
-#else
-    LOG<<"exposureOption = "<<exposureOption();
-    if (!exposureOption()) { // 设置手动曝光,exp option = 0
-        setExposure(exp);
-        setGain(gain);
-    }
-#endif
+
     // 滑动条速度很快,这里组装不再通过Assembler来组装,可能同步会出问题,直接组装
     QJsonObject object;
     object[FrameField] = TcpFramePool.adjustBrightEvent;
@@ -151,17 +141,16 @@ void Preview::adjustCamera(int exp,int gain,int br)
 
     // 发送消息同步,异步都行,如果用同步这里就可以打印消息,这里所有的函数都可以异步也可以同步,2种方式都没有问题
     // 异步做法对adjustCamera则是用ParsePointer的parseResult信号绑定到下边的onAdjustCamera函数
-    // 然后打印消息也是可以的,2种写法机制测试了所有情况都没有问题,尤其现在exec引入请求消息队列更加优化了代码不出问题
-    SocketPointer->exec(TcpFramePool.adjustBrightEvent,msg, true);
-    if (ParserResult.toBool()) {
-        LOG<<"adjust exp gain bright to"<<exp<<gain<<br;
-    }
+    // 然后打印消息也是可以的,2种写法机制测试了所有情况都没有问题,尤其现在exec_queue引入请求消息队列更加优化了代码不出问题
+    SocketPointer->exec_queue(TcpFramePool.adjustBrightEvent,msg);
+//    if (ParserResult.toBool()) {
+//        LOG<<"adjust exp gain bright to"<<exp<<gain<<br;
+//    }
 }
 
-// 一个例子,其它的函数例如adjustLens也可以绑一个函数给ParserPointer,内部f==TcpFramePool.adjustLensEvent时去做一些事
-// 只不过这里我觉得为了方便打log犯不着额外绑定个函数
-void Preview::onAdjustCamera(const QString & f,const QVariant & d)
+void Preview::onAdjustBright(const QString & f,const QVariant & d)
 { // 这个是异步获取ParsePointer的parseResult,上方不使用同步,连接本函数也是可以的
+    // 其它的函数例如adjustLens也可以绑一个函数给ParserPointer,内部f==TcpFramePool.adjustLensEvent时去做一些事
     static int count = 0;
     if (d.toBool() && f == TcpFramePool.adjustBrightEvent) {
         LOG<<"adjust exp gain bright successful!"<<count;
@@ -169,21 +158,32 @@ void Preview::onAdjustCamera(const QString & f,const QVariant & d)
     count++;
 }
 
-#ifndef notusetoupcamera
-void Preview::showCapturedImage(const QImage& image)
+void Preview::adjustCamera(int exp,int gain)
 {
-#ifdef uselabelcanvas
-    auto pix = QPixmap::fromImage(image).scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
-    livecanvas->setPixmap(pix);
-    livecanvas->repaint();
+    auto toolinfo = previewtool->toolInfo();
+
+    auto current_channel = toolinfo[CurrentChannelField].toString();
+
+    if (current_channel.isEmpty()) {
+        LOG<<"没有通道的灯被打开,不执行滑动条的参数调整!";
+        return; // 如果通道无效,没有开灯,调节参数没有意义,不发给下位机
+    }
+
+#ifndef notusetoupcamera
+    //LOG<<"exposureOption = "<<ToupCameraPointer->exposureOption();
+    if (!ToupCameraPointer->exposureOption()) {
+        ToupCameraPointer->setExposure(exp);
+        ToupCameraPointer->setGain(gain);
+    }
+;
 #else
-    // QVariantMap m;
-    // m[ImageField] = image;
-    // livecanvas->setData(m);
-    livecanvas->setImage(image,10);
+    //LOG<<"exposureOption = "<<exposureOption();
+    if (!exposureOption()) { // 设置手动曝光,exp option = 0
+        setExposure(exp);
+        setGain(gain);
+    }
 #endif
 }
-#endif
 
 void Preview::takingPhoto()
 {
@@ -192,41 +192,22 @@ void Preview::takingPhoto()
     int exp = current_info[ExposureField].toUInt();
     int ga = current_info[GainField].toUInt();
 
-//  auto save_channels = toolinfo[CaptureChannelField].toStringList();//保存过设置的所有通道
-//  QVariantMap m;
-// 不从保存过的参数去拿,而是从UI的信息直接去拿
-//    if (save_channels.contains(current_channel)) {
-//        // 例如当前通道PH,设置过PH的相机参数
-//        auto camera_info = toolinfo[current_channel].value<QVariantMap>();
-//        Q_ASSERT(camera_info[ChannelField].toString() == current_channel);
-//        exp = camera_info[ExposureField].toUInt();
-//        ga = camera_info[GainField].toUInt();
-//        m[BrightField] = camera_info[BrightField];
-//    }
-
-//    QVariantMap m;
-//    m[BrightField] = current_info[BrightField];
-//    AssemblerPointer->assemble(TcpFramePool.frame0x0004,m);
-//    auto msg = AssemblerPointer->message();
-//    SocketPointer->exec(TcpFramePool.frame0x0004,msg,true);
-//    // 等待回复后调用相机拍照(现在没有拍照事件了,无需发送0x0004命令直接拍就行)
-
 #ifndef notusetoupcamera
         ToupCameraPointer->setExposure(exp);
         ToupCameraPointer->setGain(ga);
         auto pix = ToupCameraPointer->capture();
         auto current_channel = toolinfo[CurrentChannelField].toString();
         previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道,以及显示到缩略图
-        LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
-        <<" 曝光和增益为 "<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
+        LOG<<"adjust bright to"<<current_info[BrightField].toInt()
+        <<"(exp,gain) ="<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
 #else
         setExposure(exp);
         setGain(ga);
         auto pix = capture();
         auto current_channel = toolinfo[CurrentChannelField].toString();
         previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
-        LOG<<"已经调整亮度为 "<<current_info[BrightField].toInt()
-       <<" 曝光和增益为 "<<exposure()<<gain();
+        LOG<<"adjust bright to"<<current_info[BrightField].toInt()
+       <<"(exp,gain) ="<<exposure()<<gain();
 #endif
 
         canvasmode->changeMode(CanvasMode::PhotoMode);
@@ -237,7 +218,7 @@ void Preview::takingPhoto()
         createPath(TakePhotoTempPath);
         auto path = TakePhotoTempPath
                     +QDateTime::currentDateTime().toString(DefaultImageSaveDateTimeFormat)+JPGSuffix;
-        pix.save(path,JPGField,100);
+        pix.save(path,JPGField,DefaultImageQuality);
 
 }
 
@@ -251,8 +232,7 @@ void Preview::previewViewEvent(const QPointF &viewpoint)
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto wellsize = toolinfo[WellsizeField].toUInt();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
-    auto holecoordinate = wellview->viewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
-    //auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
+    auto holecoordinate = wellview->viewInfo()[HoleCoordinateField].toPoint();
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     auto bright = current_info[BrightField];
 
@@ -275,22 +255,21 @@ void Preview::previewViewEvent(const QPointF &viewpoint)
     m[HoleViewSizeField] = viewsize;
     m[HoleCoordinateField] = holecoordinate;
     m[ViewCoordinateField] = viewpoint;
-    //m[CurrentChannelField] = current_channel;// 不需要再发当前通道了
     m[BrightField] = bright;
     m[IsHoleField] = 0;
 
     AssemblerPointer->assemble(TcpFramePool.previewEvent,m);
     auto msg = AssemblerPointer->message();
-    SocketPointer->exec(TcpFramePool.previewEvent,msg, true);
+    SocketPointer->exec(TcpFramePool.previewEvent,msg);
     if (ParserResult.toBool()) {
-//        LOG<<QString("move to view point (%1,%2)").arg(convertPrecision(viewpoint.x()))
-//        .arg(convertPrecision(viewpoint.y()));
+        LOG<<"move to view point "<<viewpoint;
     }
 }
 
 void Preview::previewHoleEvent(const QPoint &holepoint)
 {
-    if (holepoint == QPoint(-1,-1)) return;
+    if (holepoint == QPoint(-1,-1))
+        return;
 
     auto toolinfo = previewtool->toolInfo();
 
@@ -300,9 +279,7 @@ void Preview::previewHoleEvent(const QPoint &holepoint)
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto wellsize = toolinfo[WellsizeField].toUInt();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
-    //auto holecoordinate = wellview->currentViewInfo()[HoleCoordinateField].toPoint(); // 这个信息单独点击孔是没有传递的
-    auto holecoordinate = holepoint; // 所以才为什么只能分成previewViewByClickHole和previewViewByClickView 2个函数写了
-    //auto current_channel = getIndexFromFields(toolinfo[CurrentChannelField].toString());
+    auto holecoordinate = holepoint;
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
     auto bright = current_info[BrightField];
 
@@ -329,9 +306,63 @@ void Preview::previewHoleEvent(const QPoint &holepoint)
 
     AssemblerPointer->assemble(TcpFramePool.previewEvent,m);
     auto msg = AssemblerPointer->message();
-    SocketPointer->exec(TcpFramePool.previewEvent,msg, true);
+    LOG<<"exec "<<holepoint;
+    SocketPointer->exec(TcpFramePool.previewEvent,msg);
     if (ParserResult.toBool()) {
-//        LOG<<"move to hole point "<<holepoint;
+        LOG<<"move to hole point "<<holepoint<<" successful!";
+    } else LOG<<"move to hole point "<<holepoint<<" failed!";
+}
+
+void Preview::loadExper()
+{
+    auto patterninfo = wellpattern->patternInfo();
+    auto previewinfo = previewtool->toolInfo();
+    previewinfo[PreviewPatternField] = patterninfo;
+    previewinfo[PreviewToolField] = previewinfo;
+#ifdef usetab
+    auto experinfo = expertool->toolInfo();
+    previewinfo[ExperToolField] = experinfo;
+#endif
+
+
+#ifdef usetab
+    auto channels = experinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
+#else
+    auto channels = previewinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts)
+#endif
+    auto totalViews = wellpattern->numberOfViews();
+    auto totalChannels = channels.count("1"); // 为1的是勾选上的
+    auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
+    LOG<<"totalViews = "<<totalViews<<"totalChannels = "<<totalChannels<<" estimateSpace = "<<estimateSpace<<"MB";
+    previewinfo[EstimatedSpaceField] = estimateSpace;
+
+    auto dlg = new SummaryDialog(previewinfo);
+    setWindowAlignCenter(dlg);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    int ret = dlg->exec();
+    if (ret == QDialog::Rejected)
+        return;
+
+#ifndef notusetoupcamera
+    ToupCameraPointer->closeCamera(); // 先关相机后执行
+#else
+    closeCamera();
+#endif
+
+    AssemblerPointer->assemble(TcpFramePool.loadExperEvent,previewinfo);
+    auto json = AssemblerPointer->message();
+    SocketPointer->exec(TcpFramePool.loadExperEvent,json);
+
+    if (ParserResult.toBool()) {
+        QMessageBox::information(this,InformationChinese,tr("Successfully launched the experiment!"));
+
+#ifdef uselabelcanvas
+        livecanvas->setPixmap(QPixmap());
+#else
+        livecanvas->setImage(QImage());
+#endif
+        photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
+        photocanvas->setImage(QImage());
     }
 }
 
@@ -373,16 +404,16 @@ void Preview::importExperConfigV1(const QString& path)
     auto info = result[GroupField].value<QVariantMap>();
     for(auto group:info.keys()){
         auto groupinfo = info[group].value<QVariantMap>();
-        foreach(auto hole,groupinfo.keys()) {
-            auto holeinfo = groupinfo[hole].value<QVariantMap>();
-            //LOG<<holeinfo;
-            auto holepoint = holeinfo[HoleCoordinateField].toPoint();
-            auto viewpoints = holeinfo[PointsField].value<QPointFVector>();
+                foreach(auto hole,groupinfo.keys()) {
+                auto holeinfo = groupinfo[hole].value<QVariantMap>();
+                //LOG<<holeinfo;
+                auto holepoint = holeinfo[HoleCoordinateField].toPoint();
+                auto viewpoints = holeinfo[PointsField].value<QPointFVector>();
 
-            // 把holePoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
-            wellpattern->importHoleInfoV1(holepoint,group,viewpoints,viewsize);
-            wellview->importViewInfoV1(holepoint,viewpoints,viewsize);
-        }
+                // 把holePoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
+                wellpattern->importHoleInfoV1(holepoint,group,viewpoints,viewsize);
+                wellview->importViewInfoV1(holepoint,viewpoints,viewsize);
+            }
 
     }
 }
@@ -410,59 +441,6 @@ void Preview::importExperConfig(const QString &path)
     wellview->importViewInfo(holeInfoVec);
 }
 
-void Preview::loadExper()
-{
-    auto patterninfo = wellpattern->patternInfo();
-    auto previewinfo = previewtool->toolInfo();
-    previewinfo[PreviewPatternField] = patterninfo;
-    previewinfo[PreviewToolField] = previewinfo;
-#ifdef usetab
-    auto experinfo = expertool->toolInfo();
-    previewinfo[ExperToolField] = experinfo;
-#endif
-
-
-#ifdef usetab
-    auto channels = experinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
-#else
-    auto channels = previewinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts)
-#endif
-    auto totalViews = wellpattern->numberOfViews();
-    auto totalChannels = channels.count("1"); // 为1的是勾选上的
-    auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
-    LOG<<"totalViews = "<<totalViews<<"totalChannels = "<<totalChannels<<" estimateSpace = "<<estimateSpace<<"MB";
-    previewinfo[EstimatedSpace] = estimateSpace;
-
-    auto dlg = new SummaryDialog(previewinfo);
-    setWindowAlignCenter(dlg);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    int ret = dlg->exec();
-    if (ret == QDialog::Rejected)
-        return;
-
-    AssemblerPointer->assemble(TcpFramePool.loadExperEvent,previewinfo);
-    auto json = AssemblerPointer->message();
-
-    SocketPointer->exec(TcpFramePool.loadExperEvent,json);
-
-#ifndef notusetoupcamera
-    ToupCameraPointer->closeCamera();
-#else
-    closeCamera();
-#endif
-    if (ParserResult.toBool()) {
-        QMessageBox::information(this,InformationChinese,tr("Successfully launched the experiment!"));
-
-#ifdef uselabelcanvas
-        livecanvas->setPixmap(QPixmap());
-#else
-        livecanvas->setImage(QImage());
-#endif
-        photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
-        photocanvas->setImage(QImage());
-    }
-}
-
 void Preview::stopExper()
 {
     QVariantMap  m;
@@ -471,7 +449,7 @@ void Preview::stopExper()
     AssemblerPointer->assemble(TcpFramePool.stopExperEvent,m);
     auto json = AssemblerPointer->message();
 
-    SocketPointer->exec(TcpFramePool.stopExperEvent,json,true);
+    SocketPointer->exec(TcpFramePool.stopExperEvent,json);
     if (ParserResult.toBool()) {
         QMessageBox::information(this,InformationChinese,tr("Successfully stop the experiment!"));
     }

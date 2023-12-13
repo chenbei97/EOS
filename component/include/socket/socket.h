@@ -182,6 +182,7 @@ struct FieldExportExperEvent{
     // other
     const QString capture_channel = CaptureChannelField;//配置过相机参数的所有通道
 };
+
 struct FieldAskConnectedStateEvent {
     const QString state = StateField; // 程序启动时发送命令询问是否连接上了
 };
@@ -626,7 +627,7 @@ static QByteArray assembleAskConnectedStateEvent(QCVariantMap m)
 
     auto length = convertToHex(json.length()).toUtf8();
     // "@@@0x00000038{\n    \"frame\": 2,\n    \"state\": \"socket is connected?\"\n}\n"
-    LOG<<PrependSeparateField(PrependField(json,length));
+    //LOG<<PrependSeparateField(PrependField(json,length));
 
     return AppendSeparateField(json);
 }

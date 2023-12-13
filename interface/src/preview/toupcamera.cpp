@@ -58,7 +58,7 @@ void ToupCamera::exposureEvent()
     unsigned short gain = 0;
     Toupcam_get_ExpoTime(toupcam, &time);
     Toupcam_get_ExpoAGain(toupcam, &gain);
-    LOG<<"exposure event: "<<time<<gain;
+    //LOG<<"exposure event: "<<time<<gain;
     emit exposureGainCaptured(time,gain);
 }
 
@@ -288,7 +288,7 @@ int ToupCamera::byteOrder() const
 
     int option = 0;
     Toupcam_get_Option(toupcam, TOUPCAM_OPTION_BYTEORDER, &option);
-    option?LOG<<"image is rgb":LOG<<"image is bgr";
+    //option?LOG<<"image is rgb":LOG<<"image is bgr";
 }
 
 void ToupCamera::setExposureOption(int option)
@@ -304,7 +304,7 @@ int ToupCamera::exposureOption() const
 
     int expoenable = 0;
     Toupcam_get_AutoExpoEnable(toupcam,&expoenable);
-    LOG<<"image's exposure option = "<<expoenable;
+    //LOG<<"image's exposure option = "<<expoenable;
 }
 
 void ToupCamera::setExposure(unsigned exp)
@@ -320,7 +320,7 @@ unsigned ToupCamera::exposure() const
 
     unsigned exp = 0;
     Toupcam_get_ExpoTime(toupcam, &exp);
-    LOG<<"current exposure is "<<exp;
+    //LOG<<"current exposure is "<<exp;
     return exp;
 }
 
@@ -333,7 +333,7 @@ ValueRangeUnSigned ToupCamera::getExposureRange() const
                              &s.min,
                              &s.max,
                              &s.def);
-    LOG<<"exposure range: "<<s;
+    //LOG<<"exposure range: "<<s;
     return s;
 }
 
@@ -350,7 +350,7 @@ ushort ToupCamera::gain() const
 
     ushort g = 0;
     Toupcam_get_ExpoAGain(toupcam, &g);
-    LOG<<"current gain is "<<g;
+    //LOG<<"current gain is "<<g;
     return g;
 }
 
@@ -363,7 +363,7 @@ ValueRangeUShort ToupCamera::getGainRange() const
                                &s.min,
                                &s.max,
                                &s.def);
-    LOG<<"gain range: "<<s;
+    //LOG<<"gain range: "<<s;
     return s;
 }
 

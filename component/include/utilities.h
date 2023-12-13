@@ -262,18 +262,31 @@ static void setWindowAlignCenter(QWidget*w)
     w->move(x,y);
 }
 
-#define WaitDialogMsg QObject::tr("请稍等,正在处理...")
-
 /*对话框*/
+#include "waitmessagebox.h"
+#define DefaultWindowSize QSize(400,300)
 //https://cloud.tencent.com/developer/ask/sof/427509
-static QMessageBox* getWaitDialog(QWidget*parent = nullptr)
+static WaitMessageBox* getWaitMessageBox(const QString& text,bool deleteOnClose = true,QWidget*parent = nullptr)
 { // 等待对话框
-    QMessageBox * dlg = new QMessageBox(parent);
-    dlg->setText(WaitDialogMsg);
-    dlg->setWindowModality(Qt::WindowModal);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    dlg->setStandardButtons(QMessageBox::NoButton);
-    //dlg->setFixedSize(DefaultWindowSize);
+    //QMessageBox * dlg = new QMessageBox(parent);
+    WaitMessageBox * dlg = new WaitMessageBox(parent);
+    dlg->setWaitText(text);
+    if (deleteOnClose)
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+    return dlg;
+}
+
+#include "label.h"
+static QDialog* getWaitDialog(bool deleteOnClose = true,QWidget*parent = nullptr)
+{ // 等待对话框
+    QDialog * dlg = new QDialog(parent);
+//    auto label = new Label;
+//    label->setText(WaitDialogMsg);
+//    dlg->setWindowModality(Qt::WindowModal);
+//    if (deleteOnClose)
+//        dlg->setAttribute(Qt::WA_DeleteOnClose);
+//    dlg->setStandardButtons(QMessageBox::NoButton);
+//    dlg->setFixedSize(DefaultWindowSize);
     return dlg;
 }
 

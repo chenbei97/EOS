@@ -40,12 +40,12 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     connect(stitchbtn,&PushButton::clicked,this,&CameraBox::slideStitching);
     connect(cameratool,&CameraTool::exposureChanged,this,&CameraBox::adjustCamera);
     connect(cameratool,&CameraTool::gainChanged,this,&CameraBox::adjustCamera);
-    connect(cameratool,&CameraTool::brightChanged,this,&CameraBox::adjustCamera);
+    connect(cameratool,&CameraTool::brightChanged,this,&CameraBox::adjustBright);
 }
 
 void CameraBox::importExperConfig(const QVariantMap &m,const QString& objective)
 {
-    foreach(auto channel,m.keys()) {
+    for(auto channel: m.keys()) {
         auto config = m[channel].value<QVariantMap>();
         CameraInfo info;
         info[ExposureField] = config[ExposureField].toString();
@@ -69,11 +69,16 @@ void CameraBox::importExperConfig(const QVariantMap &m,const QString& objective)
 }
 
 void CameraBox::adjustCamera()
-{ // cameratool's ui调节时更改相机的2个参数和bright
+{ // cameratool's ui调节时更改相机的2个参数
     auto exp = cameratool->exposure().toUInt();
     auto gain = cameratool->gain().toUInt();
+    emit cameraAdjusted(exp,gain);
+}
+
+void CameraBox::adjustBright()
+{ // cameratool's ui调节时更改bright
     auto br = cameratool->bright().toUInt();
-    emit cameraAdjusted(exp,gain,br);
+    emit brightAdjusted(br);
 }
 
 void CameraBox::onSaveBtn()
@@ -116,12 +121,10 @@ void CameraBox::captureImage(const QImage &img, const QString &channel)
 
 void CameraBox::captureExposureGain(unsigned int exp, unsigned int gain)
 {
-    {
-        //LOG<<"回显值: "<<exp<<gain;
-        const QSignalBlocker blocker(cameratool);
-        cameratool->setExposure(exp);
-        cameratool->setGain(gain);
-    }
+    //LOG<<"回显值: "<<exp<<gain;
+    const QSignalBlocker blocker(cameratool);
+    cameratool->setExposure(exp);
+    cameratool->setGain(gain);
 }
 
 void CameraBox::setEnabled(bool enabled)

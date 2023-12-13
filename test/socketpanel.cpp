@@ -26,7 +26,7 @@ void SocketPanel::testData1_2()
             AssemblerPointer->assemble("test0x0",getTestData1());
             auto msg1 = AssemblerMessage;
             edit->append(sendText.arg(QString::fromUtf8(msg1)));
-            SocketPointer->exec("test0x0",msg1);
+            SocketPointer->exec("test0x0",msg1,true);
             //LOG<<"test0x0's response = "<<ParserPointer->response();
             //edit->append(recvText.arg(SocketPointer->result()["test0x0"].toString()));
             edit->append(recvText.arg(ParserResult.toString())); // 这2个代码都是相同的
@@ -34,7 +34,7 @@ void SocketPanel::testData1_2()
             AssemblerPointer->assemble("test0x1",getTestData2());
             auto msg2= AssemblerMessage;
             edit->append(sendText.arg(QString::fromUtf8(msg2)));
-            SocketPointer->exec("test0x1",msg2);
+            SocketPointer->exec("test0x1",msg2,true);
             //LOG<<"test0x1's response = "<<ParserPointer->response();
             //edit->append(recvText.arg(SocketPointer->result()["test0x1"].toString()));
             edit->append(recvText.arg(ParserResult.toString())); // 这2个代码都是相同的
@@ -73,7 +73,7 @@ QByteArray SocketPanel::getTestData3()
 void SocketPanel::testData3()
 {
     edit->append(sendText.arg(QString::fromUtf8(getTestData3())));
-    SocketPointer->exec(TcpFramePool.loadExperEvent,getTestData3());
+    SocketPointer->exec(TcpFramePool.loadExperEvent,getTestData3(),true);
     edit->append(recvText.arg(ParserResult.toString()));
 }
 
@@ -86,14 +86,14 @@ void SocketPanel::testStateActivateCode()
 //    LOG<<"activate code is "<<ParserResult.toString();
 
     edit->append(sendText.arg(QString::fromUtf8(assembleAskConnectedStateEvent(QVariantMap()))));
-    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()));
+    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
     //if (ParserResult.toBool())
    if (SocketPointer->result()[TcpFramePool.askConnectedStateEvent].toBool())
         edit->append(recvText.arg("[synchronous] socket is connect successful!"));
     else edit->append(recvText.arg("[synchronous] socket is connect failed!"));
 
     edit->append(sendText.arg(QString::fromUtf8(assembleAskActivateCodeEvent(QVariantMap()))));
-    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()));
+    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
     edit->append(recvText.arg("[synchronous] activate code is "+ParserResult.toString()));
 }
 

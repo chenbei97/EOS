@@ -38,6 +38,7 @@ private slots:
      void onSliderChanged(int val);
 signals:
     void valueChanged(int val);
+    void sliderReleased(int val);
 };
 
 #endif //EOSI_SLIDER_H

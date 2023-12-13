@@ -78,12 +78,10 @@ void ObjectiveSetting::moveMachine()
         m[ObjectiveLocationField] = 3;
     AssemblerPointer->assemble(TcpFramePool.moveMachineEvent,m);
 
-    //LOG<<AssemblerMessage;
-    SocketPointer->exec(TcpFramePool.moveMachineEvent,AssemblerMessage, true);
-    auto d = ParserResult; // 在不使用同步时这里只能拿到invalid qqvariant
-    if (d.toBool()) {
-        LOG<<"移动电机到位置"<<m[ObjectiveLocationField].toInt();
-    }
+    SocketPointer->exec(TcpFramePool.moveMachineEvent,AssemblerMessage);
+    if (ParserResult.toBool()) {
+        LOG<<"move machine to "<<m[ObjectiveLocationField].toInt()<<"successful!";
+    } else LOG<<"move machine to "<<m[ObjectiveLocationField].toInt()<<"failed!";
 }
 
 void ObjectiveSetting::onMoveMachine(const QString& f,const QVariant& d)

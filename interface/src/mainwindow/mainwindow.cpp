@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
     connect(appselect, QOverload<int>::of(&AppSelect::appClicked),preview,&Preview::setAppInfo);
 
     connect(setting,&Setting::objectiveSettingChanged,preview,&Preview::objectiveSettingChanged);
-    setting->emitSignals(); // 把objectivesetting的初始配置触发一下去更新previewtool
+    //setting->emitSignals(); // 把objectivesetting的初始配置触发一下去更新previewtool(如果一开始就对应上也可以不手动触发)
 }
 
 void MainWindow::navigbarSelect(int id)

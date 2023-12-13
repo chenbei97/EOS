@@ -61,11 +61,13 @@ private:
 private slots:
     void onSaveBtn();
     void onCombineBtn();
+    void adjustBright();
     void adjustCamera();
 signals:
     void cameraInfoChanged(const MultiCameraInfo &);
     void photoTaking();
     void slideStitching();
-    void cameraAdjusted(int exposure,int gain, int bright);
+    void cameraAdjusted(int exposure,int gain);
+    void brightAdjusted(int bright);
 };
 #endif //EOSI_CAMERABOX_H

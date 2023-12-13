@@ -64,7 +64,8 @@ signals:
     void directionMove(int option); // 移动镜头
     void focusChanged(double val);
     void focusSliderPressed();
-    void cameraAdjusted(int exp,int gain,int br);// 调整相机实时更改
+    void cameraAdjusted(int exposure,int gain); // 调整相机参数
+    void brightAdjusted(int bright); // 调整bright
     void loadExper(); // 启动实验
     void stopExper(); // 停止实验
     void modeSelected(int mode); // 视野选择模式

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(EOSI LANGUAGES CXX)
+project(EOS LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

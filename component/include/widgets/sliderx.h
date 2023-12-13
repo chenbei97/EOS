@@ -18,6 +18,7 @@ public:
     explicit Sliderx(QWidget*parent= nullptr);
     explicit Sliderx(Qt::Orientation orientation,QWidget*parent= nullptr);
     void mousePressEvent(QMouseEvent*event) override;
+    void mouseReleaseEvent(QMouseEvent*event) override;
     void wheelEvent(QWheelEvent*event) override;
     void setMouseEvent(bool enabled);
 private:

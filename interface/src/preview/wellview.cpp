@@ -73,8 +73,8 @@ void WellView::toggleBrandObjective(int viewSize,bool toggleObjective)
 }
 
 void WellView::adjustViewPoint(int option)
-{
-    Q_ASSERT(mSelectMode == PointMode);
+{ // 这段代码应该在preview的adjustLens电机到位后再执行
+    Q_ASSERT(mSelectMode == PointMode); // pressEvent只有在PointMode才会发送调整事件
 
     switch (option) {
         case 0: mValidMousePos += QPointF(-1.0,0.0);
@@ -581,7 +581,7 @@ void WellView::paintEvent(QPaintEvent *event)
         }
         pen.setColor(Qt::blue);
         painter.setPen(pen);
-        if (mDrapRectF.isEmpty()) { // 绘制拖拽框不绘制点
+        if (mDrapRectF.isEmpty() && isValidPoint(mValidMousePos)) { // 绘制拖拽框不绘制点
             auto pt = mapFromPointF(mValidMousePos);
             painter.drawPoint(mValidMousePos);
             painter.drawText(mValidMousePos.x()+3,mValidMousePos.y()-3,
@@ -622,24 +622,24 @@ void WellView::mousePressEvent(QMouseEvent *event)
             if (!mViewInfo[HoleGroupNameField].toString().isEmpty()) {
                 if (getLeftTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)){
                     isHighlight = true;
+                    LOG<<"left triangle is clicked";
                     emit leftTriangleClicked();
                     emit triangleClicked(0);
-                    LOG<<"left triangle is clicked";
                 } else if (getRightTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
                     isHighlight = true;
+                    LOG<<"right triangle is clicked";
                     emit rightTriangleClicked();
                     emit triangleClicked(2);
-                    LOG<<"right triangle is clicked";
                 } else if (getTopTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
+                    LOG<<"top triangle is clicked";
                     isHighlight = true;
                     emit topTriangleClicked();
                     emit triangleClicked(1);
-                    LOG<<"top triangle is clicked";
                 } else if (getBottomTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
+                    LOG<<"bottom triangle is clicked";
                     isHighlight = true;
                     emit bottomTriangleClicked();
                     emit triangleClicked(3);
-                    LOG<<"bottom triangle is clicked";
                 }
             }
         }
@@ -688,5 +688,6 @@ void WellView::setSelectMode(WellView::ViewSelectMode mode)
 
 WellView::WellView(QWidget *parent) : View(parent)
 {
-    connect(this,&WellView::triangleClicked,this,&WellView::adjustViewPoint);
+    //adjustViewPoint应该在preview的adjustLens电机到位后再执行
+    //connect(this,&WellView::triangleClicked,this,&WellView::adjustViewPoint);
 }

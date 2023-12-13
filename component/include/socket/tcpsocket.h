@@ -12,6 +12,10 @@
 #include "socket.h"
 #include "parsecontrol.h"
 
+#define WaitMessageBoxMoveMachineMsg  "please wait moving machine..."
+#define WaitMessageBoxStartExperimentMsg  "please wait starting experiment..."
+#define WaitMessageBoxStopExperimentMsg  "please wait stoping experiment..."
+
 class COMPONENT_IMEXPORT TcpSocket: public QObject
 {
     Q_OBJECT
@@ -20,7 +24,9 @@ public:
     bool isConnected() const;
     QTcpSocket::SocketState socketState() const;
     void connectToHost(const QString &hostName = LocalHost, quint16 port = SocketPort);
-    void exec(const QString& f,const QByteArray& c,bool use_sync = true);
+    void exec(const QString& f,const QByteArray& c,bool use_sync);
+    void exec(const QString& f,const QByteArray& c);
+    void exec_queue(const QString& f,const QByteArray& c);
     QVariantMap result() const;
 private:
     explicit TcpSocket(QObject *parent = nullptr);
@@ -29,6 +35,7 @@ private:
     void processMsgQueue();
     Q_INVOKABLE void processRequestQueue();
     QTcpSocket * socket = nullptr;
+    WaitMessageBox * waitdlg = nullptr;
     QByteQueue msgQueue;
     QRequestQueue requestQueue;
     QByteArray message;
@@ -37,5 +44,6 @@ private:
     QTimer looptimer;
     QTimer requesttimer;
 signals:
+    //void readyExec();
 };
 #endif //EOSI_TCPSOCKET_H
