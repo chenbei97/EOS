@@ -110,7 +110,7 @@ private:
     void openSlideViewWindow();
     void openWellGroupWindow(const QVariantMap& m);
 private:
-    void setSelectMode(int mode);
+    void setViewMode(int mode);
     void toggleStack(int option);
     void toggleManufacturer(int option);
     void toggleBrand(int option);
@@ -125,8 +125,9 @@ private:
     void adjustBright(int br);
     void onAdjustBright(const QString &f,const QVariant & d);
     void adjustLens(int option);
-    void manualFocus(double val);
+    void adjustFocus(double val);
     void toggleChannel(int option);
+    void closeChannel(int option);
     void previewViewEvent(const QPointF& viewPoint);
     void previewHoleEvent(const QPoint& holePoint);
     void previewSlideEvent(const QPointF& point);

@@ -30,10 +30,10 @@ void initApp(QApplication& a)
     LOG << "UserScreen Width:" << UserScreenWidth << "UserScreen Height:" << UserScreenHeight;
     LOG<<"main thread is "<<CURRENT_THREAD;
     LOG<<"current path = "<<CURRENT_PATH;
-    foreach(auto p, systemDrivers()) {
-        LOG<<p<<" total = "<<getDiskSpace(p,false)<<"MB free = "<<getDiskSpace(p)<<"MB "
-        << getDiskSpace(p) / getDiskSpace(p,false) * 100.0 <<"%";
-    }
+//    foreach(auto p, systemDrivers()) {
+//        LOG<<p<<" total = "<<getDiskSpace(p,false)<<"MB free = "<<getDiskSpace(p)<<"MB "
+//        << getDiskSpace(p) / getDiskSpace(p,false) * 100.0 <<"%";
+//    }
     //QTextCodec *codec = QTextCodec::codecForName("utf-8");
     //QTextCodec::setCodecForLocale(codec);
     a.setFont(QFont(DefaultFontFamily,DefaultFontSize));

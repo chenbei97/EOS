@@ -14,7 +14,7 @@ void WellPattern::mouseReleaseEvent(QMouseEvent *event)
     if (mMouseEvent) {
 
         // 1. 点到边缘位置不能打开视野窗口和设置分组信息
-        if (mMousePos == QPoint(-1,-1)){
+        if (!isValidPoint(mLastPos) || mMousePos == QPoint(-1,-1)){
             openviewact->setEnabled(false);
             opengroupact->setEnabled(false);
             removeholeact->setEnabled(false);
@@ -50,7 +50,7 @@ void WellPattern::mouseMoveEvent(QMouseEvent *event)
             initDrapHoles(); // 清除拖拽区域
             auto end = event->pos(); // 鼠标停下的点
             mDrapRect = QRectF(mLastPos,end); // 鼠标形成的矩形框
-            auto rects = getChildRects();
+            auto rects = getAllInnerRects();
             for(int row = 0; row < mrows; ++row)
                 for(int col = 0; col < mcols; ++col) {
                     if(mDrapRect.intersects(rects[row][col])// 小矩形区域在这个推拽区域内有交集
@@ -70,8 +70,6 @@ void WellPattern::mousePressEvent(QMouseEvent *event)
     Pattern::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         initDrapHoles(); // 框选后，如果左键点一下应该取消框选
-        mDrapRect.setWidth(0);
-        mDrapRect.setHeight(0);
         mDrapRect = QRectF();
         update();
     } // 右键是菜单
@@ -84,7 +82,7 @@ void WellPattern::mouseDoubleClickEvent(QMouseEvent*event)
     Pattern::mouseDoubleClickEvent(event);
 
     // 点到不可选的孔也不能打开,这样wellpattern的限制就禁止了viewpattern的打开,viewpattern不再需要针对置灰功能写逻辑
-    if (mDisableHoles[mMousePos.x()][mMousePos.y()]) {
+    if (mMousePos == QPoint(-1,-1) || mDisableHoles[mMousePos.x()][mMousePos.y()]) {
         openviewact->setEnabled(false);
         opengroupact->setEnabled(false);
         removeholeact->setEnabled(false);

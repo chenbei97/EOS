@@ -16,20 +16,20 @@ Preview::Preview(QWidget*parent): QWidget(parent)
     initLayout();
 }
 
-void Preview::setSelectMode(int mode)
+void Preview::setViewMode(int mode)
 {
     switch (mode) {
         case 0:
-            wellview->setSelectMode(WellView::PointMode);
-            wellpattern->setSelectMode(WellPattern::PointMode);
+            wellview->setViewMode(ViewMode::PointMode);
+            wellpattern->setViewMode(ViewMode::PointMode);
             break;
         case 1:
-            wellview->setSelectMode(WellView::RectMode);
-            wellpattern->setSelectMode(WellPattern::RectMode);
+            wellview->setViewMode(ViewMode::RectMode);
+            wellpattern->setViewMode(ViewMode::RectMode);
             break;
         case 2:
-            wellview->setSelectMode(WellView::WholeMode);
-            wellpattern->setSelectMode(WellPattern::WholeMode);
+            wellview->setViewMode(ViewMode::WholeMode);
+            wellpattern->setViewMode(ViewMode::WholeMode);
             break;
     }
 }
@@ -421,13 +421,14 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
     connect(previewtool,&PreviewTool::slideStitching,this,&Preview::stitchSlide);
     //connect(previewtool,&PreviewTool::directionMove,this,&Preview::adjustLens);
-    connect(previewtool,&PreviewTool::focusChanged,this,&Preview::manualFocus);
+    connect(previewtool,&PreviewTool::focusChanged,this,&Preview::adjustFocus);
     connect(previewtool,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
+    connect(previewtool,&PreviewTool::channelClosed,this,&Preview::closeChannel);
     connect(previewtool,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
     connect(previewtool,&PreviewTool::importFilePath,this,&Preview::importExperConfig);
     connect(previewtool,&PreviewTool::loadExper,this,&Preview::loadExper);
     connect(previewtool,&PreviewTool::stopExper,this,&Preview::stopExper);
-    connect(previewtool,&PreviewTool::modeSelected,this,&Preview::setSelectMode);
+    connect(previewtool,&PreviewTool::modeSelected,this,&Preview::setViewMode);
 #ifdef usetab
     connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
     connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);

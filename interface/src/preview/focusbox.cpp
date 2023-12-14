@@ -125,7 +125,10 @@ void FocusBox::initAttributes()
     slider->setPrefix("");
     slider->setMouseEvent(true);
 
+    step->setValue(0.000);
     step->setMaximumWidth(FocusToolStepSpinMaxWidth);
+    step->setSingleStep(FocusToolStepVal);
+    step->setDecimals(FocusToolStepDecimal);
     step->setMaximum(FocusToolStepMaxVal);
 
     topbtn->setStrategy(RoundButton::TopTriangle);

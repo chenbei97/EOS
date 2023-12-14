@@ -36,7 +36,7 @@
 #include "skipbox.h"
 #include "summarypanel.h"
 #include "summarydialog.h"
-#include "viewselect.h"
+#include "viewmode.h"
 
 #include "setting.h"
 #include "settingnotifier.h"

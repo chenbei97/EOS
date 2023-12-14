@@ -213,7 +213,7 @@ namespace obsoleteClass {
     void ViewPatternV2::onRemoveViewAct()
     {
         auto id = holeID();
-        if (mSelectMode == RectMode) {
+        if (mSelectMode == ViewMode::RectMode) {
 
             // 不是原来的方式:删除添加flag为false,保存添加flag为true
             // 现在改为整体删除,那么只需要检测已有的矩形是否和框选的矩形有交集,直接删除之前保存的就可以
@@ -250,7 +250,7 @@ namespace obsoleteClass {
     void ViewPatternV2::onSaveViewAct()
     {
         auto id = holeID();
-        if(mSelectMode == RectMode) {
+        if(mSelectMode == ViewMode::RectMode) {
             // 框选的时候保存框选的矩形,不保存单击生成的矩形
             if (!mDrapRectF.isEmpty()) {
 #ifdef use_save_cover  // 变为覆盖处理,也就是说flag其实不再需要了
@@ -419,7 +419,7 @@ namespace obsoleteClass {
         auto groupcolor = mViewInfo[HoleGroupColorField].toString();
         auto id = holeID();
 
-        if (mSelectMode == RectMode) { // 区域模式
+        if (mSelectMode == ViewMode::RectMode) { // 区域模式
             // 2. 绘制选中的区域
             // 以下2种绘制法都可以,和wellpattern绘制对应,wellpattern也是2种绘制法
             // 1. 直接绘制视野区域 对应wellpattern的(3.2)画法

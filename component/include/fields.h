@@ -269,8 +269,10 @@ enum class ObjectiveLocationType {
 #define GainUpLimit 5000
 #define BrightLowLimit 0
 #define BrightUpLimit 100
-#define FocusToolFocusMaxVal 50000
-#define FocusToolStepMaxVal 25000
+#define FocusToolFocusMaxVal 10
+#define FocusToolStepMaxVal 10
+#define FocusToolStepVal 0.001
+#define FocusToolStepDecimal 3
 static const char* ObjectiveLocationField = "objective_loc";
 static const char* CameraChannelField = "camera_channel";
 static const char* ExposureField = "exposure";
@@ -365,6 +367,14 @@ static const QFieldList VideoFormatFields = {
 static const QFieldList VideoFrameRateFields = {
         "10","20","30","40"
 };
+
+// ViewSelectBox涉及的
+enum class ViewMode {
+    PointMode = 0,
+    RectMode = 1,
+    WholeMode = 2
+};
+static const char* ViewModeField = "viewmode";
 
 enum class ImageFormatType {
     jpg = 0,

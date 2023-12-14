@@ -244,7 +244,7 @@ void View::paintEvent(QPaintEvent *event)
     painter.fillRect(rect(),gc);
 
 
-    mSelectMode == PointMode? trianglen = ViewTriangleLength: trianglen = 0;
+    mSelectMode == ViewMode::PointMode? trianglen = ViewTriangleLength: trianglen = 0;
     auto radius = getCircleRadius();
     auto diameter = radius * 2.0;
     QPainterPath path;

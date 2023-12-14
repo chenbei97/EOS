@@ -11,7 +11,7 @@
 PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
 {
     historybox = new HistoryBox;
-    selectbox = new ViewSelect;
+    selectbox = new ViewModeBox;
     wellbox = new WellBox;
     objectivebox = new ObjectiveBox;
     focusbox = new FocusBox;
@@ -48,6 +48,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(camerabox,&CameraBox::cameraAdjusted,this,&PreviewTool::cameraAdjusted);
     connect(camerabox,&CameraBox::brightAdjusted,this,&PreviewTool::brightAdjusted);
     connect(channelbox,&ChannelBoxx::channelChanged,this,&PreviewTool::channelChanged);
+    connect(channelbox,&ChannelBoxx::channelClosed,this,&PreviewTool::channelClosed);
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
     connect(historybox,&HistoryBox::importFilePath,this,&PreviewTool::importFilePath);
@@ -60,12 +61,12 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(recordbox,&RecordBox::pauseVideo,this,&PreviewTool::pauseVideo);
     connect(recordbox,&RecordBox::playVideo,this,&PreviewTool::playVideo);
     connect(recordbox,&RecordBox::stopVideo,this,&PreviewTool::stopVideo);
-    connect(selectbox,&ViewSelect::modeSelected,this,&PreviewTool::modeSelected);
+    connect(selectbox,&ViewModeBox::modeSelected,this,&PreviewTool::modeSelected);
     // 2. 信号槽函数
     connect(channelbox,&ChannelBoxx::channelChanged,camerabox,&CameraBox::setChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBoxx::disableChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,timebox,&TimeBox::disableChannel);
-    connect(wellbox,&WellBox::welltypeChanged,selectbox,&ViewSelect::setEnabled);
+    connect(wellbox,&WellBox::welltypeChanged,selectbox,&ViewModeBox::setEnabled);
     // 3.外部信号
     connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
     connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage); // 当前通道的图像
@@ -100,6 +101,8 @@ QMap<QString,QString> PreviewTool::boxInfo(const QString &box) const
         return recordbox->recordInfo();
     } else if (box == ExperimentBoxTitle) {
         return timebox->timeInfo();
+    } else if (box == ViewSelectBoxTitle) {
+        return selectbox->viewModeInfo();
     }
 
     return info;
@@ -165,7 +168,9 @@ PreviewToolInfo PreviewTool::toolInfo() const
     foreach(auto key,experinfo.keys())
             info[key] = experinfo[key];
 
-    // 8.
+    // 8. viewmode
+    auto viewmodeinfo = selectbox->viewModeInfo();
+    info[ViewModeField] = viewmodeinfo[ViewModeField];
 
     //LOG<<"tool info = "<<info;
     return info;

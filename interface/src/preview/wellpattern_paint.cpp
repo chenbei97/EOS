@@ -13,7 +13,7 @@ QRectF2DVector WellPattern::getHoleRectsOnViewSize(const QPoint &coordinate) con
 {// 拿到某个孔基于视野窗口尺寸来划分的所有小矩形区域
 
     // 1. 获取孔内圆的半径+圆心坐标
-    auto cell_size = getChildSize();
+    auto cell_size = getInnerRectSize();
     double cell_w = cell_size.width();
     double cell_h = cell_size.height();
     double radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
@@ -58,10 +58,10 @@ void WellPattern::paintEvent(QPaintEvent *event)
 {
     Pattern::paintEvent(event);
 
-    auto cell_size = getChildSize();
-    int cell_w = cell_size.width();
-    int cell_h = cell_size.height();
-    int radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
+    auto cell_size = getInnerRectSize();
+    auto cell_w = cell_size.width();
+    auto cell_h = cell_size.height();
+    auto radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
     //auto  centerPts = getCenterPoints();// 改为直接计算,减少循环
 
     QPainter painter(this);
@@ -103,7 +103,7 @@ void WellPattern::paintEvent(QPaintEvent *event)
                 painter.fillPath(path,mHoleInfo[row][col].color);
 
                 // 对于区域模式有3种方法绘制
-                if (mSelectMode == RectMode) {
+                if (mSelectMode == ViewMode::RectMode) {
                     // (3.2) 第1种绘制法: 直接绘制视野区域
 //                    auto rects = mHoleInfo[row][col].viewrects; // 视野选中区域不为空
 //                    if (!rects.isEmpty()) {
@@ -150,7 +150,7 @@ void WellPattern::paintEvent(QPaintEvent *event)
                         }
                     } // end 3.4
                 }
-                else if(mSelectMode == PointMode) {// end rectmode ,如果是点模式可以通过电机坐标来绘制,电机坐标就是视野离散坐标
+                else if(mSelectMode == ViewMode::PointMode) {// end rectmode ,如果是点模式可以通过电机坐标来绘制,电机坐标就是视野离散坐标
                     auto points = mHoleInfo[row][col].viewpoints;
                     if (!points.isEmpty()) {
                         auto pen = painter.pen();

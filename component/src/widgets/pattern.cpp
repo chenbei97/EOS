@@ -2,11 +2,11 @@
 
 void Pattern::drawHighlight(QPainter&painter)
 {
-    auto cell_size = getChildSize();
-    int cell_w = cell_size.width();
-    int cell_h = cell_size.height();
+    auto cell_size = getInnerRectSize();
+    auto cell_w = cell_size.width();
+    auto cell_h = cell_size.height();
 
-    int radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
+    auto radius = cell_w>=cell_h? cell_h/2.0: cell_w/2.0; // 选较小的确保圆在矩形内
 
     auto  centerPts = getCenterPoints();
     QPainterPath path;
@@ -32,20 +32,24 @@ void Pattern::mousePressEvent(QMouseEvent *event)
 {
     if (mMouseEvent) {
         if (event->button() == Qt::LeftButton) { // 改为左键才会变化,防止右击也动电机
-            //mMousePos = QPoint(-1,-1);
-            QPoint tmp;
+            //mMousePos = QPoint(-1,-1); // mMousePos是上次的位置不要重置
             mLastPos = event->pos();
-            auto rects = getChildRects(); // 所有小正方形区域匹配这个坐标
-            for(int row = 0; row < mrows; ++row)
-                for(int col = 0; col < mcols; ++col)
-                    if (rects[row][col].contains(mLastPos))
-                        tmp = {row,col};
-            //LOG<<mLastPos<<mMousePos;
-            update();
-            if (tmp != mMousePos) { // 电机已经在这个位置了无需移动
-                mMousePos = tmp;
-                emit holeClicked(mMousePos);
+            if (isValidPoint(mLastPos)) {
+                QPoint tmp(-1,-1);
+                auto rects = getAllInnerRects(); // 所有小正方形区域匹配这个坐标
+                for(int row = 0; row < mrows; ++row)
+                    for(int col = 0; col < mcols; ++col)
+                        if (rects[row][col].contains(mLastPos))
+                            tmp = {row,col};
+                //LOG<<mLastPos<<mMousePos<<tmp;
+                if (tmp != QPoint(-1,-1)) { // 点击的不是无效位置
+                    if(tmp != mMousePos) { // mMousePos是上次点击的有效位置
+                        mMousePos = tmp;
+                        emit holeClicked(mMousePos); // 新位置和原来位置不同才动电机
+                    }
+                }
             }
+            update();
         }
     }
 
@@ -55,15 +59,17 @@ void Pattern::mousePressEvent(QMouseEvent *event)
 void Pattern::mouseDoubleClickEvent(QMouseEvent*event)
 {
     if (mMouseEvent) {
-        mMousePos = QPoint(-1,-1);
+        //mMousePos = QPoint(-1,-1);
         mLastPos = event->pos();
-        auto rects = getChildRects(); // 所有小正方形区域匹配这个坐标
-        for(int row = 0; row < mrows; ++row)
-            for(int col = 0; col < mcols; ++col)
-                if (rects[row][col].contains(mLastPos))
-                    mMousePos = {row,col};
-        update();
-        emit doubleClicked(mMousePos);
+        if (isValidPoint(mLastPos)) {
+            auto rects = getAllInnerRects(); // 所有小正方形区域匹配这个坐标
+            for(int row = 0; row < mrows; ++row)
+                for(int col = 0; col < mcols; ++col)
+                    if (rects[row][col].contains(mLastPos))
+                        mMousePos = {row,col};
+            update();
+            emit doubleClicked(mMousePos);
+        }
     }
     event->accept();
 }
@@ -77,12 +83,11 @@ void Pattern::paintEvent(QPaintEvent *event)
     painter.setPen(pen);
 
     painter.drawRect(0,0,width(),height());
+    painter.drawRect(getValidRect());
 
-//    if (mPatternMode == PlateMode) {
-        drawLine(painter);
-        drawText(painter);
-        drawHighlight(painter);
-//    }
+    drawLine(painter);
+    drawText(painter);
+    drawHighlight(painter);
     event->accept();
 }
 
@@ -116,23 +121,38 @@ void Pattern::drawText(QPainter &painter)
     auto colpts = getColHeaderPoints();
     for(int row = 0 ; row < mrows; ++ row)
     {
-        auto center = colpts[row];
+        auto center = colpts[row]+QPointF(-5.0,0); // 文字稍微靠左一些
         painter.drawText(center,QChar(row+65));
     }
 }
 
-QSize Pattern::getChildSize() const
+QSizeF Pattern::getInnerRectSize() const
 { // 每个圆都在划分的小正方形区域内,计算正方形的长度
-    int w = width() ;
-    int h = height() ;
+    double w = width() ;
+    double h = height() ;
     // 总宽度-2个到边界的gap-圆之间留出的mSpace,边界sapce留出2个,共(mCol-1+2)个
-    int cell_w = (w-2*mGap-mSpace*(mcols+1))/mcols;
-    int cell_h = (h-2*mGap-mSpace*(mrows+1)) / mrows;
-    return  QSize(cell_w,cell_h);
+    double cell_w = (w-2.0*mGap-mSpace*(mcols+1))/mcols;
+    double cell_h = (h-2.0*mGap-mSpace*(mrows+1)) / mrows;
+    return  QSizeF(cell_w,cell_h);
 }
 
-QRectF2DVector Pattern::getChildRects() const
-{ // 拿到所有小正方形的区域
+QRectF Pattern::getValidRect() const
+{
+    return QRectF(mGap+mSpace/2.0,mGap+mSpace/2.0,
+                 width()-2.0*(mGap+mSpace/2.0),height()-2.0*(mGap+mSpace/2.0));
+//    auto rects = getAllInnerRects();
+//    auto topleft = rects[0][0].topLeft();
+//    auto bottomright = rects[mrows-1][mcols-1].bottomRight();
+//    return QRectF(topleft,bottomright);
+}
+
+bool Pattern::isValidPoint(const QPointF& point) const
+{
+    return getValidRect().contains(point);
+}
+
+QRectF2DVector Pattern::getAllInnerRects() const
+{ // 拿到所有小正方形的区域: 注意并不是圆的外接正方形,而是根据mGap,mSpace等分出来的小正方形区域
     auto points = getBorderPoints();
 
     QRectF2DVector rects;
@@ -151,18 +171,18 @@ QRectF2DVector Pattern::getChildRects() const
 }
 
 QPointF2DVector Pattern::getBorderPoints() const
-{ // 按行从左到右拿到所有分隔线上的点,可用于画线
-    auto cell_size = getChildSize();
-    int cell_w = cell_size.width();
-    int cell_h = cell_size.height();
+{ // 划分小正方区域经过的所有点
+    auto cell_size = getInnerRectSize();
+    auto cell_w = cell_size.width();
+    auto cell_h = cell_size.height();
 
     QPointF2DVector points;
     for(int row = 0; row < mrows+1; ++row) // 4x6,4行5条边,所以需要mrows+1多加1边
     {
         QPointFVector p; // 拿到每行的分隔点
         for(int col = 0; col < mcols+1; ++col)
-            p.append(QPointF(mGap+mSpace/2+(cell_w+mSpace)*col, // 分隔点坐标从起始位置(mgap+maspace/2)开始
-                             mGap+mSpace/2+(cell_h+mSpace)*row));
+            p.append(QPointF(mGap+mSpace/2.0+(cell_w+mSpace)*col, // 分隔点坐标从起始位置(mgap+maspace/2)开始
+                             mGap+mSpace/2.0+(cell_h+mSpace)*row));
         points.append(p);
     }
 
@@ -171,31 +191,31 @@ QPointF2DVector Pattern::getBorderPoints() const
 
 QPointFVector Pattern::getRowHeaderPoints()
 {// 获取行表头文字的点,用于绘制文字
-    auto cell_size = getChildSize();
-    int cell_w = cell_size.width();
+    auto cell_size = getInnerRectSize();
+    auto cell_w = cell_size.width();
     QPointFVector points;
     for(int col = 0; col < mcols; ++col)
-        points.append(QPointF(mGap+mSpace/2+cell_w/2+(cell_w+mSpace)*col,
-                              mGap-mSpace/2)); // 列y坐标不变就是mgap-space/2
+        points.append(QPointF(mGap+mSpace/2.0+cell_w/2.0+(cell_w+mSpace)*col,
+                              mGap-mSpace/2.0)); // 列y坐标不变就是mgap-space/2
     return points;
 }
 
 QPointFVector Pattern::getColHeaderPoints()
 {// 获取列表头文字的点,用于绘制文字
-    auto cell_size = getChildSize();
-    int cell_h = cell_size.height();
+    auto cell_size = getInnerRectSize();
+    auto cell_h = cell_size.height();
     QPointFVector points;
     for(int row = 0; row < mrows; ++row)
         points.append(QPointF(mGap-mSpace, // 行x坐标不变就是mgap-space
-                              mGap+mSpace+cell_h/2+(cell_h+mSpace)*row));
+                              mGap+mSpace+cell_h/2.0+(cell_h+mSpace)*row));
     return points;
 }
 
 QPointF2DVector Pattern::getCenterPoints() const
 {// 获取小正方形区域的中心用于绘制圆用
-    auto cell_size = getChildSize();
-    int cell_w = cell_size.width();
-    int cell_h = cell_size.height();
+    auto cell_size = getInnerRectSize();
+    auto cell_w = cell_size.width();
+    auto cell_h = cell_size.height();
 
     QPointF2DVector centerPts;
     for(int row = 0; row < mrows; ++row)
@@ -203,8 +223,8 @@ QPointF2DVector Pattern::getCenterPoints() const
         QVector<QPointF> p;
         for(int col = 0; col < mcols; ++col)
             // 中心位置相对起点左上角多了cell_w和cell_h的一半,还多了mSpace
-            p.append(QPointF(mGap+cell_w/2+mSpace+(cell_w+mSpace)*col,
-                             mGap+cell_h/2+mSpace+(cell_h+mSpace)*row));
+            p.append(QPointF(mGap+cell_w/2.0+mSpace+(cell_w+mSpace)*col,
+                             mGap+cell_h/2.0+mSpace+(cell_h+mSpace)*row));
         centerPts.append(p);
     }
 
@@ -223,27 +243,6 @@ void Pattern::setPatternSize(int rows,int cols)
 QSize Pattern::patternSize() const
 {
     return QSize(mrows,mcols);
-}
-
-//void Pattern::setPatternMode(Pattern::PatternMode mode)
-//{
-//    mPatternMode = mode;
-//}
-//
-//Pattern::PatternMode Pattern::patternMode() const
-//{
-//    return mPatternMode;
-//}
-
-void Pattern::clearMousePoint()
-{
-    mMousePos = QPoint(-1,-1);
-    update();
-}
-
-QPoint Pattern::currentMousePoint() const
-{
-    return mMousePos;
 }
 
 Pattern::Pattern(int rows, int cols,QWidget*parent):mrows(rows),mcols(cols),QWidget(parent)

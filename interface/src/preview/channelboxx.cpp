@@ -94,14 +94,15 @@ void ChannelBoxx::clickBr()
     dapibtn->resetBackGroundColor();
     brbtn->isChecked()? emit channelChanged(0): emit channelChanged(-1);
     if (!brbtn->isChecked()) {// 原来是true,要取消高亮和关灯,高亮已经变成了true,关灯要用取反状态
-        QVariantMap m;
-        m[CurrentChannelField] = 0;
-        m[TurnOffLight] = 1;
-        m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
-        if (ParserResult.toBool()) {
-            LOG<<"close BR";
-        }
+        emit channelClosed(0); // 把下方代码转移到preview_tcp,方便维护
+//        QVariantMap m;
+//        m[CurrentChannelField] = 0;
+//        m[TurnOffLight] = 1;
+//        m[BrightField] = -1;
+//        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
+//        if (ParserResult.toBool()) {
+//            LOG<<"close br channel";
+//        }
     }
 }
 
@@ -114,14 +115,15 @@ void ChannelBoxx::clickPh()
     dapibtn->resetBackGroundColor();
     phbtn->isChecked()? emit channelChanged(1): emit channelChanged(-1);
     if (!phbtn->isChecked()) {
-        QVariantMap m;
-        m[CurrentChannelField] = 1;
-        m[TurnOffLight] = 1;
-        m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
-        if (ParserResult.toBool()) {
-            LOG<<"close PH";
-        }
+        emit channelClosed(1);
+//        QVariantMap m;
+//        m[CurrentChannelField] = 1;
+//        m[TurnOffLight] = 1;
+//        m[BrightField] = -1;
+//        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
+//        if (ParserResult.toBool()) {
+//            LOG<<"close ph channel";
+//        }
     }
 }
 
@@ -134,14 +136,15 @@ void ChannelBoxx::clickGfp()
     dapibtn->resetBackGroundColor();
     gfpbtn->isChecked()? emit channelChanged(2): emit channelChanged(-1);
     if (!gfpbtn->isChecked()) {
-        QVariantMap m;
-        m[CurrentChannelField] = 2;
-        m[TurnOffLight] = 1;
-        m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
-        if (ParserResult.toBool()) {
-            LOG<<"close GFP";
-        }
+        emit channelClosed(2);
+//        QVariantMap m;
+//        m[CurrentChannelField] = 2;
+//        m[TurnOffLight] = 1;
+//        m[BrightField] = -1;
+//        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
+//        if (ParserResult.toBool()) {
+//            LOG<<"close gfp channel";
+//        }
     }
 }
 
@@ -154,14 +157,15 @@ void ChannelBoxx::clickRfp()
     dapibtn->resetBackGroundColor();
     rfpbtn->isChecked()? emit channelChanged(3): emit channelChanged(-1);
     if (!rfpbtn->isChecked()) {
-        QVariantMap m;
-        m[CurrentChannelField] = 3;
-        m[TurnOffLight] = 1;
-        m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
-        if (ParserResult.toBool()) {
-            LOG<<"close RFP";
-        }
+        emit channelClosed(3);
+//        QVariantMap m;
+//        m[CurrentChannelField] = 3;
+//        m[TurnOffLight] = 1;
+//        m[BrightField] = -1;
+//        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
+//        if (ParserResult.toBool()) {
+//            LOG<<"close rfp channel";
+//        }
     }
 }
 
@@ -175,23 +179,22 @@ void ChannelBoxx::clickDapi()
     dapibtn->isChecked()? emit channelChanged(4): emit channelChanged(-1);
 
     if (!dapibtn->isChecked()) {
-        QVariantMap m;
-        m[CurrentChannelField] = 4;
-        m[TurnOffLight] = 1;
-        m[BrightField] = -1;
-        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
-        if (ParserResult.toBool()) {
-            LOG<<"close DAPI";
-        }
+        emit channelClosed(4);
+//        QVariantMap m;
+//        m[CurrentChannelField] = 4;
+//        m[TurnOffLight] = 1;
+//        m[BrightField] = -1;
+//        SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
+//        if (ParserResult.toBool()) {
+//            LOG<<"close dapi channel";
+//        }
     }
-
-    //LOG<<channelInfo();
 }
 #endif
 
 void ChannelBoxx::takePhoto(const QImage &img, const QString &channel)
 {
-    LOG<<channel;
+    LOG<<"current channel is "<<channel;
     canvas->setImage(ChannelFields.indexOf(channel),img);
 }
 

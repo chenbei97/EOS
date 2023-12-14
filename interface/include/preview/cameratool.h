@@ -23,6 +23,8 @@ public:
     void setGain(int gain);
     void setExposure(int exposure);
 
+    void setEnabled(int tool,bool enable);
+
     QString exposure() const;
     QString gain() const;
     QString bright() const;
@@ -30,9 +32,9 @@ public:
 //    QSize minimumSizeHint() const;
 private:
     Label * label;
-    Slider * cameraExposureSlider;
-    Slider * cameraGainSlider;
-    Slider * cameraBrightSlider;
+    Slider * expslider;
+    Slider * gainslider;
+    Slider * brightslider;
 signals:
     void exposureChanged(int ms); // 1ms-15s
     void gainChanged(int percent); // 100%-5000%

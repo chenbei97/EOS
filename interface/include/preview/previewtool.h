@@ -21,7 +21,7 @@
 #include "timebox.h"
 #include "historybox.h"
 #include "recordbox.h"
-#include "viewselect.h"
+#include "viewmode.h"
 
 class INTERFACE_IMEXPORT PreviewTool : public QWidget
 {
@@ -33,7 +33,7 @@ public:
     void importExperConfig(const QVariantMap& m);
 private:
     HistoryBox * historybox;
-    ViewSelect * selectbox;
+    ViewModeBox * selectbox;
     WellBox * wellbox;
     ObjectiveBox * objectivebox;
     FocusBox * focusbox;
@@ -50,7 +50,8 @@ signals:
     void manufacturerChanged(int option);
     void objectiveChanged(const QString& obj);
     void objectiveToggled(int objective,int objective_loc,int isPh);
-    void channelChanged(int option);// 通道选择
+    void channelChanged(int option);// 通道切换
+    void channelClosed(int option); // 通道关闭
     void cameraInfoChanged(const MultiCameraInfo&m);// 通道配置改变
     void zstackChanged(bool isChecked);// 是否勾选zstack和stitch
     void stitchChanged(bool isChecked);

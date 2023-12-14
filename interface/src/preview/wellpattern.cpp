@@ -86,7 +86,7 @@ void WellPattern::setPatternSize(int rows, int cols)
     initHoleInfo();
 }
 
-void WellPattern::setSelectMode(WellPattern::ViewSelectMode mode)
+void WellPattern::setViewMode(ViewMode mode)
 {
     mSelectMode = mode;
     update();
@@ -341,9 +341,9 @@ void WellPattern::importHoleInfoV1(QCPoint point,QCString group,QCPointFVector v
     update();
 }
 
-void WellPattern::importHoleInfo(const QHoleInfoVector& vec)
+void WellPattern::importHoleInfo(const QHoleInfoVector& vec,ViewMode mode)
 {
-    setSelectMode(WellPattern::RectMode);
+    setViewMode(mode);
     for(auto holeInfo: vec) {
         auto x = holeInfo.coordinate.x();
         auto y = holeInfo.coordinate.y();

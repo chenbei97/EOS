@@ -41,7 +41,7 @@ void Preview::stitchSlide()
     }
 }
 
-void Preview::manualFocus(double val)
+void Preview::adjustFocus(double val)
 { // 手动调焦,来自focus_slider的信号,目前是移动滑动条时就会触发,点击2个细调按钮也会触发
     //LOG<<"focus = "<<val;
     QVariantMap m;
@@ -75,23 +75,47 @@ void Preview::toggleObjective(int objective,int objective_loc,int isPh)
     } else {LOG<<"toggle objective failed!";}
 }
 
+void Preview::closeChannel(int option)
+{
+    QVariantMap m;
+    m[CurrentChannelField] = option;
+    m[TurnOffLight] = 1;
+    m[BrightField] = -1;
+    SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
+    if (ParserResult.toBool()) {
+        switch(option) {
+            case 0:LOG<<"close br channel";
+                break;
+            case 1:LOG<<"close ph channel";
+                break;
+            case 2:LOG<<"close gfp channel";
+                break;
+            case 3:LOG<<"close rfp channel";
+                break;
+            case 4:LOG<<"close dapi channel";
+                break;
+        }
+
+    }
+}
+
 void Preview::toggleChannel(int option)
 {
     auto toolinfo = previewtool->toolInfo();
     auto current_channel = toolinfo[CurrentChannelField].toString();
 
     if (current_channel.isEmpty()) {
-        LOG<<"toggle channel isvalid";
-        Q_ASSERT(option == -1); // 如果没有通道,此时是空字符串,切option=1,那么这个时候就直接关灯即可
-        // 不过关灯需要知道关哪个灯,这个工作在channelboxx已经做了,这里什么也不做
+        LOG<<"not have channel is open";
+        Q_ASSERT(option == -1); // 如果是关灯,此时当前通道是空字符串,此时传来的option=-1,那么这个时候就直接关灯即可
+        // 不过关灯需要知道关哪个灯,这个工作在closeChannel去做
         return; // 灯全灭的情况直接返回
     }
 
     auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
 
     QVariantMap m;
-    m[CurrentChannelField] = getIndexFromFields(current_channel);
-    m[BrightField] = current_info[BrightField];
+    m[CurrentChannelField] = getIndexFromFields(current_channel).toInt();
+    m[BrightField] = current_info[BrightField].toDouble();
     m[TurnOffLight] = 0;
 
     AssemblerPointer->assemble(TcpFramePool.toggleChannelEvent,m);
@@ -100,7 +124,7 @@ void Preview::toggleChannel(int option)
     SocketPointer->exec(TcpFramePool.toggleChannelEvent,msg, true);
 
     if (ParserResult.toBool()) {
-        LOG<<"turn on light successful! current channel is "<<m[CurrentChannelField];
+        LOG<<"turn on light successful! current channel is"<<m[CurrentChannelField].toInt();
     }
 }
 
@@ -135,7 +159,7 @@ void Preview::adjustBright(int br)
     QJsonObject object;
     object[FrameField] = TcpFramePool.adjustBrightEvent;
     object[FieldAdjustBrightEvent.bright] = br;
-    object[FieldAdjustBrightEvent.current_channel] = getIndexFromFields(current_channel);
+    object[FieldAdjustBrightEvent.current_channel] = getIndexFromFields(current_channel).toInt();
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());;
 
@@ -153,22 +177,14 @@ void Preview::onAdjustBright(const QString & f,const QVariant & d)
     // 其它的函数例如adjustLens也可以绑一个函数给ParserPointer,内部f==TcpFramePool.adjustLensEvent时去做一些事
     static int count = 0;
     if (d.toBool() && f == TcpFramePool.adjustBrightEvent) {
-        LOG<<"adjust exp gain bright successful!"<<count;
+        LOG<<"adjust exp gain bright successful! total adjust count = "<<count;
     }
     count++;
 }
 
 void Preview::adjustCamera(int exp,int gain)
 {
-    auto toolinfo = previewtool->toolInfo();
-
-    auto current_channel = toolinfo[CurrentChannelField].toString();
-
-    if (current_channel.isEmpty()) {
-        LOG<<"没有通道的灯被打开,不执行滑动条的参数调整!";
-        return; // 如果通道无效,没有开灯,调节参数没有意义,不发给下位机
-    }
-
+    LOG<<"adjusting exp to"<<exp<<" gain to"<<gain;
 #ifndef notusetoupcamera
     //LOG<<"exposureOption = "<<ToupCameraPointer->exposureOption();
     if (!ToupCameraPointer->exposureOption()) {
@@ -198,16 +214,14 @@ void Preview::takingPhoto()
         auto pix = ToupCameraPointer->capture();
         auto current_channel = toolinfo[CurrentChannelField].toString();
         previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道,以及显示到缩略图
-        LOG<<"adjust bright to"<<current_info[BrightField].toInt()
-        <<"(exp,gain) ="<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain();
+        LOG<<"current (exp,gain,bright) is ("<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain()<<current_info[BrightField].toInt()<<")";
 #else
         setExposure(exp);
         setGain(ga);
         auto pix = capture();
         auto current_channel = toolinfo[CurrentChannelField].toString();
         previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
-        LOG<<"adjust bright to"<<current_info[BrightField].toInt()
-       <<"(exp,gain) ="<<exposure()<<gain();
+        LOG<<"current (exp,gain,bright) is ("<<gain()<<current_info[BrightField].toInt()<<")";
 #endif
 
         canvasmode->changeMode(CanvasMode::PhotoMode);
@@ -218,7 +232,8 @@ void Preview::takingPhoto()
         createPath(TakePhotoTempPath);
         auto path = TakePhotoTempPath
                     +QDateTime::currentDateTime().toString(DefaultImageSaveDateTimeFormat)+JPGSuffix;
-        pix.save(path,JPGField,DefaultImageQuality);
+        if (!pix.isNull())
+            pix.save(path,JPGField,DefaultImageQuality);
 
 }
 
@@ -262,8 +277,8 @@ void Preview::previewViewEvent(const QPointF &viewpoint)
     auto msg = AssemblerPointer->message();
     SocketPointer->exec(TcpFramePool.previewEvent,msg);
     if (ParserResult.toBool()) {
-        LOG<<"move to view point "<<viewpoint;
-    }
+        LOG<<"move to view point "<<viewpoint<<"successful!";
+    } else LOG<<"move to view point "<<viewpoint<<"failed!";
 }
 
 void Preview::previewHoleEvent(const QPoint &holepoint)
@@ -376,7 +391,6 @@ void Preview::exportExperConfig(const QString& path)
     auto json = assembleExportExperEvent(previewinfo);
     JsonReadWrite m; // 借助工具类写到文件内
     m.writeJson(path,json);
-
     // 存数据库,直接存整个json文件是最简单的
 }
 
@@ -427,6 +441,7 @@ void Preview::importExperConfig(const QString &path)
     auto result = m.map();
     auto groupInfos = result[GroupField].value<QVariantMap>();
     auto patterSize = convertToPointF(result[HoleSizeField].toString());
+    auto viewMode = result[ViewModeField].toInt();
 
     QHoleInfoVector holeInfoVec;
     for(auto var1: groupInfos.values()) {
@@ -437,8 +452,8 @@ void Preview::importExperConfig(const QString &path)
         }
     }
     wellpattern->setPatternSize(patterSize.x(),patterSize.y());
-    wellpattern->importHoleInfo(holeInfoVec);
-    wellview->importViewInfo(holeInfoVec);
+    wellpattern->importHoleInfo(holeInfoVec,ViewMode(viewMode));
+    wellview->importViewInfo(holeInfoVec,ViewMode(viewMode));
 }
 
 void Preview::stopExper()

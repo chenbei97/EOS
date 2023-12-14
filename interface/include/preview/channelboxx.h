@@ -36,6 +36,7 @@ private:
 #endif
 signals:
     void channelChanged(int option);
+    void channelClosed(int option);
 };
 
 #endif //EOS_CHANNELBOXX_H

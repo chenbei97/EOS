@@ -16,7 +16,6 @@ class COMPONENT_IMEXPORT View: public QWidget
 {
     Q_OBJECT
 public:
-    enum ViewSelectMode {PointMode,RectMode,WholeMode};
     explicit View(QWidget*parent= nullptr);
 
     virtual void setViewInfo(const ViewInfo& info);
@@ -41,7 +40,7 @@ public:
     QRectF getBottomDisableRect() const;
     void drawDisableLines(QPainter& painter,const QRectF& rect,const QColor& color,Qt::Orientation oriention);
 protected:
-    ViewSelectMode mSelectMode = PointMode;
+    ViewMode mSelectMode = ViewMode::PointMode;
     ViewInfo mViewInfo;
     int mSize = 0;
     double overlapRate = 0.1;

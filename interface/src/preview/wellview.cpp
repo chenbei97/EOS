@@ -74,7 +74,7 @@ void WellView::toggleBrandObjective(int viewSize,bool toggleObjective)
 
 void WellView::adjustViewPoint(int option)
 { // 这段代码应该在preview的adjustLens电机到位后再执行
-    Q_ASSERT(mSelectMode == PointMode); // pressEvent只有在PointMode才会发送调整事件
+    Q_ASSERT(mSelectMode == ViewMode::PointMode); // pressEvent只有在PointMode才会发送调整事件
 
     switch (option) {
         case 0: mValidMousePos += QPointF(-1.0,0.0);
@@ -139,18 +139,17 @@ void WellView::importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int
     update();
 }
 
-void WellView::importViewInfo(const QHoleInfoVector& vec)
+void WellView::importViewInfo(const QHoleInfoVector& vec,ViewMode mode)
 { // 如果是区域模式: rect,viewpoints都有意义,但viewpoints可以通过rect得到,且更简便,不使用viewpoints
     // 如果是点模式,rect为空,使用viewpoints
-    setSelectMode(ViewSelectMode::RectMode);
+    setViewMode(mode);
     mMousePos = {-1.0,-1.0};
     mValidMousePos = {-1.0,-1.0};
     mMouseRect = QRectF();
     mDrapRectF = QRectF();
 
-    if (mSelectMode == RectMode) {
+    if (mSelectMode == ViewMode::RectMode) {
         for(auto holeInfo: vec) {
-
             mViewInfo[HoleCoordinateField] = holeInfo.coordinate;
             mViewInfo[HoleGroupNameField] = holeInfo.group;
             mViewInfo[HoleGroupColorField] = holeInfo.color;
@@ -158,7 +157,8 @@ void WellView::importViewInfo(const QHoleInfoVector& vec)
             mViewInfo[HoleViewPointsField].setValue(holeInfo.viewpoints);
             mViewInfo[HoleViewSizeField] = holeInfo.viewsize;
 
-            // 这3行代码只是单纯过checkField()函数,没有特定含义
+            // 这4行代码只是单纯过checkField()函数,没有特定含义
+            mViewInfo[HoleViewUiPointsField].setValue(QPointFVector());
             mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
             mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
             mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
@@ -167,12 +167,15 @@ void WellView::importViewInfo(const QHoleInfoVector& vec)
             // 在dispersedViewRects()已经完成mViewRects,mViewRectDispersedPoints,mMachinePoints的更新
 
             mSize = holeInfo.viewsize;
-            Q_ASSERT(holeInfo.viewrects.count() == 1);
-            mDrapRectF = holeInfo.viewrects[0];
+            if (!holeInfo.viewrects.isEmpty()) {
+                Q_ASSERT(holeInfo.viewrects.count() == 1);
+                mDrapRectF = holeInfo.viewrects[0]; // 不为空的话一定有1个视野
+            } else mDrapRectF = QRectF();// 为空是点模式或者区域模式忘了选视野
+
             saveviewact->trigger(); // 去更新mViewRects从而绘图,同时还能映射到wellPattern
         }
     }
-    else if (mSelectMode == PointMode) {
+    else if (mSelectMode == ViewMode::PointMode) {
 
     }
 
@@ -190,7 +193,7 @@ void WellView::onApplyAllAct()
     auto id = holeID();
     QVariantMap m;
     m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
-    if (mSelectMode == RectMode) {
+    if (mSelectMode == ViewMode::RectMode) {
         m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
         m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
     }
@@ -207,12 +210,12 @@ void WellView::onApplyAllAct()
     for(auto holes: allholes) {
         for(auto hole: holes) {
             auto pt_idx = holeID(hole);// 所有其他孔的临时数据区更新为当前孔的视野信息
-            if (mSelectMode == RectMode) {
+            if (mSelectMode == ViewMode::RectMode) {
                 mViewRects[pt_idx] = mViewRects[id];
                 mTmpRects[pt_idx] = mViewRects[id];
                 mViewRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
                 mTmpRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
-            } else if(mSelectMode == PointMode){
+            } else if(mSelectMode == ViewMode::PointMode){
                 mViewPoints[pt_idx] = mViewPoints[id];
                 mTmpPoints[pt_idx] = mViewPoints[id];
             }
@@ -237,7 +240,7 @@ void WellView::onApplyGroupAct()
     m[HoleAllCoordinatesField] = mViewInfo[HoleAllCoordinatesField]; // 孔板所有选择的孔坐标信息顺带组装
     m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
     // HoleGroupCoordinatesField 该组的所有孔坐标不组装
-    if (mSelectMode == RectMode) {
+    if (mSelectMode == ViewMode::RectMode) {
         m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
         m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
     }
@@ -247,12 +250,12 @@ void WellView::onApplyGroupAct()
     auto holeCoordinates = mViewInfo[HoleGroupCoordinatesField].value<QPointVector>();//拿到本组其它孔的所有孔坐标
     for(auto pt: holeCoordinates) {
         auto pt_idx = holeID(pt);// 本组其他孔的临时数据区更新为当前孔的视野信息
-        if (mSelectMode == RectMode) {
+        if (mSelectMode == ViewMode::RectMode) {
             mTmpRects[pt_idx] = mViewRects[id];
             mViewRects[pt_idx] = mViewRects[id];
             mViewRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
             mTmpRectDispersedPoints[pt_idx] = mViewRectDispersedPoints[id];
-        } else if (mSelectMode == PointMode){
+        } else if (mSelectMode == ViewMode::PointMode){
             mViewPoints[pt_idx] = mViewPoints[id];
             mTmpPoints[pt_idx] = mViewPoints[id];
         }
@@ -276,7 +279,7 @@ void WellView::onApplyHoleAct()
     m[HoleAllCoordinatesField] = mViewInfo[HoleAllCoordinatesField]; // 孔板所有选择的孔坐标信息顺带组装
     m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
     // HoleGroupCoordinatesField 该组的所有孔坐标不组装
-    if (mSelectMode == RectMode) {
+    if (mSelectMode == ViewMode::RectMode) {
         m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
         m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
     }
@@ -287,7 +290,7 @@ void WellView::onApplyHoleAct()
 void WellView::onRemoveViewAct()
 {
     auto id = holeID();
-    if (mSelectMode == RectMode) {
+    if (mSelectMode == ViewMode::RectMode) {
         // 不是原来的方式:删除添加flag为false,保存添加flag为true
         // 现在改为整体删除,那么只需要检测已有的矩形是否和框选的矩形有交集,直接删除之前保存的就可以
         int i = 0;
@@ -309,7 +312,7 @@ void WellView::onRemoveViewAct()
         dispersedViewRects();
         mMouseRect = QRectF();
         mTmpRects[id] = mViewRects[id];
-    } else if (mSelectMode == PointMode){
+    } else if (mSelectMode == ViewMode::PointMode){
         if (!mDrapRectF.isEmpty()) {
             QPointFVector points;
             for(auto pt: mViewPoints[id]) {
@@ -329,7 +332,7 @@ void WellView::onRemoveViewAct()
 void WellView::onSaveViewAct()
 {
     auto id = holeID();
-    if(mSelectMode == RectMode) {
+    if(mSelectMode == ViewMode::RectMode) {
         // 框选的时候保存框选的矩形,不保存单击生成的矩形
         if (!mDrapRectF.isEmpty()) {
             if (mViewRects[id].isEmpty())
@@ -343,7 +346,7 @@ void WellView::onSaveViewAct()
         mTmpRects[id] = mViewRects[id];
         dispersedViewRects(); // 区域模式通过此函数内部把电机坐标算出来
         mMouseRect = QRectF();
-    } else if (mSelectMode == PointMode){
+    } else if (mSelectMode == ViewMode::PointMode){
         mViewPoints[id].append(mapFromPointF(mValidMousePos));
         mTmpPoints[id] = mViewPoints[id]; // 需要重叠一定比例
         // 点模式不是通过dispersedViewRects()计算,就等于选择的视野坐标
@@ -395,7 +398,7 @@ void WellView::dispersedViewRects()
 
 QPointFVector WellView::getViewPoints(int id,bool norm) const
 { // 只用于区域模式
-    Q_ASSERT(mSelectMode == RectMode);
+    Q_ASSERT(mSelectMode == ViewMode::RectMode);
     auto viewRects = mViewRects[id];
     auto diameter = getCircleRadius() * 2.0;
     QPointFVector points;
@@ -481,7 +484,7 @@ void WellView::paintEvent(QPaintEvent *event)
     auto id = holeID();
 
     // 2. 绘制选中的区域,区域模式绘制区域,点模式绘制点
-    if (mSelectMode == RectMode) { // 区域模式
+    if (mSelectMode == ViewMode::RectMode) { // 区域模式
         // 以下2种绘制法都可以,和wellpattern绘制对应,wellpattern也是2种绘制法
         // 1. 直接绘制视野区域 对应wellpattern的(3.2)画法 最有效率
         if (!mViewRects[id].isEmpty()) {
@@ -564,12 +567,17 @@ void WellView::paintEvent(QPaintEvent *event)
         painter.setPen(pen);
 
         // 5.鼠标单击生成的矩形框
+        auto norm_pos = mapFromPointF(mMousePos);
+        painter.drawText(mMousePos-QPointF(3,3),QString("(%1,%2)").arg(norm_pos.x()).arg(norm_pos.y()));
         painter.drawRect(mapToSize(mMouseRect,topleft,diameter,diameter));
+        pen.setWidth(DefaultPainterPenWidth*2);
+        painter.setPen(pen);
+        painter.drawPoint(mMousePos);
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
         painter.setPen(pen);
     }
-    else if (mSelectMode == PointMode){ // 点模式
+    else if (mSelectMode == ViewMode::PointMode){ // 点模式
         pen.setWidth(DefaultDrawPointWidth);
         pen.setColor(groupcolor);
         painter.setPen(pen);
@@ -617,7 +625,7 @@ void WellView::paintEvent(QPaintEvent *event)
 void WellView::mousePressEvent(QMouseEvent *event)
 {
     View::mousePressEvent(event);
-    if (mSelectMode == PointMode) {
+    if (mSelectMode == ViewMode::PointMode) {
         if (event->button() == Qt::LeftButton) {
             if (!mViewInfo[HoleGroupNameField].toString().isEmpty()) {
                 if (getLeftTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)){
@@ -658,7 +666,7 @@ void WellView::mouseMoveEvent(QMouseEvent *event)
     View::mouseMoveEvent(event);
 }
 
-void WellView::setSelectMode(WellView::ViewSelectMode mode)
+void WellView::setViewMode(ViewMode mode)
 { // 切换区域模式不删除不更改wellview的任何信息
     mSelectMode = mode;
 
@@ -668,10 +676,10 @@ void WellView::setSelectMode(WellView::ViewSelectMode mode)
     for(auto holes: allholes) { //所有孔都要重新更新电机坐标的信息
         for (auto hole: holes) {
             auto pt_idx = holeID(hole);
-            if (mSelectMode == RectMode) {
+            if (mSelectMode == ViewMode::RectMode) {
                 m[HoleViewPointsField].setValue(overlap(getViewPoints(pt_idx), overlapRate));
             }
-            else if (mSelectMode == PointMode) {
+            else if (mSelectMode == ViewMode::PointMode) {
                 m[HoleViewPointsField].setValue(overlap(mViewPoints[pt_idx],overlapRate));
             } // 只需要使用每个孔已有的信息根据不同模式重新把电机坐标算一下更新给wellpattern
             m[HoleCoordinateField] = hole; // 这个孔坐标装上是wellpattern去更新对应的孔
@@ -679,7 +687,7 @@ void WellView::setSelectMode(WellView::ViewSelectMode mode)
         }
     }
 
-    if (mode == WholeMode)
+    if (mode == ViewMode::WholeMode)
         setEnabled(false);
     else setEnabled(true);
 

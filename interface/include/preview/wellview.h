@@ -16,8 +16,8 @@ public:
     void toggleBrandObjective(int viewSize,bool toggleObjective = true);
     void adjustViewPoint(int option);
     void importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
-    void importViewInfo(const QHoleInfoVector& vec);
-    void setSelectMode(ViewSelectMode mode);
+    void importViewInfo(const QHoleInfoVector& vec,ViewMode mode);
+    void setViewMode(ViewMode mode);
 private:
     // 区域模式: 电机坐标!=UI离散坐标
     QMap<int,QPointFVector> mViewRectDispersedPoints; // UI离散坐标

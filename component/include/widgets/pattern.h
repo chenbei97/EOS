@@ -23,17 +23,15 @@ public:
     explicit Pattern(int rows, int cols,QWidget*parent= nullptr);
     virtual void setPatternSize(int rows,int cols);
     QSize patternSize() const;
-//    void setPatternMode(PatternMode mode);
-//    PatternMode patternMode() const;
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent*event) override;
-    QPoint currentMousePoint() const;
-    void clearMousePoint();//清除鼠标选中的圆
 //    QSize sizeHint() const override;
 protected:
-    QSize getChildSize() const; // 每个圆都在划分的小正方形区域内,计算正方形的长度
-    QRectF2DVector getChildRects() const; // 拿到所有小正方形的区域
+    QRectF getValidRect() const;
+    bool isValidPoint(const QPointF& point) const;
+    QSizeF getInnerRectSize() const; // 每个圆都在划分的小正方形区域内,计算正方形的长度
+    QRectF2DVector getAllInnerRects() const; // 拿到所有小正方形的区域
     QPointF2DVector getBorderPoints() const;// 按行从左到右拿到所有分隔线上的点,可用于画线
     QPointFVector getRowHeaderPoints(); // 获取行表头文字的点,用于绘制文字
     QPointFVector getColHeaderPoints();// 获取列表头文字的点,用于绘制文字
@@ -51,7 +49,7 @@ protected:
     QColor mMouseClickColor = Qt::green; // 鼠标点击填充内圆的颜色
     bool mMouseEvent = false; // 是否启用鼠标事件
     QPoint mMousePos = QPoint(-1,-1); // 鼠标点击的坐标,不是真实物理坐标
-    QPoint mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
+    QPointF mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
 signals:
     void holeClicked(const QPoint& point);
     void doubleClicked(const QPoint& point);

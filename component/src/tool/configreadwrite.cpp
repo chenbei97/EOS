@@ -120,9 +120,13 @@ void ConfigReadWrite::parseGroupField(const QJsonValue &key, const QJsonValue &v
 
             holeInfo.viewsize = holeInfoObject[HoleViewSizeField].toInt();
             auto rect_str = holeInfoObject[HoleViewRectsField].toString();
-            if (rect_str.isEmpty()) holeInfo.viewrects = QRectFVector(); // 点模式下可能为空
+            if (rect_str.isEmpty()) holeInfo.viewrects = QRectFVector(); // 点模式下一定为空,区域模式可能没选视野也为空
             else holeInfo.viewrects = QRectFVector()<<convertToRectF(rect_str);
-            holeInfo.viewpoints = convertToPointFVector(holeInfoObject[HoleViewPointsField].toString()); //没有uipoints
+            auto viewpt_str = holeInfoObject[HoleViewPointsField].toString();
+            if (!viewpt_str.isEmpty()) // 有可能用户分了组但是却忘记选择视野导致viewpoints是空的
+                holeInfo.viewpoints = convertToPointFVector(viewpt_str);
+            else holeInfo.viewpoints = QPointFVector();
+            //没有uipoints不导入
 
             groupInfoMap[holeInfoObject[HoleCoordinateField].toString()].setValue(holeInfo); // 用坐标做关键字
         }

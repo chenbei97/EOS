@@ -17,10 +17,10 @@ void PreviewPattern::paintEvent(QPaintEvent *event)
 {
     Pattern::paintEvent(event);
 
-    auto cell_size = getChildSize();
-    int cell_w = cell_size.width();
-    int cell_h = cell_size.height();
-    int radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
+    auto cell_size = getInnerRectSize();
+    auto cell_w = cell_size.width();
+    auto cell_h = cell_size.height();
+    auto radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
     auto  centerPts = getCenterPoints();
 
     QPainter painter(this);

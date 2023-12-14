@@ -150,7 +150,7 @@ void WellPattern::applyHoleEvent(QCVariantMap m)
     holeinfo.viewsize = viewsize; // 本组应用的视野尺寸
     holeinfo.viewpoints = viewpoints; // 本组应用的电机坐标
 
-    if (mSelectMode == RectMode) { // 区域模式下才会有这2个信息,点模式下不要获取,这样得到的是空向量把已有的覆盖了
+    if (mSelectMode == ViewMode::RectMode) { // 区域模式下才会有这2个信息,点模式下不要获取,这样得到的是空向量把已有的覆盖了
         auto viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
         auto uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
         holeinfo.viewrects = viewrects; // 本组应用的视野数量和位置信息
@@ -175,7 +175,7 @@ void WellPattern::applyGroupEvent(QCVariantMap m)
 
     QRectFVector viewrects;
     QPointFVector uipoints;
-    if (mSelectMode == RectMode) {
+    if (mSelectMode == ViewMode::RectMode) {
         viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
         uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
     }
@@ -192,7 +192,7 @@ void WellPattern::applyGroupEvent(QCVariantMap m)
                 Q_ASSERT(holeinfo.allcoordinate == allcoordinates); // 同理
                 holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
                 holeinfo.color = groupColor; // 本组应用的组颜色(有可能同组不同孔的颜色不同,帮助统一化)
-                if (mSelectMode == RectMode) {
+                if (mSelectMode == ViewMode::RectMode) {
                     holeinfo.viewrects = viewrects; // 本组应用的视野数量和位置信息
                     holeinfo.uipoints = uipoints;
                 }
@@ -215,7 +215,7 @@ void WellPattern::applyAllEvent(QCVariantMap m)
     auto viewpoints = m[HoleViewPointsField].value<QPointFVector>(); // 关键信息
     QRectFVector viewrects;
     QPointFVector uipoints;
-    if (mSelectMode == RectMode) {
+    if (mSelectMode == ViewMode::RectMode) {
         viewrects = m[HoleViewRectsField].value<QRectFVector>(); // 关键信息
         uipoints = m[HoleViewUiPointsField].value<QPointFVector>(); // 关键信息
     }
@@ -231,7 +231,7 @@ void WellPattern::applyAllEvent(QCVariantMap m)
             holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
             if (holeinfo.group == groupName) // 本组应用的组颜色,不同组的颜色不需要统一
                 holeinfo.color = groupColor;
-            if (mSelectMode == RectMode) {
+            if (mSelectMode == ViewMode::RectMode) {
                 holeinfo.viewrects = viewrects;
                 holeinfo.uipoints = uipoints;
             }

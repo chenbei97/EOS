@@ -134,6 +134,8 @@ struct FieldLoadExperEvent{
     const QString start_time = StartTimeField;
     const QString is_schedule = IsScheduleField;
     const QString channel = ChannelField;
+    // viewmode
+    const QString viewmode = ViewModeField;
     // global
     const QString app = AppSelectField;
     // wellpattern
@@ -174,6 +176,8 @@ struct FieldExportExperEvent{
     const QString start_time = StartTimeField;
     const QString is_schedule = IsScheduleField;
     const QString channel = ChannelField;
+    // viewmode
+    const QString viewmode = ViewModeField;
     // global
     const QString app = AppSelectField;
     // wellpattern
@@ -390,6 +394,9 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
     object[FieldLoadExperEvent.is_schedule] = toolinfo[FieldLoadExperEvent.is_schedule].toInt();
 #endif
 
+    // viewmodebox
+    object[FieldLoadExperEvent.viewmode] = toolinfo[FieldLoadExperEvent.viewmode].toInt();
+
     // 其它全局信息
     object[FieldLoadExperEvent.app] = m[FieldLoadExperEvent.app].toInt();
 
@@ -514,6 +521,9 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
         object[FieldExportExperEvent.channel] = toolinfo[FieldExportExperEvent.channel].toString();
         object[FieldExportExperEvent.is_schedule] = toolinfo[FieldExportExperEvent.is_schedule].toInt();
 #endif
+
+        // viewmodebox
+        object[FieldExportExperEvent.viewmode] = toolinfo[FieldExportExperEvent.viewmode].toInt();
 
         // 其它全局信息
         object[FieldExportExperEvent.app] = m[FieldExportExperEvent.app].toInt();
@@ -655,8 +665,8 @@ static QByteArray assembleAdjustBrightEvent(QCVariantMap m)
 { // 调节bright参数
     QJsonObject object;
     object[FrameField] = AdjustBrightEvent;
-    object[FieldAdjustBrightEvent.bright] = m[BrightField].toString();
-    object[FieldAdjustBrightEvent.current_channel] = m[CurrentChannelField].toString();
+    object[FieldAdjustBrightEvent.bright] = m[BrightField].toDouble();
+    object[FieldAdjustBrightEvent.current_channel] = m[CurrentChannelField].toInt();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -673,9 +683,9 @@ static QByteArray assembleToggleChannelEvent(QCVariantMap m)
 { // 切换通道
     QJsonObject object;
     object[FrameField] = ToggleChannelEvent;
-    object[FieldToggleChannelEvent.bright] = m[BrightField].toString();
-    object[FieldToggleChannelEvent.turnoff_light] = m[TurnOffLight].toString();
-    object[FieldToggleChannelEvent.current_channel] = m[CurrentChannelField].toString();
+    object[FieldToggleChannelEvent.bright] = m[BrightField].toDouble();
+    object[FieldToggleChannelEvent.turnoff_light] = m[TurnOffLight].toInt();
+    object[FieldToggleChannelEvent.current_channel] = m[CurrentChannelField].toInt();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -693,7 +703,7 @@ static QByteArray assembleAdjustLensEvent(QCVariantMap m)
 { // 移动镜头
     QJsonObject object;
     object[FrameField] = AdjustLensEvent;
-    object[FieldAdjustLensEvent.direction] = m[DirectionField].toString();
+    object[FieldAdjustLensEvent.direction] = m[DirectionField].toInt();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -711,7 +721,7 @@ static QByteArray assembleMoveMachineEvent(QCVariantMap m)
 { // 移动电机到指定位置
     QJsonObject object;
     object[FrameField] = MoveMachineEvent;
-    object[FieldMoveMachineEvent.objective_loc] = m[ObjectiveLocationField].toString();
+    object[FieldMoveMachineEvent.objective_loc] = m[ObjectiveLocationField].toInt();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -729,7 +739,7 @@ static QByteArray assembleStopExperEvent(QCVariantMap m)
 { // 停止实验
     QJsonObject object;
     object[FrameField] = StopExperEvent;
-    object[FieldStopExperEvent.stop] = m[StopField].toString();
+    object[FieldStopExperEvent.stop] = m[StopField].toInt();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);

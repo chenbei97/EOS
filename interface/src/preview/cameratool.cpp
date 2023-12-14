@@ -12,26 +12,41 @@ CameraTool::CameraTool(QWidget*parent): QWidget(parent)
 {
     label = new Label();
     label->hide();
-    cameraExposureSlider = new Slider(ExposureFieldLabel,ExposureFieldUnit,ExposureLowLimit,ExposureUpLimit);
-    cameraGainSlider = new Slider(GainFieldLabel,GainFieldUnit,GainLowLimit,GainUpLimit);
-    cameraBrightSlider = new Slider(BrightFieldLabel,"",BrightLowLimit,BrightUpLimit);
-    cameraExposureSlider->setSingleStep(1);
+    expslider = new Slider(ExposureFieldLabel,ExposureFieldUnit,ExposureLowLimit,ExposureUpLimit);
+    gainslider = new Slider(GainFieldLabel,GainFieldUnit,GainLowLimit,GainUpLimit);
+    brightslider = new Slider(BrightFieldLabel,"",BrightLowLimit,BrightUpLimit);
+    expslider->setSingleStep(1);
 
     auto vlay = new QVBoxLayout;
     vlay->addWidget(label);
-    vlay->addWidget(cameraExposureSlider);
-    vlay->addWidget(cameraGainSlider);
-    vlay->addWidget(cameraBrightSlider);
+    vlay->addWidget(expslider);
+    vlay->addWidget(gainslider);
+    vlay->addWidget(brightslider);
     //vlay->setMargin(0);
     //vlay->setSpacing(0);
 
     setLayout(vlay);
 
-    connect(cameraExposureSlider,&Slider::valueChanged,this,&CameraTool::exposureChanged);
-    connect(cameraGainSlider,&Slider::valueChanged,this,&CameraTool::gainChanged);
-    //connect(cameraBrightSlider,&Slider::valueChanged,this,&CameraTool::brightChanged);
-    connect(cameraBrightSlider,&Slider::sliderReleased,this,&CameraTool::brightChanged);
+    connect(expslider,&Slider::valueChanged,this,&CameraTool::exposureChanged);
+    connect(gainslider,&Slider::valueChanged,this,&CameraTool::gainChanged);
+    connect(brightslider,&Slider::valueChanged,this,&CameraTool::brightChanged);
+    //connect(brightslider,&Slider::sliderReleased,this,&CameraTool::brightChanged);
     //setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
+}
+
+void CameraTool::setEnabled(int tool, bool enable)
+{ // 对3个滑动条之一进行设置使能
+    switch (tool) {
+        case 0:
+            expslider->setEnabled(enable);
+            break;
+        case 1:
+            gainslider->setEnabled(enable);
+            break;
+        case 2:
+            brightslider->setEnabled(enable);
+            break;
+    }
 }
 
 void CameraTool::setTitle(const QString &title)
@@ -42,32 +57,32 @@ void CameraTool::setTitle(const QString &title)
 
 void CameraTool::setExposure(int exposure)
 {
-    cameraExposureSlider->setValue(exposure);
+    expslider->setValue(exposure);
 }
 
 QString CameraTool::exposure() const
 {
-    return cameraExposureSlider->value();
+    return expslider->value();
 }
 
 QString CameraTool::gain() const
 {
-    return cameraGainSlider->value();
+    return gainslider->value();
 }
 
 void CameraTool::setGain(int gain)
 {
-    cameraGainSlider->setValue(gain);
+    gainslider->setValue(gain);
 }
 
 QString CameraTool::bright() const
 {
-    return cameraBrightSlider->value();
+    return brightslider->value();
 }
 
 void CameraTool::setBright(int bright)
 {
-    cameraBrightSlider->setValue(bright);
+    brightslider->setValue(bright);
 }
 
 //QSize CameraTool::sizeHint() const

@@ -617,7 +617,7 @@ namespace obsoleteClass {
                 initDrapPoints(); // 清除拖拽区域
                 auto end = event->pos(); // 鼠标停下的点
                 mDrapRect = QRectF(mLastPos,end); // 鼠标形成的矩形框
-                auto rects = getChildRects();
+                auto rects = getAllInnerRects();
                 for(int row = 0; row < mrows; ++row)
                     for(int col = 0; col < mcols; ++col) {
                         if(mDrapRect.intersects(rects[row][col])// 小矩形区域在这个推拽区域内有交集
@@ -667,7 +667,7 @@ namespace obsoleteClass {
     {// 拿到某个孔基于视野窗口尺寸来划分的所有小矩形区域
 
         // 1. 获取孔内圆的半径+圆心坐标
-        auto cell_size = getChildSize();
+        auto cell_size = getInnerRectSize();
         double cell_w = cell_size.width();
         double cell_h = cell_size.height();
         double radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
@@ -713,10 +713,10 @@ namespace obsoleteClass {
         //LOG<<mrows<<mcols<<mHoleInfo.count()<<mHoleInfo[0].count()<<mMousePos;
         Pattern::paintEvent(event);
 
-        auto cell_size = getChildSize();
-        int cell_w = cell_size.width();
-        int cell_h = cell_size.height();
-        int radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
+        auto cell_size = getInnerRectSize();
+        auto cell_w = cell_size.width();
+        auto cell_h = cell_size.height();
+        auto radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
         //auto  centerPts = getCenterPoints();// 改为直接计算,减少循环
 
         QPainter painter(this);

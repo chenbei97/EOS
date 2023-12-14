@@ -129,11 +129,9 @@ void CameraBox::captureExposureGain(unsigned int exp, unsigned int gain)
 
 void CameraBox::setEnabled(bool enabled)
 { // 除了br,phase,其它通道不需要调整相机参数
-    cameratool->setEnabled(enabled);
+    cameratool->setEnabled(2,enabled); // 只需要bright滑动条禁用
     savebtn->setEnabled(enabled);
     currentchannel->setEnabled(enabled);
-//    capturebtn->setEnabled(enabled);
-//    stitchbtn->setEnabled(enabled);
 }
 
 void CameraBox::setChannel(int option)
