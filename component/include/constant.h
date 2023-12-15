@@ -25,6 +25,7 @@ static const int DefaultDrawPointWidth = 8;
 static const int DefaultPainterPenWidth = 2;
 static const int DefaultDispersedMaskSize = 100;
 static const int DefaultImageQuality = 100;
+static const int DefaultThreadSleepMs = 100;
 #define PointToIDCoefficient 1000 // kx1+y1=kx2+y2=> k=(y2-y1)/(x1-x2),k取什么值?找不到这样的2个坐标能等于k,由于wellsize最大384,实际上k>384就能保证id唯一了
 #define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 #define SqlExecFailedLOG (qDebug()<<"[" \
@@ -172,14 +173,14 @@ static const char*  MoveMachineActTitle = "Move Machine";
 static const QStringList TimeBoxTimeUnitFields = {
         HourField,MinuteField,
 };
-static const QFieldList DishFields = {
-        "dish1","dish2","dish3"
-};
-static const QFieldList FlaskFields = {
-        "flask1","flask2","flask3"
-};
-static const QFieldList SlideFields = {
-        "slide1","slide2","slide3"
-};
+//static const QFieldList DishFields = {
+//        "dish1","dish2","dish3"
+//};
+//static const QFieldList FlaskFields = {
+//        "flask1","flask2","flask3"
+//};
+//static const QFieldList SlideFields = {
+//        "slide1","slide2","slide3"
+//};
 
 #endif //EOSI_CONSTANT_H

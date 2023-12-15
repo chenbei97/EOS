@@ -111,7 +111,7 @@ void TcpSocket::processMsgQueue()
 }
 
 void TcpSocket::processRequestQueue()
-{
+{ // 使用定时器方式 处理请求消息队列(占据cpu高)
     while (!requestQueue.empty()) {
         //LOG<<"requestQueue's count = "<<requestQueue.count();
         frame = requestQueue.head().first;
@@ -123,6 +123,11 @@ void TcpSocket::processRequestQueue()
         loop.exec();
         //LOG<<"after loop is running? "<<loop.isRunning();
     }
+}
+
+void TcpSocket::processRequestMsg(const QRequestMsg& msg)
+{ // 使用子线程方式处理请求消息队列 (代替定时器方式)
+    exec(msg.first,msg.second,false); // 子线程固定100ms处理1次,其实就不能使用同步逻辑了
 }
 
 void TcpSocket::exec(const QString& f,const QByteArray& c,bool use_sync)
@@ -153,12 +158,12 @@ void TcpSocket::exec(const QString& f,const QByteArray& c,bool use_sync)
 
 void TcpSocket::exec(const QString& f,const QByteArray& c)
 { // 本函数只适用于: 有弹窗需求的硬同步,服务侧有明显延迟;
-    // 适用于:1.预览孔/视野/载玻片事件;2.微调镜头事件; 3切换物镜同时动电机;4.setting单纯动电机到某个位置; 5.启动实验
+    // 适用于:1.预览孔/视野/载玻片事件;2.微调镜头事件; 3切换物镜同时动电机;4.setting单纯动电机到某个位置; 5.启动实验 6.手动调焦
     frame = f;
     socket->write(c);
     looptimer.start(SocketWaitTime);
     if (f == TcpFramePool.previewEvent || f == TcpFramePool.adjustLensEvent || f == TcpFramePool.toggleObjectiveEvent
-     || f == TcpFramePool.moveMachineEvent) {
+     || f == TcpFramePool.moveMachineEvent || f == TcpFramePool.manualFocusEvent) {
         waitdlg->setWaitText(tr(WaitMessageBoxMoveMachineMsg));
     } else if (f == TcpFramePool.loadExperEvent) {
         waitdlg->setWaitText(tr(WaitMessageBoxStartExperimentMsg));
@@ -170,8 +175,12 @@ void TcpSocket::exec(const QString& f,const QByteArray& c)
 
 void TcpSocket::exec_queue(const QString &f, const QByteArray &c)
 {//使用请求消息队列的方式: 本函数用于滑动条或者短时发送大量请求消息的同步操作,而且不需要弹窗硬同步
-    // 1.调节br,gain,exp; 2.focus滑动条的操作使用
+    // 1.调节br
     //LOG<<"request msg = "<<c;
+
+#ifdef use_queuethread
+    requestThread->enqueue(qMakePair(f,c));
+#else
     //LOG<<"before = "<<requestQueue.count();
     requestQueue.enqueue(qMakePair(f,c));
     //LOG<<"after = "<<requestQueue.count();
@@ -215,6 +224,7 @@ void TcpSocket::exec_queue(const QString &f, const QByteArray &c)
         [ "11:39:25:431" TcpSocket::processRequestQueue ]  before loop is running?  false
         [ "11:39:25:439" TcpSocket::processRequestQueue ]  after loop is running?  false
      * */
+#endif
 }
 
 QVariantMap TcpSocket::result() const
@@ -263,17 +273,23 @@ TcpSocket::TcpSocket(QObject *parent):QObject(parent)
     //拿到同步后的结果,外接可以从TcpSocket.result也可以直接从ParserResult拿结果,这2个都已经是同步的
     connect(ParserPointer,&ParserControl::parseResult,&loop,&EventLoop::quit);
 
-    // 硬同步: 超时就
+    // 硬同步: 超时就弹窗阻塞
     connect(ParserPointer,&ParserControl::parseResult,waitdlg,&QMessageBox::accept);
     connect(&looptimer,&QTimer::timeout,waitdlg,&QMessageBox::accept);
 
     connect(socket,&QTcpSocket::readyRead,this,&TcpSocket::onReadyReadSlot);
     connect(socket,&QTcpSocket::readyRead,this,&TcpSocket::processMsgQueue);
 
+    // 队列同步: 定时器和子线程方式,但是定时器占据cpu高不采用
+#ifdef use_queuethread
+    requestThread = new RequestQueueThread(this);
+    connect(requestThread,&RequestQueueThread::requestDequeue,this,&TcpSocket::processRequestMsg);
+    requestThread->start();
+#else
     connect(&requesttimer,&QTimer::timeout,this,&TcpSocket::processRequestQueue);
     requesttimer.start(0);
+#endif
     connectToHost();
-
 }
 
 TcpSocket::~TcpSocket()
@@ -284,4 +300,10 @@ TcpSocket::~TcpSocket()
         delete socket;
         socket = nullptr;
     }
+#ifdef use_queuethread
+    if (requestThread->isRunning()) {
+        requestThread->quit();
+        requestThread->wait();
+    }
+#endif
 }

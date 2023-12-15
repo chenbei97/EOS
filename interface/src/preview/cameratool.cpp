@@ -29,8 +29,8 @@ CameraTool::CameraTool(QWidget*parent): QWidget(parent)
 
     connect(expslider,&Slider::valueChanged,this,&CameraTool::exposureChanged);
     connect(gainslider,&Slider::valueChanged,this,&CameraTool::gainChanged);
-    connect(brightslider,&Slider::valueChanged,this,&CameraTool::brightChanged);
-    //connect(brightslider,&Slider::sliderReleased,this,&CameraTool::brightChanged);
+    //connect(brightslider,&Slider::valueChanged,this,&CameraTool::brightChanged);
+    connect(brightslider,&Slider::sliderReleased,this,&CameraTool::brightChanged);
     //setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
 }
 

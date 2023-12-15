@@ -272,6 +272,7 @@ enum class ObjectiveLocationType {
 #define FocusToolFocusMaxVal 10
 #define FocusToolStepMaxVal 10
 #define FocusToolStepVal 0.001
+#define FocusToolScaleVal 1000 // 是FocusToolStepVal的倒数
 #define FocusToolStepDecimal 3
 static const char* ObjectiveLocationField = "objective_loc";
 static const char* CameraChannelField = "camera_channel";
@@ -308,8 +309,9 @@ static const QFieldList ObjectiveLocationFields = {
 
 // timebox涉及的
 #define TimeBoxPhotoTimeLimit 1800
-#define TimeBoxPhotoTimeWaring (QObject::tr("警告:实验间隔时间不能低于%1分钟!").arg(TimeBoxPhotoTimeLimit/60))
-#define TimeBoxTotalBeyondDurationWaring (QObject::tr("警告:实验时长至少大于等于一个实验间隔!"))
+#define TimeBoxPhotoTimeWarning (QObject::tr("Warning:duration should be greater than or equal to %1 minutes!").arg(TimeBoxPhotoTimeLimit/60))
+#define TimeBoxTotalBeyondDurationWarning (QObject::tr("Warning:total should be greater than or equal to duration!"))
+#define TimeBoxStartTimeWarning (QObject::tr("start time cannot be in the past!"))
 static const char* IsScheduleField = "is_schedule";
 static const char* TotalTimeField = "total_time";
 static const char* DurationTimeField = "duration_time";

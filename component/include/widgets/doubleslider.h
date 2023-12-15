@@ -26,6 +26,7 @@ public:
     void setPrefix(const QString& p);
     void setSuffix(const QString& s);
     void setSingleStep(int step);
+    void setScaleFactor(int factor);
     void setMouseEvent(bool enabled);
     double value() const;
     void setValue(double val); // 外部可以传double
@@ -39,15 +40,19 @@ private:
     Label * prefix;
     Label * suffix;
     QString suffixtext;
+    int scalefactor = 1;
     double accumulateval = 0.0;
+    double tmpval = -1.0;
+    void setValue_(double val);//内部使用转换到滑动条上
+
     double fracval = 0.0;
     double intval = 0.0;
-    void setValue(int val);//内部使用转换到滑动条上
 private slots:
-    void onSliderChanged(int val);
+    void onSliderMoved(int val);
+    void onSliderReleased();
 signals:
-    void valueChanged(double val);
-    void sliderPressed();
+    void sliderMoved(double val);
+    void sliderReleased(double val);
 };
 
 #endif //EOSI_DOUBLESLIDER_H

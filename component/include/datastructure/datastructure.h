@@ -19,6 +19,8 @@
 #include "qgraphicseffect.h"
 #include "qlistwidget.h"
 #include "qstyleditemdelegate.h"
+#include "qthread.h"
+#include "qmutex.h"
 
 // (2) 定义常量
 #define CURRENT_PATH (QDir::currentPath())

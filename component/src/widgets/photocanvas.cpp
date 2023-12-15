@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-25 09:48:48
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-25 09:49:29
- * @FilePath: \EOS\interface\src\preview\photocanvas.cpp
+ * @LastEditTime: 2023-12-15 16:11:37
+ * @FilePath: \EOS\component\src\widgets\photocanvas.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "photocanvas.h"

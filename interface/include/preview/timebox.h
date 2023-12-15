@@ -12,11 +12,13 @@
 
 #include "window.h"
 
+#define use_timerthread 1
 class INTERFACE_IMEXPORT TimeBox: public GroupBox
 {
     Q_OBJECT
 public:
     explicit TimeBox(QWidget*parent= nullptr);
+    ~TimeBox();
     void importExperConfig(bool is_schedule,long long total,long long duration,
                            const QStringList&channels,const QString& objective);
     bool checkTime() const;
@@ -50,7 +52,11 @@ private:
     CheckBox * rfpbox;
     CheckBox * dapibox;
     Label * tipinfo;
-    QTimer timer; // 定时更新datetimeedit
+#ifdef use_timerthread // 定时更新datetimeedit
+    TimerBroadCastThread timerthread;
+#else
+    QTimer timer;
+#endif
 signals:
 
 };

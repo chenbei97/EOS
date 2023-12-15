@@ -85,8 +85,8 @@ static QPointFVector convertToPointFVector(const QString& text)
                 while (text[s2] != ")") {
                     s2++;
                 }//匹配时的s2就是")"的索引
-                auto x = text.mid(s1+1,i-s1-1).toDouble();
-                auto y = text.mid(i+1,s2-i-1).toDouble();
+                auto x = text.midRef(s1+1,i-s1-1).toDouble();
+                auto y = text.midRef(i+1,s2-i-1).toDouble();
                 points.append(QPointF(x,y));
             }
         }
@@ -112,8 +112,8 @@ static QPointVector convertToPointVector(const QString& text)
                 while (text[s2] != ")") {
                     s2++;
                 }//匹配时的s2就是")"的索引
-                auto x = text.mid(s1+1,i-s1-1).toInt();
-                auto y = text.mid(i+1,s2-i-1).toInt();
+                auto x = text.midRef(s1+1,i-s1-1).toInt();
+                auto y = text.midRef(i+1,s2-i-1).toInt();
                 points.append(QPoint(x,y));
             }
         }

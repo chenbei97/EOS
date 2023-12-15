@@ -21,9 +21,11 @@
 #include "parse.h"
 #include "parsecontrol.h"
 #include "socket.h"
+#include "requestqueuethread.h"
 
 #include "eventloop.h"
 #include "sqlquerymodel.h"
+#include "timerbroadcastthread.h"
 #include "sqltablemodel.h"
 #include "standarditemmodel.h"
 #include "gradienthiddenanimation.h"

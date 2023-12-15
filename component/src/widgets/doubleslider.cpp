@@ -8,71 +8,37 @@
  */
 #include "doubleslider.h"
 
-DoubleSlider::DoubleSlider(QWidget *parent) : QWidget(parent)
-{
-    slider = new Sliderx(Qt::Horizontal);
-    suffix = new Label;
-    prefix = new Label;
-
-    suffix->setText("0.0");
-
-    auto hlay = new QHBoxLayout;
-    hlay->addWidget(prefix);
-    hlay->addWidget(slider);
-    hlay->addWidget(suffix);
-    hlay->setMargin(0);
-    hlay->setSpacing(0);
-    setLayout(hlay);
-
-    connect(slider,&QSlider::sliderMoved,this,&DoubleSlider::onSliderChanged);
-    connect(slider,&QSlider::sliderPressed,this,&DoubleSlider::sliderPressed);
+void DoubleSlider::setScaleFactor(int factor)
+{ // factor只能大于等于1
+    // 为了模拟滑动条浮点数的效果,例如把0-10的所有浮点数换算到0-10000即可
+    if (factor<1)
+        scalefactor = 1;
+    else scalefactor = factor;
+    slider->setMaximum(scalefactor*slider->maximum());
 }
 
-void DoubleSlider::setDirection(Qt::Orientation orientation)
+void DoubleSlider::onSliderMoved(int val)
 {
-    slider->setOrientation(orientation);
-}
-
-void DoubleSlider::setMouseEvent(bool enabled)
-{
-    slider->setMouseEvent(enabled);
-}
-
-void DoubleSlider::onSliderChanged(int val)
-{
-    QString s = QString("%1").arg(val);
+    accumulateval = (double)val / scalefactor;
+    //tmpval = accumulateval; // 滑动是一定会改变的
+    QString s = QString("%1").arg(accumulateval);
     if (!s.contains(".")) s+=".0";
     auto text = QString("%1 %2").arg(s).arg(suffixtext);
-    accumulateval = val;
     suffix->setText(text);
-    emit valueChanged(accumulateval);
+    emit sliderMoved(accumulateval);
 }
 
-void DoubleSlider::setRange(int min,int max)
-{
-    slider->setRange(min,max);
-}
+void DoubleSlider::onSliderReleased()
+{// 引入tmpval原因是: 单击slider的滑块似乎release信号会发送2次导致相同的值重复发送
+    if (accumulateval != tmpval) // 注意tmpval初始值用负数,避免更改到0.0时不触发
+    {
+        emit sliderReleased(accumulateval); // 释放不一定会改变值
+        //LOG<<"last val ="<<tmpval<<" now ="<<accumulateval <<"has changed";
+        tmpval = accumulateval;
+    } else {
+        //LOG<<"val not changed!";
+    }
 
-void DoubleSlider::setPrefix(const QString& p)
-{
-    prefix->setText(p);
-}
-
-void DoubleSlider::setSuffix(const QString& s)
-{
-    suffixtext = s;
-    suffix->setText(s);
-}
-
-void DoubleSlider::setSingleStep(int step)
-{
-    slider->setSingleStep(step);
-}
-
-double DoubleSlider::value() const
-{
-    //return slider->sliderPosition();
-    return accumulateval;
 }
 
 void DoubleSlider::setValue(double val)
@@ -83,20 +49,18 @@ void DoubleSlider::setValue(double val)
     auto text = QString("%1 %2").arg(s).arg(suffixtext);
     suffix->setText(text);
     slider->blockSignals(true);
-    setValue((int)accumulateval-1);
+    setValue_(accumulateval);
     slider->blockSignals(false);
-    emit valueChanged(accumulateval);
 }
 
-void DoubleSlider::setValue(int value)
-{ // 给滑动条设置值
-    slider->setValue(value);
-    slider->setSliderPosition(value);
-    if (value<=slider->minimum())
+void DoubleSlider::setValue_(double value)
+{
+    value = value * scalefactor;
+    if (value<=slider->minimum())// 浮点数可能会累计超过最值
         slider->setValue(slider->minimum());
-    if (value>=slider->maximum())
+    else if (value>=slider->maximum())
         slider->setValue(slider->maximum());
-    slider->sliderMoved(value);
+    else slider->setValue(value);// 给滑动条设置值会自动取整
 }
 
 void DoubleSlider::addValue(double val)
@@ -125,17 +89,23 @@ void DoubleSlider::addValue(double val)
 
 #else
     accumulateval += val;
-    if (accumulateval >= (double)slider->maximum() || qAbs(accumulateval - (double)slider->maximum())<1e-5)
-        accumulateval = (double)slider->maximum();
+    auto tmp = accumulateval * scalefactor;
+    if (tmp >= (double)slider->maximum() || qAbs(tmp - (double)slider->maximum())<1e-5)
+        accumulateval = (double)slider->maximum() / scalefactor;
     QString s = QString("%1").arg(accumulateval);
     if (!s.contains(".")) s+=".0";
     auto text = QString("%1 %2").arg(s).arg(suffixtext); // 数特别大的话用num
 #endif
     suffix->setText(text);
     slider->blockSignals(true); // 防止触发slidermove信号,这个是int的会重新设置suffix
-    setValue((int)accumulateval-1);
+    setValue_(accumulateval);
     slider->blockSignals(false);
-    emit valueChanged(accumulateval);
+
+    if (tmpval != accumulateval) {
+        emit sliderMoved(accumulateval);
+        emit sliderReleased(accumulateval);
+        tmpval = accumulateval;
+    }
 }
 
 void DoubleSlider::subtractValue(double val)
@@ -159,15 +129,77 @@ void DoubleSlider::subtractValue(double val)
     auto text = QString("%1 %2").arg(num).arg(suffixtext);
 #else
     accumulateval -= val;
-    if (qAbs(accumulateval - (double)slider->minimum())<1e-5 || accumulateval<=(double)slider->minimum())
-        accumulateval = (double)slider->minimum(); // 有可能差值是个很小的正数,也要视为0
+    auto tmp = accumulateval * scalefactor;
+    if (qAbs(tmp - (double)slider->minimum())<1e-5 || tmp<=(double)slider->minimum())
+        accumulateval = (double)slider->minimum() / scalefactor; // 有可能差值是个很小的正数,也要视为0
     QString s = QString("%1").arg(accumulateval);
     if (!s.contains(".")) s+=".0";
     auto text = QString("%1 %2").arg(s).arg(suffixtext);
 #endif
     suffix->setText(text);
     slider->blockSignals(true);
-    setValue((int)accumulateval+1);
+    setValue_(accumulateval);
     slider->blockSignals(false);
-    emit valueChanged(accumulateval);
+
+    if (tmpval != accumulateval) {
+        emit sliderMoved(accumulateval);
+        emit sliderReleased(accumulateval);
+        tmpval = accumulateval;
+    }
+}
+
+DoubleSlider::DoubleSlider(QWidget *parent) : QWidget(parent)
+{
+    slider = new Sliderx(Qt::Horizontal);
+    suffix = new Label;
+    prefix = new Label;
+
+    suffix->setText("0.000");
+
+    auto hlay = new QHBoxLayout;
+    hlay->addWidget(prefix);
+    hlay->addWidget(slider);
+    hlay->addWidget(suffix);
+    hlay->setMargin(0);
+    hlay->setSpacing(0);
+    setLayout(hlay);
+
+    connect(slider,&QSlider::sliderMoved,this,&DoubleSlider::onSliderMoved);
+    connect(slider,&QSlider::sliderReleased,this,&DoubleSlider::onSliderReleased);
+}
+
+void DoubleSlider::setDirection(Qt::Orientation orientation)
+{
+    slider->setOrientation(orientation);
+}
+
+void DoubleSlider::setMouseEvent(bool enabled)
+{
+    slider->setMouseEvent(enabled);
+}
+
+void DoubleSlider::setRange(int min,int max)
+{
+    slider->setRange(min,max);
+}
+
+void DoubleSlider::setPrefix(const QString& p)
+{
+    prefix->setText(p);
+}
+
+void DoubleSlider::setSuffix(const QString& s)
+{
+    suffixtext = s;
+    suffix->setText(s);
+}
+
+void DoubleSlider::setSingleStep(int step)
+{
+    slider->setSingleStep(step);
+}
+
+double DoubleSlider::value() const
+{
+    return accumulateval;
 }

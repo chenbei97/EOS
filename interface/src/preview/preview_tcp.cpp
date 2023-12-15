@@ -48,9 +48,7 @@ void Preview::adjustFocus(double val)
     m[FocusField] = val;
     m[FrameField] = TcpFramePool.manualFocusEvent;
     auto msg = assembleManualFocusEvent(m);
-    //SocketPointer->exec(TcpFramePool.manualFocusEvent,msg, true);
-    SocketPointer->exec_queue(TcpFramePool.manualFocusEvent,msg);
-    // 对于滑动条用请求队列防止重复调用exec,QEventLoop::exec: instance 0x7ffd85fdbab8 has already called exec()
+    SocketPointer->exec(TcpFramePool.manualFocusEvent,msg);
     if (ParserResult.toBool()) {
         LOG<<"adjust focus to "<<val<<"successful!";
     }
@@ -131,7 +129,7 @@ void Preview::toggleChannel(int option)
 void Preview::adjustLens(int option)
 { // 0-left,1-rop,2-right,3-bottom 微调节镜头
     QJsonObject object;
-    object[FrameField] = TcpFramePool.adjustLensEvent;
+    object[FrameField] = AdjustLensEvent;
     object[DirectionField] = option;
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
@@ -139,9 +137,9 @@ void Preview::adjustLens(int option)
     SocketPointer->exec(TcpFramePool.adjustLensEvent,msg);
 
     if (ParserResult.toBool()) {
-        LOG<<"move direction: "<<option;
+        LOG<<"move direction: "<<option<<"successful!";
         wellview->adjustViewPoint(option);
-    }
+    } else LOG<<"move direction: "<<option<<"failed!";
 }
 
 void Preview::adjustBright(int br)
@@ -163,13 +161,7 @@ void Preview::adjustBright(int br)
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());;
 
-    // 发送消息同步,异步都行,如果用同步这里就可以打印消息,这里所有的函数都可以异步也可以同步,2种方式都没有问题
-    // 异步做法对adjustCamera则是用ParsePointer的parseResult信号绑定到下边的onAdjustCamera函数
-    // 然后打印消息也是可以的,2种写法机制测试了所有情况都没有问题,尤其现在exec_queue引入请求消息队列更加优化了代码不出问题
-    SocketPointer->exec_queue(TcpFramePool.adjustBrightEvent,msg);
-//    if (ParserResult.toBool()) {
-//        LOG<<"adjust exp gain bright to"<<exp<<gain<<br;
-//    }
+    SocketPointer->exec_queue(TcpFramePool.adjustBrightEvent,msg); // 不适用同步
 }
 
 void Preview::onAdjustBright(const QString & f,const QVariant & d)
@@ -330,6 +322,7 @@ void Preview::previewHoleEvent(const QPoint &holepoint)
 
 void Preview::loadExper()
 {
+    LOG<<"收集启动实验需要的信息";
     auto patterninfo = wellpattern->patternInfo();
     auto previewinfo = previewtool->toolInfo();
     previewinfo[PreviewPatternField] = patterninfo;
@@ -348,37 +341,43 @@ void Preview::loadExper()
     auto totalViews = wellpattern->numberOfViews();
     auto totalChannels = channels.count("1"); // 为1的是勾选上的
     auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
-    LOG<<"totalViews = "<<totalViews<<"totalChannels = "<<totalChannels<<" estimateSpace = "<<estimateSpace<<"MB";
+    LOG<<"总的孔视野数 = "<<totalViews<<"勾选的通道数 = "<<totalChannels<<" 预计占据空间 = "<<estimateSpace<<"MB";
     previewinfo[EstimatedSpaceField] = estimateSpace;
 
     auto dlg = new SummaryDialog(previewinfo);
     setWindowAlignCenter(dlg);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
+    LOG<<"打开实验信息面板";
     int ret = dlg->exec();
     if (ret == QDialog::Rejected)
         return;
-
+    LOG<<"首先关闭相机";
 #ifndef notusetoupcamera
     ToupCameraPointer->closeCamera(); // 先关相机后执行
 #else
     closeCamera();
 #endif
 
+    LOG<<"然后清理图像";
+#ifdef uselabelcanvas
+    livecanvas->setPixmap(QPixmap());
+#else
+    livecanvas->setImage(QImage());
+#endif
+    photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
+    photocanvas->setImage(QImage());
+    
+    LOG<<"清理图像完毕";
+
     AssemblerPointer->assemble(TcpFramePool.loadExperEvent,previewinfo);
     auto json = AssemblerPointer->message();
+    LOG<<"然后发送启动实验命令";
     SocketPointer->exec(TcpFramePool.loadExperEvent,json);
 
     if (ParserResult.toBool()) {
         QMessageBox::information(this,InformationChinese,tr("Successfully launched the experiment!"));
-
-#ifdef uselabelcanvas
-        livecanvas->setPixmap(QPixmap());
-#else
-        livecanvas->setImage(QImage());
-#endif
-        photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
-        photocanvas->setImage(QImage());
     }
+    LOG<<"启动实验结束";
 }
 
 void Preview::exportExperConfig(const QString& path)

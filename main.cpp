@@ -9,7 +9,7 @@
 #include "test/test.h"
 
 void initApp(QApplication& a);
-#define usetesttcp 0
+//#define usetesttcp 0
 
 int main(int argc, char *argv[]) {
     LogInit;
@@ -39,6 +39,8 @@ void initApp(QApplication& a)
     a.setFont(QFont(DefaultFontFamily,DefaultFontSize));
     a.setWindowIcon(QApplication::style()->standardIcon(QStyle::SP_DesktopIcon));
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+    qRegisterMetaType<QRequestMsg>("QRequestMsg");
+    qRegisterMetaType<QRequestQueue>("QRequestQueue");
     //QTimer::singleShot(0,qApp,SLOT(quit()));
 
     // 这段Python进程的代码移动到initApp去写而不是在mainwindow.cpp的构造函数去写
@@ -46,15 +48,6 @@ void initApp(QApplication& a)
     // 这样setting有关的信号发送的时候python进程尚未启动(mainwindow并未构造完)导致服务端没收到消息
     // 所以提前启动Python进程,这样mainwindow或者settng初始化发送某些信号时都能保证服务端已经正常
     // 现在方便测试自己去启动Python,以后变成自启动时这些代码也就不需要了,目前需要保留
-
-    // 1.进程方式
-    //auto process = new PythonProcess;
-    //process->start("../test/test_socket.py");
-    // 2.线程方式
-    //StartPythonPointer->start("../test","test_socket","test_server");
-
-    // 3.非线程也非进程方式(会阻塞)
-    //PythonCallPointer->start("../test","test_socket","test_server");
 
     // 属于进程方式 测试方便,暂时需要保留,以后可以从这开始到代码结束都注释掉
     auto * process = new QProcess;

@@ -10,11 +10,13 @@
 #define EOSI_TCPSOCKET_H
 
 #include "socket.h"
+#include "requestqueuethread.h"
 #include "parsecontrol.h"
 
 #define WaitMessageBoxMoveMachineMsg  "please wait moving machine..."
 #define WaitMessageBoxStartExperimentMsg  "please wait starting experiment..."
 #define WaitMessageBoxStopExperimentMsg  "please wait stoping experiment..."
+#define use_queuethread 1
 
 class COMPONENT_IMEXPORT TcpSocket: public QObject
 {
@@ -34,16 +36,17 @@ private:
     void onReadyReadSlot();
     void processMsgQueue();
     Q_INVOKABLE void processRequestQueue();
+    void processRequestMsg(const QRequestMsg& msg);
     QTcpSocket * socket = nullptr;
     WaitMessageBox * waitdlg = nullptr;
     QByteQueue msgQueue;
     QRequestQueue requestQueue;
+    RequestQueueThread * requestThread;
     QByteArray message;
     QString frame;
     EventLoop loop;
     QTimer looptimer;
     QTimer requesttimer;
 signals:
-    //void readyExec();
 };
 #endif //EOSI_TCPSOCKET_H

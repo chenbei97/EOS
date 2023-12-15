@@ -22,8 +22,8 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     connect(pattern,&TriangleMove::topTriangleClicked,this,&FocusBox::topMove);
     connect(pattern,&TriangleMove::bottomTriangleClicked,this,&FocusBox::bottomMove);
     connect(pattern,&TriangleMove::triangleClicked,this,&FocusBox::directionMove);
-    connect(slider,&DoubleSlider::valueChanged,this,&FocusBox::valueChanged);
-    connect(slider,&DoubleSlider::sliderPressed,this,&FocusBox::sliderPressed);
+    //connect(slider,&DoubleSlider::sliderMoved,this,&FocusBox::valueChanged);
+    connect(slider,&DoubleSlider::sliderReleased,this,&FocusBox::valueChanged); // 改成释放才更改
 
     setTitle(tr(FocusBoxTitle));
 }
@@ -50,12 +50,15 @@ void FocusBox::setEnabled(bool enabled)
 void FocusBox::addFocus()
 {
     auto val = step->value();
-    slider->addValue(step->value());
+    if (val == 0.0) return;
+    slider->addValue(val);
 }
 
 void FocusBox::subtractFocus()
 {
-    slider->subtractValue(step->value());
+    auto val = step->value();
+    if (val == 0.0) return;
+    slider->subtractValue(val);
 }
 
 double FocusBox::focus() const
@@ -122,6 +125,7 @@ void FocusBox::initAttributes()
 
     slider->setDirection(Qt::Vertical);
     slider->setRange(0,FocusToolFocusMaxVal);
+    slider->setScaleFactor(FocusToolScaleVal);
     slider->setPrefix("");
     slider->setMouseEvent(true);
 

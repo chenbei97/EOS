@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-30 16:03:47
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-02 15:58:14
+ * @LastEditTime: 2023-12-15 14:05:44
  * @FilePath: \EOS\interface\src\preview\timebox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -171,8 +171,13 @@ void TimeBox::initConnections()
     connect(durationtime,QOverload<double>::of(&SpinBox::valueChanged),this,&TimeBox::refreshInfo);
     connect(totalunit,QOverload<const QString&>::of(&ComboBox::currentIndexChanged),this,&TimeBox::updateTotalTimeUnit);
     connect(durationunit,QOverload<const QString&>::of(&ComboBox::currentIndexChanged),this,&TimeBox::updateDurationTimeUnit);
+#ifdef use_timerthread
+    connect(&timerthread,&TimerBroadCastThread::currentDateTime,[=](auto dt){datetimeedit->setMinimumDateTime(dt);});
+    timerthread.start();
+#else
     connect(&timer,&QTimer::timeout,this,&TimeBox::updateDateTimeEdit);
     timer.start(1000); // 每秒更新1次
+#endif
 }
 
 void TimeBox::initLayout()
@@ -217,6 +222,11 @@ bool TimeBox::isSchedule() const
 
 bool TimeBox::checkTime() const
 {
+    if (datetimeedit->dateTime() < QDateTime::currentDateTime()) {
+        tipinfo->setText(TimeBoxStartTimeWarning); // 时间可能变成过去时间
+        return false;
+    }
+
     // 1. 取实验时长转为秒
     auto total = totalTime();
 
@@ -225,13 +235,13 @@ bool TimeBox::checkTime() const
 
     // 3. 间隔时间不能小于拍图时间，这个拍图时间是后端给定的，例如30mins
     if (duration<TimeBoxPhotoTimeLimit) {
-        tipinfo->setText(TimeBoxPhotoTimeWaring);
+        tipinfo->setText(TimeBoxPhotoTimeWarning);
         return false;
     }
 
     // 4.总实验时长要大于实验间隔时间,不然不能完成实验
     if (total<duration) {
-        tipinfo->setText(TimeBoxTotalBeyondDurationWaring);
+        tipinfo->setText(TimeBoxTotalBeyondDurationWarning);
         return false;
     }
     return true;
@@ -268,4 +278,12 @@ QDateTime TimeBox::startTime() const
         return QDateTime::currentDateTime(); // 有可能用户设置时间后又做了一些别的事导致这个时间过时了
     }
     return datetime;
+}
+
+TimeBox::~TimeBox() noexcept
+{
+#ifdef use_timerthread
+    timerthread.quit();
+    timerthread.wait();
+#endif
 }
