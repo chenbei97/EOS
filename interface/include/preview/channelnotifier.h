@@ -22,6 +22,7 @@ private:
     QMap<int,PushButton*> notifiers;
 signals:
     void channelChanged(int option);
+    void channelClosed(int option);
 };
 
 #endif //CHANNELNOTIFIER_H

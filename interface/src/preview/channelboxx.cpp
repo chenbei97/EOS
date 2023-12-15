@@ -52,6 +52,7 @@ ChannelBoxx::ChannelBoxx(QWidget*parent): GroupBox(parent)
     notifier->addToList(dapibtn);
     connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&ChannelBoxx::toggleChannel);
     connect(notifier,&ChannelNotifier::channelChanged,this,&ChannelBoxx::channelChanged);
+    connect(notifier,&ChannelNotifier::channelClosed,this,&ChannelBoxx::channelClosed);
 #else
     connect(brbtn,&PushButton::clicked,this,&ChannelBoxx::clickBr);
     connect(phbtn,&PushButton::clicked,this,&ChannelBoxx::clickPh);

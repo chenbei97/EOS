@@ -8,7 +8,7 @@
  */
 
 #include "windowinfo.h"
-#include "windows.h"
+#include "Windows.h"
 
 static WindowsMemoryInfo getWindowsMemoryInfo()
 {

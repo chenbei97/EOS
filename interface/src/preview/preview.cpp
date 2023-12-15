@@ -346,7 +346,7 @@ void Preview::initAttributes()
 #else
     livecanvas->drawTriangle(false);
     livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
-    livecanvas->optimizePaint(50);
+    //livecanvas->optimizePaint(50);
 #endif
     stackcanvas->addWidget(livecanvas);
     stackcanvas->addWidget(photocanvas);

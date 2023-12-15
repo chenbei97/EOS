@@ -49,14 +49,14 @@ set(IMAGEFORMATS_PATH "${CMAKE_PREFIX_PATH}/plugins/imageformats")
 set(MEDIA_PATH "${CMAKE_PREFIX_PATH}/plugins/mediaservice")
 set(ICONENGINE_PATH "${CMAKE_PREFIX_PATH}/plugins/iconengines")
 set(QML_PATH "${CMAKE_PREFIX_PATH}/qml")
-#set(USE_PYTHON 0)
-#if (${USE_PYTHON})
-#set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
-#set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
-#set(PYTHON310_LIB_PATH_python310 ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310.lib)
-#set(PYTHON310_LIB_PATH_python310d ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310_d.lib)
-#set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
-#endif ()
+set(USE_PYTHON 1)
+if (${USE_PYTHON})
+set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
+set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
+set(PYTHON310_LIB_PATH_python310 ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310.lib)
+set(PYTHON310_LIB_PATH_python310d ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310_d.lib)
+set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
+endif ()
 
 set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
 set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
@@ -104,9 +104,9 @@ add_subdirectory(interface)
 link_directories(${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib
         #${A1}${A2}${A3}${A4}${A5}${A6}${A7}${A8}${A9}
         )
-#if (${USE_PYTHON})
-#    link_directories(${PYTHON310_LIB_PATH})
-#endif ()
+if (${USE_PYTHON})
+   link_directories(${PYTHON310_LIB_PATH})
+endif ()
 # ${PYTHON310_LIB_PATH}只能在这里,不能在target_link_libraries
 # ${OPENCV_LIBs_PATH}不能放link_directories 只能在target_link_libraries, ${TOUPCAM_LIB_PATH}测试是2个都可以放
 
@@ -120,9 +120,9 @@ add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES}) # ${THEME
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
           ${TOUPCAM_INCLUDE_PATH})
-#if (${USE_PYTHON})
-#target_include_directories(${PROJECT_NAME} PUBLIC ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
-#endif ()
+if (${USE_PYTHON})
+target_include_directories(${PROJECT_NAME} PUBLIC ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
+endif ()
 #if (${USE_OPENCV})
 #target_include_directories(${PROJECT_NAME} PUBLIC ${OPENCV_INCLUDE_PATH})
 #endif ()
@@ -271,9 +271,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         ${TOUPCAM_LIB_PATH}# opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
 
         )
-#if (${USE_PYTHON})
-#target_link_libraries(${PROJECT_NAME} PRIVATE ${PYTHON310_LIB_PATH_python310} ${PYTHON310_LIB_PATH_python310d})
-#endif ()
+if (${USE_PYTHON})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PYTHON310_LIB_PATH_python310} ${PYTHON310_LIB_PATH_python310d})
+endif ()
 #if (${USE_OPENCV})
 #target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH})
 # # bin下已经放好了2个文件 ${OPENCV_LIBs_PATH},所以可以不使用OPENCV_LIBs_PATH

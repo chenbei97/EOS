@@ -15,7 +15,6 @@ from collections import defaultdict
 from random import randint
 from queue import Queue
 import numpy as np
-import  cv2
 
 class ParseManager:
     def __init__(self):
@@ -156,7 +155,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0003回复: ", reponse)
-        time.sleep(1)
+        #time.sleep(1)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 滑动条调节br

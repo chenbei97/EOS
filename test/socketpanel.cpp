@@ -12,34 +12,10 @@
 void SocketPanel::onSend()
 {
     edit->clear();
-    testStateActivateCode();
+    askActivateCodeSync();
     //testData1_2();
-    //testData3();
     //QThread::sleep(1);
 
-}
-
-void SocketPanel::testData1_2()
-{
-    for(int i = 0; i < 10;++i) {
-        if (i%2) {
-            AssemblerPointer->assemble("test0x0",getTestData1());
-            auto msg1 = AssemblerMessage;
-            edit->append(sendText.arg(QString::fromUtf8(msg1)));
-            SocketPointer->exec("test0x0",msg1,true);
-            //LOG<<"test0x0's response = "<<ParserPointer->response();
-            //edit->append(recvText.arg(SocketPointer->result()["test0x0"].toString()));
-            edit->append(recvText.arg(ParserResult.toString())); // 这2个代码都是相同的
-        } else {
-            AssemblerPointer->assemble("test0x1",getTestData2());
-            auto msg2= AssemblerMessage;
-            edit->append(sendText.arg(QString::fromUtf8(msg2)));
-            SocketPointer->exec("test0x1",msg2,true);
-            //LOG<<"test0x1's response = "<<ParserPointer->response();
-            //edit->append(recvText.arg(SocketPointer->result()["test0x1"].toString()));
-            edit->append(recvText.arg(ParserResult.toString())); // 这2个代码都是相同的
-        }
-    }
 }
 
 QVariantMap SocketPanel::getTestData1()
@@ -59,42 +35,23 @@ QVariantMap SocketPanel::getTestData2()
     return m;
 }
 
-QByteArray SocketPanel::getTestData3()
-{
-    QByteArray c;
-    QFile file(CURRENT_PATH+"/../test/test0x0001.json");
-    file.open(QIODevice::ReadOnly);
-    c = file.readAll();
-    file.close();
-    c.append(SeparateField);
-    return c;
-}
-
-void SocketPanel::testData3()
-{
-    edit->append(sendText.arg(QString::fromUtf8(getTestData3())));
-    SocketPointer->exec(TcpFramePool.loadExperEvent,getTestData3(),true);
-    edit->append(recvText.arg(ParserResult.toString()));
-}
-
-void SocketPanel::testStateActivateCode()
-{// 测试激活码状态连接
-//    SocketPointer->exec(TcpFramePool.frame0x0002,assemble0x0002(QVariantMap()));
-//    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
-//    else LOG<<"socket is connect failed!";
-//    SocketPointer->exec(TcpFramePool.frame0x0003,assemble0x0003(QVariantMap()));
-//    LOG<<"activate code is "<<ParserResult.toString();
-
-    edit->append(sendText.arg(QString::fromUtf8(assembleAskConnectedStateEvent(QVariantMap()))));
-    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
-    //if (ParserResult.toBool())
-   if (SocketPointer->result()[TcpFramePool.askConnectedStateEvent].toBool())
-        edit->append(recvText.arg("[synchronous] socket is connect successful!"));
-    else edit->append(recvText.arg("[synchronous] socket is connect failed!"));
-
-    edit->append(sendText.arg(QString::fromUtf8(assembleAskActivateCodeEvent(QVariantMap()))));
-    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
-    edit->append(recvText.arg("[synchronous] activate code is "+ParserResult.toString()));
+void SocketPanel::testData1_2()
+{ // 测试data1和data2交替,不过socket.h定义的帧头不包含test0x0和text0x1所以没有回复
+    for(int i = 0; i < 10;++i) {
+        if (i%2) {
+            AssemblerPointer->assemble("test0x0",getTestData1());
+            auto msg1 = AssemblerMessage;
+            edit->append(sendText.arg(QString::fromUtf8(msg1)));
+            SocketPointer->exec("test0x0",msg1,true);
+            edit->append(recvText.arg(ParserResult.toString())); // 这2个代码都是相同的
+        } else {
+            AssemblerPointer->assemble("test0x1",getTestData2());
+            auto msg2= AssemblerMessage;
+            edit->append(sendText.arg(QString::fromUtf8(msg2)));
+            SocketPointer->exec("test0x1",msg2,true);
+            edit->append(recvText.arg(ParserResult.toString())); // 这2个代码都是相同的
+        }
+    }
 }
 
 SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
@@ -113,7 +70,7 @@ SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
 
     connect(btn,&QPushButton::clicked,this,&SocketPanel::onSend);
     SocketInit;
-    connect(ParserPointer,&ParserControl::parseResult,this,&SocketPanel::parseResult0x0002_0x0003);
+    connect(ParserPointer,&ParserControl::parseResult,this,&SocketPanel::askActivateCodeASync);
 
     SocketPython * pthread = new SocketPython();
     pthread->start();
@@ -123,8 +80,22 @@ SocketPanel::SocketPanel(QWidget *parent): QWidget(parent)
 
 }
 
-void SocketPanel::parseResult0x0002_0x0003(const QString &f, const QVariant &d)
-{ // 可以通过同步或者异步拿到消息
+void SocketPanel::askActivateCodeSync()
+{// 可以通过同步拿到消息
+    edit->append(sendText.arg(QString::fromUtf8(assembleAskConnectedStateEvent(QVariantMap()))));
+    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
+    //if (ParserResult.toBool())
+   if (SocketPointer->result()[TcpFramePool.askConnectedStateEvent].toBool())
+        edit->append(recvText.arg("[synchronous] socket is connect successful!"));
+    else edit->append(recvText.arg("[synchronous] socket is connect failed!"));
+
+    edit->append(sendText.arg(QString::fromUtf8(assembleAskActivateCodeEvent(QVariantMap()))));
+    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
+    edit->append(recvText.arg("[synchronous] activate code is "+ParserResult.toString()));
+}
+
+void SocketPanel::askActivateCodeASync(const QString &f, const QVariant &d)
+{ // 可以通过异步拿到消息
     //LOG<<"frame = "<<f<<" d = "<<d;
     if (f == TcpFramePool.askConnectedStateEvent && d.toBool()) {
         edit->append(recvText.arg("[asynchronous] socket is connect successful!"));

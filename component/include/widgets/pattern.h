@@ -13,13 +13,11 @@
 #include "alias.h"
 #include "constant.h"
 #include "groupinfo.h"
-#include "circle.h"
 
 class COMPONENT_IMEXPORT Pattern : public QWidget
 {
     Q_OBJECT
 public:
-//    enum PatternMode {PlateMode,SlideMode};
     explicit Pattern(int rows, int cols,QWidget*parent= nullptr);
     virtual void setPatternSize(int rows,int cols);
     QSize patternSize() const;

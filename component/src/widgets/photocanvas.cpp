@@ -200,7 +200,7 @@ void PhotoCanvas::appendImage(const QImage &img, const QPointF &point)
 }
 
 void PhotoCanvas::setImage(const QImage &img, int duration)
-{
+{ // 手动掉过duration张然后update
     Q_ASSERT(mStrategy == SinglePixmap);
     static long long count = 0;
     static long c = 0;
@@ -210,8 +210,7 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
             mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
         else
             mimage = QImage();
-        //LOG<<count<<c;
-        update();// 这是定时器来帮助刷新
+        update();
         ++c;
     }
     count++;
@@ -223,13 +222,13 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
 }
 
 void PhotoCanvas::setImage(const QImage &img)
-{
+{ // 立即update不跳过任何
     Q_ASSERT(mStrategy == SinglePixmap);
     if (!img.isNull())
         mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
     else
         mimage = QImage();
-    update(); // 这里是立即刷新的
+    update(); // 这里是立即刷新的可能会卡
 }
 
 void PhotoCanvas::setPixmap(const QPixmap &pix)

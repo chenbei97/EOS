@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-16 13:22:02
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-16 14:06:26
+ * @LastEditTime: 2023-12-14 14:26:25
  * @FilePath: \EOS\component\include\public.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -47,8 +47,6 @@
 #include "groupbox.h"
 #include "dockwidget.h"
 #include "pattern.h"
-#include "previewpattern.h"
-#include "protocolpattern.h"
 #include "inscribedrect.h"
 #include "trianglemove.h"
 #include "lensbox.h"
@@ -65,7 +63,6 @@
 #include "roundbutton.h"
 #include "colorbutton.h"
 #include "doubleslider.h"
-#include "circle.h"
 #include "photocanvas.h"
 #include "photocanvastriangle.h"
 #include "labeltriangle.h"
@@ -76,5 +73,6 @@
 #include "view.h"
 
 // (2) 常量定义
-//#define use_python 0
+#define use_python 0
+#define use_testSocket 0
 #endif //EOSI_PUBLIC_H

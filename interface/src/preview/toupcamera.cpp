@@ -11,6 +11,7 @@
 
 void ToupCamera::captureLiveImage()
 {
+    LOG<<"here: toupcam"<<toupcam<<" toupcam = nullptr?"<<(toupcam== nullptr);
     if (!toupcam) return;
     int bStill = 0; // 拉取图像要求设置为0
     int bits = rgbBit(); // 默认就是24bit
@@ -20,6 +21,7 @@ void ToupCamera::captureLiveImage()
     //auto resolu = resolution();
     //std::vector<uchar> vec(TDIBWIDTHBYTES(resolu.width() * 24) * resolu.height());
 
+    static int count = 0;
     if (SUCCEEDED(Toupcam_PullImageV3(toupcam, imgdata.get(),
                                       bStill, bits, rowPitch, &info))){
         //print_imageInfo(&info);
@@ -28,7 +30,10 @@ void ToupCamera::captureLiveImage()
         auto image = QImage(imgdata.get(), info.width, info.height, QImage::Format_RGB888);
         //auto pair = qMakePair(image,info);//把数据发出去,别的地方使用
         //emit imageCaptured(pair);
+
         emit imageCaptured(image);
+        count++;
+        LOG<<"pull image count = "<<count;
     } else {
         LOG<<"pull image failed";
     }
@@ -369,6 +374,7 @@ ValueRangeUShort ToupCamera::getGainRange() const
 
 void ToupCamera::processCallback(unsigned int nEvent)
 {
+    //LOG<<"here: toupcam"<<toupcam<<" toupcam = nullptr?"<<(toupcam== nullptr);
     if (!toupcam) return;
     switch (nEvent) {
         case TOUPCAM_EVENT_IMAGE:
@@ -392,9 +398,13 @@ void ToupCamera::processCallback(unsigned int nEvent)
 void ToupCamera::eventCallBack(unsigned int nEvent, void *ctxEvent)
 { // 事件回调函数
     //Q_ASSERT(ctxEvent == ToupCameraPointer);
-    ToupCamera* pThis = reinterpret_cast<ToupCamera*>(ctxEvent);
-    emit pThis->evtCallback(nEvent);
-    //ToupCameraPointer->evtCallback(nEvent);//必须强转不能用这个
+    //ToupCamera* pThis = reinterpret_cast<ToupCamera*>(ctxEvent);
+    //emit pThis->evtCallback(nEvent);
+    ////ToupCameraPointer->evtCallback(nEvent);//必须强转不能用这个
+
+    ToupCamera* pthis = reinterpret_cast<ToupCamera*>(ctxEvent);
+    if (nEvent == TOUPCAM_EVENT_IMAGE) // 直接在这处理更有效率
+        pthis->captureLiveImage();
 }
 
 ToupCamera& ToupCamera::instance()

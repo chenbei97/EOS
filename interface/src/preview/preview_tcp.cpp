@@ -157,7 +157,7 @@ void Preview::adjustBright(int br)
 
     // 滑动条速度很快,这里组装不再通过Assembler来组装,可能同步会出问题,直接组装
     QJsonObject object;
-    object[FrameField] = TcpFramePool.adjustBrightEvent;
+    object[FrameField] = AdjustBrightEvent;
     object[FieldAdjustBrightEvent.bright] = br;
     object[FieldAdjustBrightEvent.current_channel] = getIndexFromFields(current_channel).toInt();
     TcpAssemblerDoc.setObject(object);

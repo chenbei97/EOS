@@ -27,12 +27,11 @@ public:
     QVariantMap getTestData2();
     QByteArray getTestData3();
     void testData1_2();
-    void testData3();
-    void testStateActivateCode();
 private:
     PushButton * btn;
     TextEdit * edit;
     void onSend();
-    void parseResult0x0002_0x0003(const QString& f,const QVariant& d);
+    void askActivateCodeSync();
+    void askActivateCodeASync(const QString& f,const QVariant& d);
 };
 #endif //EOSI_SOCKETPANEL_H

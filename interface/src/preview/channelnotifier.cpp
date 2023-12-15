@@ -48,14 +48,7 @@ void ChannelNotifier::notify(PushButton *btn)
                 button->isChecked()? emit channelChanged(button->getID())
                     : emit channelChanged(-1);
                 if (!button->isChecked()) {
-                    QVariantMap m;
-                    m[CurrentChannelField] = button->getID();
-                    m[TurnOffLight] = 1;
-                    m[BrightField] = -1;
-                    SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
-                    if (ParserResult.toBool()) {
-                        LOG<<"close "<<ChannelFields[button->getID()];
-                    }
+                    emit channelClosed(button->getID());
                 }
             }
         }
