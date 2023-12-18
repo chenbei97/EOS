@@ -105,9 +105,14 @@ void TimeBox::toggleScanType(bool isSchedule)
 }
 
 void TimeBox::updateDateTimeEdit()
-{
+{ // 定时器绑定的函数
     //if (!isSchedule()) return;//禁用状态也还是给更新
     datetimeedit->setMinimumDateTime(QDateTime::currentDateTime());
+}
+
+void TimeBox::refreshDateTimeEdit(const QDateTime &dateTime)
+{ // 子线程绑定的函数
+    datetimeedit->setMinimumDateTime(dateTime);
 }
 
 void TimeBox::updateTotalTimeUnit(const QString &unit)
@@ -150,11 +155,11 @@ void TimeBox::initAttributes()
     totaltime->setMaximumWidth(TimeBoxSpinBoxMaxWidth);
     datetimeedit->setMaximumWidth(TimeBoxDateTimeEditMaxWidth);
 
-    totaltime->setRange(1.0,LONG_MAX);
+    totaltime->setRange(1.0,10000);
     totaltime->setSuffix(HoursFieldSuffix);
     totaltime->setValue(1.0);
 
-    durationtime->setRange(1.0,LONG_MAX);
+    durationtime->setRange(1.0,10000);
     durationtime->setSuffix(HoursFieldSuffix);
     durationtime->setValue(1.0);
 
@@ -172,8 +177,8 @@ void TimeBox::initConnections()
     connect(totalunit,QOverload<const QString&>::of(&ComboBox::currentIndexChanged),this,&TimeBox::updateTotalTimeUnit);
     connect(durationunit,QOverload<const QString&>::of(&ComboBox::currentIndexChanged),this,&TimeBox::updateDurationTimeUnit);
 #ifdef use_timerthread
-    connect(&timerthread,&TimerBroadCastThread::currentDateTime,[=](auto dt){datetimeedit->setMinimumDateTime(dt);});
-    timerthread.start();
+    connect(TimerBroadCastThreadPointer,&TimerBroadCastThread::currentDateTime,this,&TimeBox::refreshDateTimeEdit);
+    TimerBroadCastThreadPointer->startThread();
 #else
     connect(&timer,&QTimer::timeout,this,&TimeBox::updateDateTimeEdit);
     timer.start(1000); // 每秒更新1次
@@ -283,7 +288,8 @@ QDateTime TimeBox::startTime() const
 TimeBox::~TimeBox() noexcept
 {
 #ifdef use_timerthread
-    timerthread.quit();
-    timerthread.wait();
+    if (TimerBroadCastThreadPointer->isRunning()) {
+        TimerBroadCastThreadPointer->stopThread();
+    }
 #endif
 }

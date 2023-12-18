@@ -17,10 +17,15 @@ class COMPONENT_IMEXPORT TimerBroadCastThread: public QThread
 {
     Q_OBJECT
 public:
+    static TimerBroadCastThread& instance();
+    void stopThread();
+    void startThread();
+private:
     explicit TimerBroadCastThread(QObject*parent= nullptr);
     void run() override;
+    bool flag = false;
 signals:
     void currentDateTime(const QDateTime& datetime);
 };
-
+#define TimerBroadCastThreadPointer (&TimerBroadCastThread::instance())
 #endif //EOS_TIMERBROADCASTTHREAD_H

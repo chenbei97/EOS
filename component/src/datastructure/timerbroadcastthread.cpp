@@ -9,10 +9,18 @@
 
 #include "timerbroadcastthread.h"
 
+TimerBroadCastThread &TimerBroadCastThread::instance()
+{
+    static TimerBroadCastThread instance;
+    return instance;
+}
+
 void TimerBroadCastThread::run()
 {
-    while(true) {
+    LOG<<"timer broadcast's thread: "<<CURRENT_THREAD;
+    while(flag) {
         emit currentDateTime(QDateTime::currentDateTime());
+        //LOG<<"here";
         msleep(1000); // 1s一次即可
     }
 }
@@ -20,4 +28,17 @@ void TimerBroadCastThread::run()
 TimerBroadCastThread::TimerBroadCastThread(QObject *parent) : QThread(parent)
 {
 
+}
+
+void TimerBroadCastThread::startThread()
+{
+    flag = true;
+    start();
+}
+
+void TimerBroadCastThread::stopThread()
+{
+    flag = false;
+    quit();
+    wait();
 }

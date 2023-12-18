@@ -27,9 +27,10 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
         case NoStrategy:
             break;
         case SinglePixmap:
-            if(mimage.isNull()) return;
-            painter.drawImage(QRect(0,0,width(),height()),mimage);
-            //painter.drawPixmap(targetRect,QPixmap::fromImage(mimage));
+            if(!mimage.isNull()) {
+                painter.drawImage(QRect(0,0,width(),height()),mimage);
+                //painter.drawPixmap(targetRect,QPixmap::fromImage(mimage));
+            }
             break;
         case GridPixmap:
             drawGridImage(painter);
@@ -203,26 +204,41 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
 { // 手动掉过duration张然后update
     Q_ASSERT(mStrategy == SinglePixmap);
     static long long count = 0;
-    static long c = 0;
     if (count % duration == 0) { // 不能能用count % 10取非好像long会有问题
         // 一种除了定时update辅助减少界面刷新的功能,10张图显示1次
-        if (!img.isNull())
-            mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+#ifdef use_imagetransformthread
+        if (!img.isNull()) {
+            ImageTransformThreadPointer->setImage(img);
+        }
+        else
+            ImageTransformThreadPointer->setImage(QImage());
+#else
+        if (!img.isNull()) {
+            static long count = 0;
+            auto image = img.mirrored(true,false);
+            QMatrix matrix;
+            matrix.rotate(270.0);
+            mimage = image.transformed(matrix,Qt::FastTransformation);
+            mimage = mimage.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+            count++;
+            LOG<<"accept image count = "<<count;
+            if (count > 60000)
+                count = 0;
+        }
         else
             mimage = QImage();
+#endif
         update();
-        ++c;
     }
     count++;
 
     if (count > 1000 ){
         count = 0; // 防止一直累计溢出
-        c = 0;
     }
 }
 
 void PhotoCanvas::setImage(const QImage &img)
-{ // 立即update不跳过任何
+{ // 立即update(本函数不使用子线程)
     Q_ASSERT(mStrategy == SinglePixmap);
     if (!img.isNull())
         mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
@@ -261,9 +277,40 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
     mMouseClickColor.setAlpha(DefaultColorAlpha);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
+#ifdef use_imagetransformthread
+    ImageTransformThreadPointer->setImageSize(this->size());
+    connect(ImageTransformThreadPointer,&ImageTransformThread::imageTransformed,this,&PhotoCanvas::upateImageByThread);
+#endif
+
 //    static bool flag = false;
 //    connect(&timer,&QTimer::timeout,[this]{setUpdatesEnabled(flag);flag=!flag;});
     connect(&timer,&QTimer::timeout,[this]{update();});
+}
+
+PhotoCanvas::~PhotoCanvas() noexcept
+{
+#ifdef use_imagetransformthread
+    if (ImageTransformThreadPointer->isRunning()) {
+        ImageTransformThreadPointer->stopThread();
+    }
+#endif
+}
+
+void PhotoCanvas::upateImageByThread(const QImage& img)
+{
+    static long count = 0;
+    mimage = img;
+    count++;
+    LOG<<"accept image count = "<<count;
+    if (count > 60000)
+        count = 0;
+}
+
+void PhotoCanvas::enableTransformThread(bool e)
+{
+#ifdef use_imagetransformthread
+    ImageTransformThreadPointer->startThread();
+#endif
 }
 
 void PhotoCanvas::updateRect(const QRectF &rect)

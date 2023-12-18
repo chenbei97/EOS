@@ -46,11 +46,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 
     connect(setting,&Setting::objectiveSettingChanged,preview,&Preview::objectiveSettingChanged);
     //setting->emitSignals(); // 把objectivesetting的初始配置触发一下去更新previewtool(如果一开始就对应上也可以不手动触发)
-}
-
-void MainWindow::navigbarSelect(int id)
-{
-    stack->setCurrentIndex(id);
 #ifdef notusetoupcamera
     if (preview->isCameraOpen()) return;
     else  preview->openCamera();
@@ -58,4 +53,9 @@ void MainWindow::navigbarSelect(int id)
     if (ToupCameraPointer->isOpen()) return;
     ToupCameraPointer->openCamera();
 #endif
+}
+
+void MainWindow::navigbarSelect(int id)
+{
+    stack->setCurrentIndex(id);
 }

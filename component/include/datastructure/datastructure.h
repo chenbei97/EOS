@@ -32,7 +32,6 @@
 #define DoubleZeroValue 0.0
 static const char* OpacityField = "opacity";
 
-
 // (3) 导出定义
 #if defined(COMPONENT_LIBRARY)
 #  define COMPONENT_IMEXPORT Q_DECL_EXPORT

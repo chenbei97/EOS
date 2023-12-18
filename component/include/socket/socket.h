@@ -46,17 +46,18 @@ class ParserControl;
 // (3) 帧头定义
 enum TcpEventType {
     PreviewEvent = 0, // 点击孔,视野的预览事件
-    LoadExperEvent, // 启动实验事件
-    AskConnectedStateEvent, // 询问套接字连接状态事件
-    AskActivateCodeEvent,// 请求激活码事件
-    AdjustBrightEvent, // 滑动条调整brght事件
-    ToggleChannelEvent, // 切换通道关灯开灯事件
-    AdjustLensEvent, // 上下左右调整镜头事件
-    MoveMachineEvent,// 移动点击到指定物镜位置事件
-    StopExperEvent, // 停止实验事件
-    ToggleObjectiveEvent, // 切换物镜动电机事件
-    RecordVideoEvent, // 录制视频事件
-    ManualFocusEvent, // 手动聚焦事件
+    LoadExperEvent = 1, // 启动实验事件
+    AskConnectedStateEvent = 2, // 询问套接字连接状态事件
+    AskActivateCodeEvent = 3,// 请求激活码事件
+    AdjustBrightEvent = 4, // 滑动条调整brght事件
+    ToggleChannelEvent = 5, // 切换通道关灯开灯事件
+    AdjustLensEvent = 6, // 上下左右调整镜头事件
+    MoveMachineEvent = 7,// 移动点击到指定物镜位置事件
+    StopExperEvent = 8, // 停止实验事件
+    ToggleObjectiveEvent = 9, // 切换物镜动电机事件
+    RecordVideoEvent = 10, // 录制视频事件
+    ManualFocusEvent = 11, // 手动聚焦事件
+    AutoFocusEvent = 12, // 自动聚焦事件
 };
 
 typedef struct { // 注册过的帧头命令

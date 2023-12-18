@@ -10,7 +10,11 @@
 #define EOSI_PHOTOCANVAS_H
 
 #include "widgets.h"
-#include "qtimer.h"
+//#define use_imagetransformthread 1
+
+#ifdef use_imagetransformthread
+#include "imagetransformthread.h"
+#endif
 
 class COMPONENT_IMEXPORT PhotoCanvas: public QWidget
 {
@@ -18,6 +22,7 @@ class COMPONENT_IMEXPORT PhotoCanvas: public QWidget
 public:
     enum DrawStrategy {NoStrategy,SinglePixmap,GridPixmap};
     explicit PhotoCanvas(QWidget*parent= nullptr);
+    ~PhotoCanvas();
     void setStrategy(DrawStrategy s,const QVariantMap& m = QVariantMap());
     PhotoCanvas::DrawStrategy strategy() const;
 
@@ -41,8 +46,11 @@ public:
     void mouseMoveEvent(QMouseEvent *event) override;// 绘制拖拽框
     void mouseReleaseEvent(QMouseEvent *event) override;// 拖拽区域点个数为0才是预览事件
     void paintEvent(QPaintEvent *event) override;
+
+    void enableTransformThread(bool e);
 protected:
     QImage mimage; // 单图模式使用
+    void upateImageByThread(const QImage& img);
 protected: // 多图模式使用
     int mGridSize = 0;
     QPairImageVector mGridImageVector;

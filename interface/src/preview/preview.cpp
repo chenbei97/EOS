@@ -253,16 +253,12 @@ void Preview::openWellGroupWindow(const QVariantMap &m)
 #ifndef notusetoupcamera // 如果使用照相机指针类,preview内部直接使用相机
 void Preview::showCapturedImage(const QImage& image)
 { // 来自照相机的捕捉图像事件传来的live图像显示
-    auto img = image.mirrored(true,false);
-//    QMatrix matrix;
-//    matrix.rotate(270.0);
-//    img = img.transformed(matrix,Qt::FastTransformation);
 #ifdef uselabelcanvas
     auto pix = QPixmap::fromImage(img).scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
     livecanvas->setPixmap(pix);
     livecanvas->repaint();
 #else
-    livecanvas->setImage(img,10); // 10张图片显示1次
+    livecanvas->setImage(image,8); // 10张图片显示1次
 #endif
 }
 #endif
@@ -350,6 +346,9 @@ void Preview::initAttributes()
 #else
     livecanvas->drawTriangle(false);
     livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
+#ifdef use_imagetransformthread
+    livecanvas->enableTransformThread(true);
+#endif
     livecanvas->optimizePaint(50);
 #endif
     stackcanvas->addWidget(livecanvas);

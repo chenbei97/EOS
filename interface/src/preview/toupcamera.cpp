@@ -11,7 +11,7 @@
 
 void ToupCamera::captureLiveImage()
 {
-    LOG<<"here: toupcam"<<toupcam<<" toupcam = nullptr?"<<(toupcam== nullptr);
+    //LOG<<"here: toupcam"<<toupcam<<" toupcam = nullptr?"<<(toupcam== nullptr);
     if (!toupcam) return;
     int bStill = 0; // 拉取图像要求设置为0
     int bits = rgbBit(); // 默认就是24bit
@@ -21,19 +21,13 @@ void ToupCamera::captureLiveImage()
     //auto resolu = resolution();
     //std::vector<uchar> vec(TDIBWIDTHBYTES(resolu.width() * 24) * resolu.height());
 
-    static int count = 0;
     if (SUCCEEDED(Toupcam_PullImageV3(toupcam, imgdata.get(),
                                       bStill, bits, rowPitch, &info))){
         //print_imageInfo(&info);
         // imgdata分配了多大内存读取就使用多大内存,_msize可以计算分配的内存
         //auto image = QImage::fromData(imgdata.get(), _msize(imgdata.get()));
         auto image = QImage(imgdata.get(), info.width, info.height, QImage::Format_RGB888);
-        //auto pair = qMakePair(image,info);//把数据发出去,别的地方使用
-        //emit imageCaptured(pair);
-
         emit imageCaptured(image);
-        count++;
-        LOG<<"pull image count = "<<count;
     } else {
         LOG<<"pull image failed";
     }

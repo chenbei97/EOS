@@ -37,6 +37,7 @@ private:
     void toggleScanType(bool isSchedule);//切换计划执行或立即执行
     void refreshInfo();//dutation/total/start时间更新时刷新提示信息
     void updateDateTimeEdit();
+    void refreshDateTimeEdit(const QDateTime& dateTime);
     void updateTotalTimeUnit(const QString& unit);
     void updateDurationTimeUnit(const QString& unit);
 private:
@@ -53,7 +54,7 @@ private:
     CheckBox * dapibox;
     Label * tipinfo;
 #ifdef use_timerthread // 定时更新datetimeedit
-    TimerBroadCastThread timerthread;
+    //TimerBroadCastThread timerthread;
 #else
     QTimer timer;
 #endif

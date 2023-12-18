@@ -30,7 +30,11 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
 
 void FocusBox::onAutoFocus()
 {
-
+    QJsonObject object;
+    object[FrameField] = AutoFocusEvent;
+    TcpAssemblerDoc.setObject(object);
+    auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
+    SocketPointer->exec("12",msg);
 }
 
 void FocusBox::importExperConfig(double focus, double s)
