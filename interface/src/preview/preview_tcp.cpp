@@ -167,11 +167,9 @@ void Preview::adjustBright(int br)
 void Preview::onAdjustBright(const QString & f,const QVariant & d)
 { // 这个是异步获取ParsePointer的parseResult,上方不使用同步,连接本函数也是可以的
     // 其它的函数例如adjustLens也可以绑一个函数给ParserPointer,内部f==TcpFramePool.adjustLensEvent时去做一些事
-    static int count = 0;
     if (d.toBool() && f == TcpFramePool.adjustBrightEvent) {
-        LOG<<"adjust exp gain bright successful! total adjust count = "<<count;
+        LOG<<"adjust exp gain bright successful! total adjust count = ";
     }
-    count++;
 }
 
 void Preview::adjustCamera(int exp,int gain)

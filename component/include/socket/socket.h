@@ -58,6 +58,8 @@ enum TcpEventType {
     RecordVideoEvent = 10, // 录制视频事件
     ManualFocusEvent = 11, // 手动聚焦事件
     AutoFocusEvent = 12, // 自动聚焦事件
+    ChannelMergeEvent = 13, // 通道merge事件
+    ExperFinishedEvent = 14, // 实验结束事件
 };
 
 typedef struct { // 注册过的帧头命令
@@ -73,6 +75,9 @@ typedef struct { // 注册过的帧头命令
     const QString toggleObjectiveEvent = QString::number(ToggleObjectiveEvent);
     const QString recordVideoEvent = QString::number(RecordVideoEvent);
     const QString manualFocusEvent = QString::number(ManualFocusEvent);
+    const QString autoFocusEvent = QString::number(AutoFocusEvent);
+    const QString channelMergeEvent = QString::number(ChannelMergeEvent);
+    const QString experFinishedEvent = QString::number(ExperFinishedEvent);
 } TcpFrameList;
 
 const QFieldList TcpUsedFrameList { // 用于解析时检测返回的帧是否正确,在这个列表内
@@ -80,6 +85,7 @@ const QFieldList TcpUsedFrameList { // 用于解析时检测返回的帧是否�
         QString::number(AskActivateCodeEvent),QString::number(AdjustBrightEvent),QString::number(ToggleChannelEvent),
         QString::number(AdjustLensEvent),QString::number(MoveMachineEvent),QString::number(StopExperEvent),
         QString::number(ToggleObjectiveEvent),QString::number(RecordVideoEvent),QString::number(ManualFocusEvent),
+        QString::number(AutoFocusEvent),QString::number(ChannelMergeEvent),QString::number(ExperFinishedEvent),
 };
 
 struct FieldPreviewEvent {
@@ -242,6 +248,18 @@ struct FieldManualFocusEvent {
     const QString state = StateField;
 };
 
+struct FieldAutoFocusEvent {
+
+};
+
+struct FieldChannelMergeEvent {
+
+};
+
+struct FieldExperFinishedEvent {
+    const QString exper_finished = ExperFinishedField;
+};
+
 typedef struct {
     FieldPreviewEvent fieldPreviewEvent;
     FieldLoadExperEvent fieldLoadExperEvent;
@@ -256,6 +274,9 @@ typedef struct {
     FieldToggleObjectiveEvent fieldToggleObjectiveEvent;
     FieldRecordVideoEvent fieldRecordVideoEvent;
     FieldManualFocusEvent fieldManualFocusEvent;
+    FieldAutoFocusEvent fieldAutoFocusEvent;
+    FieldChannelMergeEvent fieldChannelMergeEvent;
+    FieldExperFinishedEvent fieldExperFinishedEvent;
 } TcpFieldList;
 
 static QJsonDocument TcpAssemblerDoc;
@@ -275,6 +296,9 @@ static const TcpFieldList TcpFieldPool;
 #define FieldToggleObjectiveEvent TcpFieldPool.fieldToggleObjectiveEvent
 #define FieldRecordVideoEvent TcpFieldPool.fieldRecordVideoEvent
 #define FieldManualFocusEvent TcpFieldPool.fieldManualFocusEvent
+#define FieldAutoFocusEvent TcpFieldPool.fieldAutoFocusEvent
+#define FieldChannelMergeEvent TcpFieldPool.fieldChannelMergeEvent
+#define FieldExperFinishedEvent TcpFieldPool.fieldExperFinishedEvent
 
 static QVariant parsePreviewEvent(QCVariantMap m)
 { // 预览事件
@@ -812,6 +836,44 @@ static QVariant parseManualFocusEvent(QCVariantMap m)
     return state == OkField;
 }
 
+static QByteArray assembleAutoFocusEvent(QCVariantMap m)
+{// 自动调焦事件
+    QJsonObject object;
+    object[FrameField] = AutoFocusEvent;
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parseAutoFocusEvent(QCVariantMap m)
+{// 手动调焦事件
+    if (!m.keys().contains(FrameField)) return false;
+    return false;
+}
+
+static QByteArray assembleChannelMergeEvent(QCVariantMap m)
+{// 通道合并事件
+    QJsonObject object;
+    object[FrameField] = AutoFocusEvent;
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    return AppendSeparateField(json);
+}
+
+static QVariant parseChannelMergeEvent(QCVariantMap m)
+{// 通道事件
+    if (!m.keys().contains(FrameField)) return false;
+    return false;
+}
+
+static QVariant parseExperFinishedEvent(QCVariantMap m)
+{ // 实验结束-服务端主动给客户端发
+    if (!m.keys().contains(FrameField)) return false;
+    if (!m.keys().contains(FieldExperFinishedEvent.exper_finished)) return false;
+    auto isFinished = m[FieldExperFinishedEvent.exper_finished].toInt();
+    return isFinished;
+}
+
 /*---------以下都是临时测试函数,以后可以注释掉-----------------*/
 static QByteArray assemble_test0x0(QCVariantMap m)
 { // test0x0会传来x,y,frame字段
@@ -868,6 +930,9 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.toggleObjectiveEvent, parseToggleObjectiveEvent},
         {TcpFramePool.recordVideoEvent, parseRecordVideoEvent},
         {TcpFramePool.manualFocusEvent, parseManualFocusEvent},
+        {TcpFramePool.autoFocusEvent, parseAutoFocusEvent},
+        {TcpFramePool.channelMergeEvent, parseChannelMergeEvent},
+        {TcpFramePool.experFinishedEvent, parseExperFinishedEvent},
         {"test0x0",parse_test0x0},
         {"test0x1",parse_test0x1},
 };
@@ -885,6 +950,8 @@ static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {
         {TcpFramePool.toggleObjectiveEvent, assembleToggleObjectiveEvent},
         {TcpFramePool.recordVideoEvent, assembleRecordVideoEvent},
         {TcpFramePool.manualFocusEvent, assembleManualFocusEvent},
+        {TcpFramePool.autoFocusEvent, assembleAutoFocusEvent},
+        {TcpFramePool.channelMergeEvent, assembleChannelMergeEvent},
         {"test0x0",assemble_test0x0},
         {"test0x1",assemble_test0x1},
 };

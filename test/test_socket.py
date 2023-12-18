@@ -2,7 +2,7 @@
 Author: chenbei97 chenbei_electric@163.com
 Date: 2023-10-19 15:25:08
 LastEditors: chenbei97 chenbei_electric@163.com
-LastEditTime: 2023-10-19 15:52:48
+LastEditTime: 2023-12-18 14:18:35
 FilePath: \EOS\test\test_socket.py
 Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
 '''
@@ -297,10 +297,23 @@ class SocketServerManger:
             return
         self.__thread1 = threading.Thread(target=self.__recvFromClient)
         self.__thread2 = threading.Thread(target=self.__parseMessage)
+        self.__thread3 = threading.Thread(target=self.__sendMessage)
         self.__thread1.start()
         self.__thread2.start()
+        self.__thread3.start()
         self.__thread1.join()
         self.__thread2.join()
+        self.__thread3.join()
+
+    def __sendMessage(self):
+        while self.__isConnected:
+            reponse = defaultdict()
+            reponse["frame"] = 14 # 实验结束
+            reponse["exper_finished"] = 1
+            response = json.dumps(reponse)
+            response += "@@@"
+            time.sleep(10)
+            self.client.sendall(response.encode("utf-8"))
 
     def __recvFromClient(self):
         while self.__isConnected:
