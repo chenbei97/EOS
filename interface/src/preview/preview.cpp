@@ -465,7 +465,7 @@ void Preview::initConnections()
     connect(slideview,&SlidePattern::rectUpdated,slidepattern,&SlidePattern::updateRect);
 
     // (3) 外部信号=>preview/previewtool
-    connect(ParserPointer,&ParserControl::parseResult,this,&Preview::onAdjustBright);
+    connect(ParserPointer,&ParserControl::parseResult,this,&Preview::parseResult);
 #ifdef notusetoupcamera
     connect(this, &Preview::evtCallback, this, &Preview::processCallback);
 #else

@@ -222,7 +222,7 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
 //            mimage = mimage.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
             mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
             count++;
-            LOG<<"accept image count = "<<count;
+            //LOG<<"accept image count = "<<count;
             if (count > 60000)
                 count = 0;
         }

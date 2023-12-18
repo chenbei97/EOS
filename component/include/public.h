@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-16 13:22:02
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-12-14 14:26:25
+ * @LastEditTime: 2023-12-18 15:20:19
  * @FilePath: \EOS\component\include\public.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -76,5 +76,4 @@
 
 // (2) 常量定义
 #define use_python 0
-#define use_testSocket 0
 #endif //EOSI_PUBLIC_H

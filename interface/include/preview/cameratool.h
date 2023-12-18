@@ -35,6 +35,7 @@ private:
     Slider * expslider;
     Slider * gainslider;
     Slider * brightslider;
+    void onBrightReleased(int bright);
 signals:
     void exposureChanged(int ms); // 1ms-15s
     void gainChanged(int percent); // 100%-5000%

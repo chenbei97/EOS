@@ -30,8 +30,18 @@ CameraTool::CameraTool(QWidget*parent): QWidget(parent)
     connect(expslider,&Slider::valueChanged,this,&CameraTool::exposureChanged);
     connect(gainslider,&Slider::valueChanged,this,&CameraTool::gainChanged);
     //connect(brightslider,&Slider::valueChanged,this,&CameraTool::brightChanged);
-    connect(brightslider,&Slider::sliderReleased,this,&CameraTool::brightChanged);
+    connect(brightslider,&Slider::sliderReleased,this,&CameraTool::onBrightReleased);
     //setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
+}
+
+void CameraTool::onBrightReleased(int bright)
+{ // 原生的release信号似乎点击时会触发2次,为了避免重复触发引入
+    static int tmpval = 0;
+    if (bright != tmpval) {
+        emit brightChanged(bright);
+        tmpval = bright;
+    } else {
+    }
 }
 
 void CameraTool::setEnabled(int tool, bool enable)

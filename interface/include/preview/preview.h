@@ -123,7 +123,6 @@ private:
     void toggleObjective(int objective,int objective_loc,int isPh);
     void adjustCamera(int exp,int gain);
     void adjustBright(int br);
-    void onAdjustBright(const QString &f,const QVariant & d);
     void adjustLens(int option);
     void adjustFocus(double val);
     void toggleChannel(int option);
@@ -136,6 +135,7 @@ private:
     void importExperConfig(const QString& path);
     void loadExper();
     void stopExper();
+    void parseResult(const QString &f,const QVariant & d);
 #ifndef notusetoupcamera
     void showCapturedImage(const QImage& image);
 #endif

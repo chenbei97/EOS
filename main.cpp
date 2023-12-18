@@ -78,13 +78,6 @@ void initApp(QApplication& a)
     if (!ToupCameraPointer->isOpen()){
         ToupCameraPointer->openCamera();
     };
-    QObject::connect(ParserPointer,&ParserControl::parseResult,[=](auto f,auto d) {
-        if (d.toInt() == 1 && f == TcpFramePool.experFinishedEvent) {
-            LOG<<"exper is finished, open camera";
-            if (!ToupCameraPointer->isOpen())
-                ToupCameraPointer->openCamera();
-        }
-    });
 
     // 这段Python进程的代码移动到initApp去写而不是在mainwindow.cpp的构造函数去写
     // 因为mainwindow.cpp构造完成之前可能已经触发了某些信号给服务端发送命令,例如独立于mainwindow构造的setting

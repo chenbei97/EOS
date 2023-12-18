@@ -8,6 +8,19 @@
  */
 #include "preview.h"
 
+void Preview::parseResult(const QString & f,const QVariant & d)
+{ // 任何来自服务端的消息都在这里
+    if (d.toBool() && f == TcpFramePool.adjustBrightEvent) {
+        LOG<<"adjust bright successful!";
+    }
+
+    if (d.toInt() == 1 && f == TcpFramePool.experFinishedEvent) {
+        LOG<<"exper is finished, open camera";
+        if (!ToupCameraPointer->isOpen())
+            ToupCameraPointer->openCamera();
+    }
+}
+
 void Preview::previewSlideEvent(const QPointF& point)
 {
     LOG<<"slide point: "<<point;
@@ -162,14 +175,6 @@ void Preview::adjustBright(int br)
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());;
 
     SocketPointer->exec_queue(TcpFramePool.adjustBrightEvent,msg); // 不适用同步
-}
-
-void Preview::onAdjustBright(const QString & f,const QVariant & d)
-{ // 这个是异步获取ParsePointer的parseResult,上方不使用同步,连接本函数也是可以的
-    // 其它的函数例如adjustLens也可以绑一个函数给ParserPointer,内部f==TcpFramePool.adjustLensEvent时去做一些事
-    if (d.toBool() && f == TcpFramePool.adjustBrightEvent) {
-        LOG<<"adjust exp gain bright successful! total adjust count = ";
-    }
 }
 
 void Preview::adjustCamera(int exp,int gain)
