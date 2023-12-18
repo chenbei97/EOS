@@ -11,19 +11,19 @@
 
 void ImageTransformThread::run()
 {
-    LOG<<"image transform's thread: "<<CURRENT_THREAD;
     while(enable)
     {
         QMutexLocker locker(&mutex);
         if (!mimage.isNull()) {
-//            auto img = mimage.mirrored(true,false);
-//            QMatrix matrix;
-//            matrix.rotate(270.0);
-//            img = img.transformed(matrix,Qt::FastTransformation);
-            //mimage = img.scaled(msize,Qt::KeepAspectRatio,Qt::FastTransformation);
-            mimage = mimage.scaled(msize,Qt::KeepAspectRatio,Qt::FastTransformation);
+            //LOG<<"image transform's thread: "<<CURRENT_THREAD;
+            auto img = mimage.mirrored(true,false);
+            QMatrix matrix;
+            matrix.rotate(270.0);
+            img = img.transformed(matrix,Qt::FastTransformation);
+            mimage = img.scaled(msize,Qt::KeepAspectRatio,Qt::FastTransformation);
+            //mimage = mimage.scaled(msize,Qt::KeepAspectRatio,Qt::FastTransformation);
             emit imageTransformed(mimage);
-        }
+        }  else emit imageTransformed(QImage());
         msleep(DefaultThreadSleepMs);
     }
 }

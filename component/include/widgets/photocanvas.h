@@ -10,8 +10,8 @@
 #define EOSI_PHOTOCANVAS_H
 
 #include "widgets.h"
-//#define use_imagetransformthread 1
 
+#define use_imagetransformthread 1
 #ifdef use_imagetransformthread
 #include "imagetransformthread.h"
 #endif

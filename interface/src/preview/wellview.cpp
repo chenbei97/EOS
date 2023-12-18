@@ -347,10 +347,12 @@ void WellView::onSaveViewAct()
         dispersedViewRects(); // 区域模式通过此函数内部把电机坐标算出来
         mMouseRect = QRectF();
     } else if (mSelectMode == ViewMode::PointMode){
-        mViewPoints[id].append(mapFromPointF(mValidMousePos));
-        mTmpPoints[id] = mViewPoints[id]; // 需要重叠一定比例
-        // 点模式不是通过dispersedViewRects()计算,就等于选择的视野坐标
-        mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
+        if (isValidPoint(mValidMousePos)) {
+            mViewPoints[id].append(mapFromPointF(mValidMousePos));
+            mTmpPoints[id] = mViewPoints[id]; // 需要重叠一定比例
+            // 点模式不是通过dispersedViewRects()计算,就等于选择的视野坐标
+            mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
+        }
     }
     applyholeact->trigger();
     update();

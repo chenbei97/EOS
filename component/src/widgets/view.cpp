@@ -189,8 +189,7 @@ void View::mousePressEvent(QMouseEvent *event)
         }
         update();
     } else if (event->button() == Qt::RightButton) {
-        if (mViewInfo[HoleGroupNameField].toString().isEmpty()
-            || !isValidPoint(mValidMousePos)) {
+        if (mViewInfo[HoleGroupNameField].toString().isEmpty()) { //
             applyallact->setEnabled(false);
             applygroupact->setEnabled(false);
             saveviewact->setEnabled(false);

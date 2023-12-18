@@ -365,7 +365,7 @@ void Preview::loadExper()
 #ifdef uselabelcanvas
     livecanvas->setPixmap(QPixmap());
 #else
-    livecanvas->setImage(QImage());
+    livecanvas->setImage(QImage(),1);
 #endif
     photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
     photocanvas->setImage(QImage());
