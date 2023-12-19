@@ -258,7 +258,7 @@ void Preview::showCapturedImage(const QImage& image)
     livecanvas->setPixmap(pix);
     livecanvas->repaint();
 #else
-    livecanvas->setImage(image,15); // 10张图片显示1次
+    livecanvas->setImage(image,10); // 10张图片显示1次
 #endif
 }
 #endif
@@ -340,6 +340,7 @@ void Preview::initLayout()
 void Preview::initAttributes()
 {
     photocanvas->setStrategy(PhotoCanvas::SinglePixmap);// 默认单图模式
+    photocanvas->enableTransformThread(false);
 #ifdef uselabelcanvas
     livecanvas->setAlignment(Qt::AlignCenter);
     livecanvas->setScaledContents(true);
@@ -349,7 +350,7 @@ void Preview::initAttributes()
 #ifdef use_imagetransformthread
     livecanvas->enableTransformThread(true);
 #endif
-    livecanvas->optimizePaint(150);
+    livecanvas->optimizePaint(50);
 #endif
     stackcanvas->addWidget(livecanvas);
     stackcanvas->addWidget(photocanvas);

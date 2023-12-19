@@ -1,0 +1,45 @@
+/**/
+
+QWidget {
+    font-size: 12pt;
+    font-family: "Times New Roman";
+    text-align: center;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0.5, y2: 0.5, x3: 1, y3: 1,
+        stop: 0 #00AAA9,stop: 0.5 #2EBEA5,stop: 1 #5CD09A);
+}
+
+/*∞¥≈•¿‡: */
+QPushButton
+{
+        border: 1px solid #3282F6; /*blue*/
+        border-radius: 10px;
+        min-width: 100px;
+        min-height: 30px;
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0.5, y2: 0.5, x3: 1, y3: 1,
+            stop: 0 #D1DDDB,stop: 0.5 #85B8CB,stop: 1 #1D6A96);
+}
+
+QPushButton:default {
+    border-color:#FF095E; /*red*/
+}
+
+QPushButton:flat {
+    /*border:2px solid #FFFD55;*/ /*yellow*/
+    border:none;
+}
+
+QPushButton:hover {
+    background-color:#A93700;
+}
+
+/*
+QPushButton#iconpbtn {
+    background-image: url(:/images/setting.png);
+    background-repeat: none;
+    background-origin:content;
+    background-position:left;
+    icon-size: 25px 25px;
+}
+*/
+
+

@@ -18,6 +18,9 @@ void initApp(QApplication& a);
 int main(int argc, char *argv[]) {
     LogInit;
     QApplication a(argc, argv);
+    QFile qss("style.qss");
+    qss.open(QIODevice::ReadOnly);
+    a.setStyleSheet(qss.readAll());
     initApp(a);
 #ifdef usetesttcp
     test_tcp();

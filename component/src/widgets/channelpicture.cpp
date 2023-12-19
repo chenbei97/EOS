@@ -37,7 +37,6 @@ ChannelPicture::ChannelPicture(QWidget *parent) : QWidget(parent)
     lay->setMargin(0);
     setLayout(lay);
 
-
     setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Minimum);
     resize(ChannelPictureLabelDefaultWidth,ChannelPictureLabelMinHeight);
 }

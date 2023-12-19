@@ -279,8 +279,8 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
 #ifdef use_imagetransformthread
+    ImageTransformThreadPointer->stopThread();
     ImageTransformThreadPointer->setImageSize(this->size());
-    connect(ImageTransformThreadPointer,&ImageTransformThread::imageTransformed,this,&PhotoCanvas::upateImageByThread);
 #endif
 
 //    static bool flag = false;
@@ -303,18 +303,25 @@ void PhotoCanvas::upateImageByThread(const QImage& img)
     static long count_c = 0;
     mimage = img;
     count++;
-    LOG<<"accept image count = "<<count<<" _c = "<<count_c;
+    //LOG<<"accept image count = "<<count<<" _c = "<<count_c;
     if (count > LONG_MAX-1)
     {
         count = 0;
         count_c++;
     }
+    update();
 }
 
 void PhotoCanvas::enableTransformThread(bool e)
 {
 #ifdef use_imagetransformthread
-    ImageTransformThreadPointer->startThread();
+    e?
+    ImageTransformThreadPointer->startThread():
+    ImageTransformThreadPointer->stopThread();
+    disconnect(ImageTransformThreadPointer,&ImageTransformThread::imageTransformed,this,&PhotoCanvas::upateImageByThread);
+    e?
+    connect(ImageTransformThreadPointer,&ImageTransformThread::imageTransformed,this,&PhotoCanvas::upateImageByThread):
+    disconnect(ImageTransformThreadPointer,&ImageTransformThread::imageTransformed,this,&PhotoCanvas::upateImageByThread);
 #endif
 }
 

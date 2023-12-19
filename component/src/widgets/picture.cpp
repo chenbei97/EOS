@@ -17,6 +17,7 @@ Picture::Picture(QWidget *parent) : QWidget(parent)
     experact = new QAction(tr(ExportField),this);
     originact = new QAction(tr(OriginalField),this);
 
+    pix->enableTransformThread(false);
     pix->setStrategy(PhotoCanvas::SinglePixmap);
     info->setAlignment(Qt::AlignCenter);
     info->setScaledContents(true);

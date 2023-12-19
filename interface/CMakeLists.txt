@@ -13,14 +13,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
 set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
 
- set(USE_PYTHON 1) # socketpython.h还需要使用
- if (${USE_PYTHON})
- set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
- set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
- set(PYTHON310_LIB_PATH_python310 ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310.lib)
- set(PYTHON310_LIB_PATH_python310d ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310_d.lib)
- set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
- endif ()
+set(USE_PYTHON 1) # socketpython.h还需要使用
+if (${USE_PYTHON})
+set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
+set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
+set(PYTHON310_LIB_PATH_python310 ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310.lib)
+set(PYTHON310_LIB_PATH_python310d ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310_d.lib)
+set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
+endif ()
 
 set(DATA_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/data.lib")
 set(DATA_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/data)

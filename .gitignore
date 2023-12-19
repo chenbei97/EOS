@@ -5,13 +5,15 @@ build
 *.ilk
 *.pdb
 *.exp
-*.lib
+# *.lib
 *.pyc
-*.dll
+# *.dll
 *.exe
 *.log
 *.ax
 *crash.dmp
+interface.dll
+component.dll
 
 qml
 cmakePresets.json
