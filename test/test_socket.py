@@ -313,7 +313,7 @@ class SocketServerManger:
             response = json.dumps(reponse)
             response += "@@@"
             time.sleep(20)
-            self.client.sendall(response.encode("utf-8"))
+            #self.client.sendall(response.encode("utf-8"))
 
     def __recvFromClient(self):
         while self.__isConnected:

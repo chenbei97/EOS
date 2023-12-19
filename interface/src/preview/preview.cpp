@@ -258,7 +258,7 @@ void Preview::showCapturedImage(const QImage& image)
     livecanvas->setPixmap(pix);
     livecanvas->repaint();
 #else
-    livecanvas->setImage(image,8); // 10张图片显示1次
+    livecanvas->setImage(image,15); // 10张图片显示1次
 #endif
 }
 #endif
@@ -349,7 +349,7 @@ void Preview::initAttributes()
 #ifdef use_imagetransformthread
     livecanvas->enableTransformThread(true);
 #endif
-    livecanvas->optimizePaint(50);
+    livecanvas->optimizePaint(150);
 #endif
     stackcanvas->addWidget(livecanvas);
     stackcanvas->addWidget(photocanvas);
@@ -404,8 +404,6 @@ void Preview::initObjects()
 #endif
     previewtool = new PreviewTool;
     scrollarea = new QScrollArea;
-
-    Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持
 }
 
 void Preview::initConnections()

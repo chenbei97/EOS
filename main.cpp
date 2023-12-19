@@ -75,6 +75,7 @@ void initApp(QApplication& a)
     //QTimer::singleShot(0,qApp,SLOT(quit()));
 
 
+    Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持
     if (!ToupCameraPointer->isOpen()){
         ToupCameraPointer->openCamera();
     };

@@ -300,11 +300,15 @@ PhotoCanvas::~PhotoCanvas() noexcept
 void PhotoCanvas::upateImageByThread(const QImage& img)
 {
     static long count = 0;
+    static long count_c = 0;
     mimage = img;
     count++;
-    LOG<<"accept image count = "<<count;
-    if (count > 60000)
+    LOG<<"accept image count = "<<count<<" _c = "<<count_c;
+    if (count > LONG_MAX-1)
+    {
         count = 0;
+        count_c++;
+    }
 }
 
 void PhotoCanvas::enableTransformThread(bool e)
