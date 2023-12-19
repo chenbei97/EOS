@@ -12,7 +12,6 @@ PushButton::PushButton(QWidget*parent):QPushButton(parent)
 {
     checked = false;
     setAutoFillBackground(true);
-    //setFlat(true);
     resetBackGroundColor();
 }
 
@@ -21,7 +20,6 @@ PushButton::PushButton(const QString&text,QWidget*parent):QPushButton(parent)
 {
     checked = false;
     setAutoFillBackground(true);
-    //setFlat(true);
     setText(text);
     resetBackGroundColor();
 }
@@ -36,7 +34,12 @@ void PushButton::setBackGroundColor(QCColor color)
 //    auto pal = palette();
 //    pal.setColor(QPalette::Button,color);
 //    setPalette(pal);
-    setStyleSheet("background-color:#FFF200");
+    auto sheet = tr("QPushButton{border:2px solid #3282F6;border-radius: 5px;min-height: 30px;background-color: %1;}\n"
+                 "QPushButton:default {border-color:#FF095E;}\n"
+                 "QPushButton:flat {border:2px solid #FFFD55;border:none;}\n"
+                 "QPushButton:hover {background-color:#A93700;}"
+                 "QPushButton:disabled {background-color:gray;color:black;}");
+    setStyleSheet(sheet.arg(color.name()));
     checked = true;
 }
 
@@ -45,7 +48,15 @@ void PushButton::resetBackGroundColor()
 //    auto pal = palette();
 //    pal.setColor(QPalette::Button,"#F0F0F0");
 //    setPalette(pal);
-    setStyleSheet("background-color:#F0F0F0");
+    //setStyleSheet("background-color:#F0F0F0");
+    auto sheet = tr("QPushButton{border: 2px solid #3282F6;border-radius: 5px;min-height: 30px;}\n"
+                    //"background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,stop: 0 #F09B59,stop: 1 #FF8E55);}\n"
+                    "QPushButton:default {border-color:#FF095E;}\n"
+                    "QPushButton:flat {border:2px solid #FFFD55;border:none;}\n"
+                    "QPushButton:hover {background-color:#A93700;}"
+                    "QPushButton:disabled {background-color:gray;color:black;}"
+                    );
+    setStyleSheet(sheet);
     checked = false;
 }
 
