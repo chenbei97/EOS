@@ -24,6 +24,7 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     connect(pattern,&TriangleMove::triangleClicked,this,&FocusBox::directionMove);
     //connect(slider,&DoubleSlider::sliderMoved,this,&FocusBox::valueChanged);
     connect(slider,&DoubleSlider::sliderReleased,this,&FocusBox::valueChanged); // 改成释放才更改
+    connect(autofocusdlg,&AutoFocus::autoFocus,this,&FocusBox::autoFocus);
     connect(qApp, &QCoreApplication::aboutToQuit, [=](){autofocusdlg->close();}); // 防止关了主窗口这个还在
     setTitle(tr(FocusBoxTitle));
 }

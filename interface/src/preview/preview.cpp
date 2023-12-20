@@ -424,6 +424,7 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::slideStitching,this,&Preview::stitchSlide);
     //connect(previewtool,&PreviewTool::directionMove,this,&Preview::adjustLens);
     connect(previewtool,&PreviewTool::focusChanged,this,&Preview::adjustFocus);
+    connect(previewtool,&PreviewTool::autoFocus,this,&Preview::autoFocus);
     connect(previewtool,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
     connect(previewtool,&PreviewTool::channelClosed,this,&Preview::closeChannel);
     connect(previewtool,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);

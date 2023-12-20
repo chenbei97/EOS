@@ -22,11 +22,7 @@ AutoFocus::AutoFocus(QWidget*parent):GroupBox(parent)
 
 void AutoFocus::apply()
 {
-    QJsonObject object;
-    object[FrameField] = AutoFocusEvent;
-    TcpAssemblerDoc.setObject(object);
-    auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
-    SocketPointer->exec(TcpFramePool.autoFocusEvent,msg);
+    emit autoFocus();
 }
 
 void AutoFocus::initLayout()

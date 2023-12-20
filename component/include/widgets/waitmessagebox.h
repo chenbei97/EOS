@@ -20,6 +20,7 @@ class COMPONENT_IMEXPORT WaitMessageBox: public QMessageBox
 public:
     explicit WaitMessageBox(QWidget*parent= nullptr);
     void wait();
+    void wait(unsigned count);
     void setWaitText(const QString& text);
 private:
     void updateText();

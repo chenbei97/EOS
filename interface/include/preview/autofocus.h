@@ -33,6 +33,7 @@ private:
     SpinBox * skipviews;
     PushButton * applybtn;
 signals:
+    void autoFocus();
 };
 
 #endif //EOS_AUTOFOCUS_H

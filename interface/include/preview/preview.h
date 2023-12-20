@@ -125,6 +125,7 @@ private:
     void adjustBright(int br);
     void adjustLens(int option);
     void adjustFocus(double val);
+    void autoFocus();
     void toggleChannel(int option);
     void closeChannel(int option);
     void previewViewEvent(const QPointF& viewPoint);

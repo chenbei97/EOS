@@ -10,6 +10,8 @@
 
 void Preview::parseResult(const QString & f,const QVariant & d)
 { // 任何来自服务端的消息都在这里
+    LOG<<f<<d;
+
     if (d.toBool() && f == TcpFramePool.adjustBrightEvent) {
         LOG<<"adjust bright successful!";
     }
@@ -22,6 +24,10 @@ void Preview::parseResult(const QString & f,const QVariant & d)
 
     if (f == TcpFramePool.moveMachineEvent && d.toBool()) {
         LOG<<"move machine successful!"; // 使用异步时也可以绑定信号来实现
+    }
+
+    if (f == "test0x2" && d.toBool()) {
+        LOG<<"test0x2 ok";
     }
 }
 
@@ -69,6 +75,40 @@ void Preview::adjustFocus(double val)
     if (ParserResult.toBool()) {
         LOG<<"adjust focus to "<<val<<"successful!";
     }
+}
+
+void Preview::autoFocus()
+{
+    //    QJsonObject object;
+//    object[FrameField] = AutoFocusEvent;
+//    TcpAssemblerDoc.setObject(object);
+//    auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
+//    SocketPointer->exec(TcpFramePool.autoFocusEvent,msg);
+
+    auto f = "test0x2";
+    QJsonObject object;
+    object[FrameField] = f;
+    object[PathField] = "";
+    TcpAssemblerDoc.setObject(object);
+    auto json = TcpAssemblerDoc.toJson();
+    json = AppendSeparateField(json);
+    unsigned i = 0;
+    SocketPointer->setWaitText(WaitMessageBoxWaitFocusMsg);
+    SocketPointer->exec(f,json);
+    while (i < 10 && ParserResult.toBool()) {
+        if (i == 0) {
+            LOG<<"ready auto focus";
+        } else {
+            LOG<<"send"<<i<<".jpg successful";
+        }
+        object[PathField] = QString("%1.jpg").arg(i);
+        TcpAssemblerDoc.setObject(object);
+        json = AppendSeparateField(TcpAssemblerDoc.toJson());
+        SocketPointer->exec(f,json,i);
+        ++i;
+    }
+    LOG<<"send"<<i<<".jpg successful";
+    SocketPointer->resetWaitText();
 }
 
 void Preview::toggleObjective(int objective,int objective_loc,int isPh)

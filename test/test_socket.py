@@ -96,7 +96,16 @@ class ParseManager:
         print("test0x1回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
     def __parsetest0x2(self,msg: dict):
-        pass
+        frame = msg[self.frame]
+        path = msg[self.path]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.state] = "ok"
+        response = json.dumps(reponse)
+        response +=self.separate
+        print("test0x2回复: ", reponse)
+        time.sleep(3)
+        self.__socket.sendall(response.encode("utf-8"))
 
     # 预览事件
     def __parse0x0000(self,msg:dict):

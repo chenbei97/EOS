@@ -173,6 +173,16 @@ void TcpSocket::exec(const QString& f,const QByteArray& c)
     waitdlg->wait(); // 弹窗形式的硬同步
 }
 
+void TcpSocket::exec(const QString& f,const QByteArray& c,unsigned count)
+{ // 本函数只适用于: 有弹窗需求的硬同步,服务侧有明显延迟,且是需要多轮发送与回复的流程;
+    // 适用于:1.自动聚焦 2.载玻片的拼图
+    frame = f;
+    socket->write(c);
+    looptimer.start(SocketWaitTime);
+    waitdlg->setWaitText(tr(WaitMessageBoxAutoFocusMsg).arg(count+1));
+    waitdlg->wait(count);
+}
+
 void TcpSocket::exec_queue(const QString &f, const QByteArray &c)
 {//使用请求消息队列的方式: 本函数用于滑动条或者短时发送大量请求消息的同步操作,而且不需要弹窗硬同步
     // 1.调节br
@@ -257,12 +267,22 @@ QTcpSocket::SocketState TcpSocket::socketState() const
     return socket->state();
 }
 
+void TcpSocket::resetWaitText()
+{
+    waitdlg->setWaitText(tr(WaitMessageBoxMoveMachineMsg));
+}
+
+void TcpSocket::setWaitText(const QString &text)
+{
+    waitdlg->setWaitText(text);
+}
+
 TcpSocket::TcpSocket(QObject *parent):QObject(parent)
 {
     socket = new QTcpSocket;
     waitdlg = getWaitMessageBox(tr(WaitMessageBoxMoveMachineMsg),false);
     socket->setReadBufferSize(0);// 默认就是0,也就是缓冲不受限制,有多少就接受多少
-    socket->setSocketOption(QAbstractSocket::LowDelayOption, true); // 尽可能低延迟,但是不能避免,还是会粘包
+    socket->setSocketOption(QAbstractSocket::LowDelayOption, true); // 尽可能低延迟,但是不能避免
 
     looptimer.setSingleShot(true);
     looptimer.setInterval(SocketWaitTime);

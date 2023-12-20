@@ -86,6 +86,7 @@ const QFieldList TcpUsedFrameList { // 用于解析时检测返回的帧是否�
         QString::number(AdjustLensEvent),QString::number(MoveMachineEvent),QString::number(StopExperEvent),
         QString::number(ToggleObjectiveEvent),QString::number(RecordVideoEvent),QString::number(ManualFocusEvent),
         QString::number(AutoFocusEvent),QString::number(ChannelMergeEvent),QString::number(ExperFinishedEvent),
+        "test0x0","test0x1","test0x2"
 };
 
 struct FieldPreviewEvent {
@@ -914,6 +915,14 @@ static QVariant parse_test0x1(QCVariantMap m)
     auto equip = m[EquipField].toString();
     return equip;
 }
+static QVariant parse_test0x2(QCVariantMap m)
+{// test0x2会返回equip,frame字段
+    if (!m.keys().contains(StateField)) return QVariant();
+    if (!m.keys().contains(FrameField)) return QVariant();
+
+    auto state = m[StateField].toString();
+    return state == "ok";
+}
 /*---------以上都是临时测试函数,以后可以注释掉-----------------*/
 
 // 根据帧头选择对应的解析函数
@@ -935,6 +944,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {TcpFramePool.experFinishedEvent, parseExperFinishedEvent},
         {"test0x0",parse_test0x0},
         {"test0x1",parse_test0x1},
+        {"test0x2",parse_test0x2},
 };
 
 static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {

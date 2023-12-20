@@ -63,6 +63,7 @@ signals:
     void slideStitching(); // slide下允许拼图
     void directionMove(int option); // 移动镜头
     void focusChanged(double val);
+    void autoFocus();
     void cameraAdjusted(int exposure,int gain); // 调整相机参数
     void brightAdjusted(int bright); // 调整bright
     void loadExper(); // 启动实验

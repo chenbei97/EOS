@@ -14,6 +14,8 @@
 #include "parsecontrol.h"
 
 #define WaitMessageBoxMoveMachineMsg  "please wait moving machine..."
+#define WaitMessageBoxAutoFocusMsg  "please wait executing auto focus,...\n[has focused %1 times]"
+#define WaitMessageBoxWaitFocusMsg  "please wait auto focus ready finished..."
 #define WaitMessageBoxStartExperimentMsg  "please wait starting experiment..."
 #define WaitMessageBoxStopExperimentMsg  "please wait stoping experiment..."
 #define use_queuethread 1
@@ -28,8 +30,11 @@ public:
     void connectToHost(const QString &hostName = LocalHost, quint16 port = SocketPort);
     void exec(const QString& f,const QByteArray& c,bool use_sync);
     void exec(const QString& f,const QByteArray& c);
+    void exec(const QString& f,const QByteArray& c,unsigned count);
     void exec_queue(const QString& f,const QByteArray& c);
     QVariantMap result() const;
+    void resetWaitText();
+    void setWaitText(const QString& text);
 private:
     explicit TcpSocket(QObject *parent = nullptr);
     ~TcpSocket();

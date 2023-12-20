@@ -44,6 +44,7 @@ signals:
     void bottomMove();
     void directionMove(int option);
     void valueChanged(double val);
+    void autoFocus();
 };
 
 #endif //EOSI_FOCUSBOX_H
