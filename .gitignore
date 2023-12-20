@@ -14,6 +14,8 @@ build
 *crash.dmp
 interface.dll
 component.dll
+interface.lib
+component.lib
 
 qml
 cmakePresets.json
