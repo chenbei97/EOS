@@ -19,6 +19,10 @@ void Preview::parseResult(const QString & f,const QVariant & d)
         if (!ToupCameraPointer->isOpen())
             ToupCameraPointer->openCamera();
     }
+
+    if (f == TcpFramePool.moveMachineEvent && d.toBool()) {
+        LOG<<"move machine successful!"; // 使用异步时也可以绑定信号来实现
+    }
 }
 
 void Preview::previewSlideEvent(const QPointF& point)

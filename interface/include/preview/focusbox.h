@@ -10,6 +10,7 @@
 #define EOSI_FOCUSBOX_H
 
 #include "window.h"
+#include "autofocus.h"
 
 class INTERFACE_IMEXPORT FocusBox: public GroupBox
 {
@@ -32,6 +33,7 @@ private:
     RoundButton * bottombtn;
     SpinBox * step;
     PushButton * autofocusbtn;
+    AutoFocus * autofocusdlg;
     void addFocus();
     void subtractFocus();
     void onAutoFocus();

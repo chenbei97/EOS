@@ -24,17 +24,13 @@ FocusBox::FocusBox(QWidget *parent) : GroupBox(parent)
     connect(pattern,&TriangleMove::triangleClicked,this,&FocusBox::directionMove);
     //connect(slider,&DoubleSlider::sliderMoved,this,&FocusBox::valueChanged);
     connect(slider,&DoubleSlider::sliderReleased,this,&FocusBox::valueChanged); // 改成释放才更改
-
+    connect(qApp, &QCoreApplication::aboutToQuit, [=](){autofocusdlg->close();}); // 防止关了主窗口这个还在
     setTitle(tr(FocusBoxTitle));
 }
 
 void FocusBox::onAutoFocus()
 {
-    QJsonObject object;
-    object[FrameField] = AutoFocusEvent;
-    TcpAssemblerDoc.setObject(object);
-    auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
-    SocketPointer->exec("12",msg);
+    autofocusdlg->show();
 }
 
 void FocusBox::importExperConfig(double focus, double s)
@@ -115,6 +111,7 @@ void FocusBox::initObjects()
 {
     pattern = new TriangleMove; // 懒得删代码了
     autofocusbtn = new PushButton(tr(AutoFocusField));
+    autofocusdlg = new AutoFocus();
 
     slider = new DoubleSlider;
     step = new SpinBox(true);
@@ -142,3 +139,4 @@ void FocusBox::initAttributes()
     topbtn->setStrategy(RoundButton::TopTriangle);
     bottombtn->setStrategy(RoundButton::BottomTriangle);
 }
+

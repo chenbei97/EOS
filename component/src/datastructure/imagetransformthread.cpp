@@ -27,7 +27,7 @@ void ImageTransformThread::run()
 
             emit imageTransformed(QImage());
         }
-        msleep(DefaultThreadSleepMs);
+        msleep(100);
     }
 }
 

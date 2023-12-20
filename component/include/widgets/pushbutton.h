@@ -9,7 +9,6 @@
 #ifndef EOSI_PUSHBUTTON_H
 #define EOSI_PUSHBUTTON_H
 
-
 #include "widgets.h"
 
 class COMPONENT_IMEXPORT PushButton : public QPushButton

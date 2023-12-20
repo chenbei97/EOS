@@ -27,6 +27,7 @@
 #include "sqlquerymodel.h"
 #include "timerbroadcastthread.h"
 #include "sqltablemodel.h"
+#include "buttongroup.h"
 #include "standarditemmodel.h"
 #include "gradienthiddenanimation.h"
 #include "listwidgetitem.h"
@@ -42,6 +43,8 @@
 #include "log.h"
 #include "recordimage.h"
 
+#include "radiobutton.h"
+#include "radiogroup.h"
 #include "picture.h"
 #include "colorbutton.h"
 #include "combobox.h"
@@ -75,5 +78,4 @@
 #include "view.h"
 
 // (2) 常量定义
-#define use_python 0
 #endif //EOSI_PUBLIC_H

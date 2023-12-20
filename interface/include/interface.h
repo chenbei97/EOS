@@ -6,38 +6,39 @@
  * @FilePath: \EOS\interface\interface.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#ifndef EOSI_INTERFACE_H
-#define EOSI_INTERFACE_H
+#ifndef EOS_INTERFACE_H
+#define EOS_INTERFACE_H
 
-#include "navigbar.h"
-#include "appselect.h"
+// 对外只需要提供mainwindow.h
+
 #include "mainwindow.h"
-#include "toupcamera.h"
+//#include "navigbar.h"
+//#include "appselect.h"
+//#include "toupcamera.h"
 
-#include "preview.h"
-#include "canvasmode.h"
-#include "recordbox.h"
-#include "wellview.h"
-#include "wellpattern.h"
-#include "previewtool.h"
-#include "historybox.h"
-#include "wellbox.h"
-#include "focusbox.h"
-#include "channelbox.h"
-#include "channelboxx.h"
-#include "channelnotifier.h"
-#include "cameratool.h"
-#include "camerabox.h"
-#include "zstackbox.h"
-#include "savebox.h"
-#include "skipbox.h"
-#include "summarypanel.h"
-#include "summarydialog.h"
-#include "viewmode.h"
+//#include "preview.h"
+//#include "canvasmode.h"
+//#include "recordbox.h"
+//#include "wellview.h"
+//#include "wellpattern.h"
+//#include "previewtool.h"
+//#include "historybox.h"
+//#include "wellbox.h"
+//#include "focusbox.h"
+//#include "channelbox.h"
+//#include "channelnotifier.h"
+//#include "cameratool.h"
+//#include "camerabox.h"
+//#include "zstackbox.h"
+//#include "savebox.h"
+//#include "autofocus.h"
+//#include "summarypanel.h"
+//#include "summarydialog.h"
+//#include "viewmode.h"
+//
+//#include "setting.h"
+//#include "settingnotifier.h"
+//#include "objectivesetting.h"
+//#include "wellsetting.h"
 
-#include "setting.h"
-#include "settingnotifier.h"
-#include "objectivesetting.h"
-#include "wellsetting.h"
-
-#endif //EOSI_INTERFACE_H
+#endif //EOS_INTERFACE_H

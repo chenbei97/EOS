@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-31 14:11:59
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-31 14:13:53
+ * @LastEditTime: 2023-12-20 10:11:36
  * @FilePath: \EOS\interface\include\setting\setting.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -26,18 +26,13 @@ private:
     void initLayout();
     void initConnections();
 private:
-    QRadioButton * loginbtn;
     GroupBox * b1;
-    QRadioButton * databasebtn;
     GroupBox * b2;
-    QRadioButton * objectivebtn;
-    QRadioButton * wellbtn;
 private:
     ObjectiveSetting * objectivesetting;
     WellSetting * wellsetting;
-    QButtonGroup * buttongroup;
+    ButtonGroup * buttongroup;
     SettingNotifier * notifier;
-private:
     void toggleSetting(int option);
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);

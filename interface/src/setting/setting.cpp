@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-31 14:13:03
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-17 16:39:58
+ * @LastEditTime: 2023-12-20 10:11:59
  * @FilePath: \EOS\interface\src\setting\setting.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -23,59 +23,34 @@ void Setting::emitSignals()
 }
 
 void Setting::toggleSetting(int option)
-{ // 这里用通知者模式比较好,避免大量的if_else判断
+{ // 这里用通知者模式比较好,避免大量的if_else判断,注意option从1开始
     switch (option)
     {
-        case 0:
+        case 1:
             notifier->notify(b1);
             break;
-        case 1:
+        case 2:
             notifier->notify(b2);
             break;
-        case 2:
+        case 3:
             notifier->notify(objectivesetting);
             break;
-        case 3:
+        case 4:
             notifier->notify(wellsetting);
             break;
     }
-//    if (option == 0) {
-//        b1->show();
-//        b2->hide();
-//        objectivesetting->hide();
-//        wellsetting->hide();
-//        loginbtn->setChecked(true);
-//    } else if (option == 1) {
-//        b1->hide();
-//        b2->show();
-//        objectivesetting->hide();
-//        wellsetting->hide();
-//        databasebtn->setChecked(true);
-//    } else if (option == 2) {
-//        b1->hide();
-//        b2->hide();
-//        objectivesetting->show();
-//        wellsetting->hide();
-//        objectivebtn->setChecked(true);
-//    } else if (option == 3) {
-//        b1->hide();
-//        b2->hide();
-//        objectivesetting->hide();
-//        wellsetting->show();
-//        wellbtn->setChecked(true);
-//    }
 }
 
 void Setting::initLayout()
 {
     auto lay = new QVBoxLayout;
-    lay->addWidget(loginbtn);
+    lay->addWidget(buttongroup->button(1));
     lay->addWidget(b1);
-    lay->addWidget(databasebtn);
+    lay->addWidget(buttongroup->button(2));
     lay->addWidget(b2);
-    lay->addWidget(objectivebtn);
+    lay->addWidget(buttongroup->button(3));
     lay->addWidget(objectivesetting);
-    lay->addWidget(wellbtn);
+    lay->addWidget(buttongroup->button(4));
     lay->addWidget(wellsetting);
     //lay->addStretch();
     setLayout(lay);
@@ -83,46 +58,38 @@ void Setting::initLayout()
 
 void Setting::initAttributes()
 {
+    buttongroup->setText(QStringList()<<tr("Login Setting")<<tr("Database Setting")
+        <<tr("Objective Setting")<<tr("Well Setting")); // 注意顺序1,2,3,4
+
     b1->hide();
     b2->hide();
     objectivesetting->hide();
     wellsetting->hide();
 
-    buttongroup->addButton(loginbtn,0);
-    buttongroup->addButton(databasebtn,1);
-    buttongroup->addButton(objectivebtn,2);
-    buttongroup->addButton(wellbtn,3);
+    b1->setID(1);
+    b2->setID(2);
+    objectivesetting->setID(3);
+    wellsetting->setID(4);
 
-    b1->setID(0);
-    b2->setID(1);
-    objectivesetting->setID(2);
-    wellsetting->setID(3);
-
-    notifier->addToList(b1,loginbtn);// 要在设置ID之后去添加
-    notifier->addToList(b2,databasebtn);
-    notifier->addToList(objectivesetting,objectivebtn);
-    notifier->addToList(wellsetting,wellbtn);
+    notifier->addToList(b1,static_cast<RadioButton*>(buttongroup->button(1)));// 要在设置ID之后去添加
+    notifier->addToList(b2,static_cast<RadioButton*>(buttongroup->button(2)));
+    notifier->addToList(objectivesetting,static_cast<RadioButton*>(buttongroup->button(3)));
+    notifier->addToList(wellsetting,static_cast<RadioButton*>(buttongroup->button(4)));
 }
 
 void Setting::initObjects()
 {
-    loginbtn = new QRadioButton(tr("Login Setting"));
-    databasebtn = new QRadioButton(tr("Database Setting"));
-    objectivebtn = new QRadioButton(tr("Objective Setting"));
-    wellbtn = new QRadioButton(tr("Well Setting"));
-    buttongroup = new QButtonGroup;
-
+    buttongroup = new ButtonGroup(4,ButtonGroup::RadioBtn);
     b1 = new GroupBox;
     b2 = new GroupBox;
     objectivesetting = new ObjectiveSetting;
     wellsetting = new WellSetting;
-
     notifier = new SettingNotifier;
 }
 
 void Setting::initConnections()
 {
-    connect(buttongroup,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&Setting::toggleSetting);
+    connect(buttongroup,&ButtonGroup::buttonClicked,this,&Setting::toggleSetting);
     connect(objectivesetting,&ObjectiveSetting::objectiveSettingChanged,this,&Setting::objectiveSettingChanged);
     //objectivesetting->emitSignals();
 }

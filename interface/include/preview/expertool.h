@@ -14,7 +14,6 @@
 #include "timebox.h"
 #include "zstackbox.h"
 #include "savebox.h"
-#include "skipbox.h"
 
 class INTERFACE_IMEXPORT ExperTool: public QWidget
 {
@@ -27,7 +26,6 @@ private:
     TimeBox * timebox;
     ZStackBox * zstackbox;
     SaveBox * savebox;
-    SkipBox * skipbox;
     QVBoxLayout * lay;
 signals:
     void zstackChanged(bool isChecked);// 是否勾选zstack和stitch

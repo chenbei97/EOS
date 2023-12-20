@@ -13,14 +13,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(TOUPCAM_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/toupcam)
 set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
 
-set(USE_PYTHON 1) # socketpython.h还需要使用
-if (${USE_PYTHON})
-set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
-set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
-set(PYTHON310_LIB_PATH_python310 ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310.lib)
-set(PYTHON310_LIB_PATH_python310d ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310_d.lib)
-set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
-endif ()
+#set(USE_PYTHON 1)
+#if (${USE_PYTHON})
+#set(PYTHON310_PATH ${PROJECT_SOURCE_DIR}/bin/python310)
+#set(PYTHON310_LIB_PATH ${PROJECT_SOURCE_DIR}/bin/python310/libs)
+#set(PYTHON310_LIB_PATH_python310 ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310.lib)
+#set(PYTHON310_LIB_PATH_python310d ${PROJECT_SOURCE_DIR}/bin/python310/libs/python310_d.lib)
+#set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
+#endif ()
 
 set(DATA_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/data.lib")
 set(DATA_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/data)
@@ -36,11 +36,9 @@ add_definitions(-DINTERFACE_LIBRARY=0) # 添加预定义宏,=号不能有空格,
 file(GLOB_RECURSE INTERFACE_HEADERS  "include/*.h")
 file(GLOB_RECURSE INTERFACE_SOURCES "src/*.cpp")
 
-link_directories(${Test_LIB_PATH})
-
-if (${USE_PYTHON})
-link_directories(${PYTHON310_LIB_PATH})# python引入lib只能在这里
-endif ()
+#if (${USE_PYTHON})
+#link_directories(${PYTHON310_LIB_PATH})# python引入lib只能在这里
+#endif ()
 #if (${USE_OPENCV})
 #link_directories(${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH})
 #endif ()# opencv 2个都需要指定
@@ -80,9 +78,9 @@ target_include_directories(${DLLNAME}
         ${TOUPCAM_INCLUDE_PATH}
         ${DATA_INCLUDE_PATH}
         )
- if (${USE_PYTHON})
- target_include_directories(${DLLNAME} PUBLIC ${PYTHON310_INCLUDE_PATH})
- endif ()
+# if (${USE_PYTHON})
+# target_include_directories(${DLLNAME} PUBLIC ${PYTHON310_INCLUDE_PATH})
+# endif ()
 #if (${USE_OPENCV})
 #target_include_directories(${DLLNAME} PUBLIC ${PROJECT_SOURCE_DIR}/interface/include/opencv2)
 #endif()
@@ -108,11 +106,11 @@ target_link_libraries(${DLLNAME}
         ${TOUPCAM_LIB_PATH}
         ${DATA_LIB_PATH}
         )
- if (${USE_PYTHON})
- target_link_libraries(${DLLNAME}
-        ${PYTHON310_LIB_PATH_python310}
-        ${PYTHON310_LIB_PATH_python310d}) # mingw必须显示指定python310,msvc指定与否都可
- endif ()
+# if (${USE_PYTHON})
+# target_link_libraries(${DLLNAME}
+#        ${PYTHON310_LIB_PATH_python310}
+#        ${PYTHON310_LIB_PATH_python310d}) # mingw必须显示指定python310,msvc指定与否都可
+# endif ()
 #if (${USE_OPENCV})
 #target_link_libraries(${DLLNAME}
 #    ${OPENCV_opencv_world_LIB_PATH}

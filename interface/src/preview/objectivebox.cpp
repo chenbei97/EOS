@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-23 13:55:14
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-01 17:13:02
+ * @LastEditTime: 2023-12-20 10:10:08
  * @FilePath: \EOS\interface\src\preview\objectivebox.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -11,10 +11,10 @@
 ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
 {
     // 这里初始化文字时需要跟objectivesetting.cpp初始化的4个镜头选项保持一致
-    rbtn_loc1 = new QRadioButton(Objective4x);
-    rbtn_loc2 = new QRadioButton(Objective10x);
-    rbtn_loc3 = new QRadioButton(Objective20x);
-    rbtn_loc4 = new QRadioButton(Objective40x);
+    rbtn_loc1 = new RadioButton(Objective4x);
+    rbtn_loc2 = new RadioButton(Objective10x);
+    rbtn_loc3 = new RadioButton(Objective20x);
+    rbtn_loc4 = new RadioButton(Objective40x);
 
     location_button[ObjectiveLocationField1] = rbtn_loc1;
     location_button[ObjectiveLocationField2] = rbtn_loc2;
@@ -32,10 +32,10 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
     setLayout(lay);
     setTitle(tr(ObjectiveBoxTitle));
 
-    connect(rbtn_loc1,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
-    connect(rbtn_loc2,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
-    connect(rbtn_loc3,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
-    connect(rbtn_loc4,&QRadioButton::clicked,this,&ObjectiveBox::onClicked);
+    connect(rbtn_loc1,&RadioButton::clicked,this,&ObjectiveBox::onClicked);
+    connect(rbtn_loc2,&RadioButton::clicked,this,&ObjectiveBox::onClicked);
+    connect(rbtn_loc3,&RadioButton::clicked,this,&ObjectiveBox::onClicked);
+    connect(rbtn_loc4,&RadioButton::clicked,this,&ObjectiveBox::onClicked);
 }
 
 void ObjectiveBox::onObjectiveSettingChanged(const LocationObjectiveInfo &m)

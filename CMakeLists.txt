@@ -89,26 +89,13 @@ add_subdirectory(component)
 add_subdirectory(interface)
 
 #（4）链接的库目录 必须add_executable之前
+link_directories(${TOUPCAM_LIB_PATH}) # ${TOUPCAM_LIB_PATH}测试是2个都可以放
 
-#set(A1 ${PROJECT_SOURCE_DIR}/bin/swscale-lav-3.dll)
-#set(A2 ${PROJECT_SOURCE_DIR}/bin/libbluray.dll)
-#set(A3 ${PROJECT_SOURCE_DIR}/bin/IntelQuickSyncDecoder.dll)
-#set(A4 ${PROJECT_SOURCE_DIR}/bin/swscale-lav-3.dll)
-#set(A5 ${PROJECT_SOURCE_DIR}/bin/avutil-lav-54.dll)
-#set(A6 ${PROJECT_SOURCE_DIR}/bin/avresample-lav-2.dll)
-#set(A7 ${PROJECT_SOURCE_DIR}/bin/avformat-lav-56.dll)
-#set(A8 ${PROJECT_SOURCE_DIR}/bin/avfilter-lav-5.dll)
-#set(A9 ${PROJECT_SOURCE_DIR}/bin/avcodec-lav-56.dll)
-
-
-link_directories(${TOUPCAM_LIB_PATH} ${PROJECT_SOURCE_DIR}/lib
-        #${A1}${A2}${A3}${A4}${A5}${A6}${A7}${A8}${A9}
-        )
 # if (${USE_PYTHON})
 #    link_directories(${PYTHON310_LIB_PATH})
 # endif ()
 # ${PYTHON310_LIB_PATH}只能在这里,不能在target_link_libraries
-# ${OPENCV_LIBs_PATH}不能放link_directories 只能在target_link_libraries, ${TOUPCAM_LIB_PATH}测试是2个都可以放
+# ${OPENCV_LIBs_PATH}不能放link_directories 只能在target_link_libraries
 
 # （5）查找包 // C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\include
 find_package(Qt5 COMPONENTS Core Gui Widgets Sql Network

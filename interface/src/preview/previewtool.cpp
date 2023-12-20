@@ -15,7 +15,7 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     wellbox = new WellBox;
     objectivebox = new ObjectiveBox;
     focusbox = new FocusBox;
-    channelbox = new ChannelBoxx;
+    channelbox = new ChannelBox;
     camerabox = new CameraBox;
     recordbox = new RecordBox;
     timebox = new TimeBox;
@@ -47,8 +47,8 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(camerabox,&CameraBox::slideStitching,this,&PreviewTool::slideStitching);
     connect(camerabox,&CameraBox::cameraAdjusted,this,&PreviewTool::cameraAdjusted);
     connect(camerabox,&CameraBox::brightAdjusted,this,&PreviewTool::brightAdjusted);
-    connect(channelbox,&ChannelBoxx::channelChanged,this,&PreviewTool::channelChanged);
-    connect(channelbox,&ChannelBoxx::channelClosed,this,&PreviewTool::channelClosed);
+    connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::channelChanged);
+    connect(channelbox,&ChannelBox::channelClosed,this,&PreviewTool::channelClosed);
     connect(zstackbox,&ZStackBox::zstackChanged,this,&PreviewTool::zstackChanged);
     connect(zstackbox,&ZStackBox::stitchChanged,this,&PreviewTool::stitchChanged);
     connect(historybox,&HistoryBox::importFilePath,this,&PreviewTool::importFilePath);
@@ -62,14 +62,14 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(recordbox,&RecordBox::stopVideo,this,&PreviewTool::stopVideo);
     connect(selectbox,&ViewModeBox::modeSelected,this,&PreviewTool::modeSelected);
     // 2. 信号槽函数
-    connect(channelbox,&ChannelBoxx::channelChanged,camerabox,&CameraBox::setChannel);
-    connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBoxx::disableChannel);
+    connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
+    connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBox::disableChannel);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,timebox,&TimeBox::disableChannel);
     connect(wellbox,&WellBox::welltypeChanged,selectbox,&ViewModeBox::setEnabled);
     // 3.外部信号
     connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
     connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage); // 当前通道的图像
-    connect(this,&PreviewTool::captureImage,channelbox,&ChannelBoxx::takePhoto);
+    connect(this,&PreviewTool::captureImage,channelbox,&ChannelBox::takePhoto);
     connect(this,&PreviewTool::imageCaptured,recordbox,&RecordBox::recordImage); // 原始相机图像
     connect(this,&PreviewTool::exposureGainCaptured,camerabox,&CameraBox::captureExposureGain);
 

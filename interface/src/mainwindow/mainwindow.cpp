@@ -59,3 +59,9 @@ void MainWindow::navigbarSelect(int id)
 {
     stack->setCurrentIndex(id);
 }
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    qApp->quit();
+    event->accept();
+}

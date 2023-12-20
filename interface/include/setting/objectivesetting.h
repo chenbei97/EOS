@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-31 14:38:19
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-31 14:41:48
+ * @LastEditTime: 2023-12-20 10:11:28
  * @FilePath: \EOS\interface\include\setting\objectivesetting.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -18,40 +18,21 @@ public:
     explicit ObjectiveSetting(QWidget *parent = nullptr);
     void emitSignals();
 private:
-    void onMoveMachine(const QString& f,const QVariant& d);
-private:
     void initObjects();
     void initAttributes();
     void initLayout();
-    QButtonGroup * buttongroup1;
-    QButtonGroup * buttongroup2;
     void moveMachine();
     void saveSetting();
     void updateTipInfo();
     void updateCheckedState();
+private:
     Label * tipinfo;
     QString tip;
     LocationObjectiveInfo info;
-    QMap<QString,QRadioButton*> objective_button;
-private:
-    QRadioButton * location_one;
-    QRadioButton * location_two;
-    QRadioButton * location_three;
-    QRadioButton * location_four;
+    QMap<QString,RadioButton*> objective_button;
+    RadioGroup * locationgroup;
     PushButton * locationbtn;
-private:
-    QRadioButton * br4x;
-    QRadioButton * ph4x;
-    QRadioButton * br10x;
-    QRadioButton * ph10x;
-    QRadioButton * br20x;
-    QRadioButton * ph20x;
-    QRadioButton * br40x;
-    QRadioButton * ph40x;
-    QRadioButton * na20x05;
-    QRadioButton * na20x08;
-    QRadioButton * na40x095;
-    QRadioButton * none;
+    ButtonGroup * objectivegroup;
     PushButton * savebtn;
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);

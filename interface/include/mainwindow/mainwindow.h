@@ -21,6 +21,7 @@ class INTERFACE_IMEXPORT MainWindow: public QMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QWidget*parent= nullptr);
+    void closeEvent(QCloseEvent*event);
 private:
     NavigBar * navigbar;
     AppSelect * appselect;

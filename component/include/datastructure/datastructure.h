@@ -21,6 +21,8 @@
 #include "qstyleditemdelegate.h"
 #include "qthread.h"
 #include "qmutex.h"
+#include "qbuttongroup.h"
+#include "qabstractbutton.h"
 
 // (2) 定义常量
 #define CURRENT_PATH (QDir::currentPath())
@@ -31,7 +33,6 @@
 #define DefaultOpacityValue 1.0
 #define DoubleZeroValue 0.0
 static const char* OpacityField = "opacity";
-
 // (3) 导出定义
 #if defined(COMPONENT_LIBRARY)
 #  define COMPONENT_IMEXPORT Q_DECL_EXPORT

@@ -19,15 +19,15 @@ Preview::Preview(QWidget*parent): QWidget(parent)
 void Preview::setViewMode(int mode)
 {
     switch (mode) {
-        case 0:
+        case 1:
             wellview->setViewMode(ViewMode::PointMode);
             wellpattern->setViewMode(ViewMode::PointMode);
             break;
-        case 1:
+        case 2:
             wellview->setViewMode(ViewMode::RectMode);
             wellpattern->setViewMode(ViewMode::RectMode);
             break;
-        case 2:
+        case 3:
             wellview->setViewMode(ViewMode::WholeMode);
             wellpattern->setViewMode(ViewMode::WholeMode);
             break;

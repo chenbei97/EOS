@@ -37,6 +37,8 @@
 #include "qmainwindow.h"
 #include "qstackedwidget.h"
 #include "qmessagebox.h"
+#include "qradiobutton.h"
+#include "qbuttongroup.h"
 
 #include "qfiledialog.h"
 #include "qfile.h"

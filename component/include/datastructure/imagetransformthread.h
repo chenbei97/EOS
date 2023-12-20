@@ -11,7 +11,7 @@
 #define EOS_IMAGETRANSFORMTHREAD_H
 
 #include "datastructure.h"
-extern const int DefaultThreadSleepMs;
+//extern const int DefaultThreadSleepMs;
 
 class COMPONENT_IMEXPORT ImageTransformThread : public QThread
 {

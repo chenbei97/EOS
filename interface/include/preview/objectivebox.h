@@ -2,8 +2,8 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-23 13:54:55
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-10-23 14:13:51
- * @FilePath: \EOS\interface\include\window\objectivebox.h
+ * @LastEditTime: 2023-12-20 10:09:51
+ * @FilePath: \EOS\interface\include\preview\objectivebox.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #ifndef EOSI_OBJECTIVEBOX_H
@@ -21,11 +21,11 @@ public:
 public slots:
     void onObjectiveSettingChanged(const LocationObjectiveInfo& m);
 private:
-    QRadioButton *  rbtn_loc1;
-    QRadioButton *  rbtn_loc2;
-    QRadioButton *  rbtn_loc3;
-    QRadioButton *  rbtn_loc4;
-    QMap<QString,QRadioButton*> location_button;
+    RadioButton *  rbtn_loc1;
+    RadioButton *  rbtn_loc2;
+    RadioButton *  rbtn_loc3;
+    RadioButton *  rbtn_loc4;
+    QMap<QString,RadioButton*> location_button;
     void onClicked();
     QString convertTo(const QString& text) const;
     QString convertFrom(const QString& text) const;

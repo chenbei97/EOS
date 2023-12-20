@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-11-14 15:10:15
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-14 15:16:51
+ * @LastEditTime: 2023-12-20 10:12:03
  * @FilePath: \EOS\interface\src\setting\wellsetting.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -20,11 +20,9 @@ void WellSetting::initObjects()
 {
     {
         boardbox = new GroupBox(tr("Well Board"));
-        singleboardbtn = new QRadioButton(tr("Single Board"));
-        multiboardbtn = new QRadioButton(tr("Multi Boards"));
+        radioGroup = new RadioGroup;
         auto lay = new QHBoxLayout;
-        lay->addWidget(singleboardbtn);
-        lay->addWidget(multiboardbtn);
+        lay->addWidget(radioGroup);
         lay->addStretch();
         boardbox->setLayout(lay);
     }
@@ -32,7 +30,9 @@ void WellSetting::initObjects()
 
 void WellSetting::initAttributes()
 {
-    singleboardbtn->setChecked(true);
+    radioGroup->setText(1,tr("Single Board"));
+    radioGroup->setText(2,tr("Multi Boards"));
+    radioGroup->setChecked(1,true);
 }
 
 void WellSetting::initLayout()

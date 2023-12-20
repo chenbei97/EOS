@@ -10,7 +10,6 @@
 #define EOSI_TEST_H
 
 #include "interface.h"
-#include "socketpanel.h"
 #include <thread>
 using std::thread;
 using std::async;
@@ -156,15 +155,6 @@ static void test_async()
         }
     } while (status != std::future_status::ready);
     LOG << "result is " << future2.get() << '\n';
-}
-
-static void test_tcp()
-{
-    auto w = new SocketPanel;
-    w->resize(1000,600);
-    setWindowAlignCenter(w);
-    w->show();
-
 }
 
 static void test_assemble_parse()

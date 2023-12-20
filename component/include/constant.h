@@ -58,6 +58,9 @@ static const int DefaultThreadSleepMs = 100;
 #define RecordVideoDefaultTempPath (CURRENT_PATH+"/temp/video/")
 #define AutoFocusTempPath (CURRENT_PATH+"/temp/focus/")
 
+static const char* ApplyField = "apply";
+static const char* AllChannelsField = "allchannels";
+static const char* CustomField = "custom";
 static const char* PurpleEA3FF7 = "#EA3FF7";
 static const char* PointModeField = "Point Mode";
 static const char* RectModeField = "Rect Mode";

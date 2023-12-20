@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-12-04 13:48:06
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-12-14 13:53:59
+ * @LastEditTime: 2023-12-20 10:12:06
  * @FilePath: \EOS\interface\src\preview\viewmode.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -11,47 +11,35 @@
 
 ViewModeBox::ViewModeBox(QWidget *parent) : GroupBox(parent)
 {
-    pointMode = new QRadioButton(tr(PointModeField));
-    rectMode = new QRadioButton(tr(RectModeField));
-    wholeMode = new QRadioButton(tr(WholeModeField));
-    pointMode->setChecked(true);
+    groupMode = new RadioGroup(3);
+    groupMode->setText(QStringList()<<tr(PointModeField)<<tr(RectModeField)<<tr(WholeModeField));
 
     auto lay = new QHBoxLayout;
-    lay->addWidget(pointMode);
-    lay->addWidget(rectMode);
-    lay->addWidget(wholeMode);
+    lay->addWidget(groupMode);
 
     setLayout(lay);
     setTitle(tr(ViewSelectBoxTitle));
 
-    auto group = new QButtonGroup;
-    group->addButton(pointMode,0);
-    group->addButton(rectMode,1);
-    group->addButton(wholeMode,2);
-
-    connect(group,QOverload<int>::of(&QButtonGroup::buttonClicked),this, &ViewModeBox::modeSelected);
+    connect(groupMode,&RadioGroup::radioClicked,this, &ViewModeBox::modeSelected);
 }
 
 void ViewModeBox::setEnabled(int option)
 { // 0表示孔板类型,1表示载玻片类型
-    pointMode->setEnabled(!option);
-    rectMode->setEnabled(true);
-    wholeMode->setEnabled(!option);
+    groupMode->setEnabled(1,!option);
+    groupMode->setEnabled(2,true); // 区域模式任何时候都可用
+    groupMode->setEnabled(3,!option);
     if (option) {
-        rectMode->setChecked(true);
-        rectMode->click(); // 这样才能触发信号
+        groupMode->setChecked(2,true); // 如果是载玻片,区域模式的checked要设置上
+        groupMode->emitSignals(2);// 这样才能触发信号
     }
 }
 
 ViewMode ViewModeBox::viewMode() const
 {
     ViewMode mode;
-    if (pointMode->isChecked())
-        mode = ViewMode::PointMode;
-    else if (rectMode->isChecked())
-        mode = ViewMode::RectMode;
-    else if (wholeMode->isChecked())
-        mode = ViewMode::WholeMode;
+    auto checkID = groupMode->checkedID();
+    checkID--;
+    mode = ViewMode(checkID);
     return mode;
 }
 

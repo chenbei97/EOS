@@ -242,8 +242,8 @@ static const char* NAField = "NA";
 static const char* NoneField = "none";
 static const QFieldList ObjectiveSettingFields = {
         Objective4x,_4xPHField,Objective10x,_10xPHField,
-        Objective20x,_20xPHField,Objective40x,_40xPHField,
-        NoneField
+        Objective20x,_20xPHField,NA20x05Field,NA20x08Field,
+        Objective40x,_40xPHField,NA40x095Field,NoneField
 };
 static const QFieldList ChannelFields = {
         BRField,PHField,GFPField,RFPField,DAPIField
@@ -294,6 +294,9 @@ static const char* FocusSkipHolesField = "skip holes";
 static const char* FocusSkipViewsField = "skip views";
 static const char* FocusSkipHolesLabelField = "skip holes: ";
 static const char* FocusSkipViewsLabelField = "skip views: ";
+static const char* FocusExtendRangeLabelField = "extend range?";
+static const char* FocusFocusModeLabelField = "focus mode: ";
+static const char* FocusAutoFocusLabelField = "auto focus?";
 static const char* FocusStepField = "focus_step";
 static const char* ObjectiveLocationField1 = "objective1";
 static const char* ObjectiveLocationField2 = "objective2";

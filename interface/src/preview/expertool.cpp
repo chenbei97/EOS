@@ -14,11 +14,9 @@ ExperTool::ExperTool(QWidget*parent):QWidget(parent)
     timebox = new TimeBox;
     zstackbox = new ZStackBox;
     savebox = new SaveBox;
-    skipbox = new SkipBox;
 
     lay = new QVBoxLayout;
     lay->addWidget(timebox);
-    lay->addWidget(skipbox);
     lay->addWidget(zstackbox);
     lay->addWidget(savebox);
     lay->addStretch();

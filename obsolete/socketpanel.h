@@ -34,4 +34,14 @@ private:
     void askActivateCodeSync();
     void askActivateCodeASync(const QString& f,const QVariant& d);
 };
+
+static void test_socketPanel()
+{
+    auto w = new SocketPanel;
+    w->setAttribute(Qt::WA_DeleteOnClose);
+    w->resize(1000,600);
+    setWindowAlignCenter(w);
+    w->show();
+}
+
 #endif //EOSI_SOCKETPANEL_H

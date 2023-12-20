@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-12-04 13:47:39
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-12-14 13:54:05
+ * @LastEditTime: 2023-12-20 10:11:41
  * @FilePath: \EOS\interface\include\preview\viewmode.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -21,9 +21,7 @@ public:
     ViewMode viewMode() const;
     ViewModeInfo viewModeInfo() const;
 private:
-    QRadioButton * pointMode;
-    QRadioButton * rectMode;
-    QRadioButton * wholeMode;
+    RadioGroup * groupMode;
 signals:
     void modeSelected(int mode);
 };

@@ -2,14 +2,14 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-11-17 17:25:29
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-17 17:27:26
+ * @LastEditTime: 2023-12-20 10:11:23
  * @FilePath: \EOS\interface\src\setting\settingnotifier.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 
 #include "settingnotifier.h"
 
-void SettingNotifier::addToList(GroupBox*box,QRadioButton*radio)
+void SettingNotifier::addToList(GroupBox*box,RadioButton*radio)
 {
     auto id = box->getID();
     if (id != -1)
@@ -20,7 +20,7 @@ void SettingNotifier::addToList(GroupBox*box,QRadioButton*radio)
     }
 }
 
-void SettingNotifier::removeFromList(GroupBox *box,QRadioButton*radio)
+void SettingNotifier::removeFromList(GroupBox *box,RadioButton*radio)
 {
     auto id = box->getID();
     if (id != -1)
