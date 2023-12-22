@@ -17,7 +17,7 @@ QRectF2DVector WellPattern::getHoleRectsOnViewSize(const QPoint &coordinate) con
     double cell_w = cell_size.width();
     double cell_h = cell_size.height();
     double radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
-    radius = radius * 0.75;
+    radius = radius * 0.75; // 这个圆的半径
     auto  centerPts = getCenterPoints();
     auto center  = centerPts[coordinate.x()][coordinate.y()]; // 圆心
 
@@ -25,13 +25,17 @@ QRectF2DVector WellPattern::getHoleRectsOnViewSize(const QPoint &coordinate) con
     auto rect = QRectF(center,QSize(radius*2,radius*2)); // 这个孔内圆的外接正方形
 
     // 3. 拿到这个孔存储的视野尺寸信息
+#ifdef viewRowColUnEqual
+    auto viewrows = mHoleInfo[coordinate.x()][coordinate.y()].dimension.rows;
+    auto viewcols = mHoleInfo[coordinate.x()][coordinate.y()].dimension.cols;
+#else
     auto viewrows = mHoleInfo[coordinate.x()][coordinate.y()].viewsize;
     auto viewcols = viewrows;
-
+#endif
     // 4. 得到外接正方形根据视野尺寸划分后每个小矩形的长度和宽度
     QRectF2DVector m;
-    auto hoffset = 2 * radius / viewrows *1.0; // 整个外接正方形的尺寸就是2*radius
-    auto voffset = 2 * radius / viewcols *1.0;
+    auto hoffset = 2 * radius / viewcols *1.0; // 整个外接正方形的尺寸就是2*radius
+    auto voffset = 2 * radius / viewrows *1.0;
 
     // 4.拿到外界正方形的左上角顶点
     auto start = center-QPointF(radius,radius); // 圆心坐标减去水平垂直距离radius即可

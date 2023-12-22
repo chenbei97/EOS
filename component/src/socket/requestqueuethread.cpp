@@ -11,7 +11,7 @@
 
 void RequestQueueThread::run()
 {
-    LOG<<"requestQueue's thread: "<<CURRENT_THREAD;
+    LOG<<"socket requestQueue's thread: "<<CURRENT_THREAD;
 #ifdef useblockqueue
     while (true) {
         if (!requestQueue.isEmpty()) {

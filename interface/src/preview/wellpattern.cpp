@@ -37,7 +37,12 @@ WellPatternInfo WellPattern::patternInfo() const
             holeInfoMap[HoleAllGroupsField].setValue(holeInfo.allgroup);
             holeInfoMap[HoleAllCoordinatesField].setValue(holeInfo.allcoordinate);
 
-            holeInfoMap[HoleViewSizeField] = holeInfo.viewsize; // 2. 视野信息
+            // 2. 视野信息
+#ifdef viewRowColUnEqual
+            holeInfoMap[HoleViewSizeField].setValue(holeInfo.dimension);
+#else
+            holeInfoMap[HoleViewSizeField] = holeInfo.viewsize;
+#endif
             holeInfoMap[HoleViewRectsField].setValue(holeInfo.viewrects);
             holeInfoMap[HoleViewUiPointsField].setValue(holeInfo.uipoints);
             holeInfoMap[HoleViewPointsField].setValue(holeInfo.viewpoints);
@@ -47,7 +52,7 @@ WellPatternInfo WellPattern::patternInfo() const
             holeInfoMap[HoleDoseField] = holeInfo.dose;
             holeInfoMap[HoleDoseUnitField] = holeInfo.doseunit;
 
-            auto groupInfoKey = QString("(%1,%2)").arg(hole.x()).arg(hole.y());
+            auto groupInfoKey = QString(PairArgsField).arg(hole.x()).arg(hole.y());
             groupInfoMap[groupInfoKey] = holeInfoMap;
         }
         //LOG<<groupName<<"'s hole count = "<<groupInfoMap.keys().count();
@@ -132,7 +137,7 @@ void WellPattern::setDisableHole(QCPoint point, bool enable)
 
 void WellPattern::setDisableHoles(QCPointVector points, bool enable)
 {// 对指定的有限坐标进行设置
-    foreach(auto pt , points) {
+    for(auto pt : points) {
         setDisableHole(pt,enable);
     }
 }
@@ -256,8 +261,11 @@ void WellPattern::initHoleInfo()
             info.group = QString();
             info.coordinate = QPoint(row,col);
             info.color = Qt::red;
-
+#ifdef viewRowColUnEqual
+            info.dimension = Dimension2D();
+#else
             info.viewsize = 0;
+#endif
             info.viewrects = QRectFVector();
             info.viewpoints = QPointFVector();
             info.uipoints = QPointFVector();
@@ -284,62 +292,66 @@ void WellPattern::clearViewInfo()
             mHoleInfo[row][col].viewrects = QRectFVector();
             mHoleInfo[row][col].viewpoints = QPointFVector();
             mHoleInfo[row][col].uipoints = QPointFVector();
+#ifdef viewRowColUnEqual
+            mHoleInfo[row][col].dimension = Dimension2D();
+#else
             mHoleInfo[row][col].viewsize = 0;
+#endif
         }
     }
     update();
 }
 
-void WellPattern::importHoleInfoV1(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize)
-{ // 完全弃用,后续版本会删除此函数
-    // 更新指定孔的信息,用于导入实验配置时逐孔更新,mrows,mcols无需更新的原因是导入实验配置先更新的tool信息触发了togglebrand已经更新过
-    // 1. viewpoints存储的时候是电机坐标,并非UI坐标,需要转换
-    QPointFVector points;
-    QRectFVector rects; // 基于电机坐标的等比例区域
-    for(auto pt: viewpoints)
-    {
-        points.append(QPointF(pt.x(),pt.y())); // 当初电机坐标是按照1.0/viewsize去存的,现在的比例不变
-        auto rect = QRectF(pt.x(),pt.y(),1.0/viewsize,1.0/viewsize);
-        rects.append(rect);
-    }
-
-    // 2. 转换ui坐标需要 UI区域和掩码矩阵
-    QPointFVector uipoints; // 要转换的UI坐标
-    for(int r = 0; r < mDispersedMaskSize; ++r) {
-        for (int c = 0; c < mDispersedMaskSize; ++c) {
-            for(auto viewRect: rects) {
-                auto topleft = viewRect.topLeft();
-                auto size = viewRect.size(); // 每个等比例UI区域要放大到固定的UI掩码矩阵尺寸
-
-                auto x = topleft.x() * mDispersedMaskSize ;
-                auto y = topleft.y() * mDispersedMaskSize ;
-                auto w = size.width() * mDispersedMaskSize;
-                auto h = size.height() * mDispersedMaskSize;
-
-                auto rect = QRectF(x,y,w,h); // 等比例放大尺寸到mUiViewMaskSize
-                if (rect.intersects(QRectF(c,r,1.0,1.0))) { // 掩码区域包含的点都视为UI点
-                    uipoints.append(QPointF((r+0.5)/mDispersedMaskSize,(c+0.5)/mDispersedMaskSize));
-                }
-            }  // end 3层for
-        }
-    }
-
-
-    Q_ASSERT(mHoleInfo[point.x()][point.y()].coordinate == point);
-
-    // 3.颜色不更新,默认就红色,不同组的颜色会一样,因为当初没有存不同的颜色
-    mHoleInfo[point.x()][point.y()].group = group;
-    mHoleInfo[point.x()][point.y()].viewpoints = points;
-    mHoleInfo[point.x()][point.y()].uipoints = uipoints;
-
-    mHoleInfo[point.x()][point.y()].viewsize = viewsize;
-    mHoleInfo[point.x()][point.y()].isselected = true;
-
-    mHoleInfo[point.x()][point.y()].allgroup = getAllGroups();
-    mHoleInfo[point.x()][point.y()].allcoordinate = getAllHoles();
-    // 不能借助onOpenViewAct打开视野窗口更新,因为不传递viewpoints给视野窗口,而且更新仅仅更新1个孔的
-    update();
-}
+//void WellPattern::importHoleInfoV1(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize)
+//{ // 完全弃用,后续版本会删除此函数
+//    // 更新指定孔的信息,用于导入实验配置时逐孔更新,mrows,mcols无需更新的原因是导入实验配置先更新的tool信息触发了togglebrand已经更新过
+//    // 1. viewpoints存储的时候是电机坐标,并非UI坐标,需要转换
+//    QPointFVector points;
+//    QRectFVector rects; // 基于电机坐标的等比例区域
+//    for(auto pt: viewpoints)
+//    {
+//        points.append(QPointF(pt.x(),pt.y())); // 当初电机坐标是按照1.0/viewsize去存的,现在的比例不变
+//        auto rect = QRectF(pt.x(),pt.y(),1.0/viewsize,1.0/viewsize);
+//        rects.append(rect);
+//    }
+//
+//    // 2. 转换ui坐标需要 UI区域和掩码矩阵
+//    QPointFVector uipoints; // 要转换的UI坐标
+//    for(int r = 0; r < mDispersedMaskSize; ++r) {
+//        for (int c = 0; c < mDispersedMaskSize; ++c) {
+//            for(auto viewRect: rects) {
+//                auto topleft = viewRect.topLeft();
+//                auto size = viewRect.size(); // 每个等比例UI区域要放大到固定的UI掩码矩阵尺寸
+//
+//                auto x = topleft.x() * mDispersedMaskSize ;
+//                auto y = topleft.y() * mDispersedMaskSize ;
+//                auto w = size.width() * mDispersedMaskSize;
+//                auto h = size.height() * mDispersedMaskSize;
+//
+//                auto rect = QRectF(x,y,w,h); // 等比例放大尺寸到mUiViewMaskSize
+//                if (rect.intersects(QRectF(c,r,1.0,1.0))) { // 掩码区域包含的点都视为UI点
+//                    uipoints.append(QPointF((r+0.5)/mDispersedMaskSize,(c+0.5)/mDispersedMaskSize));
+//                }
+//            }  // end 3层for
+//        }
+//    }
+//
+//
+//    Q_ASSERT(mHoleInfo[point.x()][point.y()].coordinate == point);
+//
+//    // 3.颜色不更新,默认就红色,不同组的颜色会一样,因为当初没有存不同的颜色
+//    mHoleInfo[point.x()][point.y()].group = group;
+//    mHoleInfo[point.x()][point.y()].viewpoints = points;
+//    mHoleInfo[point.x()][point.y()].uipoints = uipoints;
+//
+//    mHoleInfo[point.x()][point.y()].viewsize = viewsize;
+//    mHoleInfo[point.x()][point.y()].isselected = true;
+//
+//    mHoleInfo[point.x()][point.y()].allgroup = getAllGroups();
+//    mHoleInfo[point.x()][point.y()].allcoordinate = getAllHoles();
+//    // 不能借助onOpenViewAct打开视野窗口更新,因为不传递viewpoints给视野窗口,而且更新仅仅更新1个孔的
+//    update();
+//}
 
 void WellPattern::importHoleInfo(const QHoleInfoVector& vec,ViewMode mode)
 {

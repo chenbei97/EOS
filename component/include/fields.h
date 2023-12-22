@@ -447,6 +447,7 @@ static const char* GroupField = "group";
 static const char* XField = "x";
 static const char* YField = "y";
 static const char* PointsField = "points";
+static const char* PointField = "point";
 
 // sql数据库存储涉及的
 static const char * LoginTableName = "logininfo";

@@ -13,6 +13,7 @@
 
 LONG CreateDumpFile(EXCEPTION_POINTERS *pException);
 void initApp(QApplication& a);
+#define use_python 1
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -20,6 +21,17 @@ int main(int argc, char *argv[]) {
     MainWindow w;
     setWindowAlignCenter(&w);
     w.show();
+
+    // mainwindow建立后再执行,否则异步消息会收不到,同步不影响
+    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
+    //SocketPointer->exec_queue(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()));
+    //QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
+    if (ParserResult.toBool()) LOG<<"[sync] socket is connect successful!";
+    else LOG<<"[sync] socket is connect failed!";
+    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
+    //SocketPointer->exec_queue(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()));
+    //QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
+    LOG<<"[sync] activate code is "<<ParserResult.toString();
     return QApplication::exec();
 }
 
@@ -39,7 +51,7 @@ void initApp(QApplication& a)
     SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)CreateDumpFile);
 
     // 3. qss/font
-    QFile qss("style.qss");
+    QFile qss(":/style.qss");
     qss.open(QIODevice::ReadOnly);
     a.setStyleSheet(qss.readAll());
     a.setFont(QFont(DefaultFontFamily,DefaultFontSize));
@@ -54,7 +66,7 @@ void initApp(QApplication& a)
         ToupCameraPointer->openCamera();
     };
 
-
+#ifdef use_python
     // 5. python
     // 这段Python进程的代码移动到initApp去写而不是在mainwindow.cpp的构造函数去写
     // 因为mainwindow.cpp构造完成之前可能已经触发了某些信号给服务端发送命令,例如独立于mainwindow构造的setting
@@ -65,14 +77,14 @@ void initApp(QApplication& a)
     auto * process = new QProcess;
     // 22987 Lenovo
     process->start("C:\\Users\\22987\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
-                   QStringList()<<"../test/test_socket.py");
+                   QStringList()<<"test_socket.py");
     process->waitForStarted();
     QObject::connect(qApp, &QCoreApplication::aboutToQuit, [process](){
         process->close();
         process->waitForFinished();
         LOG<<"python process is kill? "<<!process->isOpen();
     });
-
+#endif
     // 6. quit thread
     QObject::connect(qApp, &QCoreApplication::aboutToQuit, [=]() {
         if (TimerBroadCastThreadPointer->isRunning()) {
@@ -89,16 +101,7 @@ void initApp(QApplication& a)
 
     // 7. socket/tcp
     SocketInit; //注意: 先启动进程再启动连接
-    //LOG<<"is connect? "<<SocketPointer->isConnected()<<SocketPointer->socketState();
-    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
-    //SocketPointer->exec_queue(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()));
-    //QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
-    if (ParserResult.toBool()) LOG<<"socket is connect successful!";
-    else LOG<<"socket is connect failed!";
-    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
-    //SocketPointer->exec_queue(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()));
-    //QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
-    LOG<<"activate code is "<<ParserResult.toString();
+    LOG<<"is connect? "<<SocketPointer->isConnected()<<SocketPointer->socketState();
 }
 
 LONG CreateDumpFile(EXCEPTION_POINTERS *pException)

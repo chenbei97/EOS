@@ -118,7 +118,11 @@ void ConfigReadWrite::parseGroupField(const QJsonValue &key, const QJsonValue &v
             //holeInfo.allcoordinate = convertTo2DPointVector(holeInfoObject[HoleAllCoordinatesField].toString()); // 组信息和所有点信息可以自行计算也无需导入
             //holeInfo.allgroup = convertToSet(holeInfoObject[HoleAllGroupsField].toString());
 
+#ifdef viewRowColUnEqual
+            holeInfo.dimension = convertToDimension2D(holeInfoObject[HoleViewSizeField].toString());
+#else
             holeInfo.viewsize = holeInfoObject[HoleViewSizeField].toInt();
+#endif
             auto rect_str = holeInfoObject[HoleViewRectsField].toString();
             if (rect_str.isEmpty()) holeInfo.viewrects = QRectFVector(); // 点模式下一定为空,区域模式可能没选视野也为空
             else holeInfo.viewrects = QRectFVector()<<convertToRectF(rect_str);

@@ -57,7 +57,7 @@ static const int DefaultThreadSleepMs = 100;
 #define MergeChannelTempPath (CURRENT_PATH+"/temp/merge/")
 #define RecordVideoDefaultTempPath (CURRENT_PATH+"/temp/video/")
 #define AutoFocusTempPath (CURRENT_PATH+"/temp/focus/")
-
+static const char* PairArgsField = "(%1,%2)";
 static const char* ApplyField = "apply";
 static const char* AllChannelsField = "allchannels";
 static const char* CustomField = "custom";

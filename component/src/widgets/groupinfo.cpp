@@ -122,6 +122,7 @@ void GroupInfo::initObjects()
     doseunit = new ComboBox;
     btn = new PushButton(tr("Confirm"));
     cbtn = new ColorButton;
+    cbtn->setObjectName("groupInfoColorButton");
 
     grouptype->addItems(GroupTypeFields);
     doseunit->addItems(GroupDoseUnitFields);

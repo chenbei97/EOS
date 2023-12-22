@@ -40,6 +40,39 @@ void WellView::removeHole(const QPoint &holePoint)
     update();
 }
 
+#ifdef viewRowColUnEqual
+void WellView::toggleBrandObjective(const Dimension2D& dimension,bool toggleObjective)
+{// 切换厂家或者物镜倍数时把所有的区域信息都要清空,对于mViewInfo只需要清理视野相关的2个信息
+    mDrapRectF = QRectF();
+    mViewRects.clear();
+    mTmpRects.clear();
+    mViewRectDispersedPoints.clear();
+    mTmpRectDispersedPoints.clear();
+    mViewPoints.clear();
+    mTmpPoints.clear();
+    initDispersedMask(); // 这个掩码矩阵也要清理
+    mViewMachinePoints.clear(); // 电机坐标清理
+
+    // 视野的尺寸发生了变化,才清理掉视野的4个信息,否则不用动
+    if (dimension != mViewInfo[HoleViewSizeField].value<Dimension2D>()) {
+        mViewInfo[HoleViewSizeField].setValue(dimension);
+        mViewInfo[HoleViewRectsField].setValue(QRectFVector()); // 清空视野信息
+        mViewInfo[HoleViewUiPointsField].setValue(QPointFVector());
+        mViewInfo[HoleViewPointsField].setValue(QPointFVector());
+    } // 其它与孔有关的信息只有setViewInfo时才会传递,如果清除了就会丢掉这些信息
+    // 如果是切物镜,wellpattern没有清理掉well相关的信息,view也不需要清除
+    // 如果是切厂家,wellpattern完全重置,view也必须清理掉这些信息,否则信息传递的一些Q_Assert不成立
+    if (!toggleObjective) {
+        mViewInfo[HoleGroupColorField] = QColor(Qt::red);
+        mViewInfo[HoleGroupNameField] = "";
+        mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
+        mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
+        mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
+    }
+    mDimension = dimension;
+    update();
+}
+#else
 void WellView::toggleBrandObjective(int viewSize,bool toggleObjective)
 {// 切换厂家或者物镜倍数时把所有的区域信息都要清空,对于mViewInfo只需要清理视野相关的2个信息
     mDrapRectF = QRectF();
@@ -71,7 +104,7 @@ void WellView::toggleBrandObjective(int viewSize,bool toggleObjective)
     mSize = viewSize;
     update();
 }
-
+#endif
 void WellView::adjustViewPoint(int option)
 { // 这段代码应该在preview的adjustLens电机到位后再执行
     Q_ASSERT(mSelectMode == ViewMode::PointMode); // pressEvent只有在PointMode才会发送调整事件
@@ -89,55 +122,55 @@ void WellView::adjustViewPoint(int option)
     update();
 }
 
-void WellView::importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
-{// 导入实验配置时去更新view的ui信息(和setViewInfo初始化的代码差不多) 完全弃用
-    mViewInfo[HoleCoordinateField] = holePoint;
-    mViewInfo[HoleGroupNameField] = "";
-    mViewInfo[HoleGroupColorField] = QColor(Qt::red);
-
-    mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
-    mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
-    mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
-
-    mViewInfo[HoleViewSizeField] = viewSize;
-    mViewInfo[HoleViewRectsField].setValue(QRectFVector());
-    mViewInfo[HoleViewUiPointsField].setValue(QPointFVector());
-    mViewInfo[HoleViewPointsField].setValue(QPointFVector());
-
-    mMousePos = {-1.0,-1.0};
-    mMouseRect = QRectF();
-    mDrapRectF = QRectF();
-    mSize = viewSize;
-
-    auto id = holeID();
-
-    mViewRectDispersedPoints[id].clear();
-    mTmpRectDispersedPoints[id].clear();
-    mViewRects[id].clear();
-    mTmpRects[id].clear();
-
-    for(auto pt: viewPoints) { // 电机坐标要转成UI区域,然后转成UI坐标
-        mViewRects[id].append(QRectF(QRectF(pt.x(),pt.y(),
-               1.0/mSize,1.0/mSize)));// 这个坐标当初导出时根据每个小视野的尺寸为单位导出,小视野的比例就是1/mSize
-    }
-    mTmpRects[id] = mViewRects[id];
-
-    for(int r = 0; r < mDispersedMaskSize; ++r) {
-        for (int c = 0; c < mDispersedMaskSize; ++c) {
-            for(auto viewRect: mViewRects[id]) {
-                auto rect = mapToSize(viewRect,QPointF(0.0,0.0),
-                                      mDispersedMaskSize,mDispersedMaskSize); // 等比例放大尺寸到mDispersedMaskSize
-                if (rect.intersects(QRectF(c,r,1.0,1.0))) {
-                    mViewRectDispersedPoints[id].append(QPointF((r+0.5)/mDispersedMaskSize,(c+0.5)/mDispersedMaskSize));
-                }
-            }  // end 2层for
-        }
-    }
-
-    mTmpRectDispersedPoints[id] = mViewRectDispersedPoints[id];
-    applyholeact->trigger();
-    update();
-}
+//void WellView::importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int viewSize)
+//{// 导入实验配置时去更新view的ui信息(和setViewInfo初始化的代码差不多) 完全弃用
+//    mViewInfo[HoleCoordinateField] = holePoint;
+//    mViewInfo[HoleGroupNameField] = "";
+//    mViewInfo[HoleGroupColorField] = QColor(Qt::red);
+//
+//    mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
+//    mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
+//    mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
+//
+//    mViewInfo[HoleViewSizeField] = viewSize;
+//    mViewInfo[HoleViewRectsField].setValue(QRectFVector());
+//    mViewInfo[HoleViewUiPointsField].setValue(QPointFVector());
+//    mViewInfo[HoleViewPointsField].setValue(QPointFVector());
+//
+//    mMousePos = {-1.0,-1.0};
+//    mMouseRect = QRectF();
+//    mDrapRectF = QRectF();
+//    mSize = viewSize;
+//
+//    auto id = holeID();
+//
+//    mViewRectDispersedPoints[id].clear();
+//    mTmpRectDispersedPoints[id].clear();
+//    mViewRects[id].clear();
+//    mTmpRects[id].clear();
+//
+//    for(auto pt: viewPoints) { // 电机坐标要转成UI区域,然后转成UI坐标
+//        mViewRects[id].append(QRectF(QRectF(pt.x(),pt.y(),
+//               1.0/mSize,1.0/mSize)));// 这个坐标当初导出时根据每个小视野的尺寸为单位导出,小视野的比例就是1/mSize
+//    }
+//    mTmpRects[id] = mViewRects[id];
+//
+//    for(int r = 0; r < mDispersedMaskSize; ++r) {
+//        for (int c = 0; c < mDispersedMaskSize; ++c) {
+//            for(auto viewRect: mViewRects[id]) {
+//                auto rect = mapToSize(viewRect,QPointF(0.0,0.0),
+//                                      mDispersedMaskSize,mDispersedMaskSize); // 等比例放大尺寸到mDispersedMaskSize
+//                if (rect.intersects(QRectF(c,r,1.0,1.0))) {
+//                    mViewRectDispersedPoints[id].append(QPointF((r+0.5)/mDispersedMaskSize,(c+0.5)/mDispersedMaskSize));
+//                }
+//            }  // end 2层for
+//        }
+//    }
+//
+//    mTmpRectDispersedPoints[id] = mViewRectDispersedPoints[id];
+//    applyholeact->trigger();
+//    update();
+//}
 
 void WellView::importViewInfo(const QHoleInfoVector& vec,ViewMode mode)
 { // 如果是区域模式: rect,viewpoints都有意义,但viewpoints可以通过rect得到,且更简便,不使用viewpoints
@@ -155,8 +188,14 @@ void WellView::importViewInfo(const QHoleInfoVector& vec,ViewMode mode)
             mViewInfo[HoleGroupColorField] = holeInfo.color;
             mViewInfo[HoleViewRectsField].setValue(holeInfo.viewrects);
             mViewInfo[HoleViewPointsField].setValue(holeInfo.viewpoints);
-            mViewInfo[HoleViewSizeField] = holeInfo.viewsize;
 
+#ifdef viewRowColUnEqual
+            mViewInfo[HoleViewSizeField].setValue(holeInfo.dimension);
+            mDimension = holeInfo.dimension;
+#else
+            mViewInfo[HoleViewSizeField] = holeInfo.viewsize;
+            mSize = holeInfo.viewsize;
+#endif
             // 这4行代码只是单纯过checkField()函数,没有特定含义
             mViewInfo[HoleViewUiPointsField].setValue(QPointFVector());
             mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
@@ -166,7 +205,6 @@ void WellView::importViewInfo(const QHoleInfoVector& vec,ViewMode mode)
             // 其中uipoints是通过mViewRectDispersedPoints更新的
             // 在dispersedViewRects()已经完成mViewRects,mViewRectDispersedPoints,mMachinePoints的更新
 
-            mSize = holeInfo.viewsize;
             if (!holeInfo.viewrects.isEmpty()) {
                 Q_ASSERT(holeInfo.viewrects.count() == 1);
                 mDrapRectF = holeInfo.viewrects[0]; // 不为空的话一定有1个视野
@@ -178,9 +216,6 @@ void WellView::importViewInfo(const QHoleInfoVector& vec,ViewMode mode)
     else if (mSelectMode == ViewMode::PointMode) {
 
     }
-
-
-
     update();
 }
 
@@ -348,7 +383,10 @@ void WellView::onSaveViewAct()
         mMouseRect = QRectF();
     } else if (mSelectMode == ViewMode::PointMode){
         if (isValidPoint(mValidMousePos)) {
-            mViewPoints[id].append(mapFromPointF(mValidMousePos));
+            auto pt = mapFromPointF(mValidMousePos);
+            if (!mViewPoints[id].contains(pt)) // 防止没移动点重复添加
+                mViewPoints[id].append(pt);
+            //LOG<<mViewPoints[id].count();
             mTmpPoints[id] = mViewPoints[id]; // 需要重叠一定比例
             // 点模式不是通过dispersedViewRects()计算,就等于选择的视野坐标
             mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
@@ -517,7 +555,7 @@ void WellView::paintEvent(QPaintEvent *event)
                 auto pt_x = pt.x()*diameter+topleft.x();
                 auto pt_y = pt.y()*diameter+topleft.y();
                 painter.drawPoint(pt_x,pt_y);
-                painter.drawText(pt_x-3,pt_y-3,QString("(%1,%2)").arg(pt.x()).arg(pt.y()));
+                painter.drawText(pt_x-3,pt_y-3,QString(PairArgsField).arg(pt.x()).arg(pt.y()));
             }
         }
 
@@ -552,25 +590,38 @@ void WellView::paintEvent(QPaintEvent *event)
         pen.setColor(Qt::gray);
         painter.setPen(pen);
         auto hor_offset = getInnerRectWidth();// 绘制垂直线,2个y坐标固定
-        for (int i = 1; i <= mSize-1; ++i) {
+#ifdef viewRowColUnEqual
+        for (int i = 1; i <= mDimension.cols-1; ++i) {
             auto top = topleft + QPointF(i*hor_offset,0);
             auto bottom = bottomleft + QPointF(i*hor_offset,0);
             painter.drawLine(top,bottom);
         }
         auto ver_offset = getInnerRectHeight();// 绘制水平线,2个x坐标固定
-        for (int i = 1; i <= mSize-1; ++i){
+        for (int i = 1; i <= mDimension.rows-1; ++i){
             auto left = topleft + QPointF(0,ver_offset*i);
             auto right = topright + QPointF(0,ver_offset*i);
             painter.drawLine(left,right);
         }
-
+#else
+        for (int i = 1; i <= mSize; ++i) {
+            auto top = topleft + QPointF(i*hor_offset,0);
+            auto bottom = bottomleft + QPointF(i*hor_offset,0);
+            painter.drawLine(top,bottom);
+        }
+        auto ver_offset = getInnerRectHeight();// 绘制水平线,2个x坐标固定
+        for (int i = 1; i <= mSize; ++i){
+            auto left = topleft + QPointF(0,ver_offset*i);
+            auto right = topright + QPointF(0,ver_offset*i);
+            painter.drawLine(left,right);
+        }
+#endif
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::blue);
         painter.setPen(pen);
 
         // 5.鼠标单击生成的矩形框
         auto norm_pos = mapFromPointF(mMousePos);
-        painter.drawText(mMousePos-QPointF(3,3),QString("(%1,%2)").arg(norm_pos.x()).arg(norm_pos.y()));
+        painter.drawText(mMousePos-QPointF(3,3),QString(PairArgsField).arg(norm_pos.x()).arg(norm_pos.y()));
         painter.drawRect(mapToSize(mMouseRect,topleft,diameter,diameter));
         pen.setWidth(DefaultPainterPenWidth*2);
         painter.setPen(pen);
@@ -587,7 +638,7 @@ void WellView::paintEvent(QPaintEvent *event)
             auto mpt = mapToPointF(pt);
             painter.drawPoint(mpt);
             painter.drawText(mpt.x()+3,mpt.y()-3,
-                             QString("(%1,%2)").arg(pt.x()).arg(pt.y()));
+                             QString(PairArgsField).arg(pt.x()).arg(pt.y()));
         }
         pen.setColor(Qt::blue);
         painter.setPen(pen);
@@ -595,7 +646,7 @@ void WellView::paintEvent(QPaintEvent *event)
             auto pt = mapFromPointF(mValidMousePos);
             painter.drawPoint(mValidMousePos);
             painter.drawText(mValidMousePos.x()+3,mValidMousePos.y()-3,
-                             QString("(%1,%2)").arg(pt.x()).arg(pt.y()));
+                             QString(PairArgsField).arg(pt.x()).arg(pt.y()));
         }
 
         pen = painter.pen();

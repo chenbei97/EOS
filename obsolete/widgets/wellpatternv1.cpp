@@ -46,7 +46,7 @@ namespace obsoleteClass {
                 holeInfo[HoleDoseField] = currentholeinfo.dose;
                 holeInfo[HoleDoseUnitField] = currentholeinfo.doseunit;
 
-                auto holename = QString("(%1,%2)").arg(hole.x()).arg(hole.y());
+                auto holename = QString(PairArgsField).arg(hole.x()).arg(hole.y());
                 groupInfo[holename] = holeInfo;
                 //LOG<<groupInfo;
             }

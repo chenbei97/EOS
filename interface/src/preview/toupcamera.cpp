@@ -80,7 +80,7 @@ void ToupCamera::print_imageInfo(ToupcamFrameInfoV3* info)
 
 bool ToupCamera::isOpen() const
 {
-    LOG<<"camera is open? "<<(toupcam!= nullptr);
+    LOG<<"camera has opened? "<<(toupcam!= nullptr);
     return toupcam != nullptr;
 }
 
@@ -118,7 +118,9 @@ void ToupCamera::openCamera()
             }
         }
     }
-
+    else {
+        LOG<<"not detect camera!";
+    }
 }
 
 void ToupCamera::closeCamera()

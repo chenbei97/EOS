@@ -24,7 +24,7 @@ ParserControl::ParserControl(QObject *parent) : QObject(parent)
     connect(parser,&Parse::parseResult,this,&ParserControl::async);
 
     connect(this,&ParserControl::parse,this,[&]{loop.exec();}); // 开始解析就进入时间循环等待同步
-    connect(this,&ParserControl::parseResult,&loop,&EventLoop::quit);
+    connect(parser,&Parse::parseResult,&loop,&EventLoop::quit);
 
     parsethread.start();
 }
@@ -39,7 +39,6 @@ void ParserControl::async(QCString f,QCVariant d)
     fram=f;res=d;
     //LOG<<"frame = "<<fram<<" d = "<<res; // 从结果打印是正确的
     parseresult[fram]=d;
-    //LOG<<fram<<d;
     emit parseResult(f,d); // 外部使用这个信号纯异步写法也可以,绑定好这个信号就行
 }
 

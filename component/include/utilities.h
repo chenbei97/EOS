@@ -40,6 +40,22 @@ static QPointF convertToPointF(const QString& text)
     return {x,y};
 }
 
+static Dimension2D convertToDimension2D(const QString& text)
+{ // (0.835,0.33),(0,1)这样的字符串
+    Q_ASSERT(text.count(",") == 1);
+    Q_ASSERT(text.count("(") == 1);
+    Q_ASSERT(text.count(")") == 1);
+
+    auto tmp = text;
+    tmp.remove(0,1);
+    tmp.chop(1);
+
+    auto rows = tmp.section(",",0,0,QString::SectionSkipEmpty).toDouble();
+    auto cols = tmp.section(",",1,1,QString::SectionSkipEmpty).toDouble();
+
+    return Dimension2D(rows,cols);
+}
+
 static QRectF convertToRectF(const QString& text)
 { // (0.71,0.205,0.1725,0.35)
     Q_ASSERT(text.count(",") == 3);

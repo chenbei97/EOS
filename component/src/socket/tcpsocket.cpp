@@ -158,7 +158,8 @@ void TcpSocket::exec(const QString& f,const QByteArray& c,bool use_sync)
 
 void TcpSocket::exec(const QString& f,const QByteArray& c)
 { // 本函数只适用于: 有弹窗需求的硬同步,服务侧有明显延迟;
-    // 适用于:1.预览孔/视野/载玻片事件;2.微调镜头事件; 3切换物镜同时动电机;4.setting单纯动电机到某个位置; 5.启动实验 6.手动调焦
+    // 适用于:1.预览孔/视野/载玻片事件;2.微调镜头事件; 3切换物镜同时动电机;
+    // 4.setting单纯动电机到某个位置; 5.启动实验 6.手动调焦 7.载玻片的拼图
     frame = f;
     socket->write(c);
     looptimer.start(SocketWaitTime);
@@ -169,6 +170,8 @@ void TcpSocket::exec(const QString& f,const QByteArray& c)
         waitdlg->setWaitText(tr(WaitMessageBoxStartExperimentMsg));
     } else if ( f == TcpFramePool.stopExperEvent) {
         waitdlg->setWaitText(tr(WaitMessageBoxStopExperimentMsg));
+    } else if (f == "test0x3") {
+        waitdlg->setWaitText(tr(WaitMessageBoxWaitStitchMsg));
     }
     waitdlg->wait(); // 弹窗形式的硬同步
 }
@@ -179,7 +182,11 @@ void TcpSocket::exec(const QString& f,const QByteArray& c,unsigned count)
     frame = f;
     socket->write(c);
     looptimer.start(SocketWaitTime);
-    waitdlg->setWaitText(tr(WaitMessageBoxAutoFocusMsg).arg(count+1));
+    if (f == "test0x2" || f == TcpFramePool.autoFocusEvent)
+        waitdlg->setWaitText(tr(WaitMessageBoxAutoFocusMsg).arg(count+1));
+    if (f == "test0x3") {
+        waitdlg->setWaitText(tr(WaitMessageBoxSlideStitchMsg).arg(count+1));
+    }
     waitdlg->wait(count);
 }
 

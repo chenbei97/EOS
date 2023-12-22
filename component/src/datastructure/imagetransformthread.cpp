@@ -11,11 +11,11 @@
 
 void ImageTransformThread::run()
 {
+    LOG<<"image transform's thread: "<<CURRENT_THREAD;
     while(enable)
     {
         QMutexLocker locker(&mutex);
         if (!mimage.isNull()) {
-            //LOG<<"image transform's thread: "<<CURRENT_THREAD;
             //auto img = mimage.mirrored(true,false);
             //QMatrix matrix;
             //matrix.rotate(270.0);

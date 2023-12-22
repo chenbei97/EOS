@@ -239,7 +239,13 @@ QPushButton:default {border-color:#FF095E;}
 QPushButton:flat {border:2px solid #FFFD55;border:none;}
 QPushButton:hover {background-color:#A93700;}
 QPushButton:disabled {background-color:gray;color:black;}
-
+QPushButton#groupInfoColorButton {
+/*    border:2px solid #3282F6;*/
+/*    max-width:40px;*/
+/*    max-height:40px;*/
+/*    border-radius:10px;*/
+/*    background-color:red;*/
+}
 /*
 QPushButton#iconpbtn {
     background-image: url(:/images/setting.png);

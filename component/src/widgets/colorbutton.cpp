@@ -10,7 +10,7 @@
 
 ColorButton::ColorButton(QWidget*parent): PushButton(parent)
 {
-    setFixedSize(btnsize,btnsize);//要固定,否则会在布局内被拉伸
+    //setFixedSize(btnsize,btnsize);//要固定,否则会在布局内被拉伸
     setStyleSheet(ColorButtonStyle.arg(btncolor.name()));
     connect(this,&ColorButton::clicked,this,&ColorButton::onClick);
 }

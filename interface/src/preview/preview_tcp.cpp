@@ -10,24 +10,64 @@
 
 void Preview::parseResult(const QString & f,const QVariant & d)
 { // 任何来自服务端的消息都在这里
-    LOG<<f<<d;
-
-    if (d.toBool() && f == TcpFramePool.adjustBrightEvent) {
-        LOG<<"adjust bright successful!";
+    LOG<<"[async] frame:"<<f<<"result:"<<d;
+    if (f == TcpFramePool.previewEvent) { // 1
+        d.toBool()?
+        LOG<<"[async] preview event successful!":
+        LOG<<"[async] preview event failed!";
     }
 
-    if (d.toInt() == 1 && f == TcpFramePool.experFinishedEvent) {
-        LOG<<"exper is finished, open camera";
-        if (!ToupCameraPointer->isOpen())
-            ToupCameraPointer->openCamera();
+    if (f == TcpFramePool.askConnectedStateEvent) { // 2
+        d.toBool()?
+        LOG<<"[async] socket is connect successful!":
+        LOG<<"[async] socket is connect failed!";
     }
 
-    if (f == TcpFramePool.moveMachineEvent && d.toBool()) {
-        LOG<<"move machine successful!"; // 使用异步时也可以绑定信号来实现
+    if (f == TcpFramePool.askActivateCodeEvent) { // 3
+        LOG<<"[async] activate code: "<<d.toString();
     }
 
-    if (f == "test0x2" && d.toBool()) {
-        LOG<<"test0x2 ok";
+    if (f == TcpFramePool.adjustBrightEvent) { // 4
+        d.toBool()?LOG<<"[async] adjust bright successful!":
+        LOG<<"[async] adjust bright failed!";
+    }
+
+    if (f == TcpFramePool.toggleChannelEvent) { // 5
+        d.toBool()?LOG<<"[async] toggle channel successful!":
+        LOG<<"[async] toggle channel failed!";
+    }
+
+    if (f == TcpFramePool.adjustLensEvent) { // 6
+        d.toBool()?LOG<<"[async] adjust len successful!":
+        LOG<<"[async] adjust len failed!";
+    }
+
+    if (f == TcpFramePool.moveMachineEvent) { // 7
+        d.toBool()?LOG<<"[async] move machine successful!":
+        LOG<<"[async] move machine failed!";
+    }
+
+    if (f == TcpFramePool.toggleChannelEvent) { // 9
+        d.toBool()?LOG<<"[async] toggle objective successful!":
+        LOG<<"[async] toggle objective failed!";
+    }
+
+    if (f == TcpFramePool.manualFocusEvent) { // 11
+        d.toBool()?LOG<<"[async] adjust focus successful!":
+        LOG<<"[async] adjust focus failed!";
+    }
+
+    if (f == TcpFramePool.experFinishedEvent) { // 14
+        if (d.toInt()) {
+            LOG<<"[async] exper is finished, open camera";
+            if (!ToupCameraPointer->isOpen())
+                ToupCameraPointer->openCamera();
+        } else LOG<<"[async] exper is not finished";
+    }
+
+
+    if (f == "test0x2") {
+        d.toBool()?LOG<<"[async] auto focus successful!":LOG<<"[async] auto focus failed!";
     }
 }
 
@@ -39,28 +79,52 @@ void Preview::previewSlideEvent(const QPointF& point)
 void Preview::stitchSlide()
 { // slide 拼图功能
     auto brand = previewtool->boxInfo(WellBoxTitle)[BrandField].toUInt();
-    if(brand == SlideIndexInBrand) {
+    if(brand == SlideIndexInBrand) { // 品牌是载玻片才响应
         canvasmode->changeMode(CanvasMode::PhotoMode);
         photocanvas->setStrategy(PhotoCanvas::GridPixmap);
-
         // photocanvas的边界矩形的出现和删除只和slidepattern有关,是同步的
         Q_ASSERT(slidepattern->haveSlide() == photocanvas->hasBoundingRect());
         if (slidepattern->haveSlide()) { // 确实选中一部分区域
             auto points = slidepattern->viewPoints(false); // 载玻片框选区域的离散归一化中心坐标
             photocanvas->clearGridImage(); // 清除可能的上次拼图缓存
+
+            auto f = "test0x3";
+            QJsonObject object;
+            object[FrameField] = f;
+
             // 1.逐坐标发给下位机,让其移动电机
-            for(auto pt: points) {
+//            for(auto pt: points) {
+//                object[XField] = pt.x();
+//                object[YField] = pt.y();
+//                TcpAssemblerDoc.setObject(object);
+//                auto json = AppendSeparateField(TcpAssemblerDoc.toJson());
+//                SocketPointer->exec(f,json);
+//                if (ParserResult.toBool()) {
+//                    // 2.获取照片实现拼图效果
+//                    auto pix = ToupCameraPointer->capture();
+//                    // 3.phtotcanvas内部绘制网格图
+//                    photocanvas->appendImage(pix,pt);
+//                }
+//            }
 
-                // 2.获取照片实现拼图效果
-                auto pix = ToupCameraPointer->capture();
-
-                // 3.phtotcanvas内部绘制网格图
-                photocanvas->appendImage(pix,pt);
+            auto count = points.count();
+            unsigned i = 0;
+            while(i < count ) {
+                auto pt = points[i];
+                object[XField] = pt.x();
+                object[YField] = pt.y();
+                TcpAssemblerDoc.setObject(object);
+                auto json = AppendSeparateField(TcpAssemblerDoc.toJson());
+                SocketPointer->exec(f,json,i);
+                if (ParserResult.toBool()) {
+                    auto pix = ToupCameraPointer->capture();
+                    photocanvas->appendImage(pix,pt);
+                }
+                ++i;
             }
-
-
-
-        }
+        } else LOG<<"empty slide";
+    } else {
+        LOG<<"current brand is not slide";
     }
 }
 
@@ -69,12 +133,12 @@ void Preview::adjustFocus(double val)
     //LOG<<"focus = "<<val;
     QVariantMap m;
     m[FocusField] = val;
-    m[FrameField] = TcpFramePool.manualFocusEvent;
+    m[FrameField] = TcpFramePool.manualFocusEvent; // 11
     auto msg = assembleManualFocusEvent(m);
     SocketPointer->exec(TcpFramePool.manualFocusEvent,msg);
     if (ParserResult.toBool()) {
-        LOG<<"adjust focus to "<<val<<"successful!";
-    }
+        LOG<<"[sync] adjust focus to"<<val<<"successful!";
+    } else LOG<<"[sync] adjust focus to"<<val<<"failed!";
 }
 
 void Preview::autoFocus()
@@ -97,9 +161,9 @@ void Preview::autoFocus()
     SocketPointer->exec(f,json);
     while (i < 10 && ParserResult.toBool()) {
         if (i == 0) {
-            LOG<<"ready auto focus";
+            LOG<<"[sync] ready auto focus";
         } else {
-            LOG<<"send"<<i<<".jpg successful";
+            LOG<<"[sync] send"<<i<<".jpg successful";
         }
         object[PathField] = QString("%1.jpg").arg(i);
         TcpAssemblerDoc.setObject(object);
@@ -107,12 +171,12 @@ void Preview::autoFocus()
         SocketPointer->exec(f,json,i);
         ++i;
     }
-    LOG<<"send"<<i<<".jpg successful";
+    LOG<<"[sync] send"<<i<<".jpg successful";
     SocketPointer->resetWaitText();
 }
 
 void Preview::toggleObjective(int objective,int objective_loc,int isPh)
-{ // objective: 物镜倍数代号 objective_loc: 切到的物镜位置代号 isPH:指示是否为PH类型
+{ // 9, objective: 物镜倍数代号 objective_loc: 切到的物镜位置代号 isPH:指示是否为PH类型
     // 切换物镜同时动电机事件,setting更改物镜设置时也会触发
     // 这个初始化setting时会初始化4个位置的物镜,从而会触发本函数,在mainwindow没构造完成就发了命令
     //LOG<<"objective = "<<objective<<" loc = "<<objective_loc<<" isph = "<<isPh;
@@ -126,12 +190,12 @@ void Preview::toggleObjective(int objective,int objective_loc,int isPh)
 
     SocketPointer->exec(TcpFramePool.toggleObjectiveEvent,msg);
     if (ParserResult.toBool()) {
-        LOG<<"toggle objective successful! magnification ="<<ObjectiveMagnificationFields[objective]<<"isPH?"<<bool(isPh);
-    } else {LOG<<"toggle objective failed!";}
+        LOG<<"[sync] toggle objective successful! magnification ="<<ObjectiveMagnificationFields[objective]<<"isPH?"<<bool(isPh);
+    } else {LOG<<"[sync] toggle objective failed!";}
 }
 
 void Preview::closeChannel(int option)
-{
+{ // 5
     QVariantMap m;
     m[CurrentChannelField] = option;
     m[TurnOffLight] = 1;
@@ -139,15 +203,15 @@ void Preview::closeChannel(int option)
     SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
     if (ParserResult.toBool()) {
         switch(option) {
-            case 0:LOG<<"close br channel";
+            case 0:LOG<<"[sync] close br channel";
                 break;
-            case 1:LOG<<"close ph channel";
+            case 1:LOG<<"[sync] close ph channel";
                 break;
-            case 2:LOG<<"close gfp channel";
+            case 2:LOG<<"[sync] close gfp channel";
                 break;
-            case 3:LOG<<"close rfp channel";
+            case 3:LOG<<"[sync] close rfp channel";
                 break;
-            case 4:LOG<<"close dapi channel";
+            case 4:LOG<<"[sync] close dapi channel";
                 break;
         }
 
@@ -179,8 +243,8 @@ void Preview::toggleChannel(int option)
     SocketPointer->exec(TcpFramePool.toggleChannelEvent,msg, true);
 
     if (ParserResult.toBool()) {
-        LOG<<"turn on light successful! current channel is"<<m[CurrentChannelField].toInt();
-    }
+        LOG<<"[sync] turn on light successful! current channel is"<<m[CurrentChannelField].toInt();
+    } else LOG<<"[sync] turn on light failed! current channel is"<<m[CurrentChannelField].toInt();
 }
 
 void Preview::adjustLens(int option)
@@ -191,16 +255,16 @@ void Preview::adjustLens(int option)
     TcpAssemblerDoc.setObject(object);
     auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
 
-    SocketPointer->exec(TcpFramePool.adjustLensEvent,msg);
+    SocketPointer->exec(TcpFramePool.adjustLensEvent,msg); // 6
 
     if (ParserResult.toBool()) {
-        LOG<<"move direction: "<<option<<"successful!";
+        LOG<<"[sync] move direction: "<<option<<"successful!";
         wellview->adjustViewPoint(option);
-    } else LOG<<"move direction: "<<option<<"failed!";
+    } else LOG<<"[sync] move direction: "<<option<<"failed!";
 }
 
 void Preview::adjustBright(int br)
-{
+{ // 4
     auto toolinfo = previewtool->toolInfo();
 
     auto current_channel = toolinfo[CurrentChannelField].toString();
@@ -277,7 +341,7 @@ void Preview::takingPhoto()
 }
 
 void Preview::previewViewEvent(const QPointF &viewpoint)
-{
+{ // 1
     auto toolinfo = previewtool->toolInfo();
 
     // 预览事件需要的参数
@@ -306,7 +370,11 @@ void Preview::previewViewEvent(const QPointF &viewpoint)
     m[BrandField] = brand;
     m[ManufacturerField] = manufacturer;
     m[WellsizeField] = wellsize;
+#ifdef viewRowColUnEqual
+    m[HoleViewSizeField].setValue(Dimension2D(viewsize,viewsize));
+#else
     m[HoleViewSizeField] = viewsize;
+#endif
     m[HoleCoordinateField] = holecoordinate;
     m[ViewCoordinateField] = viewpoint;
     m[BrightField] = bright;
@@ -316,8 +384,8 @@ void Preview::previewViewEvent(const QPointF &viewpoint)
     auto msg = AssemblerPointer->message();
     SocketPointer->exec(TcpFramePool.previewEvent,msg);
     if (ParserResult.toBool()) {
-        LOG<<"move to view point "<<viewpoint<<"successful!";
-    } else LOG<<"move to view point "<<viewpoint<<"failed!";
+        LOG<<"[sync] move to view point "<<viewpoint<<"successful!";
+    } else LOG<<"[sync] move to view point "<<viewpoint<<"failed!";
 }
 
 void Preview::previewHoleEvent(const QPoint &holepoint)
@@ -352,7 +420,11 @@ void Preview::previewHoleEvent(const QPoint &holepoint)
     m[BrandField] = brand;
     m[ManufacturerField] = manufacturer;
     m[WellsizeField] = wellsize;
+#ifdef viewRowColUnEqual
+    m[HoleViewSizeField].setValue(Dimension2D(viewsize,viewsize));
+#else
     m[HoleViewSizeField] = viewsize;
+#endif
     m[HoleCoordinateField] = holecoordinate;
     m[ViewCoordinateField] = QPointF(-1.0,-1.0);//点孔触发视野坐标没有意义
     m[BrightField] = bright;
@@ -440,43 +512,43 @@ void Preview::exportExperConfig(const QString& path)
     // 存数据库,直接存整个json文件是最简单的
 }
 
-void Preview::importExperConfigV1(const QString& path)
-{// 导入实验配置,对于camera_channel和group字段要特殊解析
-
-    ConfigReadWrite m; // 借助工具类读取文件
-    auto json = m.readJson(path);
-
-    m.parseJson(json);
-    auto result = m.map();
-
-    LOG<<result[GroupField];
-
-    previewtool->importExperConfig(result);
-#ifdef usetab
-    expertool->importExperConfig(result);
-#endif
-
-    auto brand = result[BrandField].toUInt();
-    auto manufacturer = result[ManufacturerField].toUInt();
-    auto objective = result[ObjectiveField].toUInt();
-    auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];
-
-    auto info = result[GroupField].value<QVariantMap>();
-    for(auto group:info.keys()){
-        auto groupinfo = info[group].value<QVariantMap>();
-                foreach(auto hole,groupinfo.keys()) {
-                auto holeinfo = groupinfo[hole].value<QVariantMap>();
-                //LOG<<holeinfo;
-                auto holepoint = holeinfo[HoleCoordinateField].toPoint();
-                auto viewpoints = holeinfo[PointsField].value<QPointFVector>();
-
-                // 把holePoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
-                wellpattern->importHoleInfoV1(holepoint,group,viewpoints,viewsize);
-                wellview->importViewInfoV1(holepoint,viewpoints,viewsize);
-            }
-
-    }
-}
+//void Preview::importExperConfigV1(const QString& path)
+//{// 导入实验配置,对于camera_channel和group字段要特殊解析
+//
+//    ConfigReadWrite m; // 借助工具类读取文件
+//    auto json = m.readJson(path);
+//
+//    m.parseJson(json);
+//    auto result = m.map();
+//
+//    LOG<<result[GroupField];
+//
+//    previewtool->importExperConfig(result);
+//#ifdef usetab
+//    expertool->importExperConfig(result);
+//#endif
+//
+//    auto brand = result[BrandField].toUInt();
+//    auto manufacturer = result[ManufacturerField].toUInt();
+//    auto objective = result[ObjectiveField].toUInt();
+//    auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];
+//
+//    auto info = result[GroupField].value<QVariantMap>();
+//    for(auto group:info.keys()){
+//        auto groupinfo = info[group].value<QVariantMap>();
+//                foreach(auto hole,groupinfo.keys()) {
+//                auto holeinfo = groupinfo[hole].value<QVariantMap>();
+//                //LOG<<holeinfo;
+//                auto holepoint = holeinfo[HoleCoordinateField].toPoint();
+//                auto viewpoints = holeinfo[PointsField].value<QPointFVector>();
+//
+//                // 把holePoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
+//                wellpattern->importHoleInfoV1(holepoint,group,viewpoints,viewsize);
+//                wellview->importViewInfoV1(holepoint,viewpoints,viewsize);
+//            }
+//
+//    }
+//}
 
 void Preview::importExperConfig(const QString &path)
 {

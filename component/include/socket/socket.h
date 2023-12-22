@@ -86,7 +86,7 @@ const QFieldList TcpUsedFrameList { // 用于解析时检测返回的帧是否�
         QString::number(AdjustLensEvent),QString::number(MoveMachineEvent),QString::number(StopExperEvent),
         QString::number(ToggleObjectiveEvent),QString::number(RecordVideoEvent),QString::number(ManualFocusEvent),
         QString::number(AutoFocusEvent),QString::number(ChannelMergeEvent),QString::number(ExperFinishedEvent),
-        "test0x0","test0x1","test0x2"
+        "test0x0","test0x1","test0x2","test0x3"
 };
 
 struct FieldPreviewEvent {
@@ -317,7 +317,12 @@ static QByteArray assemblePreviewEvent(QCVariantMap m)
     object[FieldPreviewEvent.manufacturer] = m[ManufacturerField].toInt();
     object[FieldPreviewEvent.wellsize] = m[WellsizeField].toInt();
     object[FieldPreviewEvent.objective] = m[ObjectiveField].toInt();
+#ifdef viewRowColUnEqual
+    auto viewsize = m[HoleViewSizeField].value<Dimension2D>();
+    object[FieldPreviewEvent.viewsize] = QString("%1,%2").arg(viewsize.rows).arg(viewsize.cols);
+#else
     object[FieldPreviewEvent.viewsize] = m[HoleViewSizeField].toInt();
+#endif
     //object[FieldPreviewEvent.current_channel] = m[CurrentChannelField].toString();
     auto holepoint = m[HoleCoordinateField].toPoint();
     auto viewpoint = m[ViewCoordinateField].toPointF();
@@ -441,7 +446,7 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
             auto viewpoints = holeinfo[HoleViewPointsField].value<QPointFVector>();//注意用电机坐标不是ui坐标
 
             QJsonObject holeObject;// "a组"=[{},{},{}],是每个小的{}
-            //holeObject[HoleCoordinateField] = QString("(%1,%2)").arg(QChar(coordinate.x()+65)).arg(coordinate.y());
+            //holeObject[HoleCoordinateField] = QString(PairArgsField).arg(QChar(coordinate.x()+65)).arg(coordinate.y());
             holeObject[FieldLoadExperEvent.x] = coordinate.x();
             holeObject[FieldLoadExperEvent.y] = coordinate.y();
 
@@ -451,7 +456,7 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
                 auto viewpoint_x = viewpoints[viewcount].x();
                 auto viewpoint_y = viewpoints[viewcount].y();
 
-                //viewObject[HoleCoordinateField] = QString("(%1,%2)").arg(viewpoint_x).arg(viewpoint_y);
+                //viewObject[HoleCoordinateField] = QString(PairArgsField).arg(viewpoint_x).arg(viewpoint_y);
                 viewObject[FieldLoadExperEvent.x] = viewpoint_x;
                 viewObject[FieldLoadExperEvent.y] = viewpoint_y;
                 pointValues.append(viewObject);
@@ -574,7 +579,7 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
             holeObject[HoleDoseUnitField] = holeinfo[HoleDoseUnitField].toString();
 
             auto coordinate = holeinfo[HoleCoordinateField].toPoint();
-            holeObject[HoleCoordinateField] = QString("(%1,%2)").arg(coordinate.x()).arg(coordinate.y());
+            holeObject[HoleCoordinateField] = QString(PairArgsField).arg(coordinate.x()).arg(coordinate.y());
             holeObject[HoleGroupColorField] = holeinfo[HoleGroupColorField].toString();
             holeObject[HoleGroupNameField] = holeinfo[HoleGroupNameField].toString();
             auto groupholes = holeinfo[HoleGroupCoordinatesField].value<QPointVector>();
@@ -602,8 +607,12 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
 //            }
 //            tmpStr.chop(1);
 //            holeObject[HoleAllCoordinatesField] = tmpStr;
-
+#ifdef viewRowColUnEqual
+            auto viewsize = holeinfo[HoleViewSizeField].value<Dimension2D>();
+            holeObject[HoleViewSizeField] = QString(PairArgsField).arg(viewsize.rows).arg(viewsize.cols);
+#else
             holeObject[HoleViewSizeField] = holeinfo[HoleViewSizeField].toInt();
+#endif
             auto viewrects = holeinfo[HoleViewRectsField].value<QRectFVector>();//
             auto viewuipoints = holeinfo[HoleViewUiPointsField].value<QPointFVector>();
             auto viewpoints = holeinfo[HoleViewPointsField].value<QPointFVector>();
@@ -639,7 +648,7 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
     }
     object[FieldExportExperEvent.group] = arr;
     object[FieldExportExperEvent.holesize] =
-            QString("(%1,%2)").arg(wellpatternsize.width()).arg(wellpatternsize.height());
+            QString(PairArgsField).arg(wellpatternsize.width()).arg(wellpatternsize.height());
     TcpAssemblerDoc.setObject(object);
     return TcpAssemblerDoc.toJson();
 }
@@ -916,7 +925,16 @@ static QVariant parse_test0x1(QCVariantMap m)
     return equip;
 }
 static QVariant parse_test0x2(QCVariantMap m)
-{// test0x2会返回equip,frame字段
+{// test0x2会返回state,frame字段
+    if (!m.keys().contains(StateField)) return QVariant();
+    if (!m.keys().contains(FrameField)) return QVariant();
+
+    auto state = m[StateField].toString();
+    return state == "ok";
+}
+
+static QVariant parse_test0x3(QCVariantMap m)
+{// test0x3会返回state,frame字段
     if (!m.keys().contains(StateField)) return QVariant();
     if (!m.keys().contains(FrameField)) return QVariant();
 
@@ -945,6 +963,7 @@ static QMap<QString,TcpParseFuncPointer>  TcpParseFunctions = {
         {"test0x0",parse_test0x0},
         {"test0x1",parse_test0x1},
         {"test0x2",parse_test0x2},
+        {"test0x3",parse_test0x3},
 };
 
 static QMap<QString,TcpAssembleFuncPointer>  TcpAssembleFunctions = {

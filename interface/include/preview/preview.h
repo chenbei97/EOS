@@ -112,7 +112,6 @@ private:
 private:
     void setViewMode(int mode);
     void toggleStack(int option);
-    void toggleManufacturer(int option);
     void toggleBrand(int option);
     void onObjectiveChanged(const QString& obj);
     void playVideo(const QString& path);
@@ -132,7 +131,7 @@ private:
     void previewHoleEvent(const QPoint& holePoint);
     void previewSlideEvent(const QPointF& point);
     void exportExperConfig(const QString& path);
-    void importExperConfigV1(const QString& path);
+    //void importExperConfigV1(const QString& path);
     void importExperConfig(const QString& path);
     void loadExper();
     void stopExper();

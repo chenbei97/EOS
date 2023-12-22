@@ -42,7 +42,6 @@ View::View(QWidget *parent) : QWidget(parent)
 
 void View::initDispersedMask()
 {
-
     mDispersedMask.clear();
     for(int r = 0; r < mDispersedMaskSize; ++r)
     {
@@ -132,9 +131,13 @@ void View::setViewInfo(const ViewInfo &info)
     mMouseRect = QRectF();
     mDrapRectF = QRectF();
 
+#ifdef viewRowColUnEqual
+    auto dimension = mViewInfo[HoleViewSizeField].value<Dimension2D>();
+    mDimension = dimension;
+#else
     auto size =  mViewInfo[HoleViewSizeField].toInt();
-
     mSize = size;
+#endif
     update();
 }
 
@@ -143,6 +146,19 @@ ViewInfo View::viewInfo() const
     return mViewInfo;
 }
 
+#ifdef viewRowColUnEqual
+void View::setViewSize(int rows,int cols)
+{
+    mDimension.rows = rows;
+    mDimension.cols = cols;
+    update();
+}
+
+Dimension2D View::viewSize() const
+{
+    return mDimension;
+}
+#else
 void View::setViewSize(int size)
 {
     mSize = size;
@@ -153,6 +169,7 @@ int View::viewSize() const
 {
     return mSize;
 }
+#endif
 
 int View::holeID() const
 { // 每个孔双击打开视野窗口都是一对一的
@@ -276,6 +293,7 @@ void View::paintEvent(QPaintEvent *event)
     painter.drawPolygon(top);
     painter.drawPolygon(bottom);
 
+    // 绘制点击三角形高亮又取消的效果
     if (!mViewInfo[HoleGroupNameField].toString().isEmpty()) {
         if (isHighlight) {
             path.clear();
@@ -336,7 +354,7 @@ QRectF View::getBottomDisableRect() const
 
 void View::drawDisableLines(QPainter& painter,const QRectF& rect,const QColor& color,Qt::Orientation oriention)
 {
-    auto diameter = getCircleRadius() * 2.0;
+    //auto diameter = getCircleRadius() * 2.0;
     painter.fillRect(rect,color);
 
 //    if (!rect.isEmpty()) { // 画8条斜线+3条直线
@@ -431,12 +449,20 @@ double View::getCircleRadius() const
 
 double View::getInnerRectWidth() const
 {// 小矩形区域的宽度
+#ifdef viewRowColUnEqual
+    return 2.0 * getCircleRadius() /  mDimension.cols *1.0;
+#else
     return 2.0 * getCircleRadius() /  mSize *1.0;
+#endif
 }
 
 double View::getInnerRectHeight() const
 {// 小矩形区域的高度
+#ifdef viewRowColUnEqual
+    return 2.0 * getCircleRadius() / mDimension.rows *1.0;
+#else
     return 2.0 * getCircleRadius() / mSize *1.0;
+#endif
 }
 
 QPointF View::getExternalRectTopLeftPoint() const

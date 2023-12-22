@@ -30,7 +30,7 @@ public:
     int drapHoleCount() const; // 计算拖拽区域包含的孔个数
     void initHoleInfo(); // 初始化孔信息
     void clearViewInfo();
-    void importHoleInfoV1(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize);
+    //void importHoleInfoV1(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize);
     void importHoleInfo(const QHoleInfoVector& vec,ViewMode mode);
 
     void paintEvent(QPaintEvent *event) override;

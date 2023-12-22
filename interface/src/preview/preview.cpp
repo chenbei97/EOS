@@ -34,11 +34,6 @@ void Preview::setViewMode(int mode)
     }
 }
 
-void Preview::toggleManufacturer(int option)
-{
-
-}
-
 void Preview::toggleStack(int option) 
 { // 切换孔板和载玻片,0-plate,1-slide
     stackpattern->setCurrentIndex(option);
@@ -95,9 +90,11 @@ void Preview::toggleBrand(int option)
         else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
         // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
-        //LOG<<manufacturer<<brand<<objective<<size;
+#ifdef viewRowColUnEqual
+        wellview->toggleBrandObjective(Dimension2D(size,size), false);
+#else
         wellview->toggleBrandObjective(size, false);
-
+#endif
         // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
         dock->setWindowTitle(tr(PreviewDockHoleTitle));
 
@@ -146,8 +143,18 @@ void Preview::onObjectiveChanged(const QString& obj)
     else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
     // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
+#ifdef viewRowColUnEqual
+    auto oldViewSize = wellview->viewInfo()[HoleViewSizeField].value<Dimension2D>();
+    if (oldViewSize != Dimension2D(size,size)) { // 如果视野尺寸前后没发生变化,不需要清理
+        LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" need clear";
+        wellview->toggleBrandObjective(Dimension2D(size,size),true); // 清理ViewPattern
+        dock->setWindowTitle(tr(PreviewDockHoleTitle));
+        wellpattern->clearViewInfo();// 只需要孔关于视野的信息,其它保留
+    } else {
+        LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" not clear";
+    }
+#else
     auto oldViewSize = wellview->viewInfo()[HoleViewSizeField].toInt();
-
     if (oldViewSize != size) { // 如果视野尺寸前后没发生变化,不需要清理
         LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" need clear";
         wellview->toggleBrandObjective(size,true); // 清理ViewPattern
@@ -156,6 +163,8 @@ void Preview::onObjectiveChanged(const QString& obj)
     } else {
         LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" not clear";
     }
+#endif
+
 
     // 3. 对NA物镜的特殊处理要放在最后,因为上边的代码viewpattern->clearAllViewWindowCache会重新初始化视野尺寸
     if (obj == NA40x095Field) { // 只能选择1个孔
@@ -209,7 +218,12 @@ void Preview::openWellViewWindow(const QVariantMap& m)
 
     // 3. ⭐⭐⭐⭐ 把图案的信息传给视野窗口,必须这里额外组装3个字段
     auto nm = m;
+#ifdef viewRowColUnEqual
+    nm[HoleViewSizeField].setValue(Dimension2D(size,size));
+#else
     nm[HoleViewSizeField] = size;
+#endif
+
     nm[HoleViewRectsField].setValue(QRectFVector());
     nm[HoleViewUiPointsField].setValue(QPointFVector());
     nm[HoleViewPointsField].setValue(QPointFVector());
@@ -410,7 +424,6 @@ void Preview::initObjects()
 void Preview::initConnections()
 {
     // (1) previewtool/expertool => preview 信号-槽函数直连
-    connect(previewtool,&PreviewTool::manufacturerChanged,this,&Preview::toggleManufacturer);
     connect(previewtool,&PreviewTool::wellbrandChanged,this,&Preview::toggleBrand);
     connect(previewtool,&PreviewTool::welltypeChanged,this,&Preview::toggleStack);
     connect(previewtool,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);

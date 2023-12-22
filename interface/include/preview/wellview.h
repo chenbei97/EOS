@@ -13,9 +13,13 @@ public:
     void mouseMoveEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     void removeHole(const QPoint &holePoint);
+#ifdef viewRowColUnEqual
+    void toggleBrandObjective(const Dimension2D& dimension,bool toggleObjective = true);
+#else
     void toggleBrandObjective(int viewSize,bool toggleObjective = true);
+#endif
     void adjustViewPoint(int option);
-    void importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
+    //void importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
     void importViewInfo(const QHoleInfoVector& vec,ViewMode mode);
     void setViewMode(ViewMode mode);
 private:
@@ -31,8 +35,6 @@ private:
     QMap<int,QPointFVector> mTmpPoints;
     // 电机坐标: 2种模式共用
     QPointFVector mViewMachinePoints;
-    //
-
 private:
     virtual void onRemoveViewAct() override;
     virtual void onSaveViewAct() override;

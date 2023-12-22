@@ -53,6 +53,7 @@ class ParseManager:
             "test0x0": self.__parsetest0x0,
             "test0x1": self.__parsetest0x1,
             "test0x2": self.__parsetest0x2,
+            "test0x3": self.__parsetest0x3,
             "0": self.__parse0x0000,
             "1": self.__parse0x0001,
             "2": self.__parse0x0002,
@@ -106,7 +107,18 @@ class ParseManager:
         print("test0x2回复: ", reponse)
         time.sleep(3)
         self.__socket.sendall(response.encode("utf-8"))
-
+    def __parsetest0x3(self,msg: dict):
+        frame = msg[self.frame]
+        x = msg[self.x]
+        y = msg[self.y]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.state] = "ok"
+        response = json.dumps(reponse)
+        response +=self.separate
+        print("test0x3回复: ", reponse)
+        time.sleep(3)
+        self.__socket.sendall(response.encode("utf-8"))
     # 预览事件
     def __parse0x0000(self,msg:dict):
         frame = msg[self.frame]
@@ -276,7 +288,6 @@ class ParseManager:
         print("0x0011回复: ", reponse)
         time.sleep(1)
         self.__socket.sendall(response.encode("utf-8"))
-
 class SocketServerManger:
     def __init__(self, port=3000):  # 测试本地链接,只需要提供端口
         self.__port = port

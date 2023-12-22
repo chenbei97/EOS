@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
+        <file>style.qss</file>
         <file>images/backward.png</file>
         <file>images/cell.png</file>
         <file>images/forward.png</file>

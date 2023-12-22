@@ -103,6 +103,41 @@ typedef const QVector<QVector<QBoolColorPair>>& QCBoolColorPair2DVector;
 typedef QPair<QRectF,QImage> QPairImage;
 typedef QVector<QPair<QRectF,QImage>> QPairImageVector;
 
+extern const char* PairArgsField;
+struct Dimension2D
+{
+    int rows;
+    int cols;
+    Dimension2D():rows(0),cols(0){}
+    Dimension2D(const Dimension2D& s) {
+        rows = s.rows;
+        cols= s.cols;
+    }
+    Dimension2D(int rows, int cols) {
+        this->rows = rows;
+        this->cols = cols;
+    }
+    friend QDebug operator<<(QDebug debug, const Dimension2D& s) {
+        debug<<QString(PairArgsField).arg(s.rows).arg(s.cols);
+        return debug;
+    }
+    bool operator!=(const Dimension2D& s) {
+        return !(rows == s.rows && cols ==s.cols);
+    }
+    bool operator==(const Dimension2D& s) {
+        return (rows == s.rows && cols ==s.cols);
+    }
+};
+static bool operator==(const Dimension2D& s1,const Dimension2D& s2)
+{
+    return (s1.cols==s2.cols && s1.rows==s2.rows);
+}
+static bool operator!=(const Dimension2D& s1,const Dimension2D& s2)
+{
+    return !(s1.cols==s2.cols && s1.rows==s2.rows);
+}
+Q_DECLARE_METATYPE(Dimension2D);
+
 struct ViewPoint {
     QString x;
     QString y;
@@ -121,7 +156,7 @@ struct ViewPoint {
         this->y = QString::number(y);
     }
     friend QDebug operator<<(QDebug debug, const ViewPoint& s) {
-        debug<<QString("(%1,%2)").arg(s.x).arg(s.y);
+        debug<<QString(PairArgsField).arg(s.x).arg(s.y);
         return debug;
     }
 };
@@ -186,6 +221,7 @@ struct ValueRangeUnSigned{
     }
 };
 
+//#define viewRowColUnEqual 1
 struct HoleInfo {
     // 分组窗口去更新的信息
     QString type; // 本孔分配的实验类型
@@ -204,12 +240,17 @@ struct HoleInfo {
     // 视野窗口传递来的信息
     QRectFVector viewrects; // 本孔分配的视野区域信息
 
-    ViewPointVector uipoints_v1; // 老接口
-    ViewPointVector viewpoints_v1;
+    //ViewPointVector uipoints_v1; // 老接口
+    //ViewPointVector viewpoints_v1;
     QPointFVector uipoints; // 绘图使用(够用就行)
     QPointFVector viewpoints; // 本孔要扫描的视野坐标(电机坐标更精细)
 
-    int viewsize; // 本孔分配的视野尺寸
+
+#ifdef viewRowColUnEqual // 本孔分配的视野尺寸
+    Dimension2D dimension;
+#else
+    int viewsize;
+#endif
 
     // 每次打开分组窗口就会重新计算分过的组名和所有选中的孔坐标
     QSet<QString> allgroup; // 孔板所有分过的组别信息
@@ -222,7 +263,11 @@ struct HoleInfo {
         debug <<s.group<<",";
         debug <<s.coordinate<<",";
         debug <<s.color<<",";
+#ifdef viewRowColUnEqual
+        debug <<s.dimension<<",";
+#else
         debug <<s.viewsize<<",";
+#endif
         debug <<s.viewrects<<",";
         debug <<s.viewpoints<<",";
         debug <<s.uipoints<<",";

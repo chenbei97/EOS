@@ -73,7 +73,7 @@
 #define SplitterStyle ("QSplitter::handle { background-color: #F2A072 }")
 #define ProgressBarStyle ("QProgressBar{border:2px solid grey;border-radius:5px;text-align:center;}"\
                                     "QProgressBar::chunk{background-color: #CD96CD;width: 10px;margin: 0.5px;}")
-#define ColorButtonStyle QString("border:2px solid black;border-radius:20px;background-color:%1;")
+#define ColorButtonStyle QString("width:40px;height:40px;border:2px solid #3282F6;border-radius:20px;background-color:%1;")
 #define ProgressBarMinHeight 40
 #define ColorButtonSize 40
 #define GroupInfoSize DefaultWindowSize

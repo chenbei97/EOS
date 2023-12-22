@@ -55,10 +55,7 @@ void WellPattern::updateHoleInfo(QCVariantMap m)
                 mHoleInfo[row][col].doseunit = unit; // 本孔分配的剂量单位
                 mDrapHoles[row][col] = false; // 拖拽区域内的点也要更新为false,不然还会绘制这个区域
 
-                // 视野的2个信息无需更新,只更新分组对话框提供的信息
-                //mHoleInfo[row][col].viewpoints = QPointVector(); //每次分组就把视野坐标信息要清除掉
-                //mHoleInfo[row][col].viewsize = QSize(-1,-1); // 可能仅仅是改个颜色或者某个信息不希望把之前的信息清除,因为viewsize又没变
-                //emit clearViewWindowCache(QPoint(row,col));//重新分组后清除缓存信息
+                // 视野的信息无需更新,只更新分组对话框提供的信息
             }
         }
     }
@@ -75,9 +72,6 @@ void WellPattern::updateHoleInfo(QCVariantMap m)
         mHoleInfo[mMousePos.x()][mMousePos.y()].dose = dose; // 本孔分配的剂量
         mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = unit; // 本孔分配的剂量单位
         mDrapHoles[mMousePos.x()][mMousePos.y()] = false;
-        //mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointVector();
-        //mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = QSize(-1,-1);
-        //emit clearViewWindowCache(mMousePos);
     }
 
     // 3. 更新已有的组信息(要在上边的group更新过以后再重新计算)
@@ -133,7 +127,12 @@ void WellPattern::applyHoleEvent(QCVariantMap m)
     auto allgroup = m[HoleAllGroupsField].value<QSet<QString>>();
     auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
     // HoleGroupCoordinatesField 该组的所有孔坐标不解析
+
+#ifdef viewRowColUnEqual
+    auto dimension = m[HoleViewSizeField].value<Dimension2D>();
+#else
     auto viewsize = m[HoleViewSizeField].toInt();
+#endif
     auto viewpoints = m[HoleViewPointsField].value<QPointFVector>();// 关键信息
 
     //LOG<<"coord: "<<coordinate<<"viewpoint count = "<<viewpoints.count()<<" viewrect count = "<<viewrects.count();
@@ -147,7 +146,12 @@ void WellPattern::applyHoleEvent(QCVariantMap m)
     holeinfo.allgroup = getAllGroups();
     holeinfo.allcoordinate = getAllHoles();
     holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
-    holeinfo.viewsize = viewsize; // 本组应用的视野尺寸
+#ifdef viewRowColUnEqual // 本组应用的视野尺寸
+    holeinfo.dimension = dimension;
+#else
+    holeinfo.viewsize = viewsize;
+#endif
+
     holeinfo.viewpoints = viewpoints; // 本组应用的电机坐标
 
     if (mSelectMode == ViewMode::RectMode) { // 区域模式下才会有这2个信息,点模式下不要获取,这样得到的是空向量把已有的覆盖了
@@ -170,7 +174,11 @@ void WellPattern::applyGroupEvent(QCVariantMap m)
     auto coordinate = m[HoleCoordinateField].toPoint();
     auto allgroup = m[HoleAllGroupsField].value<QSet<QString>>();
     auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
+#ifdef viewRowColUnEqual
+    auto dimension = m[HoleViewSizeField].value<Dimension2D>();
+#else
     auto viewsize = m[HoleViewSizeField].toInt();
+#endif
     auto viewpoints = m[HoleViewPointsField].value<QPointFVector>(); // 关键信息
 
     QRectFVector viewrects;
@@ -197,7 +205,11 @@ void WellPattern::applyGroupEvent(QCVariantMap m)
                     holeinfo.uipoints = uipoints;
                 }
                 holeinfo.viewpoints = viewpoints;
-                holeinfo.viewsize = viewsize; // 本组应用的视野尺寸
+#ifdef viewRowColUnEqual // 本组应用的视野尺寸
+                holeinfo.dimension = dimension;
+#else
+                holeinfo.viewsize = viewsize;
+#endif
                 mHoleInfo[row][col] = holeinfo;
             }
         }
@@ -211,7 +223,11 @@ void WellPattern::applyAllEvent(QCVariantMap m)
     auto groupName = m[HoleGroupNameField].toString();
     auto groupColor = m[HoleGroupColorField].toString();
     auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
+#ifdef viewRowColUnEqual
+    auto dimension = m[HoleViewSizeField].value<Dimension2D>();
+#else
     auto viewsize = m[HoleViewSizeField].toInt();
+#endif
     auto viewpoints = m[HoleViewPointsField].value<QPointFVector>(); // 关键信息
     QRectFVector viewrects;
     QPointFVector uipoints;
@@ -236,7 +252,11 @@ void WellPattern::applyAllEvent(QCVariantMap m)
                 holeinfo.uipoints = uipoints;
             }
             holeinfo.viewpoints = viewpoints;
+#ifdef viewRowColUnEqual // 本组应用的视野尺寸
+            holeinfo.dimension = dimension;
+#else
             holeinfo.viewsize = viewsize;
+#endif
             mHoleInfo[hole.x()][hole.y()] = holeinfo;
         }
     }
@@ -249,7 +269,11 @@ void WellPattern::onRemoveHoleAct()
     mHoleInfo[mMousePos.x()][mMousePos.y()].group = QString();
     mHoleInfo[mMousePos.x()][mMousePos.y()].color = Qt::red;
     mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
+#ifdef viewRowColUnEqual
+    mHoleInfo[mMousePos.x()][mMousePos.y()].dimension = Dimension2D();
+#else
     mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = 0;
+#endif
     mHoleInfo[mMousePos.x()][mMousePos.y()].viewrects = QRectFVector();
     mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointFVector();
     mHoleInfo[mMousePos.x()][mMousePos.y()].uipoints = QPointFVector();

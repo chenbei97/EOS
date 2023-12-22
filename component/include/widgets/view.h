@@ -20,8 +20,13 @@ public:
 
     virtual void setViewInfo(const ViewInfo& info);
     ViewInfo viewInfo() const;
+#ifdef viewRowColUnEqual
+    void setViewSize(int rows,int cols);
+    Dimension2D viewSize() const;
+#else
     void setViewSize(int size);
     int viewSize() const;
+#endif
     int holeID() const;
     int holeID(const QPoint& holePoint) const;
 
@@ -42,7 +47,11 @@ public:
 protected:
     ViewMode mSelectMode = ViewMode::PointMode;
     ViewInfo mViewInfo;
+#ifdef viewRowColUnEqual
+    Dimension2D mDimension;
+#else
     int mSize = 0;
+#endif
     double overlapRate = 0.1;
     QMap<Qt::Alignment,double> mDisableRectRates;
     QBool2DVector mDispersedMask;
