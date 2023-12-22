@@ -203,3 +203,13 @@ double DoubleSlider::value() const
 {
     return accumulateval;
 }
+
+void DoubleSlider::setPrefixVisible(bool visible)
+{
+    prefix->setVisible(visible);
+}
+
+void DoubleSlider::setSuffixVisible(bool visible)
+{
+    suffix->setVisible(visible);
+}

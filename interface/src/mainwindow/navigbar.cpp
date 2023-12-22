@@ -12,7 +12,7 @@ NavigBar::NavigBar(QWidget*parent): QWidget(parent)
 {
     lastPos = QPoint(-1,-1);
     hightcolor.setAlpha(DefaultColorAlpha);
-    foreach(auto text, NavigBarFields)
+    for(auto text: NavigBarFields)
         pixwidths << (NavigBarWidth-NavigPainterMetric.width(text))/2;
 
     //setFixedHeight(NavigBarHeight);

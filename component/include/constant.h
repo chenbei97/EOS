@@ -87,6 +87,7 @@ static const char * IDField = "id";
 static const char * DateTimeField = "datetime";
 static const char * FlagField = "flag";
 static const char * AutoFocusField = "auto focus";
+static const char * SaveFocusField = "save focus";
 
 static const char * AdminField = "admin";
 static const char * DefalutPwdField = "123456";
@@ -148,7 +149,7 @@ static const char* PreviewDockHoleTitle = "Select Hole Inside View";
 static const char* PreviewDockSlideTitle = "Select Slide Inside View";
 static const char* PreviewWellDockTitle = "Select Hole Inside View(%1,%2)-Group(%3)";
 static const char* PreviewNoGroupWellDockTitle = "Group not set";
-static const char* ViewSelectBoxTitle = "View Mode";
+static const char* ViewSelectBoxTitle = "Capture Mode";
 static const char* WellBoxTitle = "Well";
 static const char* ChannelBoxTitle = "Channel";
 static const char* RecordBoxTitle = "Record";

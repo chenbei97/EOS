@@ -37,3 +37,13 @@ PyRun_SimpleString(appendPath.toStdString().c_str());// "sys.path.append('../tes
 (5) obsolete放了一些其它过时不可用的类,这些类只是留着以后可能参考其中的某些逻辑,减少不用的类的编译，提高编译速度
 (6) cmakelist保留了引入Python310库的操作,下一版本完全注释掉
 
+v1.0.2
+(1) 取消通道缩略图,ViewMode放在ObjectiveBox下边
+(2) 把wellbox提到wellpattern上边
+(3) 去除Preview的所有相机逻辑
+(4) 去除use_tab的所有逻辑
+(5) RadioGroup增加垂直方向的设置
+(6) DoubleSlider增加前后缀文本可显示隐藏的功能
+(7) CameraBox去掉merge按钮,增加auto/save focus按钮
+(8) 把FocusBox的功能挪到CameraBox(slider,step,top,bottom,steplabel)
+

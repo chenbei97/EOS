@@ -24,9 +24,7 @@ void SummaryPanel::setData(const QVariantMap &m)
 {
     auto toolinfo = m[PreviewToolField].value<QVariantMap>();
     auto patterninfo = m[PreviewPatternField].value<QVariantMap>();
-#ifdef usetab
     auto experinfo = m[ExperToolField].value<QVariantMap>();
-#endif
     auto estimatedSpace = m[EstimatedSpaceField].toString();
     edit->clear();
     QString indent = "      ";
@@ -111,13 +109,8 @@ void SummaryPanel::setData(const QVariantMap &m)
 
         // 5. zstackbox
         {
-#ifdef usetab
             auto zstack = experinfo[FieldLoadExperEvent.zstack].toBool();
             auto stitch = experinfo[FieldLoadExperEvent.stitch].toBool();
-#else
-            auto zstack = toolinfo[FieldLoadExperEvent.zstack].toBool();
-            auto stitch = toolinfo[FieldLoadExperEvent.stitch].toBool();
-#endif
             auto app = AppFields[m[FieldLoadExperEvent.app].toInt()];
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(5)Other Info:</font></strong>"));
@@ -128,19 +121,11 @@ void SummaryPanel::setData(const QVariantMap &m)
 
         // 6. experbox
         {
-#ifdef usetab
             auto is_schedule = experinfo[FieldLoadExperEvent.is_schedule].toBool();
             auto duration = experinfo[FieldLoadExperEvent.duration_time].toLongLong()*1.0;
             auto total = experinfo[FieldLoadExperEvent.total_time].toLongLong()*1.0;
             auto start_time = experinfo[FieldLoadExperEvent.start_time].toString();
             auto channels = experinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
-#else
-            auto is_schedule = toolinfo[FieldLoadExperEvent.is_schedule].toBool();
-            auto duration = toolinfo[FieldLoadExperEvent.duration_time].toLongLong()*1.0;
-            auto total = toolinfo[FieldLoadExperEvent.total_time].toLongLong()*1.0;
-            auto start_time = toolinfo[FieldLoadExperEvent.start_time].toString();
-            auto channels = toolinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
-#endif
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(6)Exper Info:</font></strong>"));
             edit->append(tr("<strong><font color = #00A2E8>1.is_schedule?: %1</font></strong>").arg(is_schedule));

@@ -18,19 +18,11 @@
 #include "summarydialog.h"
 #include "videowidget.h"
 #include "slidepattern.h"
+#include "wellbox.h"
 
-//#define notusetoupcamera 0
 //#define uselabelcanvas 0
-
-#ifdef notusetoupcamera
-#include "toupcam.h"
-#else
 #include "toupcamera.h"
-#endif
-
-#ifdef usetab
 #include "expertool.h"
-#endif
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -40,13 +32,6 @@ public:
     void setAppInfo(int app);// 用于appselect传递当前app信息
     WellPatternInfo patternInfo() const; // WellPattern的数据
     PreviewToolInfo toolInfo() const;
-#ifdef notusetoupcamera
-    bool isCameraOpen() const;
-    void openCamera();
-    void closeCamera();
-    bool haveCamera() const;
-    unsigned cameraCount() const;
-#endif
 private:
     PreviewInfo previewinfo;
     CanvasMode * canvasmode;
@@ -64,42 +49,16 @@ private:
     WellPattern * wellpattern;
     SlidePattern * slidepattern;
     QStackedWidget * stackpattern;
-
+    WellBox * wellbox;
     WellView * wellview;
     SlidePattern * slideview;
     QStackedWidget * stackview;
     DockWidget * dock;
     QMainWindow * dockcanvas;
-
-#ifdef usetab
     QTabWidget * tab;
     ExperTool * expertool;
-#endif
     PreviewTool * previewtool;
     QScrollArea * scrollarea;
-private:
-#ifdef notusetoupcamera
-    HToupcam toupcam = nullptr;
-    ToupcamDeviceV2  camera ;
-    QSharedPointer<uchar> imgdata = nullptr;
-    QSize cameraResolution;
-    static void __stdcall eventCallBack(unsigned nEvent, void* ctxEvent);
-    void processCallback(unsigned nEvent);
-    void captureLiveImage();
-    void exposureEvent();
-    QImage capture();
-    void setByteOrder(int option);
-    int byteOrder() const;
-    void setRgbBit(int option);
-    int rgbBit() const;
-    void setExposureOption(int option);
-    int exposureOption() const;
-    void setExposure(unsigned exp);
-    unsigned exposure() const;
-    void setGain(ushort gain);
-    ushort gain() const;
-    void allocateImageBuffer();
-#endif
 private:
     void initObjects();
     void initAttributes();
@@ -136,14 +95,9 @@ private:
     void loadExper();
     void stopExper();
     void parseResult(const QString &f,const QVariant & d);
-#ifndef notusetoupcamera
     void showCapturedImage(const QImage& image);
-#endif
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
-#ifdef notusetoupcamera
-    void evtCallback(unsigned nEvent);
-#endif
 };
 
 /*每张图分辨率为2048*2048,大小暂时不确定,2048*2048/(1024*1024)=4M,imgSize暂时取个估计值4M*/

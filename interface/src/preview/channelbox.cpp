@@ -27,6 +27,7 @@ ChannelBox::ChannelBox(QWidget*parent): GroupBox(parent)
     auto mainlay = new QVBoxLayout;
     mainlay->addLayout(lay);
     mainlay->addWidget(canvas);
+    canvas->hide(); // 取消缩略图
     setLayout(mainlay);
     setTitle(tr(ChannelBoxTitle));
 

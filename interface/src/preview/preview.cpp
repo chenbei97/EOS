@@ -264,7 +264,6 @@ void Preview::openWellGroupWindow(const QVariantMap &m)
     }
 }
 
-#ifndef notusetoupcamera // 如果使用照相机指针类,preview内部直接使用相机
 void Preview::showCapturedImage(const QImage& image)
 { // 来自照相机的捕捉图像事件传来的live图像显示
 #ifdef uselabelcanvas
@@ -275,7 +274,6 @@ void Preview::showCapturedImage(const QImage& image)
     livecanvas->setImage(image,10); // 10张图片显示1次
 #endif
 }
-#endif
 
 void Preview::setAppInfo(int app)
 { // 用于appselect传递当前app信息
@@ -323,6 +321,7 @@ void Preview::initLayout()
     pbox->setLayout(play);
 
     auto rlay = new QVBoxLayout;
+    rlay->addWidget(wellbox);
     rlay->addWidget(pbox);
     rlay->addWidget(scrollarea); // 添加滚动区域后(不是添加previewtool)再设置
     scrollarea->setWidget(previewtool);
@@ -341,13 +340,9 @@ void Preview::initLayout()
     // 3.总布局
     auto lay = new QHBoxLayout;
     lay->addWidget(lbox);
-#ifdef usetab
     tab->addTab(rbox,tr("Preview"));
     tab->addTab(expertool,tr("Experiment"));
     lay->addWidget(tab);
-#else
-    lay->addWidget(rbox);
-#endif
     setLayout(lay);
 }
 
@@ -383,9 +378,7 @@ void Preview::initAttributes()
     dockcanvas->setCentralWidget(dock);
     dockcanvas->addDockWidget(Qt::BottomDockWidgetArea,dock);// 这个地方不能选all/no,否则无法实现点击隐藏关闭效果
 
-#ifdef usetab
     tab->setMaximumWidth(PreviewToolBarMaxWidth);
-#endif
     scrollarea->setWidgetResizable(true);
 }
 
@@ -406,6 +399,7 @@ void Preview::initObjects()
     wellpattern = new WellPattern(2,3);
     slidepattern = new SlidePattern;
     stackpattern = new QStackedWidget;
+    wellbox = new WellBox;
 
     wellview = new WellView;
     slideview = new SlidePattern;
@@ -413,10 +407,8 @@ void Preview::initObjects()
     dock = new DockWidget(tr(PreviewDockHoleTitle));
     dockcanvas = new QMainWindow;
 
-#ifdef usetab
     tab = new QTabWidget;
     expertool = new ExperTool;
-#endif
     previewtool = new PreviewTool;
     scrollarea = new QScrollArea;
 }
@@ -424,8 +416,6 @@ void Preview::initObjects()
 void Preview::initConnections()
 {
     // (1) previewtool/expertool => preview 信号-槽函数直连
-    connect(previewtool,&PreviewTool::wellbrandChanged,this,&Preview::toggleBrand);
-    connect(previewtool,&PreviewTool::welltypeChanged,this,&Preview::toggleStack);
     connect(previewtool,&PreviewTool::objectiveChanged,this,&Preview::onObjectiveChanged);
     connect(previewtool,&PreviewTool::objectiveToggled,this,&Preview::toggleObjective);
     connect(previewtool,&PreviewTool::playVideo,this,&Preview::playVideo);
@@ -440,17 +430,12 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::autoFocus,this,&Preview::autoFocus);
     connect(previewtool,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
     connect(previewtool,&PreviewTool::channelClosed,this,&Preview::closeChannel);
-    connect(previewtool,&PreviewTool::exportFilePath,this,&Preview::exportExperConfig);
     connect(previewtool,&PreviewTool::importFilePath,this,&Preview::importExperConfig);
-    connect(previewtool,&PreviewTool::loadExper,this,&Preview::loadExper);
-    connect(previewtool,&PreviewTool::stopExper,this,&Preview::stopExper);
     connect(previewtool,&PreviewTool::modeSelected,this,&Preview::setViewMode);
-#ifdef usetab
     connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
     connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);
     connect(expertool,&ExperTool::loadExper,this,&Preview::loadExper);
     connect(expertool,&ExperTool::stopExper,this,&Preview::stopExper);
-#endif
 
     // (2) preview内部信号-槽函数
     connect(canvasmode,&CanvasMode::cameraModeChanged,this,[=](int option){stackcanvas->setCurrentIndex(option);});
@@ -459,6 +444,8 @@ void Preview::initConnections()
 #else
     //connect(livecanvas,&PhotoCanvasTriangle::triangleClicked,this,&Preview::adjustLens);
 #endif
+    connect(wellbox,&WellBox::wellbrandChanged,this,&Preview::toggleBrand);
+    connect(wellbox,&WellBox::welltypeChanged,this,&Preview::toggleStack);
 
     connect(wellpattern,&WellPattern::openWellViewWindow,this,&Preview::openWellViewWindow); // 打开和更新视野窗口
     connect(wellpattern,&WellPattern::openWellGroupWindow,this,&Preview::openWellGroupWindow);// 打开分组窗口
@@ -479,24 +466,8 @@ void Preview::initConnections()
 
     // (3) 外部信号=>preview/previewtool
     connect(ParserPointer,&ParserControl::parseResult,this,&Preview::parseResult);
-#ifdef notusetoupcamera
-    connect(this, &Preview::evtCallback, this, &Preview::processCallback);
-#else
     connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::showCapturedImage);
     connect(ToupCameraPointer,&ToupCamera::imageCaptured,previewtool,&PreviewTool::imageCaptured);
     connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,previewtool,&PreviewTool::exposureGainCaptured);
-#endif
     connect(this,&Preview::objectiveSettingChanged,previewtool,&PreviewTool::objectiveSettingChanged);//调整物镜位置
-
-
-#ifndef notusetoupcamera
-//    connect(&timer,&QTimer::timeout,this,[=]{
-//        QImage img1(CURRENT_PATH+"/images/cell.png");
-//        QImage img2(CURRENT_PATH+"/images/test.jpeg");
-//        static long count = 0;
-//        count %2 ? showCapturedImage(img1):showCapturedImage(img2);
-//        count ++;
-//    });
-//    timer.start(10);
-#endif
 }

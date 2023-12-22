@@ -11,7 +11,6 @@
 
 #include "alias.h"
 
-#define usetab 0
 static const char* PreviewToolField = "previewtool";
 static const char* ExperToolField = "expertool";
 static const char* PreviewPatternField = "previewpattern";
@@ -439,7 +438,7 @@ enum class LenMoveDirectionType {
 };
 
 static const QFieldList NavigBarFields = {
-        "Logo","Main","Preview","Data","Analysis","Settings"
+        "Logo","Application","Preview","Data","Analysis","Settings"
 };
 
 //wellpattern涉及的

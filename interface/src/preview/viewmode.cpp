@@ -11,7 +11,7 @@
 
 ViewModeBox::ViewModeBox(QWidget *parent) : GroupBox(parent)
 {
-    groupMode = new RadioGroup(3);
+    groupMode = new RadioGroup(3,Qt::Vertical);
     groupMode->setText(QStringList()<<tr(PointModeField)<<tr(RectModeField)<<tr(WholeModeField));
 
     auto lay = new QHBoxLayout;

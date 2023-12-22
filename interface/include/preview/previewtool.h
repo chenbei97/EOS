@@ -12,7 +12,7 @@
 #include "window.h"
 #include "camerabox.h"
 #include "channelbox.h"
-#include "wellbox.h"
+//#include "wellbox.h"
 #include "objectivebox.h"
 #include "zstackbox.h"
 #include "lensbox.h"
@@ -32,32 +32,22 @@ public:
     void importExperConfig(const QVariantMap& m);
 private:
     HistoryBox * historybox;
-    ViewModeBox * selectbox;
-    WellBox * wellbox;
     ObjectiveBox * objectivebox;
+    ViewModeBox * selectbox;
     FocusBox * focusbox;
     ChannelBox * channelbox;
     CameraBox * camerabox;
     RecordBox * recordbox;
-    TimeBox * timebox;
-    ZStackBox * zstackbox;
-    SaveBox * savebox;
     QVBoxLayout * lay;
 signals:
-    void welltypeChanged(int option);
-    void wellbrandChanged(int option);// wellbox的信息
-    void manufacturerChanged(int option);
     void objectiveChanged(const QString& obj);
     void objectiveToggled(int objective,int objective_loc,int isPh);
     void channelChanged(int option);// 通道切换
     void channelClosed(int option); // 通道关闭
     void cameraInfoChanged(const MultiCameraInfo&m);// 通道配置改变
-    void zstackChanged(bool isChecked);// 是否勾选zstack和stitch
-    void stitchChanged(bool isChecked);
     void playVideo(const QString& path); // 播放视频的功能
     void stopVideo();
     void pauseVideo();
-    void exportFilePath(const QString&path); // 导出文件配置的路径
     void importFilePath(const QString&path); // 导入文件配置的路径
     void photoTaking();// 只有camerabox的拍照会触发该信号
     void slideStitching(); // slide下允许拼图
@@ -66,8 +56,6 @@ signals:
     void autoFocus();
     void cameraAdjusted(int exposure,int gain); // 调整相机参数
     void brightAdjusted(int bright); // 调整bright
-    void loadExper(); // 启动实验
-    void stopExper(); // 停止实验
     void modeSelected(int mode); // 视野选择模式
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);

@@ -92,9 +92,11 @@ void RadioGroup::setText(const QStringList &texts)
     }
 }
 
-RadioGroup::RadioGroup(unsigned num, QWidget *parent) : QWidget(parent)
+RadioGroup::RadioGroup(unsigned num, Qt::Orientation orientation,QWidget *parent) : QWidget(parent)
 {
-    auto lay = new QHBoxLayout;
+    QLayout * lay = nullptr;
+    orientation == Qt::Horizontal?
+     lay = new QHBoxLayout: lay = new QVBoxLayout;
     group = new QButtonGroup;
     if (num < 2)
         radioNum = 2; // 至少2个才有互斥的意义

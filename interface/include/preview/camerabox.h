@@ -53,14 +53,21 @@ private:
     CameraTool * cameratool;
     Label * currentchannel;
     PushButton * savebtn;
+    PushButton * autofocusbtn;
+    PushButton * savefocusbtn;
     PushButton * capturebtn;
     PushButton * stitchbtn;
-    PushButton * combinebtn;
+    RoundButton * topbtn;
+    RoundButton * bottombtn;
+    DoubleSlider * slider;
+    SpinBox * step;
     MultiCameraInfo camerainfo;
     ChannelImageInfo imageinfo;
+    void initObjects();
+    void initAttributes();
+    void initLayout();
 private slots:
     void onSaveBtn();
-    void onCombineBtn();
     void adjustBright();
     void adjustCamera();
 signals:

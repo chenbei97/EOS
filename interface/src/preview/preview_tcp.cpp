@@ -78,7 +78,7 @@ void Preview::previewSlideEvent(const QPointF& point)
 
 void Preview::stitchSlide()
 { // slide 拼图功能
-    auto brand = previewtool->boxInfo(WellBoxTitle)[BrandField].toUInt();
+    auto brand = wellbox->wellInfo()[BrandField].toUInt();
     if(brand == SlideIndexInBrand) { // 品牌是载玻片才响应
         canvasmode->changeMode(CanvasMode::PhotoMode);
         photocanvas->setStrategy(PhotoCanvas::GridPixmap);
@@ -288,20 +288,11 @@ void Preview::adjustBright(int br)
 void Preview::adjustCamera(int exp,int gain)
 {
     LOG<<"adjusting exp to"<<exp<<" gain to"<<gain;
-#ifndef notusetoupcamera
     //LOG<<"exposureOption = "<<ToupCameraPointer->exposureOption();
     if (!ToupCameraPointer->exposureOption()) {
         ToupCameraPointer->setExposure(exp);
         ToupCameraPointer->setGain(gain);
     }
-;
-#else
-    //LOG<<"exposureOption = "<<exposureOption();
-    if (!exposureOption()) { // 设置手动曝光,exp option = 0
-        setExposure(exp);
-        setGain(gain);
-    }
-#endif
 }
 
 void Preview::takingPhoto()
@@ -311,32 +302,23 @@ void Preview::takingPhoto()
     int exp = current_info[ExposureField].toUInt();
     int ga = current_info[GainField].toUInt();
 
-#ifndef notusetoupcamera
-        ToupCameraPointer->setExposure(exp);
-        ToupCameraPointer->setGain(ga);
-        auto pix = ToupCameraPointer->capture();
-        auto current_channel = toolinfo[CurrentChannelField].toString();
-        previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道,以及显示到缩略图
-        LOG<<"current (exp,gain,bright) is ("<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain()<<current_info[BrightField].toInt()<<")";
-#else
-        setExposure(exp);
-        setGain(ga);
-        auto pix = capture();
-        auto current_channel = toolinfo[CurrentChannelField].toString();
-        previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道
-        LOG<<"current (exp,gain,bright) is ("<<gain()<<current_info[BrightField].toInt()<<")";
-#endif
+    ToupCameraPointer->setExposure(exp);
+    ToupCameraPointer->setGain(ga);
+    auto pix = ToupCameraPointer->capture();
+    auto current_channel = toolinfo[CurrentChannelField].toString();
+    previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道,以及显示到缩略图
+    LOG<<"current (exp,gain,bright) is ("<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain()<<current_info[BrightField].toInt()<<")";
 
-        canvasmode->changeMode(CanvasMode::PhotoMode);
-        photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
-        photocanvas->setImage(pix);
+    canvasmode->changeMode(CanvasMode::PhotoMode);
+    photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
+    photocanvas->setImage(pix);
 
-        // 存图功能,目前默认存到temp下,用户会更改前缀目录,或者需要按分不同通道文件夹归类等
-        createPath(TakePhotoTempPath);
-        auto path = TakePhotoTempPath
-                    +QDateTime::currentDateTime().toString(DefaultImageSaveDateTimeFormat)+JPGSuffix;
-        if (!pix.isNull())
-            pix.save(path,JPGField,DefaultImageQuality);
+    // 存图功能,目前默认存到temp下,用户会更改前缀目录,或者需要按分不同通道文件夹归类等
+    createPath(TakePhotoTempPath);
+    auto path = TakePhotoTempPath
+                +QDateTime::currentDateTime().toString(DefaultImageSaveDateTimeFormat)+JPGSuffix;
+    if (!pix.isNull())
+        pix.save(path,JPGField,DefaultImageQuality);
 
 }
 
@@ -408,13 +390,8 @@ void Preview::previewHoleEvent(const QPoint &holepoint)
     // 自己需要的相机参数
     int exp = current_info[ExposureField].toUInt();
     int ga = current_info[GainField].toUInt();
-#ifndef notusetoupcamera
     ToupCameraPointer->setExposure(exp);
     ToupCameraPointer->setGain(ga);
-#else
-    setExposure(exp);
-    setGain(ga);
-#endif
     QVariantMap m;
     m[ObjectiveField] = objective;
     m[BrandField] = brand;
@@ -441,22 +418,14 @@ void Preview::previewHoleEvent(const QPoint &holepoint)
 
 void Preview::loadExper()
 {
-    LOG<<"收集启动实验需要的信息";
     auto patterninfo = wellpattern->patternInfo();
     auto previewinfo = previewtool->toolInfo();
     previewinfo[PreviewPatternField] = patterninfo;
     previewinfo[PreviewToolField] = previewinfo;
-#ifdef usetab
     auto experinfo = expertool->toolInfo();
     previewinfo[ExperToolField] = experinfo;
-#endif
 
-
-#ifdef usetab
     auto channels = experinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
-#else
-    auto channels = previewinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts)
-#endif
     auto totalViews = wellpattern->numberOfViews();
     auto totalChannels = channels.count("1"); // 为1的是勾选上的
     auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
@@ -470,13 +439,7 @@ void Preview::loadExper()
     int ret = dlg->exec();
     if (ret == QDialog::Rejected)
         return;
-    LOG<<"首先关闭相机";
-#ifndef notusetoupcamera
     ToupCameraPointer->closeCamera(); // 先关相机后执行
-#else
-    closeCamera();
-#endif
-
     LOG<<"然后清理图像";
 #ifdef uselabelcanvas
     livecanvas->setPixmap(QPixmap());
@@ -503,9 +466,7 @@ void Preview::exportExperConfig(const QString& path)
 { // 导出实验配置
     previewinfo[PreviewPatternField] = wellpattern->patternInfo();
     previewinfo[PreviewToolField] = previewtool->toolInfo();
-#ifdef usetab
     previewinfo[ExperToolField] = expertool->toolInfo();
-#endif
     auto json = assembleExportExperEvent(previewinfo);
     JsonReadWrite m; // 借助工具类写到文件内
     m.writeJson(path,json);

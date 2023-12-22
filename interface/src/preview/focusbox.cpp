@@ -89,7 +89,7 @@ void FocusBox::initLayout()
     lay1->addWidget(bottombtn);
 
     // 2. "step: " [spinbox]
-    auto steplay = new QHBoxLayout;
+    auto steplay = new QVBoxLayout;
     steplay->addWidget(new Label(FocusToolStepLabel));
     steplay->addWidget(step);
     steplay->addStretch();
@@ -128,8 +128,8 @@ void FocusBox::initAttributes()
     slider->setDirection(Qt::Vertical);
     slider->setRange(0,FocusToolFocusMaxVal);
     slider->setScaleFactor(FocusToolScaleVal);
-    slider->setPrefix("");
     slider->setMouseEvent(true);
+    slider->setPrefixVisible(false);
 
     step->setValue(0.000);
     step->setMaximumWidth(FocusToolStepSpinMaxWidth);

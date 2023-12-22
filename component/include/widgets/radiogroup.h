@@ -18,7 +18,7 @@ class COMPONENT_IMEXPORT RadioGroup: public QWidget
     Q_OBJECT
 public:
     explicit RadioGroup(QWidget*parent= nullptr);
-    explicit RadioGroup(unsigned num,QWidget*parent= nullptr);
+    explicit RadioGroup(unsigned num,Qt::Orientation = Qt::Horizontal,QWidget*parent= nullptr);
     void setText(int id,const QString& text = QString());
     void setText(const QStringList& texts);
     void setChecked(int id,bool checked);

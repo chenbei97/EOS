@@ -350,9 +350,7 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
     auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
     auto wellpatternsize = wellpatterninfo[HoleSizeField].toSize();
     auto wellgroupinfo = wellpatterninfo[GroupField].value<WellPatternInfo>();
-#ifdef usetab
     auto experinfo = m[ExperToolField].value<ExperToolInfo>();
-#endif
     QJsonObject object;
     object[FrameField] = LoadExperEvent;
 
@@ -400,7 +398,6 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
     object[FieldLoadExperEvent.focus] = toolinfo[FieldLoadExperEvent.focus].toDouble();
     object[FieldLoadExperEvent.focus_step] = toolinfo[FieldLoadExperEvent.focus_step].toDouble();
 
-#ifdef usetab
     // zstackbox
     object[FieldLoadExperEvent.zstack] = experinfo[FieldLoadExperEvent.zstack].toInt();
     object[FieldLoadExperEvent.stitch] = experinfo[FieldLoadExperEvent.stitch].toInt();
@@ -412,18 +409,6 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
     object[FieldLoadExperEvent.channel] = experinfo[FieldLoadExperEvent.channel].toString();
     //LOG<<experinfo[FieldLoadExperEvent.channel];
     object[FieldLoadExperEvent.is_schedule] = experinfo[FieldLoadExperEvent.is_schedule].toInt();
-#else
-    // zstackbox
-    object[FieldLoadExperEvent.zstack] = toolinfo[FieldLoadExperEvent.zstack].toInt();
-    object[FieldLoadExperEvent.stitch] = toolinfo[FieldLoadExperEvent.stitch].toInt();
-
-    // experbox
-    object[FieldLoadExperEvent.total_time] = toolinfo[FieldLoadExperEvent.total_time].toInt();
-    object[FieldLoadExperEvent.duration_time] = toolinfo[FieldLoadExperEvent.duration_time].toInt();
-    object[FieldLoadExperEvent.start_time] = toolinfo[FieldLoadExperEvent.start_time].toString();
-    object[FieldLoadExperEvent.channel] = toolinfo[FieldLoadExperEvent.channel].toString();
-    object[FieldLoadExperEvent.is_schedule] = toolinfo[FieldLoadExperEvent.is_schedule].toInt();
-#endif
 
     // viewmodebox
     object[FieldLoadExperEvent.viewmode] = toolinfo[FieldLoadExperEvent.viewmode].toInt();
@@ -480,9 +465,7 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
     auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
     auto wellpatternsize = wellpatterninfo[HoleSizeField].toSize();
     auto wellgroupinfo = wellpatterninfo[GroupField].value<WellPatternInfo>();
-#ifdef usetab
     auto experinfo = m[ExperToolField].value<ExperToolInfo>();
-#endif
     QJsonObject object;
     {
         // wellbox
@@ -529,7 +512,6 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
         object[FieldExportExperEvent.focus] = toolinfo[FieldExportExperEvent.focus].toDouble();
         object[FieldExportExperEvent.focus_step] = toolinfo[FieldExportExperEvent.focus_step].toDouble();
 
-#ifdef usetab
         // zstackbox
         object[FieldExportExperEvent.zstack] = experinfo[FieldExportExperEvent.zstack].toInt();
         object[FieldExportExperEvent.stitch] = experinfo[FieldExportExperEvent.stitch].toInt();
@@ -540,18 +522,6 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
         object[FieldExportExperEvent.start_time] = experinfo[FieldExportExperEvent.start_time].toString();
         object[FieldExportExperEvent.channel] = experinfo[FieldExportExperEvent.channel].toString();
         object[FieldExportExperEvent.is_schedule] = experinfo[FieldExportExperEvent.is_schedule].toInt();
-#else
-        // zstackbox
-        object[FieldExportExperEvent.zstack] = toolinfo[FieldExportExperEvent.zstack].toInt();
-        object[FieldExportExperEvent.stitch] = toolinfo[FieldExportExperEvent.stitch].toInt();
-
-        // experbox
-        object[FieldExportExperEvent.total_time] = toolinfo[FieldExportExperEvent.total_time].toInt();
-        object[FieldExportExperEvent.duration_time] = toolinfo[FieldExportExperEvent.duration_time].toInt();
-        object[FieldExportExperEvent.start_time] = toolinfo[FieldExportExperEvent.start_time].toString();
-        object[FieldExportExperEvent.channel] = toolinfo[FieldExportExperEvent.channel].toString();
-        object[FieldExportExperEvent.is_schedule] = toolinfo[FieldExportExperEvent.is_schedule].toInt();
-#endif
 
         // viewmodebox
         object[FieldExportExperEvent.viewmode] = toolinfo[FieldExportExperEvent.viewmode].toInt();

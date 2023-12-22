@@ -28,6 +28,10 @@ public:
     void setSingleStep(int step);
     void setScaleFactor(int factor);
     void setMouseEvent(bool enabled);
+
+    void setSuffixVisible(bool visible);
+    void setPrefixVisible(bool visible);
+
     double value() const;
     void setValue(double val); // 外部可以传double
 
