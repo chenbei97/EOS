@@ -11,7 +11,8 @@ def f(path):
     for filepath,dirnames,filenames in os.walk(path):
         if filepath.count("cmake-build-debug") or filepath.count("bin") or filepath.count(".vscode")\
             or filepath.count(".git") or filepath.count("opencv2") or filepath.count("toupcam") \
-            or filepath.count(".idea") or filepath.count("lib") or filepath.count("__pycache__"):
+            or filepath.count(".idea") or filepath.count("lib") or filepath.count("__pycache__") \
+                or filepath.count("python310") or filepath.count("qml") or filepath.count("data"):
             continue
         
         for filename in filenames:

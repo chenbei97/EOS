@@ -13,17 +13,17 @@ dataWidget::dataWidget(QWidget* parent) : QWidget(parent)
     //QQuickView quickView;
 
     //mMainView = new QQuickView;
-    //mMainView->setSource(QUrl(QStringLiteral("qrc:/main.qml")));       //¼ÓÔØQML
+    //mMainView->setSource(QUrl(QStringLiteral("qrc:/main.qml")));       //ï¿½ï¿½ï¿½ï¿½QML
     //mMainView->setResizeMode(QQuickView::SizeRootObjectToView);
-    //mMainView->show();                                                      //QQuickView¿ÉÒÔÏÔÊ¾¿ÉÊÓ»¯QML¶ÔÏó
-   //QQuickItem* mainQuickItem = mainView.rootObject();                    //·µ»Øµ±Ç°QQuickViewµÄ¸ù½Úµã
+    //mMainView->show();                                                      //QQuickViewï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ó»ï¿½QMLï¿½ï¿½ï¿½ï¿½
+   //QQuickItem* mainQuickItem = mainView.rootObject();                    //ï¿½ï¿½ï¿½Øµï¿½Ç°QQuickViewï¿½Ä¸ï¿½ï¿½Úµï¿½
    //QQuickWindow* mainWin = mainQuickItem->window();
-   //mainWin->showFullScreen(); // È«ÆÁÏÔÊ¾
+   //mainWin->showFullScreen(); // È«ï¿½ï¿½ï¿½ï¿½Ê¾
 }
 
 QQuickView* dataWidget::GetMainQuickView()
 {
-    mMainView.setSource(QUrl("qrc:/main.qml"));       //¼ÓÔØQML
+    mMainView.setSource(QUrl("qrc:/main.qml"));       //ï¿½ï¿½ï¿½ï¿½QML
     mMainView.setResizeMode(QQuickView::SizeRootObjectToView);
     mMainView.show();
 
