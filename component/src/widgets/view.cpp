@@ -25,12 +25,14 @@ View::View(QWidget *parent) : QWidget(parent)
     applyholeact = new QAction(tr(ApplyHoleActTitle));
     applygroupact = new QAction(tr(ApplyGroupActTitle));
     applyallact = new QAction(tr(ApplyAllActTitle));
+    quitviewact = new QAction(tr(QuitViewActTitle));
 
     addAction(saveviewact);
     addAction(removeviewact);
     //addAction(applyholeact); // 不显式添加
     addAction(applygroupact);
     addAction(applyallact);
+    addAction(quitviewact);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
     connect(saveviewact,&QAction::triggered,this,&View::onSaveViewAct);
@@ -38,6 +40,7 @@ View::View(QWidget *parent) : QWidget(parent)
     connect(applyholeact,&QAction::triggered,this,&View::onApplyHoleAct);
     connect(applygroupact,&QAction::triggered,this,&View::onApplyGroupAct);
     connect(applyallact,&QAction::triggered,this,&View::onApplyAllAct);
+    connect(quitviewact,&QAction::triggered,this,&View::quitView);
 }
 
 void View::initDispersedMask()

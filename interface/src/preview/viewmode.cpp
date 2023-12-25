@@ -11,19 +11,45 @@
 
 ViewModeBox::ViewModeBox(QWidget *parent) : GroupBox(parent)
 {
-    groupMode = new RadioGroup(3,Qt::Vertical);
-    groupMode->setText(QStringList()<<tr(PointModeField)<<tr(RectModeField)<<tr(WholeModeField));
+    initObjects();
+    initAttributes();
+    initLayout();
 
-    auto lay = new QHBoxLayout;
-    lay->addWidget(groupMode);
-
-    setLayout(lay);
     setTitle(tr(ViewSelectBoxTitle));
-
     connect(groupMode,&RadioGroup::radioClicked,this, &ViewModeBox::modeSelected);
 }
 
-void ViewModeBox::setEnabled(int option)
+void ViewModeBox::initAttributes()
+{
+    groupMode->setText(QStringList()<<tr(PointModeField)<<tr(AreaModeField)<<tr(WholeModeField));
+
+}
+
+void ViewModeBox::initLayout()
+{
+    // 1. leftbox
+    auto leftbox = new GroupBox;
+    auto leftlay = new QHBoxLayout;
+    leftlay->addWidget(groupMode);
+    leftbox->setLayout(leftlay);
+
+    // 2. rightbox
+
+
+    // 3. mainlay
+    auto lay = new QHBoxLayout;
+    lay->addWidget(leftbox);
+    lay->setSpacing(10);
+    lay->addStretch();
+    setLayout(lay);
+}
+
+void ViewModeBox::initObjects()
+{
+    groupMode = new RadioGroup(3,Qt::Vertical);
+}
+
+void ViewModeBox::setViewEnabled(int option)
 { // 0表示孔板类型,1表示载玻片类型
     groupMode->setEnabled(1,!option);
     groupMode->setEnabled(2,true); // 区域模式任何时候都可用

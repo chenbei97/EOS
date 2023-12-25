@@ -70,9 +70,11 @@ WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,col
     opengroupact = new QAction(tr(GroupHoleActTitle));
     openviewact = new QAction(tr(SelectHoleActTitle));
     removeholeact = new QAction(tr(RemoveHoleActTitle));
+    enterviewact = new QAction(tr(EnterViewActTitle));
     addAction(opengroupact);
     addAction(openviewact);
     addAction(removeholeact);
+    addAction(enterviewact);
     setContextMenuPolicy(Qt::ActionsContextMenu);
     initDrapHoles();
     initDisableHoles();

@@ -65,6 +65,7 @@ protected:
     QAction * applyholeact;
     QAction * applygroupact;
     QAction * applyallact;
+    QAction * quitviewact;
     virtual void onRemoveViewAct();
     virtual void onSaveViewAct();
     virtual void onApplyHoleAct();
@@ -109,6 +110,7 @@ signals:
     void topTriangleClicked();
     void bottomTriangleClicked();
     void triangleClicked(int option);
+    void quitView();
 };
 
 #endif //EOS_VIEW_H

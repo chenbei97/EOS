@@ -48,7 +48,7 @@ using std::modf;
     #define MainWindowWidth 2400
     #define MainWindowHeight 1300
 
-    #define NavigBarWidth 200 // 导航条的宽度
+    #define NavigBarWidth 300 // 导航条的宽度
     #define NavigBarHeight 100 // 导航条的高度
     #define NavigBarGap 2 // 导航按钮之间的间隔
     //#define NavigBarButtonCount (MainWindowWidth+NavigBarGap)/(NavigBarWidth+NavigBarGap) // x * bw + (x-1)gap = w换算

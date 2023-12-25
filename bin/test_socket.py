@@ -117,7 +117,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response +=self.separate
         print("test0x3回复: ", reponse)
-        time.sleep(3)
+        #time.sleep(3)
         self.__socket.sendall(response.encode("utf-8"))
     # 预览事件
     def __parse0x0000(self,msg:dict):
@@ -140,7 +140,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0000回复: ", reponse)
-        time.sleep(3)
+        #time.sleep(3)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 启动实验
@@ -152,7 +152,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0001回复: ", reponse)
-        time.sleep(5)
+        #time.sleep(5)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 询问连接状态
@@ -190,7 +190,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0004回复: ", reponse)
-        time.sleep(1)
+        #time.sleep(1)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 更改通道
@@ -205,7 +205,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0005回复: ", reponse)
-        time.sleep(1)
+        #time.sleep(1)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 移动镜头
@@ -218,7 +218,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0006回复: ", reponse)
-        time.sleep(1)
+        #time.sleep(1)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 移动电机
@@ -231,7 +231,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0007回复: ", reponse)
-        time.sleep(3)
+        #time.sleep(3)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 停止实验
@@ -244,7 +244,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x008回复: ", reponse)
-        time.sleep(3)
+        #time.sleep(3)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 切物镜动电机事件
@@ -259,7 +259,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0009回复: ", reponse)
-        time.sleep(3)
+        #time.sleep(3)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 录制视频事件
@@ -286,7 +286,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response += self.separate
         print("0x0011回复: ", reponse)
-        time.sleep(1)
+        #time.sleep(1)
         self.__socket.sendall(response.encode("utf-8"))
 class SocketServerManger:
     def __init__(self, port=3000):  # 测试本地链接,只需要提供端口

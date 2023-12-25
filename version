@@ -46,4 +46,5 @@ v1.0.2
 (6) DoubleSlider增加前后缀文本可显示隐藏的功能
 (7) CameraBox去掉merge按钮,增加auto/save focus按钮
 (8) 把FocusBox的功能挪到CameraBox(slider,step,top,bottom,steplabel)
+(9) 取消dock和dockcanvas的功能,改用堆叠界面实现
 

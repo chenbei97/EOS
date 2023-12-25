@@ -13,23 +13,25 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     initObjects();
     initAttributes();
     initLayout();
-    setTitle(tr(CameraBoxTitle));
+    setTitle(tr(CameraFocusBoxTitle));
 
-    connect(savebtn,&PushButton::clicked,this,&CameraBox::onSaveBtn);
+    connect(savecamerabtn,&PushButton::clicked,this,&CameraBox::saveCamera);
     connect(capturebtn,&PushButton::clicked,this,&CameraBox::photoTaking);
     connect(stitchbtn,&PushButton::clicked,this,&CameraBox::slideStitching);
     connect(cameratool,&CameraTool::exposureChanged,this,&CameraBox::adjustCamera);
     connect(cameratool,&CameraTool::gainChanged,this,&CameraBox::adjustCamera);
     connect(cameratool,&CameraTool::brightChanged,this,&CameraBox::adjustBright);
+    connect(topbtn,&PushButton::clicked,this,&CameraBox::addFocus);
+    connect(bottombtn,&PushButton::clicked,this,&CameraBox::subtractFocus);
+    connect(focusslider,&DoubleSlider::sliderReleased,this,&CameraBox::focusChanged);
 }
 
 void CameraBox::initLayout()
 {
-    auto box1 = new GroupBox;
     auto box1lay = new QVBoxLayout;
     box1lay->addWidget(cameratool);
-    box1lay->addWidget(savebtn);
-    box1->setLayout(box1lay);
+    box1lay->addWidget(savecamerabtn);
+    leftbox->setLayout(box1lay);
 
     auto box2 = new GroupBox;
     auto box2lay = new QHBoxLayout;
@@ -39,17 +41,23 @@ void CameraBox::initLayout()
     box2lay_1->addWidget(capturebtn);
     box2lay_1->addWidget(stitchbtn);
     auto box2lay_2 = new QHBoxLayout; // box2的右半部分
-    box2lay_2->addWidget(slider);
+    box2lay_2->addWidget(focusslider);
     auto box2lay_2_1 = new QVBoxLayout; // 2个三角按钮是垂直布局
     box2lay_2_1->addWidget(topbtn);
+    box2lay_2_1->addStretch();
+    box2lay_2_1->addWidget(focusstep);
+    box2lay_2_1->addStretch();
     box2lay_2_1->addWidget(bottombtn);
     box2lay_2->addLayout(box2lay_2_1);
+    box2lay_2->addStretch();
+    box2lay_2->setSpacing(0);
     box2lay->addLayout(box2lay_1);
+    box2lay->addSpacing(20);
     box2lay->addLayout(box2lay_2);
     box2->setLayout(box2lay);
 
     auto hlay = new QHBoxLayout;
-    hlay->addWidget(box1);
+    hlay->addWidget(leftbox);
     hlay->addWidget(box2);
     hlay->addStretch();
     auto lay = new QVBoxLayout;
@@ -62,37 +70,42 @@ void CameraBox::initLayout()
 void CameraBox::initObjects()
 {
     cameratool = new CameraTool;
-    currentchannel = new Label(QString("%1%2").arg(ChannelFieldLabel).arg(BRField));
-    savebtn = new PushButton(tr(SaveCurrentChannelSettingLabelField));
+    leftbox = new GroupBox();
+    currentchannel = new Label(QString("%1%2").arg(ChannelFieldLabel).arg(NoneField));
+    savecamerabtn = new PushButton(tr(SaveCurrentChannelSettingLabelField));
     autofocusbtn = new PushButton(tr(AutoFocusField));
     savefocusbtn = new PushButton(tr(SaveFocusField));
     capturebtn = new PushButton(tr(CaptureField));
     stitchbtn = new PushButton(tr(StitchField));
     topbtn = new RoundButton;
     bottombtn = new RoundButton;
-    slider = new DoubleSlider;
-    step = new SpinBox(true);
+    focusslider = new DoubleSlider;
+    focusstep = new SpinBox(true);
 }
 
 void CameraBox::initAttributes()
 {
-    setEnabled(false); // 初始没开灯不能使用
+    setBrightEnabled(false); // 初始没开灯不能使用
     capturebtn->setBackGroundColor(Qt::yellow);
+    leftbox->setTitle(QString("%1%2").arg(ChannelFieldLabel).arg(NoneField));
+    currentchannel->hide();
 
-    slider->setDirection(Qt::Vertical);
-    slider->setRange(0,FocusToolFocusMaxVal);
-    slider->setScaleFactor(FocusToolScaleVal);
-    slider->setMouseEvent(true);
-    slider->setPrefixVisible(false);
+    focusslider->setDirection(Qt::Vertical);
+    focusslider->setRange(0,FocusToolFocusMaxVal);
+    focusslider->setScaleFactor(FocusToolScaleVal);
+    focusslider->setMouseEvent(true);
+    focusslider->setPrefixVisible(false);
 
-    step->setValue(0.000);
-    step->setMaximumWidth(FocusToolStepSpinMaxWidth);
-    step->setSingleStep(FocusToolStepVal);
-    step->setDecimals(FocusToolStepDecimal);
-    step->setMaximum(FocusToolStepMaxVal);
+    focusstep->setValue(0.000);
+    focusstep->setMaximumWidth(FocusToolStepSpinMaxWidth);
+    focusstep->setSingleStep(FocusToolStepVal);
+    focusstep->setDecimals(FocusToolStepDecimal);
+    focusstep->setMaximum(FocusToolStepMaxVal);
 
     topbtn->setStrategy(RoundButton::TopTriangle);
     bottombtn->setStrategy(RoundButton::BottomTriangle);
+    topbtn->setSize(30);
+    bottombtn->setSize(30);
 }
 
 void CameraBox::importExperConfig(const QVariantMap &m,const QString& objective)
@@ -109,14 +122,14 @@ void CameraBox::importExperConfig(const QVariantMap &m,const QString& objective)
     // br和phase的通道参数应当根据物镜的硬件参数清除
     if (objective.contains(BRField,Qt::CaseInsensitive)) {
         camerainfo[PHField].clear();
-        setChannel(0); // 切到br通道更新ui设置
+        updateChannelText(0); // 切到br通道更新ui设置
     }
     else if (objective.contains(PHField,Qt::CaseInsensitive)){
         camerainfo[BRField].clear();
-        setChannel(1); // 切到ph通道更新ui设置
+        updateChannelText(1); // 切到ph通道更新ui设置
     }
 
-    setEnabled(false); // 导入配置时默认都不可滑动,上述代码之后
+    setBrightEnabled(false); // 导入配置时默认都不可滑动,上述代码之后
     emit cameraInfoChanged(camerainfo);
 }
 
@@ -133,22 +146,36 @@ void CameraBox::adjustBright()
     emit brightAdjusted(br);
 }
 
-void CameraBox::onSaveBtn()
+void CameraBox::saveCamera()
 { // 保存通道参数
-    auto channel = currentchannel->text().remove(ChannelFieldLabel);
+    //auto channel = currentchannel->text().remove(ChannelFieldLabel);
+    auto channel = leftbox->title().remove(ChannelFieldLabel);
     if (channel == NoneField) return;
 
     camerainfo[channel] = cameraInfo();
     emit cameraInfoChanged(camerainfo);
 }
 
+void CameraBox::addFocus()
+{
+    auto val = focusstep->value();
+    if (val == 0.0) return;
+    focusslider->addValue(val);
+}
+
+void CameraBox::subtractFocus()
+{
+    auto val = focusstep->value();
+    if (val == 0.0) return;
+    focusslider->subtractValue(val);
+}
+
 void CameraBox::captureImage(const QImage &img, const QString &channel)
 { // 拍照返回来的图像和通道
     //LOG<<channel;
     if (channel.isEmpty()) return; // 都没开灯拍的黑图不存储
-
     imageinfo[channel] = img;
-    LOG<<imageinfo;
+    //LOG<<imageinfo;
 }
 
 void CameraBox::captureExposureGain(unsigned int exp, unsigned int gain)
@@ -159,24 +186,26 @@ void CameraBox::captureExposureGain(unsigned int exp, unsigned int gain)
     cameratool->setGain(gain);
 }
 
-void CameraBox::setEnabled(bool enabled)
+void CameraBox::setBrightEnabled(bool enabled)
 { // 除了br,phase,其它通道不需要调整相机参数
     cameratool->setEnabled(2,enabled); // 只需要bright滑动条禁用
-    savebtn->setEnabled(enabled);
+    savecamerabtn->setEnabled(enabled);
     currentchannel->setEnabled(enabled);
 }
 
-void CameraBox::setChannel(int option)
+void CameraBox::updateChannelText(int option)
 { // channelbox切换通道时要更新当前的通道
     if (option < 0) {
         currentchannel->setText(QString("%1%2").arg(ChannelFieldLabel).arg(NoneField));
-        setEnabled(false);
+        leftbox->setTitle(QString("%1%2").arg(ChannelFieldLabel).arg(NoneField));
+        setBrightEnabled(false);
         return;
     }
-    setEnabled(true);
+    setBrightEnabled(true);
     // 1. channelbox设置通道后更新相机设置显示的当前通道信息
     auto channel = ChannelFields[option];
     currentchannel->setText(QString("%1%2").arg(ChannelFieldLabel).arg(channel));
+    leftbox->setTitle(QString("%1%2").arg(ChannelFieldLabel).arg(channel));
 
     // 2. 防止3个滑动条设置信息的时候触发信号
     cameratool->blockSignals(true);
@@ -200,10 +229,28 @@ MultiCameraInfo CameraBox::multiCameraInfo() const
 }
 
 CameraInfo CameraBox::cameraInfo() const
-{
+{ // 当前UI的
     CameraInfo info;
     info[BrightField] = cameratool->bright();
     info[GainField] = cameratool->gain();
     info[ExposureField] = cameratool->exposure();
+    return info;
+}
+
+double CameraBox::focusStep() const
+{
+    return focusstep->value();
+}
+
+double CameraBox::focusValue() const
+{
+    return focusslider->value();
+}
+
+FocusInfo CameraBox::focusInfo() const
+{
+    FocusInfo info;
+    info[FocusField] = QString::number(focusValue());
+    info[FocusStepField] = QString::number(focusStep());
     return info;
 }

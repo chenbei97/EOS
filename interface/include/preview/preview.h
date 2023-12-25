@@ -46,15 +46,21 @@ private:
     VideoWidget * videocanvas;
     QStackedWidget * stackcanvas;
 
+    WellBox * wellbox;
+
     WellPattern * wellpattern;
     SlidePattern * slidepattern;
     QStackedWidget * stackpattern;
-    WellBox * wellbox;
+
     WellView * wellview;
     SlidePattern * slideview;
     QStackedWidget * stackview;
-    DockWidget * dock;
-    QMainWindow * dockcanvas;
+
+    QStackedWidget * stack_view_pattern;
+
+    //DockWidget * dock;
+    //QMainWindow * dockcanvas;
+
     QTabWidget * tab;
     ExperTool * expertool;
     PreviewTool * previewtool;

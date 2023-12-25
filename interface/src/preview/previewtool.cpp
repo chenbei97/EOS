@@ -13,7 +13,6 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     historybox = new HistoryBox;
     objectivebox = new ObjectiveBox;
     selectbox = new ViewModeBox;
-    focusbox = new FocusBox;
     channelbox = new ChannelBox;
     camerabox = new CameraBox;
     recordbox = new RecordBox;
@@ -22,7 +21,6 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     lay->addWidget(historybox);
     lay->addWidget(objectivebox);
     lay->addWidget(selectbox);
-    lay->addWidget(focusbox);
     lay->addWidget(channelbox);
     lay->addWidget(camerabox);
     lay->addWidget(recordbox);
@@ -36,25 +34,24 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(camerabox,&CameraBox::slideStitching,this,&PreviewTool::slideStitching);
     connect(camerabox,&CameraBox::cameraAdjusted,this,&PreviewTool::cameraAdjusted);
     connect(camerabox,&CameraBox::brightAdjusted,this,&PreviewTool::brightAdjusted);
+    connect(camerabox,&CameraBox::focusChanged,this,&PreviewTool::focusChanged);
     connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::channelChanged);
     connect(channelbox,&ChannelBox::channelClosed,this,&PreviewTool::channelClosed);
     connect(historybox,&HistoryBox::importFilePath,this,&PreviewTool::importFilePath);
-    connect(focusbox,&FocusBox::directionMove,this,&PreviewTool::directionMove);
-    connect(focusbox,&FocusBox::valueChanged,this,&PreviewTool::focusChanged);
-    connect(focusbox,&FocusBox::autoFocus,this,&PreviewTool::autoFocus);
     connect(recordbox,&RecordBox::pauseVideo,this,&PreviewTool::pauseVideo);
     connect(recordbox,&RecordBox::playVideo,this,&PreviewTool::playVideo);
     connect(recordbox,&RecordBox::stopVideo,this,&PreviewTool::stopVideo);
     connect(selectbox,&ViewModeBox::modeSelected,this,&PreviewTool::modeSelected);
     // 2. 信号槽函数
-    connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::setChannel);
+    connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::updateChannelText);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBox::disableChannel);
     // 3.外部信号
     connect(this,&PreviewTool::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
-    connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage); // 当前通道的图像
-    connect(this,&PreviewTool::captureImage,channelbox,&ChannelBox::takePhoto);
+    connect(this,&PreviewTool::captureImage,camerabox,&CameraBox::captureImage); // 保存通道的图像
+    connect(this,&PreviewTool::captureImage,channelbox,&ChannelBox::takePhoto); // 显示缩略图
     connect(this,&PreviewTool::imageCaptured,recordbox,&RecordBox::recordImage); // 原始相机图像
     connect(this,&PreviewTool::exposureGainCaptured,camerabox,&CameraBox::captureExposureGain);
+    recordbox->hide();
 }
 
 QMap<QString,QString> PreviewTool::boxInfo(const QString &box) const
@@ -65,11 +62,9 @@ QMap<QString,QString> PreviewTool::boxInfo(const QString &box) const
         return objectivebox->objectiveInfo();
     } else if (box == ChannelBoxTitle) {
         return channelbox->channelInfo();
-    } else if (box == CameraBoxTitle) {
+    } else if (box == CameraFocusBoxTitle) {
         return camerabox->cameraInfo(); // 注意: 这里只提供当前Ui的信息而不是5个通道的
-    } else if (box == FocusBoxTitle) {
-        return focusbox->focusInfo();
-    }  else if (box == RecordBoxTitle) {
+    } else if (box == RecordBoxTitle) {
         return recordbox->recordInfo();
     } else if (box == ViewSelectBoxTitle) {
         return selectbox->viewModeInfo();
@@ -104,6 +99,8 @@ PreviewToolInfo PreviewTool::toolInfo() const
     // 4. camerainfo,分不同通道,保存了gain,exposure,bright
     auto camerainfo = camerabox->multiCameraInfo();
     info[CurrentInfoField].setValue(camerabox->cameraInfo());
+    info[FocusField] = camerabox->focusValue();
+    info[FocusStepField] = camerabox->focusStep();
 
     QStringList channels;//所有保存过相机配置的通道
     if (!camerainfo.isEmpty()) { // 有保存过的通道参数
@@ -121,12 +118,6 @@ PreviewToolInfo PreviewTool::toolInfo() const
     }
     // 存储有哪些通道被设置过,方便信息组装,本身也是临时信息,没有用
     info[CaptureChannelField] = channels;//增加一个key=capture_channel,方便组装时判断
-
-    // 6. focus
-    auto focus = focusbox->focus();
-    auto focusstep = focusbox->focusStep();
-    info[FocusField] = QString::number(focus);
-    info[FocusStepField] = QString::number(focusstep);
 
     // 8. viewmode
     auto viewmodeinfo = selectbox->viewModeInfo();
@@ -149,11 +140,6 @@ void PreviewTool::importExperConfig(const QVariantMap &m)
     objectivebox->importExperConfig(objective);
     // camera_loc自动跟随objective的设置,无需导入
 
-    { // 3. focusbox
-        auto focus = m[FocusField].toDouble();
-        auto step = m[FocusStepField].toDouble();
-        focusbox->importExperConfig(focus,step);
-    }
 
     { // 6. 相机通道参数的导入
         auto camerainfo = m[CameraChannelField].value<QVariantMap>();

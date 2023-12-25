@@ -12,7 +12,6 @@
 #include "window.h"
 #include "camerabox.h"
 #include "channelbox.h"
-//#include "wellbox.h"
 #include "objectivebox.h"
 #include "zstackbox.h"
 #include "lensbox.h"
@@ -34,7 +33,6 @@ private:
     HistoryBox * historybox;
     ObjectiveBox * objectivebox;
     ViewModeBox * selectbox;
-    FocusBox * focusbox;
     ChannelBox * channelbox;
     CameraBox * camerabox;
     RecordBox * recordbox;

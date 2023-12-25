@@ -11,31 +11,6 @@
 
 #include "window.h"
 #include "cameratool.h"
-#include "focusbox.h"
-
-#ifdef use_opencv2
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/xfeatures2d.hpp>
-
-static cv::Mat qimageToMat(const QImage& img)
-{
-    auto image = img.convertToFormat(QImage::Format_BGR888); // 只能是RGB888或者BGR888
-    cv::Mat mat(image.height(), image.width(), // 只能转为CV_8UC3
-                          CV_8UC3,(void*)image.constBits(),image.bytesPerLine());
-    return mat.clone();// 需要深拷贝,临时变量会没
-}
-
-static QImage matToqimage(const cv::Mat& mat)
-{
-    QImage img((const unsigned char*)mat.data, mat.cols, mat.rows,
-            mat.step,QImage::Format_BGR888);
-//    auto lab = new Label;
-//    lab->setPixmap(QPixmap::fromImage(img));
-//    lab->show();
-     return img;
-}
-#endif
 
 class INTERFACE_IMEXPORT CameraBox : public GroupBox
 {
@@ -45,29 +20,35 @@ public:
     void importExperConfig(const QVariantMap& m,const QString&objective);
     void captureImage(const QImage&img,const QString& channel);
     void captureExposureGain(unsigned exp,unsigned gain);
-    void setEnabled(bool enabled);
-    void setChannel(int option);
+    void setBrightEnabled(bool enabled);
+    void updateChannelText(int option);
     MultiCameraInfo multiCameraInfo() const;
     CameraInfo cameraInfo() const;
+    FocusInfo focusInfo() const;
+    double focusValue() const;
+    double focusStep() const;
 private:
+    GroupBox * leftbox;
     CameraTool * cameratool;
     Label * currentchannel;
-    PushButton * savebtn;
+    PushButton * savecamerabtn;
     PushButton * autofocusbtn;
     PushButton * savefocusbtn;
     PushButton * capturebtn;
     PushButton * stitchbtn;
     RoundButton * topbtn;
     RoundButton * bottombtn;
-    DoubleSlider * slider;
-    SpinBox * step;
+    DoubleSlider * focusslider;
+    SpinBox * focusstep;
     MultiCameraInfo camerainfo;
     ChannelImageInfo imageinfo;
     void initObjects();
     void initAttributes();
     void initLayout();
 private slots:
-    void onSaveBtn();
+    void addFocus();
+    void subtractFocus();
+    void saveCamera();
     void adjustBright();
     void adjustCamera();
 signals:
@@ -76,5 +57,6 @@ signals:
     void slideStitching();
     void cameraAdjusted(int exposure,int gain);
     void brightAdjusted(int bright);
+    void focusChanged(double val);
 };
 #endif //EOSI_CAMERABOX_H

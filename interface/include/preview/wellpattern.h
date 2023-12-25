@@ -51,7 +51,6 @@ public:
     void applyGroupEvent(QCVariantMap m); // 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
     void applyAllEvent(QCVariantMap m);
     void selectModeChangedEvent(QCVariantMap m);
-
 protected:
     ViewMode mSelectMode = ViewMode::PointMode;
     const int mDispersedMaskSize = DefaultDispersedMaskSize;
@@ -63,6 +62,7 @@ protected:
     QAction * opengroupact;
     QAction * openviewact;
     QAction * removeholeact;
+    QAction * enterviewact;
     void onSetGroupAct();// 当前孔的所属组颜色和名称传递给分组窗口去更新ui信息,触发openSetGroupWindow信号
     void onOpenViewAct();//打开选择视野窗口的事件,需要传递当前孔的coordinate+group+color+grouppoints+allgroups,触发openViewWindow信号
     void onRemoveHoleAct();

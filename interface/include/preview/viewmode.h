@@ -17,11 +17,14 @@ class INTERFACE_IMEXPORT ViewModeBox: public GroupBox
     Q_OBJECT
 public:
     explicit ViewModeBox(QWidget*parent= nullptr);
-    void setEnabled(int option);
+    void setViewEnabled(int option);
     ViewMode viewMode() const;
     ViewModeInfo viewModeInfo() const;
 private:
     RadioGroup * groupMode;
+    void initObjects();
+    void initAttributes();
+    void initLayout();
 signals:
     void modeSelected(int mode);
 };
