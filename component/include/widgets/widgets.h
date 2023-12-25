@@ -6,8 +6,8 @@
  * @FilePath: \EOS\component\include\widgets\widgets.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#ifndef EOSI_WIDGETS_H
-#define EOSI_WIDGETS_H
+#ifndef EOS_WIDGETS_H
+#define EOS_WIDGETS_H
 
 // (1) 导出定义
 #if defined(COMPONENT_LIBRARY)
@@ -76,7 +76,6 @@
 #define ColorButtonStyle QString("width:40px;height:40px;border:2px solid #3282F6;border-radius:20px;background-color:%1;")
 #define ProgressBarMinHeight 40
 #define ColorButtonSize 40
-#define GroupInfoSize DefaultWindowSize
 #define RoundButtonSize 20
 #define InscribedRectDefaultRows 3
 #define InscribedRectDefaultCols 3
@@ -84,13 +83,13 @@
 #define InscribedRectColor QColor("#00A2E8")
 #define TriangleLength 30 // 绘制三角形的长度
 #define TriangleGap 10 // 三角到边缘的距离
-#define TriangleMinHeight 160
+#define TriangleMinHeight 100
 #define TriangleMinWidth (TriangleMinHeight/0.618)
 #define PhotoCanvasTriangleLength 100
 #define PhotoCanvasTriangleGap 10
-#define ViewTriangleLength 50
+#define ViewTriangleLength 30
 #define PictureDescriptionMaxHeight 30
 #define ChannelPictureLabelMinHeight 100
 #define ChannelPictureLabelMaxWidth 150
 #define ChannelPictureLabelDefaultWidth 400
-#endif //EOSI_WIDGETS_H
+#endif //EOS_WIDGETS_H

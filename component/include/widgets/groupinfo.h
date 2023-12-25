@@ -20,7 +20,6 @@ class COMPONENT_IMEXPORT GroupInfo: public QDialog
 public:
     explicit GroupInfo(QWidget*parent= nullptr);
 
-    QString groupType() const;
     QString groupName() const;
     QColor groupColor() const;
     QString groupMedicine() const;
@@ -30,7 +29,6 @@ public:
     QVariantMap groupInfo() const;
     void setGroupInfo(const QVariantMap& m);
 
-    void setGroupType(const QString& type);
     void setGroupName(const QString& name);
     void setGroupColor(const QColor& color);
     void setGroupMedicine(const QString& mdc);
@@ -41,7 +39,6 @@ private:
     void initObjects();
     void onClick();
     ComboBox * grouptype;
-    LineEdit * groupname;
     LineEdit * medicine;
     LineEdit * dose;
     ComboBox * doseunit;

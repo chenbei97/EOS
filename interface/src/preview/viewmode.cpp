@@ -16,13 +16,69 @@ ViewModeBox::ViewModeBox(QWidget *parent) : GroupBox(parent)
     initLayout();
 
     setTitle(tr(ViewSelectBoxTitle));
-    connect(groupMode,&RadioGroup::radioClicked,this, &ViewModeBox::modeSelected);
+    connect(groupMode,&RadioGroup::radioClicked,this, &ViewModeBox::radioClick);
+    connect(triangleMove,&TriangleMove::triangleClicked,this,&ViewModeBox::triangleClick);
+    connect(enableGroupBtn,&PushButton::clicked,this,&ViewModeBox::enableGroup);
+    connect(endGroupBtn,&PushButton::clicked,this,&ViewModeBox::endGroup);
+    connect(groupType,&ComboBox::currentTextChanged,this,&ViewModeBox::toggleGroup);
+}
+
+void ViewModeBox::radioClick(int mode)
+{
+    if (mode == 1) {
+        if (groupType->isEnabled()) {
+            triangleMove->setEnabled(true);
+        }
+    } else {
+        triangleMove->setEnabled(false);
+    }
+    emit modeSelected(mode);
+}
+
+void ViewModeBox::triangleClick(int option)
+{
+    if (groupMode->checkedID() == 1 && groupType->isEnabled()) {
+        emit triangleClicked(option);
+    }
+}
+
+void ViewModeBox::enableGroup()
+{
+    groupType->setEnabled(true);
+    if (groupMode->checkedID() == 1)
+        triangleMove->setEnabled(true);
+    emit enableWellPattern(true);
+}
+
+void ViewModeBox::endGroup()
+{
+    groupType->setEnabled(false);
+    triangleMove->setEnabled(false);
+    emit enableWellPattern(false);
+}
+
+void ViewModeBox::toggleGroup(const QString &text)
+{
+    emit groupTypeChanged(text);
+    auto idx = groupType->currentIndex();
+    auto color = groupType->itemData(idx,Qt::BackgroundRole).toString();
+    emit groupColorChanged(QColor(color));
+    groupType->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color));
 }
 
 void ViewModeBox::initAttributes()
 {
     groupMode->setText(QStringList()<<tr(PointModeField)<<tr(AreaModeField)<<tr(WholeModeField));
-
+    triangleMove->setTriangleGap(0);
+    triangleMove->setEnabled(false);
+    groupType->setEnabled(false);
+    groupType->setCurrentIndex(-1);
+    auto cmodel = static_cast<QStandardItemModel*>(groupType->model());
+    Q_ASSERT(cmodel->rowCount() <= GroupTypeColors.count());
+    for(int i = 0; i < cmodel->rowCount(); ++i) {
+        cmodel->item(i)->setBackground(GroupTypeColors[i]);
+        cmodel->item(i)->setData(GroupTypeColors[i],Qt::BackgroundRole);
+    }
 }
 
 void ViewModeBox::initLayout()
@@ -34,11 +90,18 @@ void ViewModeBox::initLayout()
     leftbox->setLayout(leftlay);
 
     // 2. rightbox
-
+    auto rightbox = new GroupBox;
+    auto rightlay = new QVBoxLayout;
+    rightlay->addWidget(enableGroupBtn);
+    rightlay->addWidget(groupType);
+    rightlay->addWidget(endGroupBtn);
+    rightbox->setLayout(rightlay);
 
     // 3. mainlay
     auto lay = new QHBoxLayout;
     lay->addWidget(leftbox);
+    lay->addWidget(rightbox);
+    lay->addWidget(triangleMove);
     lay->setSpacing(10);
     lay->addStretch();
     setLayout(lay);
@@ -47,6 +110,10 @@ void ViewModeBox::initLayout()
 void ViewModeBox::initObjects()
 {
     groupMode = new RadioGroup(3,Qt::Vertical);
+    triangleMove = new TriangleMove;
+    groupType = new ComboBox(GroupTypeFields);
+    enableGroupBtn = new PushButton(tr("create group"));
+    endGroupBtn = new PushButton(tr("done"));
 }
 
 void ViewModeBox::setViewEnabled(int option)

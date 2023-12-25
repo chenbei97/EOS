@@ -35,6 +35,7 @@ private:
     QMap<int,QPointFVector> mTmpPoints;
     // 电机坐标: 2种模式共用
     QPointFVector mViewMachinePoints;
+    ViewApply * viewApply;
 private:
     virtual void onRemoveViewAct() override;
     virtual void onSaveViewAct() override;

@@ -49,7 +49,10 @@ signals:
     void importFilePath(const QString&path); // 导入文件配置的路径
     void photoTaking();// 只有camerabox的拍照会触发该信号
     void slideStitching(); // slide下允许拼图
-    void directionMove(int option); // 移动镜头
+    void triangleClicked(int option); // 移动镜头
+    void enableWellPattern(bool enable);
+    void groupTypeChanged(const QString& group);
+    void groupColorChanged(const QColor& color);
     void focusChanged(double val);
     void autoFocus();
     void cameraAdjusted(int exposure,int gain); // 调整相机参数

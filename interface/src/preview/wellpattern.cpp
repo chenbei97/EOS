@@ -47,7 +47,6 @@ WellPatternInfo WellPattern::patternInfo() const
             holeInfoMap[HoleViewUiPointsField].setValue(holeInfo.uipoints);
             holeInfoMap[HoleViewPointsField].setValue(holeInfo.viewpoints);
 
-            holeInfoMap[HoleExperTypeField] = holeInfo.type; // 3.备忘录信息
             holeInfoMap[HoleMedicineField] = holeInfo.medicine;
             holeInfoMap[HoleDoseField] = holeInfo.dose;
             holeInfoMap[HoleDoseUnitField] = holeInfo.doseunit;
@@ -68,13 +67,11 @@ WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,col
 {
     mMouseEvent = true;
     opengroupact = new QAction(tr(GroupHoleActTitle));
-    openviewact = new QAction(tr(SelectHoleActTitle));
+    openviewact = new QAction(tr(EnterViewActTitle));
     removeholeact = new QAction(tr(RemoveHoleActTitle));
-    enterviewact = new QAction(tr(EnterViewActTitle));
     addAction(opengroupact);
-    addAction(openviewact);
     addAction(removeholeact);
-    addAction(enterviewact);
+    addAction(openviewact);
     setContextMenuPolicy(Qt::ActionsContextMenu);
     initDrapHoles();
     initDisableHoles();
@@ -262,7 +259,7 @@ void WellPattern::initHoleInfo()
             HoleInfo info;
             info.group = QString();
             info.coordinate = QPoint(row,col);
-            info.color = Qt::red;
+            info.color = Qt::black;
 #ifdef viewRowColUnEqual
             info.dimension = Dimension2D();
 #else
@@ -276,7 +273,6 @@ void WellPattern::initHoleInfo()
             info.allgroup = QSet<QString>();
             info.allcoordinate = QPoint2DVector();
 
-            info.type = QString();
             info.medicine = QString();
             info.doseunit = QString();
             info.dose = QString();

@@ -147,7 +147,7 @@ static const char* StitchImageField = "stitch_image";
 
 static const char* PreviewDockHoleTitle = "Select Hole Inside View";
 static const char* PreviewDockSlideTitle = "Select Slide Inside View";
-static const char* PreviewWellDockTitle = "Select Hole Inside View(%1,%2)-Group(%3)";
+static const char* PreviewWellDockTitle = "Hole(%1,%2)-Group(%3)";
 static const char* PreviewNoGroupWellDockTitle = "Group not set";
 static const char* ViewSelectBoxTitle = "Capture Mode";
 static const char* WellBoxTitle = "Well";
@@ -162,7 +162,6 @@ static const char* OtherBoxField = "Other";
 
 static const char*  SaveViewActTitle = "Select View";
 static const char*  RemoveViewActTitle = "Remove View";
-static const char*  SelectHoleActTitle = "Select Hole";
 static const char*  RemoveHoleActTitle = "Remove Hole";
 static const char*  EnterViewActTitle = "Come into View";
 static const char*  GroupHoleActTitle = "Grouping Hole";

@@ -62,7 +62,6 @@ protected:
     QAction * opengroupact;
     QAction * openviewact;
     QAction * removeholeact;
-    QAction * enterviewact;
     void onSetGroupAct();// 当前孔的所属组颜色和名称传递给分组窗口去更新ui信息,触发openSetGroupWindow信号
     void onOpenViewAct();//打开选择视野窗口的事件,需要传递当前孔的coordinate+group+color+grouppoints+allgroups,触发openViewWindow信号
     void onRemoveHoleAct();

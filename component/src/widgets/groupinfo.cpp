@@ -12,15 +12,17 @@
 GroupInfo::GroupInfo(QWidget *parent) : QDialog(parent)
 {
     initObjects();
-    resize(GroupInfoSize);
+    resize(DefaultWindowSize.width(),DefaultWindowSize.height()-100);
     connect(btn,&PushButton::clicked,this,&GroupInfo::onClick);
+    grouptype->setEnabled(false); // 只能外部去更改
+    grouptype->setCurrentIndex(-1);
+    cbtn->hide();
 }
 
 QVariantMap GroupInfo::groupInfo() const
 {
     QVariantMap m;
 
-    m[HoleExperTypeField] = groupType();
     m[HoleGroupNameField] = groupName();
     m[HoleGroupColorField] = groupColor();
     m[HoleMedicineField] = groupMedicine();
@@ -32,15 +34,12 @@ QVariantMap GroupInfo::groupInfo() const
 
 void GroupInfo::setGroupInfo(const QVariantMap &m)
 {
-
-    auto type = m[HoleExperTypeField].toString();
     auto color = m[HoleGroupColorField].toString();
     auto group = m[HoleGroupNameField].toString();
     auto medicine = m[HoleMedicineField].toString();
     auto dose = m[HoleDoseField].toString();
     auto unit = m[HoleDoseUnitField].toString();
 
-    setGroupType(type);
     setGroupColor(color);
     setGroupName(group);
     setGroupMedicine(medicine);
@@ -48,19 +47,48 @@ void GroupInfo::setGroupInfo(const QVariantMap &m)
     setGroupDoseUnit(unit);
 }
 
-QString GroupInfo::groupType() const
+
+void GroupInfo::initObjects()
 {
-    return grouptype->currentText();
+    grouptype = new ComboBox;
+    medicine = new LineEdit;
+    dose = new LineEdit;
+    doseunit = new ComboBox;
+    btn = new PushButton(tr("Confirm"));
+    cbtn = new ColorButton;
+    cbtn->setObjectName("groupInfoColorButton");
+
+    grouptype->addItems(GroupTypeFields);
+    doseunit->addItems(GroupDoseUnitFields);
+    dose->setValidator(new QDoubleValidator);
+
+    auto lay = new QVBoxLayout;
+    auto formlay = new QFormLayout;
+    formlay->addRow(tr("Experiment Group: "),grouptype);
+    formlay->addRow(tr("Experiment Medicine: "),medicine);
+    formlay->addRow(tr("Experiment Dose: "),dose);
+    formlay->addRow(tr("Dose Unit: "),doseunit);
+
+    auto blay = new QHBoxLayout;
+    blay->addStretch();
+    blay->addWidget(cbtn);
+    blay->addWidget(btn);
+
+    lay->addLayout(formlay);
+    lay->addLayout(blay);
+    lay->addStretch();
+    setLayout(lay);
 }
 
 QString GroupInfo::groupName() const
 {
-    return groupname->text().simplified();
+    return grouptype->currentText();
 }
 
 QColor GroupInfo::groupColor() const
 {
-    return cbtn->color();
+    return grouptype->itemData(0,Qt::BackgroundRole).toString();
+    //return cbtn->color();
 }
 
 QString GroupInfo::groupMedicine() const
@@ -78,19 +106,18 @@ QString GroupInfo::groupDoseUnit() const
     return doseunit->currentText();
 }
 
-void GroupInfo::setGroupType(const QString &type)
-{
-    grouptype->setCurrentText(type);
-}
-
 void GroupInfo::setGroupName(const QString &name)
 {
-    groupname->setText(name);
+    grouptype->setCurrentText(name);
 }
 
 void GroupInfo::setGroupColor(const QColor &color)
 {
-    cbtn->setColor(color);
+    if (color != Qt::black) { // holeinfo默认是黑色,首次是黑色的话不要设置
+        // cbtn->setColor(color);
+        grouptype->setItemData(0,color,Qt::BackgroundRole);
+        grouptype->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color.name()));
+    }
 }
 
 void GroupInfo::setGroupMedicine(const QString &mdc)
@@ -110,38 +137,10 @@ void GroupInfo::setGroupDoseUnit(const QString &unit)
 
 void GroupInfo::onClick()
 {
-   emit accept();
-}
-
-void GroupInfo::initObjects()
-{
-    grouptype = new ComboBox;
-    groupname = new LineEdit;
-    medicine = new LineEdit;
-    dose = new LineEdit;
-    doseunit = new ComboBox;
-    btn = new PushButton(tr("Confirm"));
-    cbtn = new ColorButton;
-    cbtn->setObjectName("groupInfoColorButton");
-
-    grouptype->addItems(GroupTypeFields);
-    doseunit->addItems(GroupDoseUnitFields);
-    dose->setValidator(new QDoubleValidator);
-
-    auto lay = new QVBoxLayout;
-    auto formlay = new QFormLayout;
-    formlay->addRow(tr("Experiment Type: "),grouptype);
-    formlay->addRow(tr("Experiment Group: "),groupname);
-    formlay->addRow(tr("Experiment Medicine: "),medicine);
-    formlay->addRow(tr("Experiment Dose: "),dose);
-    formlay->addRow(tr("Dose Unit: "),doseunit);
-
-    auto blay = new QHBoxLayout;
-    blay->addStretch();
-    blay->addWidget(cbtn);
-    blay->addWidget(btn);
-
-    lay->addLayout(formlay);
-    lay->addLayout(blay);
-    setLayout(lay);
+    if (grouptype->currentIndex() != -1) {
+        accept();
+    } else {
+        QMessageBox::warning(this,WarningChinese,"Group Not Set!");
+        reject();
+    }
 }

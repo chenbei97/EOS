@@ -181,12 +181,10 @@ void SummaryPanel::setData(const QVariantMap &m)
                 // 每个组拿第1个孔的信息就可以了,至少1个孔
                 auto holeinfo = groupinfo.value(groupinfo.firstKey()).value<QVariantMap>();
 
-                auto expertype = holeinfo[HoleExperTypeField].toString();
                 auto medicine = holeinfo[HoleMedicineField].toString();
                 auto dose = holeinfo[HoleDoseField].toString();
                 auto unit = holeinfo[HoleDoseUnitField].toString();
                 edit->append(tr("<strong><font color = #00A2E8>%1)%2:</font></strong>").arg(count).arg(group));
-                edit->append(tr("<strong><font color = #00A2E8>1.expertype: %1</font></strong>").arg(expertype));
                 edit->append(tr("<strong><font color = #00A2E8>2.medicine: %1</font></strong>").arg(medicine));
                 edit->append(tr("<strong><font color = #00A2E8>3.dose: %1-%2</font></strong>").arg(dose).arg(unit));
             }

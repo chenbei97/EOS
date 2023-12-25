@@ -11,10 +11,10 @@
 ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
 {
     // 这里初始化文字时需要跟objectivesetting.cpp初始化的4个镜头选项保持一致
-    rbtn_loc1 = new RadioButton(Objective4x);
-    rbtn_loc2 = new RadioButton(Objective10x);
-    rbtn_loc3 = new RadioButton(Objective20x);
-    rbtn_loc4 = new RadioButton(Objective40x);
+    rbtn_loc1 = new RadioButton(Objective4x+QString("[loc1]"));
+    rbtn_loc2 = new RadioButton(Objective10x+QString("[loc2]"));
+    rbtn_loc3 = new RadioButton(Objective20x+QString("[loc3]"));
+    rbtn_loc4 = new RadioButton(Objective40x+QString("[loc4]"));
 
     location_button[ObjectiveLocationField1] = rbtn_loc1;
     location_button[ObjectiveLocationField2] = rbtn_loc2;
@@ -41,16 +41,16 @@ ObjectiveBox::ObjectiveBox(QWidget *parent): GroupBox(parent)
 void ObjectiveBox::onObjectiveSettingChanged(const LocationObjectiveInfo &m)
 { // setting设置的每个位置放的物镜型号
 
-    rbtn_loc1->setText(m[ObjectiveLocationField1]);
-    rbtn_loc2->setText(m[ObjectiveLocationField2]);
-    rbtn_loc3->setText(m[ObjectiveLocationField3]);
-    rbtn_loc4->setText(m[ObjectiveLocationField4]);
+    rbtn_loc1->setText(m[ObjectiveLocationField1]+QString("[loc1]"));
+    rbtn_loc2->setText(m[ObjectiveLocationField2]+QString("[loc1]"));
+    rbtn_loc3->setText(m[ObjectiveLocationField3]+QString("[loc1]"));
+    rbtn_loc4->setText(m[ObjectiveLocationField4]+QString("[loc1]"));
 
     // 可能有无镜头的选项
     if (m.values().contains(NoneField)) {
         auto loc = m.key(NoneField); // 找到无镜头的位置
         location_button[loc]->setEnabled(false); // none不能选禁用
-        foreach(auto cloc, m.keys()) {
+        for(auto cloc: m.keys()) {
             if (cloc != loc) {
                 location_button[cloc]->setEnabled(true); // 其它的要恢复使能
             }
@@ -58,7 +58,7 @@ void ObjectiveBox::onObjectiveSettingChanged(const LocationObjectiveInfo &m)
             location_button[cloc]->click();// click才能触发更新信号
         }
     } else { // 没包含none
-        foreach(auto cloc, m.keys()) {
+        for(auto cloc: m.keys()) {
                location_button[cloc]->setEnabled(true); // 可能第1次有none,第2次没有none要全部恢复使能
         }
         rbtn_loc1->setChecked(true); // 希望切换物镜硬件配置时能够确保UI界面信息的更新,手动触发
@@ -132,6 +132,7 @@ void ObjectiveBox::onClicked()
     }
 
     // 原来br4x,改为4x,为了方便禁用channelbox的使能,要修正改回来br4x,一种代码兼容历史原因的手段
+    text.chop(6); // 去除位置尾缀
     text = convertTo(text);
     if (text.contains(NAField,Qt::CaseInsensitive))
         QMessageBox::information(this,InformationChinese,
@@ -178,6 +179,7 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
         m[ObjectiveLocationField] = QString::number(ObjectiveLocationField4Index);
     }
 
+    text.chop(6);
     text = convertTo(text); // 兼容老代码,字段转换
     m[ObjectiveDescripField] = text;
     //LOG<<m; // 注意! : 由于objectivesetting信号是异步的,此时rbtn_loc1其实并未赋值,所以构造函数初始化时要保持一致

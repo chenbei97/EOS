@@ -19,10 +19,9 @@
 #include "videowidget.h"
 #include "slidepattern.h"
 #include "wellbox.h"
-
-//#define uselabelcanvas 0
 #include "toupcamera.h"
 #include "expertool.h"
+//#define uselabelcanvas 0
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {

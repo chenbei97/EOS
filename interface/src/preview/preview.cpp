@@ -36,10 +36,10 @@ void Preview::setViewMode(int mode)
 
 void Preview::toggleStack(int option) 
 { // 切换孔板和载玻片,0-plate,1-slide
+    stack_view_pattern->setCurrentWidget(stackpattern);
     stackpattern->setCurrentIndex(option);
     stackview->setCurrentIndex(option);
     if (option) {
-        //dock->setFloating(false);
         canvasmode->changeMode(CanvasMode::PhotoMode);
         photocanvas->setStrategy(PhotoCanvas::GridPixmap);
     } else {
@@ -85,11 +85,6 @@ void Preview::toggleBrand(int option)
 
     if (stackpattern->currentWidget() == wellpattern) {
         Q_ASSERT(stackview->currentWidget() == wellview);
-//        if (size > view_well_6_4x*10)
-//            dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
-//        else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
-//        else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
-
         // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
 #ifdef viewRowColUnEqual
         wellview->toggleBrandObjective(Dimension2D(size,size), false);
@@ -97,7 +92,7 @@ void Preview::toggleBrand(int option)
         wellview->toggleBrandObjective(size, false);
 #endif
         // 3. 视野窗口的数据信息临时信息需要更改,因为尺寸变了
-        stackview->setWindowTitle(tr(PreviewDockHoleTitle));
+        wellview->drawGroupText(tr(PreviewDockHoleTitle));
 
         // 4.切换厂家setPattenSize已经都清理完了,无需再调用
 
@@ -139,19 +134,13 @@ void Preview::onObjectiveChanged(const QString& obj)
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
     stack_view_pattern->setCurrentWidget(stackview);
-//    if (size > view_well_6_4x*10)
-//        dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
-//    else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
-//    else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
-
     // 2. 更新视野窗口去更新视野窗口绘制和临时保存信息
 #ifdef viewRowColUnEqual
     auto oldViewSize = wellview->viewInfo()[HoleViewSizeField].value<Dimension2D>();
     if (oldViewSize != Dimension2D(size,size)) { // 如果视野尺寸前后没发生变化,不需要清理
         LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" need clear";
         wellview->toggleBrandObjective(Dimension2D(size,size),true); // 清理ViewPattern
-        //dock->setWindowTitle(tr(PreviewDockHoleTitle));
-        stackview->setWindowTitle(tr(PreviewDockHoleTitle));
+        wellview->drawGroupText(tr(PreviewDockHoleTitle));
         wellpattern->clearViewInfo();// 只需要孔关于视野的信息,其它保留
     } else {
         LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" not clear";
@@ -161,7 +150,7 @@ void Preview::onObjectiveChanged(const QString& obj)
     if (oldViewSize != size) { // 如果视野尺寸前后没发生变化,不需要清理
         LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" need clear";
         wellview->toggleBrandObjective(size,true); // 清理ViewPattern
-        stackview->setWindowTitle(tr(PreviewDockHoleTitle));
+        wellview->drawGroupText(tr(PreviewDockHoleTitle));
         wellpattern->clearViewInfo();// 只需要孔关于视野的信息,其它保留
     } else {
         LOG<<"toggle objective viewsize,before: "<<oldViewSize<<" after: "<<size<<" not clear";
@@ -206,19 +195,13 @@ void Preview::openWellViewWindow(const QVariantMap& m)
 
     // 2.根据当前brand/objective更新视野的尺寸
     stack_view_pattern->setCurrentWidget(stackview);
-    stackview->setWindowTitle(tr(PreviewWellDockTitle).arg(QChar(holepoint.x()+65)).arg(holepoint.y()+1).arg(groupname));
-//    dock->setWindowTitle(tr(PreviewWellDockTitle)
-//                                 .arg(QChar(holepoint.x()+65)).arg(holepoint.y()+1).arg(groupname));
-//    dock->setFloating(true);
+    wellview->drawGroupText(tr(PreviewWellDockTitle).arg(QChar(holepoint.x()+65)).arg(holepoint.y()+1).arg(groupname));
+
     auto toolinfo = previewtool->toolInfo();
     auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
     auto brand = toolinfo[BrandField].toUInt();
     auto manufacturer = toolinfo[ManufacturerField].toUInt();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
-//    if (size > view_well_6_4x*10)
-//        dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*3,PreviewPhotoCanvasViewDefaultSize*3);
-//    else if (size < view_well_6_4x) dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize,PreviewPhotoCanvasViewDefaultSize);
-//    else dock->setWindowSize(PreviewPhotoCanvasViewDefaultSize*2,PreviewPhotoCanvasViewDefaultSize*2);
 
     // 3. ⭐⭐⭐⭐ 把图案的信息传给视野窗口,必须这里额外组装3个字段
     auto nm = m;
@@ -247,12 +230,9 @@ void Preview::openWellViewWindow(const QVariantMap& m)
 // 打开slideview
 void Preview::openSlideViewWindow()
 {
-    // 1.打开dock,此时堆叠界面是slideview
+    stack_view_pattern->setCurrentWidget(stackview);
+    // 1.此时堆叠界面是slideview
     Q_ASSERT(stackview->currentWidget() == slideview);
-    stackview->setWindowTitle(tr(PreviewDockSlideTitle));
-    //dock->setWindowTitle(tr(PreviewDockSlideTitle));
-    //dock->setFloating(true);
-    //dock->setWindowSize(DefaultWindowSize.width()*2,DefaultWindowSize.height()*2);
     // 2. slidepattern不对slideview传递信息,也没有其它额外设置
 }
 
@@ -264,7 +244,7 @@ void Preview::openWellGroupWindow(const QVariantMap &m)
 
     // 2. 分组窗口设置的组信息去更新孔的数据
     int ret = groupinfo->exec();
-    if (ret == QDialog::Accepted) {
+    if (ret == QDialog::Accepted ) {
         wellpattern->updateHoleInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
     }
 }
@@ -322,7 +302,6 @@ void Preview::initLayout()
     // 1.右侧布局
     auto pbox = new GroupBox(tr("Hole/View Selection"));
     auto play = new QVBoxLayout;
-    //play->addWidget(stackpattern);
     play->addWidget(stack_view_pattern);
     pbox->setLayout(play);
     auto rlay = new QVBoxLayout;
@@ -374,21 +353,17 @@ void Preview::initAttributes()
     stackcanvas->addWidget(videocanvas);
 
     // 4. 孔板/载玻片堆叠的界面
+    wellpattern->setEnabled(false);
     stackpattern->addWidget(wellpattern);
     stackpattern->addWidget(slidepattern);
     stackpattern->setMinimumHeight(PreviewPatternMinHeight);
 
+    wellview->drawTriangle(false);
     stackview->addWidget(wellview);
     stackview->addWidget(slideview);
 
     stack_view_pattern->addWidget(stackpattern);
     stack_view_pattern->addWidget(stackview);
-
-//    dock->setWidget(stackview);
-//    dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-//    dock->setAllowedAreas(Qt::AllDockWidgetAreas);
-//    dockcanvas->setCentralWidget(dock);
-//    dockcanvas->addDockWidget(Qt::BottomDockWidgetArea,dock);// 这个地方不能选all/no,否则无法实现点击隐藏关闭效果
 
     tab->setMaximumWidth(PreviewToolBarMaxWidth);
     scrollarea->setWidgetResizable(true);
@@ -420,9 +395,6 @@ void Preview::initObjects()
 
     stack_view_pattern = new QStackedWidget;
 
-    //dock = new DockWidget(tr(PreviewDockHoleTitle));
-    //dockcanvas = new QMainWindow;
-
     tab = new QTabWidget;
     expertool = new ExperTool;
     previewtool = new PreviewTool;
@@ -448,6 +420,10 @@ void Preview::initConnections()
     connect(previewtool,&PreviewTool::importFilePath,this,&Preview::importExperConfig);
     connect(previewtool,&PreviewTool::modeSelected,this,&Preview::setViewMode);
     connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
+    connect(previewtool,&PreviewTool::triangleClicked,this,&Preview::adjustLens);
+    connect(previewtool,&PreviewTool::enableWellPattern,wellpattern,&WellPattern::setEnabled);
+    connect(previewtool,&PreviewTool::groupTypeChanged,groupinfo,&GroupInfo::setGroupName);
+    connect(previewtool,&PreviewTool::groupColorChanged,groupinfo,&GroupInfo::setGroupColor);
     connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);
     connect(expertool,&ExperTool::loadExper,this,&Preview::loadExper);
     connect(expertool,&ExperTool::stopExper,this,&Preview::stopExper);
@@ -474,7 +450,7 @@ void Preview::initConnections()
     connect(wellview,&WellView::applyAllEvent,wellpattern,&WellPattern::applyAllEvent); // 不按组更新孔窗口的信息
     connect(wellview,&WellView::selectModeChangedEvent,wellpattern,&WellPattern::selectModeChangedEvent);
     connect(wellview,&WellView::previewEvent,this,&Preview::previewViewEvent); // 点击视野预览
-    connect(wellview,&WellView::triangleClicked,this,&Preview::adjustLens); // 点模式微调
+    //connect(wellview,&WellView::triangleClicked,this,&Preview::adjustLens); // 点模式微调,取消在这里,改为viewmode那里去调
     connect(wellview,&WellView::quitView,[=]{stack_view_pattern->setCurrentWidget(stackpattern);});
     connect(slideview,&SlidePattern::rectUpdated,slidepattern,&SlidePattern::updateRect);
 

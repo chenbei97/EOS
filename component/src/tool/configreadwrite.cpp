@@ -105,7 +105,6 @@ void ConfigReadWrite::parseGroupField(const QJsonValue &key, const QJsonValue &v
 //            groupInfoMap[holeInfoObject[HoleCoordinateField].toString()] = holeInfoMap; // 用坐标做关键字
 
             HoleInfo holeInfo;
-            holeInfo.type = holeInfoObject[HoleExperTypeField].toString();
             holeInfo.medicine = holeInfoObject[HoleMedicineField].toString();
             holeInfo.dose = holeInfoObject[HoleDoseField].toString();
             holeInfo.doseunit = holeInfoObject[HoleDoseUnitField].toString();

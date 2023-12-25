@@ -224,11 +224,10 @@ struct ValueRangeUnSigned{
 //#define viewRowColUnEqual 1
 struct HoleInfo {
     // 分组窗口去更新的信息
-    QString type; // 本孔分配的实验类型
+    QString group; // 本孔分配的组
     QString medicine; // 本孔分配的药物
     QString dose; // 本孔分配的剂量
     QString doseunit; // 本孔分配的剂量单位
-    QString group; // 本孔分配的组名
     QColor color; // 本孔分配的组颜色
 
     // 拖拽区域控制的
@@ -259,7 +258,7 @@ struct HoleInfo {
     friend QDebug operator<<(QDebug debug, const HoleInfo& s) {
         debug << "(group,coordinate,color,viewsize,rects,viewpoints,uipoints,"
                  "isselect,allgroup,allcoordinate,"
-                 "type,medicine,dose,unit)=[";
+                 "medicine,dose,unit)=[";
         debug <<s.group<<",";
         debug <<s.coordinate<<",";
         debug <<s.color<<",";
@@ -276,7 +275,6 @@ struct HoleInfo {
         debug <<s.allgroup<<",";
         debug <<s.allcoordinate<<",";
 
-        debug <<s.type<<",";
         debug <<s.medicine<<",";
         debug <<s.dose<<",";
         debug <<s.doseunit<<"]";

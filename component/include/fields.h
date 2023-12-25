@@ -331,7 +331,7 @@ static const char* HoleXCoordinateField = "hole_x";
 static const char* HoleYCoordinateField = "hole_y";
 static const char* ViewSizeField = "viewsize";
 static const char* HoleSizeField = "holesize";
-static const char* HoleExperTypeField = "hole_expertype"; // 本孔所属实验类型
+//static const char* HoleExperTypeField = "hole_expertype"; // 本孔所属实验类型
 static const char* HoleMedicineField = "hole_medicine"; // 本孔的药物信息
 static const char* HoleDoseField = "hole_dose"; // 本孔的剂量信息
 static const char* HoleDoseUnitField = "hole_doseunit"; // 本孔的剂量单位信息
@@ -347,7 +347,10 @@ static const QStringList GroupDoseUnitFields =  {
         "mg/mL","mg/L","g/mL","g/L",
 };
 static const QStringList GroupTypeFields = {
-        QObject::tr("Control"),QObject::tr("Contrast"),QObject::tr("Other"),
+        QObject::tr("Positive Control 1"),QObject::tr("Negative Control 1"),QObject::tr("Treatment 1"),
+        QObject::tr("Positive Control 2"),QObject::tr("Negative Control 2"),QObject::tr("Treatment 2"),
+        QObject::tr("Positive Control 3"),QObject::tr("Negative Control 3"),QObject::tr("Treatment 3"),
+        QObject::tr("Positive Control 4"),QObject::tr("Negative Control 4"),QObject::tr("Treatment 4"),
 };
 
 // stackbox

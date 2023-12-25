@@ -13,7 +13,6 @@ void WellPattern::onSetGroupAct()
 {
     auto color = mHoleInfo[mMousePos.x()][mMousePos.y()].color;
     auto name = mHoleInfo[mMousePos.x()][mMousePos.y()].group;
-    auto type = mHoleInfo[mMousePos.x()][mMousePos.y()].type;
     auto dose = mHoleInfo[mMousePos.x()][mMousePos.y()].dose;
     auto unit = mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit;
     auto medicine = mHoleInfo[mMousePos.x()][mMousePos.y()].medicine;
@@ -21,7 +20,6 @@ void WellPattern::onSetGroupAct()
     QVariantMap m;
     m[HoleGroupColorField] = color;
     m[HoleGroupNameField] = name;
-    m[HoleExperTypeField] = type;
     m[HoleDoseUnitField] = unit;
     m[HoleDoseField] = dose;
     m[HoleMedicineField] = medicine;
@@ -33,7 +31,6 @@ void WellPattern::onSetGroupAct()
 void WellPattern::updateHoleInfo(QCVariantMap m)
 {
     // 1. 更新分组对话框提供的信息
-    auto gtype = m[HoleExperTypeField].toString();
     auto gcolor = m[HoleGroupColorField].toString();
     auto gname = m[HoleGroupNameField].toString();
     auto medicine = m[HoleMedicineField].toString();
@@ -49,7 +46,6 @@ void WellPattern::updateHoleInfo(QCVariantMap m)
                 mHoleInfo[row][col].group = gname; // 名称是分组窗口设置的分组
                 mHoleInfo[row][col].color = gcolor; // 颜色跟随分组窗口设置的颜色
                 mHoleInfo[row][col].coordinate = QPoint(row,col); // 孔坐标
-                mHoleInfo[row][col].type = gtype; // 本孔分配的实验类型
                 mHoleInfo[row][col].medicine = medicine; // 本孔分配的样品
                 mHoleInfo[row][col].dose = dose; // 本孔分配的剂量
                 mHoleInfo[row][col].doseunit = unit; // 本孔分配的剂量单位
@@ -67,7 +63,6 @@ void WellPattern::updateHoleInfo(QCVariantMap m)
         mHoleInfo[mMousePos.x()][mMousePos.y()].color = gcolor;
         mHoleInfo[mMousePos.x()][mMousePos.y()].group = gname;
         mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
-        mHoleInfo[mMousePos.x()][mMousePos.y()].type = gtype; // 本孔分配的实验类型
         mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = medicine; // 本孔分配的样品
         mHoleInfo[mMousePos.x()][mMousePos.y()].dose = dose; // 本孔分配的剂量
         mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = unit; // 本孔分配的剂量单位
@@ -281,7 +276,6 @@ void WellPattern::onRemoveHoleAct()
     mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = QPoint2DVector();
     mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = QSet<QString>();
 
-    mHoleInfo[mMousePos.x()][mMousePos.y()].type = QString();
     mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = QString();
     mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = QString();
     mHoleInfo[mMousePos.x()][mMousePos.y()].dose = QString();

@@ -249,6 +249,9 @@ void Preview::toggleChannel(int option)
 
 void Preview::adjustLens(int option)
 { // 0-left,1-rop,2-right,3-bottom 微调节镜头
+    if (!wellview->isGrouped() || !wellview->isValidMousePoint())
+        return;
+    stack_view_pattern->setCurrentWidget(stackview);
     QJsonObject object;
     object[FrameField] = AdjustLensEvent;
     object[DirectionField] = option;

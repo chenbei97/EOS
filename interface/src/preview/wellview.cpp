@@ -392,7 +392,18 @@ void WellView::onSaveViewAct()
             mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
         }
     }
-    applyholeact->trigger();
+
+    viewApply->exec();
+    LOG<<viewApply->mode();
+    switch (viewApply->mode()) {
+        case 1:applyholeact->trigger();
+            break;
+        case 2:applygroupact->trigger();
+            break;
+        case 3:applyallact->trigger();
+            break;
+    }
+
     update();
 }
 
@@ -672,6 +683,8 @@ void WellView::paintEvent(QPaintEvent *event)
     }
     pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
     painter.setPen(pen);
+    if (!groupText.isEmpty())
+        painter.drawText(30,30,groupText);
     event->accept();
 }
 
@@ -680,7 +693,7 @@ void WellView::mousePressEvent(QMouseEvent *event)
     View::mousePressEvent(event);
     if (mSelectMode == ViewMode::PointMode) {
         if (event->button() == Qt::LeftButton) {
-            if (!mViewInfo[HoleGroupNameField].toString().isEmpty()) {
+            if (isGrouped()) {
                 if (getLeftTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)){
                     isHighlight = true;
                     LOG<<"left triangle is clicked";
@@ -749,6 +762,7 @@ void WellView::setViewMode(ViewMode mode)
 
 WellView::WellView(QWidget *parent) : View(parent)
 {
+    viewApply = new ViewApply;
     //adjustViewPoint应该在preview的adjustLens电机到位后再执行
     //connect(this,&WellView::triangleClicked,this,&WellView::adjustViewPoint);
 }

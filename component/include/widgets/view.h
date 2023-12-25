@@ -34,6 +34,11 @@ public:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    void drawTriangle(bool enable);
+    void drawGroupText(const QString& text);
+
+    bool isValidMousePoint() const;
+    bool isGrouped() const;
 
     void setDisableRect(Qt::Alignment direction,double rate);
     void setDisableRect(double rate);
@@ -60,6 +65,7 @@ protected:
     QPointF mValidMousePos;
     QRectF mMouseRect;
     QRectF mDrapRectF;
+    QString groupText;
     QAction * saveviewact;
     QAction * removeviewact;
     QAction * applyholeact;
@@ -91,6 +97,7 @@ protected:
     bool isValidPoint(const QPointF& point) const;
     bool isValidRect(const QRectF& rect) const;
 protected:
+    bool isDrawTriangle = true;
     bool isHighlight = false;
     double trianglen = ViewTriangleLength; // 三角的边长
     QColor highcolor  = Qt::green;

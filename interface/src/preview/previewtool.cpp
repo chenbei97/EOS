@@ -42,6 +42,10 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(recordbox,&RecordBox::playVideo,this,&PreviewTool::playVideo);
     connect(recordbox,&RecordBox::stopVideo,this,&PreviewTool::stopVideo);
     connect(selectbox,&ViewModeBox::modeSelected,this,&PreviewTool::modeSelected);
+    connect(selectbox,&ViewModeBox::triangleClicked,this,&PreviewTool::triangleClicked);
+    connect(selectbox,&ViewModeBox::enableWellPattern,this,&PreviewTool::enableWellPattern);
+    connect(selectbox,&ViewModeBox::groupTypeChanged,this,&PreviewTool::groupTypeChanged);
+    connect(selectbox,&ViewModeBox::groupColorChanged,this,&PreviewTool::groupColorChanged);
     // 2. 信号槽函数
     connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::updateChannelText);
     connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBox::disableChannel);

@@ -20,26 +20,6 @@ TriangleMove::TriangleMove(QWidget *parent) : QWidget(parent)
     resize(TriangleMinWidth,TriangleMinHeight);
 }
 
-QSize TriangleMove::sizeHint() const
-{
-    return QSize(TriangleMinWidth,TriangleMinHeight);
-}
-
-void TriangleMove::setTriangleGap(double gap)
-{
-    trianggap = gap;
-}
-
-void TriangleMove::setTriangleLength(double len)
-{
-    trianglen = len;
-}
-
-void TriangleMove::mouseReleaseEvent(QMouseEvent *event)
-{
-    mLastPos = QPoint(-1,-1);
-    update();
-}
 
 void TriangleMove::mousePressEvent(QMouseEvent *event)
 {
@@ -79,6 +59,7 @@ void TriangleMove::paintEvent(QPaintEvent *event)
     auto pen = painter.pen();
     pen.setWidth(2);
     painter.setPen(pen);
+    painter.drawRect(rect());
 
     auto left = getLeftTrianglePoints();
     auto right = getRightTrianglePoints();
@@ -105,6 +86,26 @@ void TriangleMove::paintEvent(QPaintEvent *event)
     painter.fillPath(path,highcolor);
 }
 
+QSize TriangleMove::sizeHint() const
+{
+    return QSize(TriangleMinWidth,TriangleMinHeight);
+}
+
+void TriangleMove::setTriangleGap(double gap)
+{
+    trianggap = gap;
+}
+
+void TriangleMove::setTriangleLength(double len)
+{
+    trianglen = len;
+}
+
+void TriangleMove::mouseReleaseEvent(QMouseEvent *event)
+{
+    mLastPos = QPoint(-1,-1);
+    update();
+}
 
 QPolygonF TriangleMove::getLeftTrianglePoints() const
 {

@@ -543,7 +543,6 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
             QString tmpStr;
             auto holeinfo = groupinfo[holekey].value<WellHoleInfo>();
 
-            holeObject[HoleExperTypeField] = holeinfo[HoleExperTypeField].toString();
             holeObject[HoleMedicineField] = holeinfo[HoleMedicineField].toString();
             holeObject[HoleDoseField] = holeinfo[HoleDoseField].toString();
             holeObject[HoleDoseUnitField] = holeinfo[HoleDoseUnitField].toString();
