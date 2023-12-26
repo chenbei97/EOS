@@ -21,6 +21,7 @@
 #include "wellbox.h"
 #include "toupcamera.h"
 #include "expertool.h"
+#include "historybox.h"
 //#define uselabelcanvas 0
 
 class INTERFACE_IMEXPORT Preview : public QWidget
@@ -45,20 +46,15 @@ private:
     VideoWidget * videocanvas;
     QStackedWidget * stackcanvas;
 
+    HistoryBox * historybox;
     WellBox * wellbox;
 
+    GroupBox * holebox;
     WellPattern * wellpattern;
     SlidePattern * slidepattern;
     QStackedWidget * stackpattern;
-
     WellView * wellview;
-    SlidePattern * slideview;
-    QStackedWidget * stackview;
-
     QStackedWidget * stack_view_pattern;
-
-    //DockWidget * dock;
-    //QMainWindow * dockcanvas;
 
     QTabWidget * tab;
     ExperTool * expertool;
@@ -71,19 +67,18 @@ private:
     void initConnections();
 private:
     void openWellViewWindow(const QVariantMap& m);
-    void openSlideViewWindow();
     void openWellGroupWindow(const QVariantMap& m);
 private:
     void setViewMode(int mode);
     void toggleStack(int option);
     void toggleBrand(int option);
-    void onObjectiveChanged(const QString& obj);
+    void toggleObjective(const QString& obj);
     void playVideo(const QString& path);
     void stopVideo();
     void pauseVideo();
     void takingPhoto();
     void stitchSlide();
-    void toggleObjective(int objective,int objective_loc,int isPh);
+    void adjustObjective(int objective,int objective_loc,int isPh);
     void adjustCamera(int exp,int gain);
     void adjustBright(int br);
     void adjustLens(int option);
@@ -95,7 +90,6 @@ private:
     void previewHoleEvent(const QPoint& holePoint);
     void previewSlideEvent(const QPointF& point);
     void exportExperConfig(const QString& path);
-    //void importExperConfigV1(const QString& path);
     void importExperConfig(const QString& path);
     void loadExper();
     void stopExper();

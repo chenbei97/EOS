@@ -261,28 +261,71 @@ void WellPattern::applyAllEvent(QCVariantMap m)
 // (7) 删孔逻辑-需要清除viewPattern对应的临时信息
 void WellPattern::onRemoveHoleAct()
 {
-    mHoleInfo[mMousePos.x()][mMousePos.y()].group = QString();
-    mHoleInfo[mMousePos.x()][mMousePos.y()].color = Qt::red;
-    mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
+    if (mDrapRect.isEmpty()) {
+        mHoleInfo[mMousePos.x()][mMousePos.y()].group = QString();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].color = Qt::white;
+        mHoleInfo[mMousePos.x()][mMousePos.y()].coordinate = mMousePos;
 #ifdef viewRowColUnEqual
-    mHoleInfo[mMousePos.x()][mMousePos.y()].dimension = Dimension2D();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].dimension = Dimension2D();
 #else
-    mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = 0;
+        mHoleInfo[mMousePos.x()][mMousePos.y()].viewsize = 0;
 #endif
-    mHoleInfo[mMousePos.x()][mMousePos.y()].viewrects = QRectFVector();
-    mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointFVector();
-    mHoleInfo[mMousePos.x()][mMousePos.y()].uipoints = QPointFVector();
-    mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = false;
-    mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = QPoint2DVector();
-    mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = QSet<QString>();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].viewrects = QRectFVector();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].viewpoints = QPointFVector();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].uipoints = QPointFVector();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].isselected = false;
+        mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = QPoint2DVector();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = QSet<QString>();
 
-    mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = QString();
-    mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = QString();
-    mHoleInfo[mMousePos.x()][mMousePos.y()].dose = QString();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].medicine = QString();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].doseunit = QString();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].dose = QString();
 
-    // 清除视野窗口的缓存信息
-    emit removeHole(mMousePos);
-    openviewact->trigger(); // 重新刷新一下
+        // 清除视野窗口的缓存信息
+        openviewact->trigger(); // 重新刷新一下,先刷新再移除
+        emit removeHole(mMousePos);
+    } else { // 支持框删除
+        for(int r = 0; r < mrows; ++r) {
+            for(int c = 0; c < mcols; ++c) {
+                if (mDrapHoles[r][c]) {
+                    mHoleInfo[r][c].group = QString();
+                    mHoleInfo[r][c].color = Qt::white;
+                    mHoleInfo[r][c].coordinate = mMousePos;
+#ifdef viewRowColUnEqual
+                    mHoleInfo[r][c].dimension = Dimension2D();
+#else
+                    mHoleInfo[r][c].viewsize = 0;
+#endif
+                    mHoleInfo[r][c].viewrects = QRectFVector();
+                    mHoleInfo[r][c].viewpoints = QPointFVector();
+                    mHoleInfo[r][c].uipoints = QPointFVector();
+                    mHoleInfo[r][c].isselected = false;
+                    mHoleInfo[r][c].allcoordinate = QPoint2DVector();
+                    mHoleInfo[r][c].allgroup = QSet<QString>();
+
+                    mHoleInfo[r][c].medicine = QString();
+                    mHoleInfo[r][c].doseunit = QString();
+                    mHoleInfo[r][c].dose = QString();
+
+                    //openviewact->trigger(); // 重新刷新一下
+                    QVariantMap m;
+                    m[HoleCoordinateField] = QPoint(r,c); // 告知视野当前孔坐标
+                    m[HoleGroupNameField] = mHoleInfo[r][c].group; // 所在组
+                    m[HoleGroupColorField] = mHoleInfo[r][c].color; // 组的颜色
+                    mHoleInfo[r][c].allgroup = getAllGroups();
+                    m[HoleAllGroupsField].setValue(mHoleInfo[r][c].allgroup); // 已有的所有组(每次设置分组信息时会更新)
+                    m[HoleGroupCoordinatesField].setValue(getGroupHoles(mHoleInfo[r][c].group));
+                    mHoleInfo[r][c].allcoordinate = getAllHoles();
+                    m[HoleAllCoordinatesField].setValue(mHoleInfo[r][c].allcoordinate);
+                    emit openWellViewWindow(m);
+                    emit removeHole(QPoint(r,c));
+                }
+            }
+        }
+    }
+
+    emit toggleWellStack(); // 刷新后总是进入视野模式需要重复退出比较麻烦帮用户做好
+    emit groupChanged(getAllGroups());
     update();
 }
 

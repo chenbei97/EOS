@@ -14,10 +14,21 @@ WaitMessageBox::WaitMessageBox(QWidget *parent): QMessageBox(parent)
     setWindowModality(Qt::NonModal);
     setStandardButtons(QMessageBox::NoButton);
     setWindowFlags(windowFlags()& ~Qt::WindowCloseButtonHint&~Qt::WindowContextHelpButtonHint);
-    waitText = WaitMessageBoxMsg;
+    setWaitText(WaitMessageBoxMsg);
     timer.setInterval(0);
     connect(&timer,&QTimer::timeout,this,&WaitMessageBox::updateText);
-    resize(DefaultWindowSize*2);
+    resize(DefaultWindowSize);
+}
+
+WaitMessageBox::WaitMessageBox(const QString& text,QWidget *parent): QMessageBox(parent)
+{
+    setWindowModality(Qt::NonModal);
+    setStandardButtons(QMessageBox::NoButton);
+    setWindowFlags(windowFlags()& ~Qt::WindowCloseButtonHint&~Qt::WindowContextHelpButtonHint);
+    setWaitText(text);
+    timer.setInterval(0);
+    connect(&timer,&QTimer::timeout,this,&WaitMessageBox::updateText);
+    resize(DefaultWindowSize);
 }
 
 void WaitMessageBox::updateText()
@@ -48,4 +59,12 @@ void WaitMessageBox::wait(unsigned count)
     timer.start();
     exec();
     timer.stop();
+}
+
+
+void WaitMessageBox::showEvent(QShowEvent *e)
+{
+    QMessageBox::showEvent(e);
+    resize(DefaultWindowSize);
+    e->accept();
 }

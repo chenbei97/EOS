@@ -27,6 +27,9 @@ public:
     FocusInfo focusInfo() const;
     double focusValue() const;
     double focusStep() const;
+    int exposure() const;
+    int gain() const;
+    int bright() const;
 private:
     GroupBox * leftbox;
     CameraTool * cameratool;

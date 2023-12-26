@@ -17,7 +17,6 @@
 #include "lensbox.h"
 #include "savebox.h"
 #include "timebox.h"
-#include "historybox.h"
 #include "recordbox.h"
 #include "viewmode.h"
 
@@ -27,10 +26,22 @@ class INTERFACE_IMEXPORT PreviewTool : public QWidget
 public:
     explicit PreviewTool(QWidget*parent= nullptr);
     PreviewToolInfo toolInfo() const;
-    QMap<QString,QString> boxInfo(const QString& box) const;
+    CameraInfo cameraInfo() const;
+    ObjectiveInfo objectiveInfo() const;
+    FocusInfo focusInfo() const;
+    ChannelInfo channelInfo() const;
+    ViewModeInfo viewModeInfo() const;
+    int currentExposure() const;
+    int currentGain() const;
+    int currentBright() const;
+    int currentObjective() const;
+    QString currentObjectiveDescription() const;
+    QString currentChannel() const;
+    QString currentGroup() const;
+    int currentViewMode() const;
+    void openDefaultChannel();
     void importExperConfig(const QVariantMap& m);
 private:
-    HistoryBox * historybox;
     ObjectiveBox * objectivebox;
     ViewModeBox * selectbox;
     ChannelBox * channelbox;
@@ -46,7 +57,6 @@ signals:
     void playVideo(const QString& path); // 播放视频的功能
     void stopVideo();
     void pauseVideo();
-    void importFilePath(const QString&path); // 导入文件配置的路径
     void photoTaking();// 只有camerabox的拍照会触发该信号
     void slideStitching(); // slide下允许拼图
     void triangleClicked(int option); // 移动镜头
@@ -63,6 +73,9 @@ signals:
     void captureImage(const QImage& img,const QString& channel);
     void exposureGainCaptured(unsigned exp,unsigned gain);
     void imageCaptured(const QImage& img);
+    void groupSetted(const QString& text);
+    void groupChanged(const QSet<QString>& groups);
+    void wellbrandChanged(int option);
 };
 
 #endif //EOSI_PREVIEWTOOL_H

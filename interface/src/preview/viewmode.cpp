@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-12-04 13:48:06
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-12-20 10:12:06
+ * @LastEditTime: 2023-12-26 13:34:53
  * @FilePath: \EOS\interface\src\preview\viewmode.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -25,7 +25,7 @@ ViewModeBox::ViewModeBox(QWidget *parent) : GroupBox(parent)
 
 void ViewModeBox::radioClick(int mode)
 {
-    if (mode == 1) {
+    if (mode == 1) { // 点模式且确实开启分组功能 可用三角图案
         if (groupType->isEnabled()) {
             triangleMove->setEnabled(true);
         }
@@ -66,6 +66,32 @@ void ViewModeBox::toggleGroup(const QString &text)
     groupType->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color));
 }
 
+void ViewModeBox::updateGroupItemIcon(const QString &text)
+{ // groupInfo点击确定后,更新这里的下拉栏图标,表示不能再选了
+    auto cmodel = static_cast<QStandardItemModel*>(groupType->model());
+    for(int i = 0; i < cmodel->rowCount(); ++i) {
+        auto item = cmodel->item(i);
+        if (item->text() == text) {
+            cmodel->item(i)->setIcon(QIcon(":/images/radiobutton_unchecked.png"));
+            break;
+        }
+    }
+}
+
+void ViewModeBox::resetGroupItemIcon(const QSet<QString> texts)
+{ // 每次删孔都要检测是否某个组的孔删完了,如果删完了texts就没有那个组,对应的图标恢复
+    LOG<<texts;
+    auto cmodel = static_cast<QStandardItemModel*>(groupType->model());
+    for(int i = 0; i < cmodel->rowCount(); ++i) {
+        auto item = cmodel->item(i);
+        if (texts.contains(item->text())) {
+            cmodel->item(i)->setIcon(QIcon(":/images/radiobutton_unchecked.png"));
+        } else {
+            cmodel->item(i)->setIcon(QIcon(":/images/radiobutton_checked.png"));
+        }
+    }
+}
+
 void ViewModeBox::initAttributes()
 {
     groupMode->setText(QStringList()<<tr(PointModeField)<<tr(AreaModeField)<<tr(WholeModeField));
@@ -78,6 +104,7 @@ void ViewModeBox::initAttributes()
     for(int i = 0; i < cmodel->rowCount(); ++i) {
         cmodel->item(i)->setBackground(GroupTypeColors[i]);
         cmodel->item(i)->setData(GroupTypeColors[i],Qt::BackgroundRole);
+        cmodel->item(i)->setIcon(QIcon(":/images/radiobutton_checked.png"));
     }
 }
 
@@ -103,7 +130,7 @@ void ViewModeBox::initLayout()
     lay->addWidget(rightbox);
     lay->addWidget(triangleMove);
     lay->setSpacing(10);
-    lay->addStretch();
+    //lay->addStretch();
     setLayout(lay);
 }
 
@@ -150,5 +177,11 @@ ViewModeInfo ViewModeBox::viewModeInfo() const
             info[ViewModeField] = QString::number(2);
             break;
     }
+    info[CurrentGroupField] = groupType->currentText();
     return info;
+}
+
+QString ViewModeBox::currentGroup() const
+{
+    return groupType->currentText();
 }

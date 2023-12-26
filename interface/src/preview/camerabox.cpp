@@ -31,6 +31,9 @@ void CameraBox::initLayout()
     auto box1lay = new QVBoxLayout;
     box1lay->addWidget(cameratool);
     box1lay->addWidget(savecamerabtn);
+    box1lay->setMargin(0);
+    box1lay->setSpacing(0);
+    leftbox->setMinimumWidth(CameraBoxLeftBoxMinWidth);//让滑动条看起来不要太窄否则不会方便滑动
     leftbox->setLayout(box1lay);
 
     auto box2 = new GroupBox;
@@ -59,7 +62,7 @@ void CameraBox::initLayout()
     auto hlay = new QHBoxLayout;
     hlay->addWidget(leftbox);
     hlay->addWidget(box2);
-    hlay->addStretch();
+    //hlay->addStretch();
     auto lay = new QVBoxLayout;
     lay->addWidget(currentchannel);
     lay->addLayout(hlay);
@@ -235,6 +238,21 @@ CameraInfo CameraBox::cameraInfo() const
     info[GainField] = cameratool->gain();
     info[ExposureField] = cameratool->exposure();
     return info;
+}
+
+int CameraBox::exposure() const
+{
+    return cameratool->exposure().toUInt();
+}
+
+int CameraBox::gain() const
+{
+    return cameratool->gain().toUInt();
+}
+
+int CameraBox::bright() const
+{
+    return cameratool->bright().toUInt();
 }
 
 double CameraBox::focusStep() const

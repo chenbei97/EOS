@@ -12,23 +12,31 @@
 ViewApply::ViewApply(QWidget *parent): QDialog(parent)
 {
     auto lay = new QHBoxLayout;
-    group = new PushGroup(3);
+    current = new PushButton(ApplyHoleActTitle);
+    group = new PushButton(ApplyGroupActTitle);
+    all = new PushButton(ApplyAllActTitle);
+    lay->addWidget(current);
     lay->addWidget(group);
+    lay->addWidget(all);
     setLayout(lay);
-
-    group->setText(QStringList()<<ApplyHoleActTitle<<ApplyGroupActTitle<<ApplyAllActTitle);
-    group->setChecked(1,true);
-    connect(group,&PushGroup::pushClicked,this,&ViewApply::apply);
+    connect(current,&PushButton::clicked,this,&ViewApply::apply);
+    connect(group,&PushButton::clicked,this,&ViewApply::apply);
+    connect(all,&PushButton::clicked,this,&ViewApply::apply);
 }
 
 int ViewApply::mode() const
 {
-    return group->checkedID();
+    return mmode;
 }
 
-void ViewApply::apply(int id)
+void ViewApply::apply()
 {
-    group->setChecked(id,true);
-    Q_UNUSED(id);
+    if (sender() == current) {
+        mmode = 0;
+    } else if (sender() == group) {
+        mmode = 1;
+    } else if (sender() == all) {
+        mmode = 2;
+    }
     accept();
 }

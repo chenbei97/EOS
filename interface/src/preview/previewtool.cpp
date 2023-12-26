@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-18 15:53:52
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-09 11:58:08
+ * @LastEditTime: 2023-12-26 13:36:44
  * @FilePath: \EOS\interface\src\preview\previewtool.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -10,7 +10,6 @@
 
 PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
 {
-    historybox = new HistoryBox;
     objectivebox = new ObjectiveBox;
     selectbox = new ViewModeBox;
     channelbox = new ChannelBox;
@@ -18,7 +17,6 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     recordbox = new RecordBox;
 
     lay = new QVBoxLayout;
-    lay->addWidget(historybox);
     lay->addWidget(objectivebox);
     lay->addWidget(selectbox);
     lay->addWidget(channelbox);
@@ -37,7 +35,6 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(camerabox,&CameraBox::focusChanged,this,&PreviewTool::focusChanged);
     connect(channelbox,&ChannelBox::channelChanged,this,&PreviewTool::channelChanged);
     connect(channelbox,&ChannelBox::channelClosed,this,&PreviewTool::channelClosed);
-    connect(historybox,&HistoryBox::importFilePath,this,&PreviewTool::importFilePath);
     connect(recordbox,&RecordBox::pauseVideo,this,&PreviewTool::pauseVideo);
     connect(recordbox,&RecordBox::playVideo,this,&PreviewTool::playVideo);
     connect(recordbox,&RecordBox::stopVideo,this,&PreviewTool::stopVideo);
@@ -55,52 +52,28 @@ PreviewTool::PreviewTool(QWidget *parent) : QWidget(parent)
     connect(this,&PreviewTool::captureImage,channelbox,&ChannelBox::takePhoto); // 显示缩略图
     connect(this,&PreviewTool::imageCaptured,recordbox,&RecordBox::recordImage); // 原始相机图像
     connect(this,&PreviewTool::exposureGainCaptured,camerabox,&CameraBox::captureExposureGain);
+    connect(this,&PreviewTool::groupSetted,selectbox,&ViewModeBox::updateGroupItemIcon);
+    connect(this,&PreviewTool::groupChanged,selectbox,&ViewModeBox::resetGroupItemIcon);
+    connect(this,&PreviewTool::wellbrandChanged,selectbox,&ViewModeBox::setViewEnabled);
     recordbox->hide();
-}
-
-QMap<QString,QString> PreviewTool::boxInfo(const QString &box) const
-{
-    QMap<QString,QString> info;
-
-    if (box == ObjectiveBoxTitle) {
-        return objectivebox->objectiveInfo();
-    } else if (box == ChannelBoxTitle) {
-        return channelbox->channelInfo();
-    } else if (box == CameraFocusBoxTitle) {
-        return camerabox->cameraInfo(); // 注意: 这里只提供当前Ui的信息而不是5个通道的
-    } else if (box == RecordBoxTitle) {
-        return recordbox->recordInfo();
-    } else if (box == ViewSelectBoxTitle) {
-        return selectbox->viewModeInfo();
-    }
-
-    return info;
 }
 
 PreviewToolInfo PreviewTool::toolInfo() const
 {
     PreviewToolInfo info;
 
-    // 1. wellbox的brand+manufacturer
-    //auto wellinfo = wellbox->wellInfo();
-    //info[WellsizeField] = wellinfo[WellsizeField];
-    //info[BrandField] = wellinfo[BrandField];
-    //info[ManufacturerField] = wellinfo[ManufacturerField];
-//    foreach(auto key,wellinfo.keys())
-//        info[key] = wellinfo[key];
-
-    // 2. objective
+    // 1. objective
     auto objectiveinfo = objectivebox->objectiveInfo();
     info[ObjectiveLocationField] = objectiveinfo[ObjectiveLocationField];// 用了哪个位置的镜头
     info[ObjectiveField] = objectiveinfo[ObjectiveField]; // 4x
     info[ObjectiveDescripField] = objectiveinfo[ObjectiveDescripField]; // br4x
     info[ObjectiveTypeField] = objectiveinfo[ObjectiveTypeField];
 
-    // 3. channel
+    // 2. channel
     auto channelinfo = channelbox->channelInfo();//这个属于临时信息,其实没用(拍照这里有用,当前拍的通道)
     info[CurrentChannelField] = channelinfo[CurrentChannelField]; // 实际字符串BR,PH,如果都没开灯是空字符串
 
-    // 4. camerainfo,分不同通道,保存了gain,exposure,bright
+    // 3. camerainfo,分不同通道,保存了gain,exposure,bright
     auto camerainfo = camerabox->multiCameraInfo();
     info[CurrentInfoField].setValue(camerabox->cameraInfo());
     info[FocusField] = camerabox->focusValue();
@@ -123,9 +96,10 @@ PreviewToolInfo PreviewTool::toolInfo() const
     // 存储有哪些通道被设置过,方便信息组装,本身也是临时信息,没有用
     info[CaptureChannelField] = channels;//增加一个key=capture_channel,方便组装时判断
 
-    // 8. viewmode
+    // 4. viewmode
     auto viewmodeinfo = selectbox->viewModeInfo();
     info[ViewModeField] = viewmodeinfo[ViewModeField];
+    info[CurrentGroupField] = viewmodeinfo[CurrentGroupField];
 
     //LOG<<"tool info = "<<info;
     return info;
@@ -133,12 +107,6 @@ PreviewToolInfo PreviewTool::toolInfo() const
 
 void PreviewTool::importExperConfig(const QVariantMap &m)
 {
-    { // 1.wellbox
-        //auto brand = m[BrandField].toUInt();
-        //auto manufacturer = m[ManufacturerField].toUInt();
-        //wellbox->importExperConfig(manufacturer,brand);
-    }
-
     // 2. objectivebox
     auto objective = m[ObjectiveDescripField].toString(); // br4x
     objectivebox->importExperConfig(objective);
@@ -152,4 +120,74 @@ void PreviewTool::importExperConfig(const QVariantMap &m)
         }
     }
 
+}
+
+ObjectiveInfo PreviewTool::objectiveInfo() const
+{
+    return objectivebox->objectiveInfo();
+}
+
+int PreviewTool::currentObjective() const
+{ // <=> getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
+    return getIndexFromFields(objectivebox->objectiveInfo()[ObjectiveField]).toUInt();
+}
+
+QString PreviewTool::currentObjectiveDescription() const
+{ // <=> toolinfo[ObjectiveDescripField].toString()
+    return objectivebox->objectiveInfo()[ObjectiveDescripField];
+}
+
+CameraInfo PreviewTool::cameraInfo() const
+{ // 注意是当前ui的 <=> toolinfo[CurrentInfoField].value<CameraInfo>()
+    return camerabox->cameraInfo();
+}
+
+FocusInfo PreviewTool::focusInfo() const
+{
+    return camerabox->focusInfo();
+}
+
+ChannelInfo PreviewTool::channelInfo() const
+{
+    return channelbox->channelInfo();
+}
+
+QString PreviewTool::currentChannel() const
+{ // 一个快捷方法 <=> toolinfo[CurrentChannelField].toString()
+    return channelInfo()[CurrentChannelField];
+}
+
+void PreviewTool::openDefaultChannel()
+{// 检测到没开任何灯时要手动先打开默认(明场)通道
+    channelbox->openDefaultChannel();
+}
+
+int PreviewTool::currentExposure() const
+{// 快捷方法,当前Ui显示的值
+    return camerabox->exposure();
+}
+
+int PreviewTool::currentBright() const
+{// 快捷方法,当前Ui显示的值
+    return camerabox->bright();
+}
+
+int PreviewTool::currentGain() const
+{ // 快捷方法,当前Ui显示的值
+    return camerabox->gain();
+}
+
+ViewModeInfo PreviewTool::viewModeInfo() const
+{
+    return selectbox->viewModeInfo();
+}
+
+QString PreviewTool::currentGroup() const
+{
+    return selectbox->currentGroup();
+}
+
+int PreviewTool::currentViewMode() const
+{
+    return (int)selectbox->viewMode();
 }

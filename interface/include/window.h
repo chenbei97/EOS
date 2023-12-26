@@ -55,8 +55,6 @@ using std::modf;
     #define NavigBarFontHeight (NavigBarHeight-NavigPainterPixelHeight)  // 文字在按钮内部,按钮高度和文字高度的差值
     #define NavigBarMoveDistance (NavigBarGap+NavigBarWidth) // 下一个按钮相对于移动距离=gap+width
 
-    #define PreviewPatternMinHeight 450
-
     #define AppSelectButtonCountPerCol 4 // 每行4个按钮
     #define AppSelectButtonCountPerRow 2 // 共2行
     #define AppSelectButtonWidth 350 // 按钮的宽度
@@ -72,13 +70,11 @@ using std::modf;
     #define AppSelectMoveVerDistance (AppSelectButtonVerGap+AppSelectButtonHeight) // 垂直方向下一个按钮相对移动距离=verbtngap+btnheight
     #define AppSelectButtonRoundRadius 25 // 圆角半径
 
-    #define FocusBoxSpacing 50 // 水平布局间隔
-    #define PreviewToolBarMaxWidth 800 // 预览界面工具栏的宽度
+    #define PreviewToolBarMaxWidth 850 // 预览界面工具栏的最大宽度
+    #define PreviewPatternMinHeight 450 // 是工具栏也是Pattern的最小宽度
     #define FocusToolStepSpinMaxWidth 100 // 设置焦距中间的step步进spibox设置的宽度不能太宽
 
-    #define DefaultPreviewPhotoCanvasViewRectSize 50 // 预览图像模式画布绘制视野圆内小方格的默认尺寸(内接正方形策略)
-    #define PreviewPhotoCanvasViewDefaultSize 400 // 视野圆窗口的默认尺寸
-
+    #define CameraBoxLeftBoxMinWidth 350 // 让滑动条看起来不要太窄
     #define CameraModeHeight 40 // 切换相机模式部件的高度
 
     #define TimeBoxSpinBoxMaxWidth 100 // timebox不想让spinbox太长

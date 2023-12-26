@@ -18,6 +18,7 @@ CameraTool::CameraTool(QWidget*parent): QWidget(parent)
     expslider->setSingleStep(1);
 
     auto vlay = new QVBoxLayout;
+
     vlay->addWidget(label);
     vlay->addWidget(expslider);
     vlay->addWidget(gainslider);

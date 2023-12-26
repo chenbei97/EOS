@@ -10,7 +10,7 @@
 #define EOSI_FOCUSBOX_H
 
 #include "window.h"
-#include "autofocus.h"
+#include "focusbox.h"
 
 class INTERFACE_IMEXPORT FocusBox: public GroupBox
 {

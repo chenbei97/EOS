@@ -18,6 +18,7 @@
 #define WaitMessageBoxWaitFocusMsg  "please wait auto focus ready finished..."
 #define WaitMessageBoxStartExperimentMsg  "please wait starting experiment..."
 #define WaitMessageBoxStopExperimentMsg  "please wait stoping experiment..."
+#define WaitMessageBoxToggleChannelMsg  "please wait toggling/closing channel..."
 #define WaitMessageBoxSlideStitchMsg  "please wait stitching slide image...\n[has stitched %1 images]"
 #define WaitMessageBoxWaitStitchMsg  "please wait stitching slide image...]"
 #define use_queuethread 1

@@ -18,16 +18,25 @@ SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
     filenameedit->hide();
     exportallbtn->hide();
 
-    auto lay = new QHBoxLayout;
-    lay->addStretch();
-    lay->addWidget(filenameedit);
-    lay->addWidget(exportallbtn);
-    lay->addWidget(exportToFile);
-    lay->addWidget(stopbtn);
-    lay->addWidget(loadbtn);
+    auto lay1 = new QHBoxLayout;
+    lay1->addWidget(exportToFile);
+    lay1->addWidget(filenameedit);
+    lay1->addWidget(exportallbtn);
+    lay1->addStretch();
 
+    auto lay2 = new QHBoxLayout;
+    lay2->addWidget(loadbtn);
+    lay2->addWidget(stopbtn);
+    //lay2->addStretch();
+
+    auto lay = new QVBoxLayout;
+    lay->addLayout(lay1);
+    lay->addLayout(lay2);
     setLayout(lay);
     setTitle(tr(SaveBoxTitle));
+
+//    loadbtn->setMinimumWidth(200);
+//    stopbtn->setMinimumWidth(200);
 
     connect(exportToFile,&CheckBox::checkedChanged,this,&SaveBox::showExport);
     connect(exportallbtn,&PushButton::clicked,this,&SaveBox::exportFile);

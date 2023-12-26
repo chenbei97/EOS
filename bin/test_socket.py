@@ -205,7 +205,7 @@ class ParseManager:
         response = json.dumps(reponse)
         response+=self.separate
         print("0x0005回复: ", reponse)
-        #time.sleep(1)
+        time.sleep(2)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 移动镜头

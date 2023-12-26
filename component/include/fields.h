@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-11-01 14:55:19
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-02 17:33:59
+ * @LastEditTime: 2023-12-26 13:34:41
  * @FilePath: \EOS\component\include\fields.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -276,7 +276,7 @@ enum class ObjectiveLocationType {
 static const char* ObjectiveLocationField = "objective_loc";
 static const char* CameraChannelField = "camera_channel";
 static const char* ExposureField = "exposure";
-static const char* ExposureFieldLabel = "exposure: ";
+static const char* ExposureFieldLabel = "exp: ";
 static const char* ExposureFieldUnit = "ms";
 static const char* GainField = "gain";
 static const char* GainFieldLabel = "gain: ";
@@ -289,12 +289,15 @@ static const char* FocusField = "focus";
 static const char* FocusxField = "Focus";
 static const char* StepField = "step";
 static const char* IsCoarseField = "isCoarse";
-static const char* FocusSkipHolesField = "skip holes";
-static const char* FocusSkipViewsField = "skip views";
+static const char* SkipHolesField = "skip holes";
+static const char* SkipViewsField = "skip views";
 static const char* FocusSkipHolesLabelField = "skip holes: ";
 static const char* FocusSkipViewsLabelField = "skip views: ";
 static const char* FocusExtendRangeLabelField = "extend range?";
-static const char* FocusFocusModeLabelField = "focus mode: ";
+static const char* ExtendRangeField = "extend range";
+static const char* AllCycleField = "all cycle";
+static const char* FocusAllCycleField = "all cycle?";
+static const char* FocusAllChannelsField = "all channels?";
 static const char* FocusAutoFocusLabelField = "auto focus?";
 static const char* FocusStepField = "focus_step";
 static const char* ObjectiveLocationField1 = "objective1";
@@ -315,9 +318,14 @@ static const QFieldList ObjectiveLocationFields = {
 #define TimeBoxTotalBeyondDurationWarning (QObject::tr("Warning:total should be greater than or equal to duration!"))
 #define TimeBoxStartTimeWarning (QObject::tr("start time cannot be in the past!"))
 static const char* IsScheduleField = "is_schedule";
+static const char* IsScheduleLabelField = "is schedule? ";
 static const char* TotalTimeField = "total_time";
+static const char* TotalTimeLabelField = "total time: ";
 static const char* DurationTimeField = "duration_time";
+static const char* DurationTimeLabelField = "duration time: ";
 static const char* StartTimeField = "start_time";
+static const char* StartTimeLabelField = "start time: ";
+static const char* ChannelOptionLabelField = "channel option: ";
 
 // groupinfo涉及的
 static const char* HoleGroupNameField = "hole_groupname"; // 本孔所属组名称
@@ -331,7 +339,6 @@ static const char* HoleXCoordinateField = "hole_x";
 static const char* HoleYCoordinateField = "hole_y";
 static const char* ViewSizeField = "viewsize";
 static const char* HoleSizeField = "holesize";
-//static const char* HoleExperTypeField = "hole_expertype"; // 本孔所属实验类型
 static const char* HoleMedicineField = "hole_medicine"; // 本孔的药物信息
 static const char* HoleDoseField = "hole_dose"; // 本孔的剂量信息
 static const char* HoleDoseUnitField = "hole_doseunit"; // 本孔的剂量单位信息
@@ -382,6 +389,7 @@ enum class ViewMode {
     WholeMode = 2
 };
 static const char* ViewModeField = "viewmode";
+static const char* CurrentGroupField = "currentgroup";
 
 enum class ImageFormatType {
     jpg = 0,

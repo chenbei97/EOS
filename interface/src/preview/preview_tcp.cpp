@@ -175,7 +175,7 @@ void Preview::autoFocus()
     SocketPointer->resetWaitText();
 }
 
-void Preview::toggleObjective(int objective,int objective_loc,int isPh)
+void Preview::adjustObjective(int objective,int objective_loc,int isPh)
 { // 9, objective: 物镜倍数代号 objective_loc: 切到的物镜位置代号 isPH:指示是否为PH类型
     // 切换物镜同时动电机事件,setting更改物镜设置时也会触发
     // 这个初始化setting时会初始化4个位置的物镜,从而会触发本函数,在mainwindow没构造完成就发了命令
@@ -195,12 +195,12 @@ void Preview::toggleObjective(int objective,int objective_loc,int isPh)
 }
 
 void Preview::closeChannel(int option)
-{ // 5
+{ // 5 关闭灯
     QVariantMap m;
     m[CurrentChannelField] = option;
     m[TurnOffLight] = 1;
     m[BrightField] = -1;
-    SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m),true);
+    SocketPointer->exec(TcpFramePool.toggleChannelEvent,assembleToggleChannelEvent(m));
     if (ParserResult.toBool()) {
         switch(option) {
             case 0:LOG<<"[sync] close br channel";
@@ -220,8 +220,7 @@ void Preview::closeChannel(int option)
 
 void Preview::toggleChannel(int option)
 {
-    auto toolinfo = previewtool->toolInfo();
-    auto current_channel = toolinfo[CurrentChannelField].toString();
+    auto current_channel = previewtool->currentChannel();
 
     if (current_channel.isEmpty()) {
         LOG<<"not have channel is open";
@@ -230,7 +229,7 @@ void Preview::toggleChannel(int option)
         return; // 灯全灭的情况直接返回
     }
 
-    auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
+    auto current_info = previewtool->cameraInfo();
 
     QVariantMap m;
     m[CurrentChannelField] = getIndexFromFields(current_channel).toInt();
@@ -240,7 +239,7 @@ void Preview::toggleChannel(int option)
     AssemblerPointer->assemble(TcpFramePool.toggleChannelEvent,m);
     auto msg = AssemblerPointer->message();
 
-    SocketPointer->exec(TcpFramePool.toggleChannelEvent,msg, true);
+    SocketPointer->exec(TcpFramePool.toggleChannelEvent,msg);
 
     if (ParserResult.toBool()) {
         LOG<<"[sync] turn on light successful! current channel is"<<m[CurrentChannelField].toInt();
@@ -251,7 +250,7 @@ void Preview::adjustLens(int option)
 { // 0-left,1-rop,2-right,3-bottom 微调节镜头
     if (!wellview->isGrouped() || !wellview->isValidMousePoint())
         return;
-    stack_view_pattern->setCurrentWidget(stackview);
+    stack_view_pattern->setCurrentWidget(wellview);
     QJsonObject object;
     object[FrameField] = AdjustLensEvent;
     object[DirectionField] = option;
@@ -268,9 +267,8 @@ void Preview::adjustLens(int option)
 
 void Preview::adjustBright(int br)
 { // 4
-    auto toolinfo = previewtool->toolInfo();
 
-    auto current_channel = toolinfo[CurrentChannelField].toString();
+    auto current_channel = previewtool->currentChannel();
 
     if (current_channel.isEmpty()) {
         LOG<<"没有通道的灯被打开,不执行滑动条的参数调整!";
@@ -300,17 +298,15 @@ void Preview::adjustCamera(int exp,int gain)
 
 void Preview::takingPhoto()
 {
-    auto toolinfo = previewtool->toolInfo();
-    auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
-    int exp = current_info[ExposureField].toUInt();
-    int ga = current_info[GainField].toUInt();
+    int exp = previewtool->currentExposure();
+    int ga = previewtool->currentGain();
 
     ToupCameraPointer->setExposure(exp);
     ToupCameraPointer->setGain(ga);
     auto pix = ToupCameraPointer->capture();
-    auto current_channel = toolinfo[CurrentChannelField].toString();
+    auto current_channel = previewtool->currentChannel();
     previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道,以及显示到缩略图
-    LOG<<"current (exp,gain,bright) is ("<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain()<<current_info[BrightField].toInt()<<")";
+    LOG<<"current (exp,gain,bright) is ("<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain()<<previewtool->currentBright()<<")";
 
     canvasmode->changeMode(CanvasMode::PhotoMode);
     photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
@@ -326,30 +322,20 @@ void Preview::takingPhoto()
 }
 
 void Preview::previewViewEvent(const QPointF &viewpoint)
-{ // 1
-    auto toolinfo = previewtool->toolInfo();
-
-    // 预览事件需要的参数
-    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
-    auto brand = toolinfo[BrandField].toUInt();
-    auto manufacturer = toolinfo[ManufacturerField].toUInt();
-    auto wellsize = toolinfo[WellsizeField].toUInt();
+{ // 预览事件需要的参数:1
+    auto objective = previewtool->currentObjective();
+    auto brand = wellbox->wellBrand();
+    auto manufacturer = wellbox->wellManufacturer();
+    auto wellsize = wellbox->wellSize();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
     auto holecoordinate = wellview->viewInfo()[HoleCoordinateField].toPoint();
-    auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
-    auto bright = current_info[BrightField];
+    auto bright = previewtool->currentBright();
 
     // 自己需要的相机参数
-    int exp = current_info[ExposureField].toUInt();
-    int ga = current_info[GainField].toUInt();
-    //LOG<<wellsize<<viewpoint<<holecoordinate<<bright<<current_channel;
-#ifndef notusetoupcamera
+    int exp = previewtool->currentExposure();
+    int ga = previewtool->currentGain();
     ToupCameraPointer->setExposure(exp);
     ToupCameraPointer->setGain(ga);
-#else
-    setExposure(exp);
-    setGain(ga);
-#endif
     QVariantMap m;
     m[ObjectiveField] = objective;
     m[BrandField] = brand;
@@ -374,25 +360,28 @@ void Preview::previewViewEvent(const QPointF &viewpoint)
 }
 
 void Preview::previewHoleEvent(const QPoint &holepoint)
-{
+{// 预览事件需要的参数:1
     if (holepoint == QPoint(-1,-1))
         return;
 
-    auto toolinfo = previewtool->toolInfo();
+    auto channel = previewtool->currentChannel();
+    if (channel.isEmpty()) {
+        // 没有开灯,默认就开明场的灯
+        previewtool->openDefaultChannel();
+    }
 
     // 预览事件需要的参数
-    auto objective = getIndexFromFields(toolinfo[ObjectiveField].toString()).toUInt();
-    auto brand = toolinfo[BrandField].toUInt();
-    auto manufacturer = toolinfo[ManufacturerField].toUInt();
-    auto wellsize = toolinfo[WellsizeField].toUInt();
+    auto objective = previewtool->currentObjective();
+    auto brand = wellbox->wellBrand();
+    auto manufacturer = wellbox->wellManufacturer();
+    auto wellsize = wellbox->wellSize();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
     auto holecoordinate = holepoint;
-    auto current_info = toolinfo[CurrentInfoField].value<CameraInfo>();
-    auto bright = current_info[BrightField];
+    auto bright = previewtool->currentBright();
 
     // 自己需要的相机参数
-    int exp = current_info[ExposureField].toUInt();
-    int ga = current_info[GainField].toUInt();
+    int exp = previewtool->currentExposure();
+    int ga = previewtool->currentGain();
     ToupCameraPointer->setExposure(exp);
     ToupCameraPointer->setGain(ga);
     QVariantMap m;
@@ -422,28 +411,30 @@ void Preview::previewHoleEvent(const QPoint &holepoint)
 void Preview::loadExper()
 {
     auto patterninfo = wellpattern->patternInfo();
-    auto previewinfo = previewtool->toolInfo();
-    previewinfo[PreviewPatternField] = patterninfo;
-    previewinfo[PreviewToolField] = previewinfo;
+    auto toolinfo = previewtool->toolInfo();
     auto experinfo = expertool->toolInfo();
-    previewinfo[ExperToolField] = experinfo;
-
-    auto channels = experinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
+    auto wellinfo = wellbox->wellInfo();
+    auto channels = expertool->currentSelectedChannels();
     auto totalViews = wellpattern->numberOfViews();
     auto totalChannels = channels.count("1"); // 为1的是勾选上的
     auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
     LOG<<"总的孔视野数 = "<<totalViews<<"勾选的通道数 = "<<totalChannels<<" 预计占据空间 = "<<estimateSpace<<"MB";
+
+    previewinfo[WellBoxTitle].setValue(wellinfo);
+    previewinfo[PreviewPatternField] = patterninfo;
+    previewinfo[PreviewToolField] = toolinfo;
+    previewinfo[ExperToolField] = experinfo;
     previewinfo[EstimatedSpaceField] = estimateSpace;
 
     auto dlg = new SummaryDialog(previewinfo);
     setWindowAlignCenter(dlg);
     dlg->setAttribute(Qt::WA_DeleteOnClose);
-    LOG<<"打开实验信息面板";
+
     int ret = dlg->exec();
     if (ret == QDialog::Rejected)
         return;
     ToupCameraPointer->closeCamera(); // 先关相机后执行
-    LOG<<"然后清理图像";
+
 #ifdef uselabelcanvas
     livecanvas->setPixmap(QPixmap());
 #else
@@ -451,22 +442,20 @@ void Preview::loadExper()
 #endif
     photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
     photocanvas->setImage(QImage());
-    
-    LOG<<"清理图像完毕";
 
     AssemblerPointer->assemble(TcpFramePool.loadExperEvent,previewinfo);
     auto json = AssemblerPointer->message();
-    LOG<<"然后发送启动实验命令";
+    LOG<<"发送启动实验命令";
     SocketPointer->exec(TcpFramePool.loadExperEvent,json);
 
     if (ParserResult.toBool()) {
         QMessageBox::information(this,InformationChinese,tr("Successfully launched the experiment!"));
     }
-    LOG<<"启动实验结束";
 }
 
 void Preview::exportExperConfig(const QString& path)
 { // 导出实验配置
+    previewinfo[WellBoxTitle].setValue(wellbox->wellInfo());
     previewinfo[PreviewPatternField] = wellpattern->patternInfo();
     previewinfo[PreviewToolField] = previewtool->toolInfo();
     previewinfo[ExperToolField] = expertool->toolInfo();
@@ -518,9 +507,9 @@ void Preview::importExperConfig(const QString &path)
 {
     ConfigReadWrite m; // 借助工具类读取文件
     auto json = m.readJson(path);
-
     m.parseJson(json);
     auto result = m.map();
+
     auto groupInfos = result[GroupField].value<QVariantMap>();
     auto patterSize = convertToPointF(result[HoleSizeField].toString());
     auto viewMode = result[ViewModeField].toInt();

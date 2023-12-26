@@ -19,7 +19,7 @@ void ConfigReadWrite::parseObject(const QJsonObject &object)
     if (!object.keys().contains(CameraChannelField))
         parseData[CameraChannelField] = QVariantMap();
 
-    foreach(auto key,object.keys()) // 对象下的所有键值
+    for(auto key: object.keys()) // 对象下的所有键值
     {
         if (key == GroupField){
             parseGroupField(key,object.value(key));
@@ -85,24 +85,6 @@ void ConfigReadWrite::parseGroupField(const QJsonValue &key, const QJsonValue &v
         WellGroupInfo groupInfoMap;
         for(int i = 0; i < groupHoleInfo.count(); ++i) {
             auto holeInfoObject = groupHoleInfo[i].toObject();
-//            WellHoleInfo holeInfoMap;
-//            holeInfoMap[HoleExperTypeField] = holeInfoObject[HoleExperTypeField].toString();
-//            holeInfoMap[HoleMedicineField] = holeInfoObject[HoleMedicineField].toString();
-//            holeInfoMap[HoleDoseField] = holeInfoObject[HoleDoseField].toString();
-//            holeInfoMap[HoleDoseUnitField] = holeInfoObject[HoleDoseUnitField].toString();
-//
-//            holeInfoMap[HoleCoordinateField] = holeInfoObject[HoleCoordinateField].toString();
-//            holeInfoMap[HoleGroupColorField] = holeInfoObject[HoleGroupColorField].toString();
-//            holeInfoMap[HoleGroupNameField] = holeInfoObject[HoleGroupNameField].toString();
-//            // holeInfoMap[HoleGroupCoordinatesField] = holeInfoObject[HoleGroupCoordinatesField].toString();
-//            holeInfoMap[HoleAllCoordinatesField] = holeInfoObject[HoleAllCoordinatesField].toString();
-//            holeInfoMap[HoleAllGroupsField] = holeInfoObject[HoleAllGroupsField].toString();
-//
-//            holeInfoMap[HoleViewSizeField] = holeInfoObject[HoleViewSizeField].toInt();
-//            holeInfoMap[HoleViewRectsField] = holeInfoObject[HoleViewRectsField].toString();
-//            holeInfoMap[HoleViewPointsField] = holeInfoObject[HoleViewPointsField].toString(); //没有uipoints
-//
-//            groupInfoMap[holeInfoObject[HoleCoordinateField].toString()] = holeInfoMap; // 用坐标做关键字
 
             HoleInfo holeInfo;
             holeInfo.medicine = holeInfoObject[HoleMedicineField].toString();

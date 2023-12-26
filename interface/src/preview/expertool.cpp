@@ -14,8 +14,10 @@ ExperTool::ExperTool(QWidget*parent):QWidget(parent)
     timebox = new TimeBox;
     zstackbox = new ZStackBox;
     savebox = new SaveBox;
+    focusbox = new FocusBox;
 
     lay = new QVBoxLayout;
+    lay->addWidget(focusbox);
     lay->addWidget(timebox);
     lay->addWidget(zstackbox);
     lay->addWidget(savebox);
@@ -40,10 +42,30 @@ ExperToolInfo ExperTool::toolInfo() const
     info[StitchField] = zstackinfo[StitchField];
     // 2. exper
     auto experinfo = timebox->timeInfo();
-    foreach(auto key,experinfo.keys())
+    for(auto key: experinfo.keys())
         info[key] = experinfo[key];
 
     return info;
+}
+
+TimeInfo ExperTool::timeInfo() const
+{
+    return timebox->timeInfo();
+}
+
+FocusInfo ExperTool::focusInfo() const
+{
+    return focusbox->focusInfo();
+}
+
+bool ExperTool::isAutoFocus() const
+{
+    return focusbox->isAutoFocus();
+}
+
+QStringList ExperTool::currentSelectedChannels() const
+{ // <=> experinfo[ChannelField].toString().split(",",QString::SkipEmptyParts);
+    return timebox->selectedChannels();
 }
 
 void ExperTool::importExperConfig(const QVariantMap &m)

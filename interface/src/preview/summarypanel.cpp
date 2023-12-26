@@ -22,6 +22,7 @@ SummaryPanel::SummaryPanel(const QVariantMap &m, QWidget *parent) : QWidget(pare
 
 void SummaryPanel::setData(const QVariantMap &m)
 {
+    auto wellinfo = m[WellBoxTitle].value<WellInfo>();
     auto toolinfo = m[PreviewToolField].value<QVariantMap>();
     auto patterninfo = m[PreviewPatternField].value<QVariantMap>();
     auto experinfo = m[ExperToolField].value<QVariantMap>();
@@ -35,23 +36,23 @@ void SummaryPanel::setData(const QVariantMap &m)
         edit->append(tr("<strong><font color = #20A848>[1]Basic Info:</font></strong>"));
         // 1.wellbox
         {
-            auto manufacturer = ManufacturerFields[toolinfo[FieldLoadExperEvent.manufacturer].toInt()];
+            auto manufacturer = ManufacturerFields[wellinfo[FieldLoadExperEvent.manufacturer].toInt()];
             QString brand;
-            switch (toolinfo[FieldLoadExperEvent.manufacturer].toInt()) {
+            switch (wellinfo[FieldLoadExperEvent.manufacturer].toInt()) {
                 case 0:
-                    brand = Brand1Fields[toolinfo[FieldLoadExperEvent.wellbrand].toInt()];
+                    brand = Brand1Fields[wellinfo[FieldLoadExperEvent.wellbrand].toInt()];
                     break;
                 case 1:
-                    brand = Brand2Fields[toolinfo[FieldLoadExperEvent.wellbrand].toInt()];
+                    brand = Brand2Fields[wellinfo[FieldLoadExperEvent.wellbrand].toInt()];
                     break;
                 case 2:
-                    brand = Brand3Fields[toolinfo[FieldLoadExperEvent.wellbrand].toInt()];
+                    brand = Brand3Fields[wellinfo[FieldLoadExperEvent.wellbrand].toInt()];
                     break;
                 case 3:
-                    brand = Brand4Fields[toolinfo[FieldLoadExperEvent.wellbrand].toInt()];
+                    brand = Brand4Fields[wellinfo[FieldLoadExperEvent.wellbrand].toInt()];
                     break;
             }
-            auto wellsize = WellsizeFields[toolinfo[FieldLoadExperEvent.wellsize].toInt()];
+            auto wellsize = WellsizeFields[wellinfo[FieldLoadExperEvent.wellsize].toInt()];
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(1)WellInfo:</font></strong>"));
             //edit->setIndent(8,indent);
@@ -81,9 +82,9 @@ void SummaryPanel::setData(const QVariantMap &m)
             if (!capture_channels.isEmpty()) {
                 edit->append(tr("<strong><font color = #00A2E8>(3)Channel Info:</font></strong>"));
                 int count = 0;
-                foreach(auto currentChannel, capture_channels) {
+                for(auto currentChannel: capture_channels) { // 保存过设置的所有通道
                     count++;
-                    auto channelInfo = toolinfo[currentChannel].value<QVariantMap>();
+                    auto channelInfo = toolinfo[currentChannel].value<QVariantMap>(); // 存储某个通道的是QVariantMap
                     auto exposure = channelInfo[ExposureField].toString();
                     auto gain = channelInfo[GainField].toString();
                     auto bright = channelInfo[BrightField].toString();
@@ -185,8 +186,8 @@ void SummaryPanel::setData(const QVariantMap &m)
                 auto dose = holeinfo[HoleDoseField].toString();
                 auto unit = holeinfo[HoleDoseUnitField].toString();
                 edit->append(tr("<strong><font color = #00A2E8>%1)%2:</font></strong>").arg(count).arg(group));
-                edit->append(tr("<strong><font color = #00A2E8>2.medicine: %1</font></strong>").arg(medicine));
-                edit->append(tr("<strong><font color = #00A2E8>3.dose: %1-%2</font></strong>").arg(dose).arg(unit));
+                edit->append(tr("<strong><font color = #00A2E8>1.medicine: %1</font></strong>").arg(medicine));
+                edit->append(tr("<strong><font color = #00A2E8>2.dose: %1-%2</font></strong>").arg(dose).arg(unit));
             }
         }
 

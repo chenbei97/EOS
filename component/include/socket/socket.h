@@ -186,6 +186,7 @@ struct FieldExportExperEvent{
     const QString channel = ChannelField;
     // viewmode
     const QString viewmode = ViewModeField;
+    const QString current_group = CurrentGroupField;
     // global
     const QString app = AppSelectField;
     // wellpattern
@@ -460,7 +461,8 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
 }
 
 static QByteArray assembleExportExperEvent(QCVariantMap m)
-{// 导出实验配置(不参与tcp通讯),和启动实验相比多了一些组装的东西: 组颜色,组的一些信息,视野尺寸等,是全部的信息都导出
+{// 导出实验配置(不参与tcp通讯),和启动实验相比多了很多东西: 如组颜色,组的一些信息,视野尺寸等,是全部的信息都导出
+    auto wellinfo = m[WellBoxTitle].value<WellInfo>();
     auto toolinfo = m[PreviewToolField].value<PreviewToolInfo>();
     auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
     auto wellpatternsize = wellpatterninfo[HoleSizeField].toSize();
@@ -469,9 +471,9 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
     QJsonObject object;
     {
         // wellbox
-        object[FieldExportExperEvent.manufacturer] = toolinfo[FieldExportExperEvent.manufacturer].toInt();
-        object[FieldExportExperEvent.wellbrand] = toolinfo[FieldExportExperEvent.wellbrand].toInt();
-        object[FieldExportExperEvent.wellsize] = toolinfo[FieldExportExperEvent.wellsize].toInt();
+        object[FieldExportExperEvent.manufacturer] = wellinfo[FieldExportExperEvent.manufacturer].toInt();
+        object[FieldExportExperEvent.wellbrand] = wellinfo[FieldExportExperEvent.wellbrand].toInt();
+        object[FieldExportExperEvent.wellsize] = wellinfo[FieldExportExperEvent.wellsize].toInt();
 
         // objectivebox
         object[FieldExportExperEvent.objective_location] = toolinfo[FieldExportExperEvent.objective_location].toInt();
@@ -525,6 +527,7 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
 
         // viewmodebox
         object[FieldExportExperEvent.viewmode] = toolinfo[FieldExportExperEvent.viewmode].toInt();
+        object[FieldExportExperEvent.current_group] = toolinfo[FieldExportExperEvent.current_group].toString();
 
         // 其它全局信息
         object[FieldExportExperEvent.app] = m[FieldExportExperEvent.app].toInt();

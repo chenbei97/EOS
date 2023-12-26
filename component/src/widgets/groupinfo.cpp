@@ -113,7 +113,7 @@ void GroupInfo::setGroupName(const QString &name)
 
 void GroupInfo::setGroupColor(const QColor &color)
 {
-    if (color != Qt::black) { // holeinfo默认是黑色,首次是黑色的话不要设置
+    if (color != Qt::white) { // wellpattern_holeinfo默认是黑色,首次是白色的话不要设置
         // cbtn->setColor(color);
         grouptype->setItemData(0,color,Qt::BackgroundRole);
         grouptype->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color.name()));
@@ -139,6 +139,7 @@ void GroupInfo::onClick()
 {
     if (grouptype->currentIndex() != -1) {
         accept();
+        emit groupSetted(grouptype->currentText());
     } else {
         QMessageBox::warning(this,WarningChinese,"Group Not Set!");
         reject();

@@ -27,6 +27,7 @@ public:
     long long durationTime() const;
     QDateTime startTime() const;
     TimeInfo timeInfo() const;
+    QStringList selectedChannels() const;
 public slots:
     void disableChannel(const QString &obj);
 private:

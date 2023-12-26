@@ -22,12 +22,11 @@ Sliderx::Sliderx(Qt::Orientation orientation, QWidget *parent) : QSlider(parent)
     setMinimum(0);
     setMaximum(100);
     setOrientation(orientation);
-//    setStyleSheet("QSlider{border:1px solid #5c5c5c;border-radius:3px;}"
-//                  "QSlider::handle:horizontal { background-color:#8A5933;}");
 }
 
 void Sliderx::mousePressEvent(QMouseEvent *event)
 { // 为了支持点击滑动条也能更改值
+    QSlider::mousePressEvent(event); // 需要父类
     if (!enableMouse)
         event->ignore();
     else {
@@ -41,7 +40,6 @@ void Sliderx::mousePressEvent(QMouseEvent *event)
         }
 
         // (val-min)/(max-min) = per => val = per*(max-min)+min
-        //LOG<<per;
         int value = per*(maximum() - minimum()) + minimum();
 
         setValue(value);
@@ -49,14 +47,13 @@ void Sliderx::mousePressEvent(QMouseEvent *event)
         emit valueChanged(value);
         emit sliderMoved(value); // 这个信号也要发送
         emit sliderPressed();
-        QSlider::mousePressEvent(event);
     }
 }
 
 void Sliderx::mouseReleaseEvent(QMouseEvent *event)
 {
+    QSlider::mouseReleaseEvent(event); // 需要
     emit sliderReleased();
-    QSlider::mouseReleaseEvent(event);
 }
 
 void Sliderx::setMouseEvent(bool enabled)
@@ -66,6 +63,7 @@ void Sliderx::setMouseEvent(bool enabled)
 
 void Sliderx::wheelEvent(QWheelEvent *event)
 {
+    //QSlider::wheelEvent(event); // 不要使用父类,否则总是会多转一下
     QPoint angle = event->angleDelta();
     //LOG<<angle<<event->delta();
     if (angle.y() > 0) { // 鼠标前转,数值增加
@@ -81,5 +79,34 @@ void Sliderx::wheelEvent(QWheelEvent *event)
     emit sliderMoved(sliderPosition()); // 这个信号也要发送
     emit sliderPressed();
     emit sliderReleased();
-    QSlider::wheelEvent(event);
+}
+
+void Sliderx::keyPressEvent(QKeyEvent *event)
+{
+    if (orientation() == Qt::Horizontal) {
+        if (event->key() == Qt::Key_Right) {
+            if (sliderPosition()+singleStep() <= maximum())
+                setValue(sliderPosition()+singleStep());
+            else setValue(maximum());
+        } else if (event->key() == Qt::Key_Left) {
+            if (sliderPosition() - singleStep() >= minimum())
+                setValue(sliderPosition()-singleStep());
+            else setValue(minimum());
+        }
+    } else if (orientation() == Qt::Vertical) {
+        if (event->key() == Qt::Key_Up) {
+            if (sliderPosition()+singleStep() <= maximum())
+                setValue(sliderPosition()+singleStep());
+            else setValue(maximum());
+        } else if (event->key() == Qt::Key_Down) {
+            if (sliderPosition() - singleStep() >= minimum())
+                setValue(sliderPosition()-singleStep());
+            else setValue(minimum());
+        }
+    }
+    emit sliderMoved(sliderPosition()); // 这个信号也要发送
+    emit sliderPressed();
+    emit sliderReleased();
+    //QSlider::keyPressEvent(event);// 不要使用父类,否则总是会多增加一下,而且水平点击上下也会动
+    event->accept();
 }

@@ -40,13 +40,22 @@ Slider::Slider(const QString &p, const QString &s, int min, int max, QWidget *pa
     slider->setRange(min,max);
     suffixtext = s;
 
+//    auto hlay = new QHBoxLayout;
+//    hlay->addWidget(prefix);
+//    hlay->addWidget(slider);
+//    hlay->addWidget(suffix);
+//    hlay->setMargin(0);
+//    hlay->setSpacing(0);
+//    setLayout(hlay);
+
+    QFormLayout * formlay = new QFormLayout;
     auto hlay = new QHBoxLayout;
-    hlay->addWidget(prefix);
     hlay->addWidget(slider);
     hlay->addWidget(suffix);
-    hlay->setMargin(0);
-    hlay->setSpacing(0);
-    setLayout(hlay);
+    formlay->addRow(prefix,hlay);
+    formlay->setSpacing(0);
+    formlay->setMargin(0);
+    setLayout(formlay);
 
     connect(slider,&QSlider::sliderMoved,this,&Slider::onSliderChanged);
     connect(slider,&QSlider::sliderMoved,this,&Slider::valueChanged);

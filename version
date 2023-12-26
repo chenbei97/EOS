@@ -49,6 +49,14 @@ v1.0.2
 (9) 取消dock和dockcanvas的功能,改用堆叠界面实现
 
 v1.0.3
-(1)
-(2)
+(1) Objective增加位置描述文本
+(2) 去除stackview堆叠界面,去除slideview,堆叠顺序为
+stack_view_pattern => stack_pattern => wellpattern
+                                    => slidepattern
+                   => wellview  
+(3) 删孔功能增加框选删除,注意删孔时总是要更新组别下拉框的图标     
+(4) 选择视野取消apply-hole-group_all的动作菜单改为弹出窗口
+(5) 修改previewtool->toolInfo(),删除wellbox的相关逻辑,增加PreviewTool的方便读函数
+(6) 增加移动电机检测是否已开灯,没开灯就帮助开默认的通道BR或者PH
+(7) 增加AutoFocus在expertool的功能
 

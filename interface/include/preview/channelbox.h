@@ -4,7 +4,7 @@
 
 #include "window.h"
 
-#define use_channelnotifier 0
+#define use_channelnotifier 1
 #ifdef use_channelnotifier
 #include "channelnotifier.h"
 #endif
@@ -16,13 +16,14 @@ public:
     explicit ChannelBox(QWidget*parent= nullptr);
     ChannelInfo channelInfo() const;
     void disableChannel(const QString& obj);
+    void openDefaultChannel();
     void takePhoto(const QImage& img,const QString& channel);
 private:
-    PushButton * brbtn;
-    PushButton * phbtn;
-    PushButton * gfpbtn;
-    PushButton * rfpbtn;
-    PushButton * dapibtn;
+    PushButton * brchannel;
+    PushButton * phchannel;
+    PushButton * gfpchannel;
+    PushButton * rfpchannel;
+    PushButton * dapichannel;
     ChannelPicture * canvas;
 #ifdef use_channelnotifier
     ChannelNotifier * notifier;

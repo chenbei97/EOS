@@ -14,18 +14,24 @@
 #include "timebox.h"
 #include "zstackbox.h"
 #include "savebox.h"
+#include "focusbox.h"
 
 class INTERFACE_IMEXPORT ExperTool: public QWidget
 {
     Q_OBJECT
 public:
     explicit ExperTool(QWidget*parent= nullptr);
+    TimeInfo timeInfo() const;
     ExperToolInfo toolInfo() const;
+    FocusInfo focusInfo() const;
+    bool isAutoFocus() const;
+    QStringList currentSelectedChannels() const;
     void importExperConfig(const QVariantMap& m);
 private:
     TimeBox * timebox;
     ZStackBox * zstackbox;
     SaveBox * savebox;
+    FocusBox * focusbox;
     QVBoxLayout * lay;
 signals:
     void zstackChanged(bool isChecked);// 是否勾选zstack和stitch

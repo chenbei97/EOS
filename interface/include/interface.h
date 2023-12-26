@@ -31,7 +31,6 @@
 //#include "camerabox.h"
 //#include "zstackbox.h"
 //#include "savebox.h"
-//#include "autofocus.h"
 //#include "summarypanel.h"
 //#include "summarydialog.h"
 //#include "viewmode.h"

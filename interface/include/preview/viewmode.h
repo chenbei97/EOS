@@ -20,6 +20,9 @@ public:
     void setViewEnabled(int option);
     ViewMode viewMode() const;
     ViewModeInfo viewModeInfo() const;
+    void updateGroupItemIcon(const QString&text);
+    void resetGroupItemIcon(const QSet<QString> texts);
+    QString currentGroup() const;
 private:
     RadioGroup * groupMode;
     TriangleMove * triangleMove;

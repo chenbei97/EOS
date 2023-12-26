@@ -22,8 +22,11 @@ void WellView::removeHole(const QPoint &holePoint)
     mViewMachinePoints.clear();
     initDispersedMask();
 
-    // 颜色+当前孔坐标+当前视野尺寸 无需清理（以下代码其实不清理也行,wellpattern删孔逻辑内重新触发了openviewwindow刷新了）
+    // 以下代码其实不清理也行,wellpattern删孔逻辑内重新触发了openviewwindow刷新了,先刷新后删孔的）
     mViewInfo[HoleGroupNameField] = "";
+    //mViewInfo[HoleCoordinateField] = holePoint;
+    //mViewInfo[HoleViewSizeField] = mSize;
+    //mViewInfo[HoleGroupColorField] = QColor(Qt::white);
     mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
     mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
     mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
@@ -396,11 +399,11 @@ void WellView::onSaveViewAct()
     viewApply->exec();
     LOG<<viewApply->mode();
     switch (viewApply->mode()) {
-        case 1:applyholeact->trigger();
+        case 0:applyholeact->trigger();
             break;
-        case 2:applygroupact->trigger();
+        case 1:applygroupact->trigger();
             break;
-        case 3:applyallact->trigger();
+        case 2:applyallact->trigger();
             break;
     }
 

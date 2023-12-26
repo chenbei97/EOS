@@ -18,10 +18,13 @@ public:
     explicit WellBox(QWidget*parent= nullptr);
     void importExperConfig(int manufacturer,int brand);
     WellInfo wellInfo() const;
+    int wellBrand() const;
+    int wellManufacturer() const;
+    int wellSize() const;
 private:
     ComboBox * wellbrandCombo;
     ComboBox * manufacturerCombo;
-    void onManufacturerChange(int option);
+    void onManufacturerChanged(int option);
     void onWellbrandChanged(int option);
 signals:
     void welltypeChanged(int option);

@@ -20,6 +20,7 @@ public:
     void mousePressEvent(QMouseEvent*event) override;
     void mouseReleaseEvent(QMouseEvent*event) override;
     void wheelEvent(QWheelEvent*event) override;
+    void keyPressEvent(QKeyEvent* event) override;
     void setMouseEvent(bool enabled);
 private:
     bool enableMouse = true;

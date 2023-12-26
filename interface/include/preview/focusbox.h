@@ -7,33 +7,38 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 
-#ifndef EOS_AUTOFOCUS_H
-#define EOS_AUTOFOCUS_H
+#ifndef EOS_FOCUSBOX_H
+#define EOS_FOCUSBOX_H
 
 #include "window.h"
 
-class INTERFACE_IMEXPORT AutoFocus : public GroupBox
+class INTERFACE_IMEXPORT FocusBox : public GroupBox
 {
     Q_OBJECT
 public:
-    explicit AutoFocus(QWidget*parent= nullptr);
+    explicit FocusBox(QWidget*parent= nullptr);
     int skipHoles() const;
     int skipViews() const;
+    bool isAutoFocus() const;
+    bool isExtendRange() const;
+    bool isAllChannels() const;
+    bool isAllCycle() const;
+    FocusInfo focusInfo() const;
 private:
     void initObjects();
     void initLayout();
-    void apply();
 private:
-    CheckBox * enableAutoFocus;
-    GroupBox * settingbox;
-    GroupBox * custombox;
-    CheckBox * enableExtendRange;
-    RadioGroup * radioGroup;
+    CheckBox * autoFocus;
+    GroupBox * mainbox;
+
     SpinBox * skipholes;
     SpinBox * skipviews;
-    PushButton * applybtn;
+    CheckBox * extendRange;
+    CheckBox * cycle;
+    CheckBox * allChannels;
+    CheckBox * custom;
+    GroupBox * custombox;
 signals:
-    void autoFocus();
 };
 
-#endif //EOS_AUTOFOCUS_H
+#endif //EOS_FOCUSBOX_H

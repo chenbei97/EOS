@@ -22,7 +22,7 @@ WellBox::WellBox(QWidget*parent): GroupBox(parent)
 
     connect(wellbrandCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::onWellbrandChanged);
     connect(manufacturerCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::manufacturerChanged);
-    connect(manufacturerCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::onManufacturerChange);
+    connect(manufacturerCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::onManufacturerChanged);
 }
 
 void WellBox::importExperConfig(int manufacturer, int brand)
@@ -39,7 +39,7 @@ void WellBox::onWellbrandChanged(int option)
     } else  emit welltypeChanged(0); // 切换孔板类型
 }
 
-void WellBox::onManufacturerChange(int option)
+void WellBox::onManufacturerChanged(int option)
 {
     wellbrandCombo->blockSignals(true);
     wellbrandCombo->clear();
@@ -80,5 +80,32 @@ WellInfo WellBox::wellInfo() const
     }
 
     return m;
+}
+
+int WellBox::wellSize() const
+{
+    auto brand = wellbrandCombo->currentText();
+    QString id;
+
+    // 把wellsize提取出来比较方便
+    if (brand.count(WellSize384)) id = getIndexFromFields(WellSize384);
+    else if (brand.count(WellSize24)) id = getIndexFromFields(WellSize24);
+    else if (brand.count(WellSize96)) id = getIndexFromFields(WellSize96);
+    else if (brand.count(WellSize6) && !brand.count(WellSize96)){
+        id = getIndexFromFields(WellSize6); // 96包含了6,所以包含6不能说明就是6,还不能是96
+    } else if (brand.count(SlideField)) { // 载玻片的wellsize字段无用
+        id = "-1";
+    }
+    return id.toInt();
+}
+
+int WellBox::wellBrand() const
+{
+    return getIndexFromFields(wellbrandCombo->currentText()).toInt();
+}
+
+int WellBox::wellManufacturer() const
+{
+    return getIndexFromFields(manufacturerCombo->currentText()).toInt();
 }
 

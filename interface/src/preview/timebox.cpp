@@ -71,7 +71,6 @@ void TimeBox::disableChannel(const QString &obj)
 TimeInfo TimeBox::timeInfo() const
 {
     TimeInfo info;
-
     info[TotalTimeField] = QString::number(totalTime());
     info[DurationTimeField] = QString::number(durationTime());
     info[IsScheduleField] = QString::number((int)isSchedule());
@@ -81,6 +80,13 @@ TimeInfo TimeBox::timeInfo() const
     info[ChannelField] = channels;
 
     return info;
+}
+
+QStringList TimeBox::selectedChannels() const
+{
+    QString channels = QString("%1,%2,%3,%4,%5").arg(brbox->isChecked()).arg(phbox->isChecked())
+            .arg(gfpbox->isChecked()).arg(rfpbox->isChecked()).arg(dapibox->isChecked());
+    return channels.split(",",QString::SkipEmptyParts);
 }
 
 void TimeBox::refreshInfo()
@@ -131,7 +137,7 @@ void TimeBox::updateDurationTimeUnit(const QString& unit)
 
 void TimeBox::initObjects()
 {
-    scantype = new CheckBox(tr("is_schedule?"),true);
+    scantype = new CheckBox("",true);
     datetimeedit = new QDateTimeEdit(QDateTime::currentDateTime());
     tipinfo = new Label(tr("forecast end time: %1  total count: %2").arg(0).arg(0));
 
@@ -151,9 +157,9 @@ void TimeBox::initAttributes()
 {
     datetimeedit->setMinimumDateTime(QDateTime::currentDateTime());
 
-    durationtime->setMaximumWidth(TimeBoxSpinBoxMaxWidth);
-    totaltime->setMaximumWidth(TimeBoxSpinBoxMaxWidth);
-    datetimeedit->setMaximumWidth(TimeBoxDateTimeEditMaxWidth);
+    //durationtime->setMaximumWidth(TimeBoxSpinBoxMaxWidth);
+    //totaltime->setMaximumWidth(TimeBoxSpinBoxMaxWidth);
+    //datetimeedit->setMaximumWidth(TimeBoxDateTimeEditMaxWidth);
 
     totaltime->setRange(1.0,10000);
     totaltime->setSuffix(HoursFieldSuffix);
@@ -187,20 +193,19 @@ void TimeBox::initConnections()
 
 void TimeBox::initLayout()
 {
+    auto formlay = new QFormLayout;
+
     auto totallay = new QHBoxLayout;
-    totallay->addWidget(new Label(tr("total time:        ")));// 对齐
     totallay->addWidget(totaltime);
     totallay->addWidget(totalunit);
-    totallay->addStretch();
+    //totallay->addStretch();
 
     auto durlay = new QHBoxLayout;
-    durlay->addWidget(new Label(tr("duration time:  ")));
     durlay->addWidget(durationtime);
     durlay->addWidget(durationunit);
-    durlay->addStretch();
+    //durlay->addStretch();
 
     auto boxlay = new QHBoxLayout;
-    boxlay->addWidget(new Label(tr("channel option:")));
     boxlay->addWidget(brbox);
     boxlay->addWidget(phbox);
     boxlay->addWidget(gfpbox);
@@ -209,12 +214,14 @@ void TimeBox::initLayout()
     boxlay->addStretch();
     boxlay->setSpacing(10);
 
+    formlay->addRow(TotalTimeLabelField,totallay);
+    formlay->addRow(DurationTimeLabelField,durlay);
+    formlay->addRow(ChannelOptionLabelField,boxlay);
+    formlay->addRow(IsScheduleLabelField,scantype);
+    formlay->addRow(StartTimeLabelField,datetimeedit);
+
     auto lay = new QVBoxLayout;
-    lay->addLayout(totallay);
-    lay->addLayout(durlay);
-    lay->addLayout(boxlay);
-    lay->addWidget(scantype);
-    lay->addWidget(datetimeedit);
+    lay->addLayout(formlay);
     lay->addWidget(tipinfo);
 
     setLayout(lay);

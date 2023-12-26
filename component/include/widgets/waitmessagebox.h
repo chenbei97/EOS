@@ -11,7 +11,7 @@
 #define EOS_WAITMESSAGEBOX_H
 
 #include "widgets.h"
-
+//#include "qevent.h"
 #define WaitMessageBoxMsg QObject::tr("please wait processing...")
 
 class COMPONENT_IMEXPORT WaitMessageBox: public QMessageBox
@@ -19,9 +19,11 @@ class COMPONENT_IMEXPORT WaitMessageBox: public QMessageBox
     Q_OBJECT
 public:
     explicit WaitMessageBox(QWidget*parent= nullptr);
+    explicit WaitMessageBox(const QString& text,QWidget*parent= nullptr);
     void wait();
     void wait(unsigned count);
     void setWaitText(const QString& text);
+    void showEvent(QShowEvent *e) override;
 private:
     void updateText();
 private:

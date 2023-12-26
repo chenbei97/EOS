@@ -76,7 +76,6 @@
 #include "channelpicture.h"
 #include "videowidget.h"
 #include "view.h"
-#include "pushgroup.h"
 #include "viewapply.h"
 
 // (2) 常量定义

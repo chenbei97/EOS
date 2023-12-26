@@ -11,7 +11,7 @@
 #define EOS_VIEWAPPLY_H
 
 #include "widgets.h"
-#include "pushgroup.h"
+#include "pushbutton.h"
 
 class COMPONENT_IMEXPORT ViewApply: public QDialog
 {
@@ -20,7 +20,10 @@ public:
     explicit ViewApply(QWidget*parent= nullptr);
     int mode() const;
 private:
-    PushGroup * group;
-    void apply(int id);
+    PushButton * current;
+    PushButton * group;
+    PushButton * all;
+    void apply();
+    int mmode = 0;
 };
 #endif //EOS_VIEWAPPLY_H

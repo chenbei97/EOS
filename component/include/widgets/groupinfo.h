@@ -44,6 +44,9 @@ private:
     ComboBox * doseunit;
     PushButton * btn;
     ColorButton * cbtn;
+
+signals:
+    void groupSetted(const QString& text);
 };
 
 #endif //EOSI_GROUPINFO_H

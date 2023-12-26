@@ -259,7 +259,7 @@ void WellPattern::initHoleInfo()
             HoleInfo info;
             info.group = QString();
             info.coordinate = QPoint(row,col);
-            info.color = Qt::black;
+            info.color = Qt::white;
 #ifdef viewRowColUnEqual
             info.dimension = Dimension2D();
 #else

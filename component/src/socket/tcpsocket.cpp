@@ -160,6 +160,7 @@ void TcpSocket::exec(const QString& f,const QByteArray& c)
 { // 本函数只适用于: 有弹窗需求的硬同步,服务侧有明显延迟;
     // 适用于:1.预览孔/视野/载玻片事件;2.微调镜头事件; 3切换物镜同时动电机;
     // 4.setting单纯动电机到某个位置; 5.启动实验 6.手动调焦 7.载玻片的拼图
+    // 8.切换通道也能用
     frame = f;
     socket->write(c);
     looptimer.start(SocketWaitTime);
@@ -170,6 +171,8 @@ void TcpSocket::exec(const QString& f,const QByteArray& c)
         waitdlg->setWaitText(tr(WaitMessageBoxStartExperimentMsg));
     } else if ( f == TcpFramePool.stopExperEvent) {
         waitdlg->setWaitText(tr(WaitMessageBoxStopExperimentMsg));
+    } else if (f == TcpFramePool.toggleChannelEvent) {
+        waitdlg->setWaitText(tr(WaitMessageBoxToggleChannelMsg));
     } else if (f == "test0x3") {
         waitdlg->setWaitText(tr(WaitMessageBoxWaitStitchMsg));
     }
@@ -287,7 +290,8 @@ void TcpSocket::setWaitText(const QString &text)
 TcpSocket::TcpSocket(QObject *parent):QObject(parent)
 {
     socket = new QTcpSocket;
-    waitdlg = getWaitMessageBox(tr(WaitMessageBoxMoveMachineMsg),false);
+    //waitdlg = getWaitMessageBox(tr(WaitMessageBoxMoveMachineMsg),false);
+    waitdlg = new WaitMessageBox(tr(WaitMessageBoxMoveMachineMsg));
     socket->setReadBufferSize(0);// 默认就是0,也就是缓冲不受限制,有多少就接受多少
     socket->setSocketOption(QAbstractSocket::LowDelayOption, true); // 尽可能低延迟,但是不能避免
 

@@ -71,5 +71,7 @@ signals:
     void openWellGroupWindow(const QVariantMap& m); // 打开分组窗口事件,分组动作触发传递当前孔的color+group
     void openWellViewWindow(const QVariantMap& m); // 打开视野窗口的信号
     void removeHole(const QPoint& holepoint); // 删孔需要清除视野窗口对应的缓存信息
+    void toggleWellStack();
+    void groupChanged(const QSet<QString>& groups);
 };
 #endif //EOSI_WELLPATTERN_H

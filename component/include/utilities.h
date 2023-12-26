@@ -286,6 +286,7 @@ static WaitMessageBox* getWaitMessageBox(const QString& text,bool deleteOnClose 
 { // 等待对话框
     //QMessageBox * dlg = new QMessageBox(parent);
     WaitMessageBox * dlg = new WaitMessageBox(parent);
+    //dlg->setMinimumSize(DefaultWindowSize);
     dlg->setWaitText(text);
     if (deleteOnClose)
         dlg->setAttribute(Qt::WA_DeleteOnClose);
