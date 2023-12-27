@@ -34,7 +34,7 @@ ZStackBox::ZStackBox(QWidget *parent) : GroupBox(parent)
     //vlay->addLayout(hlay2); // 这2个不需要,懒得删代码隐藏即可
 
     setLayout(vlay);
-    setTitle(tr(OtherBoxField));
+    setTitle(tr(ZStackBoxField));
 
     connect(zstack,&CheckBox::checkedChanged,this,&ZStackBox::zstackChanged);
     connect(stitchimage,&CheckBox::checkedChanged,this,&ZStackBox::stitchChanged);

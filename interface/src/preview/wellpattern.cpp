@@ -10,11 +10,9 @@
 
 WellPatternInfo WellPattern::patternInfo() const
 {
-    WellPatternInfo allinfo;
-
     auto allgroups = getAllGroups();
-
     WellPatternInfo info;
+
     for(auto groupName: allgroups) {
         WellGroupInfo groupInfoMap;
         auto groupHoles = getGroupHoles(groupName);
@@ -58,9 +56,7 @@ WellPatternInfo WellPattern::patternInfo() const
         info[groupName] = groupInfoMap; // 存储了每个组的信息
     }
     //LOG<<"group's count = "<<info.keys().count();
-    allinfo[HoleSizeField] = patternSize();
-    allinfo[GroupField] = info;
-    return allinfo;
+    return info;
 }
 
 WellPattern::WellPattern(int rows, int cols, QWidget *parent) : Pattern(rows,cols,parent)
