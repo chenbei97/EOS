@@ -61,3 +61,7 @@ stack_view_pattern => stack_pattern => wellpattern
 (7) 增加AutoFocus在expertool的功能
 (8) previewtool/expertool的所有功能转移到了preview内去写,比较简单方便,少了间接的过程
 
+v1.0.4
+(1) 由于去除了previewtool/expertool,对loadExper,export/importExperConfig函数全部重写
+    把previewtool,expertool移入过时不再参与编译
+(2) 

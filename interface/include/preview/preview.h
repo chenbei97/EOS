@@ -6,11 +6,10 @@
  * @FilePath: \EOS\interface\include\window\preview.h
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
-#ifndef EOSI_PREVIEW_H
-#define EOSI_PREVIEW_H
+#ifndef EOS_PREVIEW_H
+#define EOS_PREVIEW_H
 
 #include "window.h"
-//#include "previewtool.h"
 #include "canvasmode.h"
 #include "photocanvastriangle.h"
 #include "wellpattern.h"
@@ -20,7 +19,6 @@
 #include "slidepattern.h"
 #include "wellbox.h"
 #include "toupcamera.h"
-#include "expertool.h"
 #include "historybox.h"
 #include "objectivebox.h"
 #include "objectivebox.h"
@@ -42,7 +40,6 @@ public:
     explicit Preview(QWidget*parent= nullptr);
     void setAppInfo(int app);// 用于appselect传递当前app信息
     WellPatternInfo patternInfo() const; // WellPattern的数据
-//    PreviewToolInfo toolInfo() const;
 private:
     PreviewInfo previewinfo;
     CanvasMode * canvasmode;
@@ -78,8 +75,6 @@ private:
     QStackedWidget * stack_view_pattern;
 
     QTabWidget * tab;
-    //ExperTool * expertool;
-    //PreviewTool * previewtool;
     QScrollArea * scrollarea_preview;
     QScrollArea * scrollarea_experiment;
 private:
@@ -132,4 +127,4 @@ static double calculateExperSpaceGB(int numOfViews,int numOfChannel,double perIm
 { // 占用空间 = 所有视野数 x 通道数 x 每张图的大小
     return numOfViews * numOfChannel * perImgSpace / 1024.0; // GB
 }
-#endif //EOSI_PREVIEW_H
+#endif //EOS_PREVIEW_H

@@ -23,11 +23,11 @@ public:
     void captureExposureGain(unsigned exp,unsigned gain);
     void setBrightEnabled(bool enabled);
     void updateChannelText(int option);
+    CameraFocusInfo cameraFocusInfo() const;
     MultiCameraInfo multiCameraInfo() const;
-    CameraInfo cameraInfo() const;
-    FocusInfo focusInfo() const;
     double focusValue() const;
     double focusStep() const;
+    CameraInfo cameraInfo() const;
     int exposure() const;
     int gain() const;
     int bright() const;

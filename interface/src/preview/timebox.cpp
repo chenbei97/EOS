@@ -14,7 +14,7 @@ TimeBox::TimeBox(QWidget *parent) : GroupBox(parent)
     initAttributes();
     initConnections();
     initLayout();
-    setTitle(tr(ExperimentBoxTitle));
+    setTitle(tr(TimeBoxTitle));
 }
 
 void TimeBox::importExperConfig(bool is_schedule,long long total,long long duration,

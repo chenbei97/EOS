@@ -109,7 +109,7 @@ struct FieldPreviewEvent {
 
 struct FieldLoadExperEvent{
     // 不需要传递给下位机(但是Tcp用过的字段)
-    const QString capture_channel = CaptureChannelField;//配置过相机参数的所有通道
+    const QString save_channels = SaveChannelsField;//配置过相机参数的所有通道
     const QString state = StateField; // 解析使用
     // 传给下位机json涉及的字段
     // wellbox
@@ -193,7 +193,7 @@ struct FieldExportExperEvent{
     const QString group = GroupField;
     const QString holesize = HoleSizeField;
     // other
-    const QString capture_channel = CaptureChannelField;//配置过相机参数的所有通道
+    const QString save_channels = SaveChannelsField;//配置过相机参数的所有通道
 };
 
 struct FieldAskConnectedStateEvent {
@@ -347,75 +347,79 @@ static QVariant parseLoadExperEvent(QCVariantMap m)
 
 static QByteArray assembleLoadExperEvent(QCVariantMap m)
 {// 启动实验
-    auto toolinfo = m[PreviewToolField].value<PreviewToolInfo>();
-    auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
-    auto wellpatternsize = wellpatterninfo[HoleSizeField].toSize();
-    auto wellgroupinfo = wellpatterninfo[GroupField].value<WellPatternInfo>();
-    auto experinfo = m[ExperToolField].value<ExperToolInfo>();
+    auto wellinfo = m[WellBoxTitle].value<WellInfo>();
+    auto objectiveinfo = m[ObjectiveBoxTitle].value<ObjectiveInfo>();
+    auto viewmodeinfo = m[ViewModeBoxTitle].value<ViewModeInfo>();
+    auto wellgroupinfo = m[WellPatternField].value<WellPatternInfo>();
+    auto channelinfo = m[ChannelBoxTitle].value<ChannelInfo>();
+    auto camerafocusinfo = m[CameraFocusBoxTitle].value<CameraFocusInfo>();
+    auto timeinfo = m[TimeBoxTitle].value<TimeInfo>();
+    auto focusinfo = m[FocusBoxTitle].value<FocusInfo>();
+    auto zstackinfo = m[ZStackBoxField].value<ZStackInfo>();
     QJsonObject object;
     object[FrameField] = LoadExperEvent;
 
-    // wellbox
-    object[FieldLoadExperEvent.manufacturer] = toolinfo[FieldLoadExperEvent.manufacturer].toInt();
-    object[FieldLoadExperEvent.wellbrand] = toolinfo[FieldLoadExperEvent.wellbrand].toInt();
-    object[FieldLoadExperEvent.wellsize] = toolinfo[FieldLoadExperEvent.wellsize].toInt();
+    {
+        // wellbox
+        object[FieldLoadExperEvent.manufacturer] = wellinfo[FieldLoadExperEvent.manufacturer].toInt();
+        object[FieldLoadExperEvent.wellbrand] = wellinfo[FieldLoadExperEvent.wellbrand].toInt();
+        object[FieldLoadExperEvent.wellsize] = wellinfo[FieldLoadExperEvent.wellsize].toInt();
 
-    // objectivebox
-    object[FieldLoadExperEvent.objective_location] = toolinfo[FieldLoadExperEvent.objective_location].toInt();
-    object[FieldLoadExperEvent.objective_descrip] = toolinfo[FieldLoadExperEvent.objective_descrip].toString();//就是传递原字符串不需要改
-    object[FieldLoadExperEvent.objective] = getIndexFromFields(toolinfo[FieldLoadExperEvent.objective].toString()).toInt();
-    object[FieldLoadExperEvent.objective_type] = toolinfo[FieldLoadExperEvent.objective_type].toInt();
+        // objectivebox
+        object[FieldLoadExperEvent.objective_location] = objectiveinfo[FieldLoadExperEvent.objective_location].toInt();
+        object[FieldLoadExperEvent.objective_descrip] = objectiveinfo[FieldLoadExperEvent.objective_descrip];//就是传递原字符串不需要改
+        object[FieldLoadExperEvent.objective] = getIndexFromFields(objectiveinfo[FieldLoadExperEvent.objective]).toInt();
+        object[FieldLoadExperEvent.objective_type] = objectiveinfo[FieldLoadExperEvent.objective_type].toInt();
 
-    // camerabox
-    auto capture_channels = toolinfo[FieldLoadExperEvent.capture_channel].toStringList(); // 设置过相机参数的所有通道
-    QJsonArray channelCameraInfo; // 组列表
-    if (!capture_channels.isEmpty()) { // 例如channels= {"PH","GFP"}
+        // viewmodebox
+        object[FieldLoadExperEvent.viewmode] = viewmodeinfo[FieldLoadExperEvent.viewmode].toInt();
 
-        QJsonArray channelInfoArr; // 保存所有通道信息的列表,这个是"PH"/"BR"等通道字段的值
+        // camerafocusbox
+        auto save_channels = camerafocusinfo[FieldLoadExperEvent.save_channels].toStringList(); // 设置过相机参数的所有通道
+        QJsonArray channelCameraInfo; // 组列表
+        if (!save_channels.isEmpty()) { // 例如channels= {"PH","GFP"}
 
-        for(auto currentChannel: capture_channels) {
-            // 通道信息用QVarintMap保存的,有4个key,channel,exposure,gain,bright
-            auto channelInfo = toolinfo[currentChannel].value<QVariantMap>();
+            QJsonArray channelInfoArr; // 保存所有通道信息的列表,这个是"PH"/"BR"等通道字段的值
 
-            Q_ASSERT(currentChannel == channelInfo[ChannelField]);
-            auto exposure = channelInfo[ExposureField].toInt();
-            auto gain = channelInfo[GainField].toInt();
-            auto bright = channelInfo[BrightField].toInt();
-            //LOG<<exposure<<gain<<bright;
+            for(auto currentChannel: save_channels) {
+                // 通道信息用QVarintMap保存的,有4个key,channel,exposure,gain,bright
+                auto channelInfo = camerafocusinfo[currentChannel].value<QVariantMap>();
 
-            QJsonObject currentChannelInfoObject; // 每个通道的3个信息
-            currentChannelInfoObject[ChannelField] = getIndexFromFields(currentChannel).toInt(); // 如PH转为0
-            currentChannelInfoObject[ExposureField] = exposure;
-            currentChannelInfoObject[GainField] = gain;
-            currentChannelInfoObject[BrightField] = bright;
+                auto exposure = channelInfo[ExposureField].toInt();
+                auto gain = channelInfo[GainField].toInt();
+                auto bright = channelInfo[BrightField].toInt();
 
-            channelInfoArr.append(currentChannelInfoObject); // 所有通道的信息组成列表,这个列表是camera_channel字段的值
+                QJsonObject currentChannelInfoObject; // 每个通道的3个信息
+                currentChannelInfoObject[ChannelField] = getIndexFromFields(currentChannel).toInt(); // 如PH转为0
+                currentChannelInfoObject[ExposureField] = exposure;
+                currentChannelInfoObject[GainField] = gain;
+                currentChannelInfoObject[BrightField] = bright;
+
+                channelInfoArr.append(currentChannelInfoObject); // 所有通道的信息组成列表,这个列表是camera_channel字段的值
+            }
+
+            object[CameraChannelField] = channelInfoArr; // camera_channel字段,存储了所有通道的配置信息
         }
 
-        object[CameraChannelField] = channelInfoArr; // camera_channel字段,存储了所有通道的配置信息
+        object[FieldLoadExperEvent.focus] = camerafocusinfo[FieldLoadExperEvent.focus].toDouble();
+        object[FieldLoadExperEvent.focus_step] = camerafocusinfo[FieldLoadExperEvent.focus_step].toDouble();
+
+        // timebox
+        object[FieldExportExperEvent.total_time] = timeinfo[FieldExportExperEvent.total_time].toInt();
+        object[FieldExportExperEvent.duration_time] = timeinfo[FieldExportExperEvent.duration_time].toInt();
+        object[FieldExportExperEvent.start_time] = timeinfo[FieldExportExperEvent.start_time];
+        object[FieldExportExperEvent.channel] = timeinfo[FieldExportExperEvent.channel];
+        object[FieldExportExperEvent.is_schedule] = timeinfo[FieldExportExperEvent.is_schedule].toInt();
+
+        // focusbox
+
+        // zstackbox
+        object[FieldExportExperEvent.zstack] = zstackinfo[FieldExportExperEvent.zstack].toInt();
+        object[FieldExportExperEvent.stitch] = zstackinfo[FieldExportExperEvent.stitch].toInt();
+
+        // 其它全局信息
+        object[FieldLoadExperEvent.app] = m[FieldLoadExperEvent.app].toInt();
     }
-
-    // focusbox
-    object[FieldLoadExperEvent.focus] = toolinfo[FieldLoadExperEvent.focus].toDouble();
-    object[FieldLoadExperEvent.focus_step] = toolinfo[FieldLoadExperEvent.focus_step].toDouble();
-
-    // zstackbox
-    object[FieldLoadExperEvent.zstack] = experinfo[FieldLoadExperEvent.zstack].toInt();
-    object[FieldLoadExperEvent.stitch] = experinfo[FieldLoadExperEvent.stitch].toInt();
-
-    // experbox
-    object[FieldLoadExperEvent.total_time] = experinfo[FieldLoadExperEvent.total_time].toInt();
-    object[FieldLoadExperEvent.duration_time] = experinfo[FieldLoadExperEvent.duration_time].toInt();
-    object[FieldLoadExperEvent.start_time] = experinfo[FieldLoadExperEvent.start_time].toString();
-    object[FieldLoadExperEvent.channel] = experinfo[FieldLoadExperEvent.channel].toString();
-    //LOG<<experinfo[FieldLoadExperEvent.channel];
-    object[FieldLoadExperEvent.is_schedule] = experinfo[FieldLoadExperEvent.is_schedule].toInt();
-
-    // viewmodebox
-    object[FieldLoadExperEvent.viewmode] = toolinfo[FieldLoadExperEvent.viewmode].toInt();
-
-    // 其它全局信息
-    object[FieldLoadExperEvent.app] = m[FieldLoadExperEvent.app].toInt();
 
     // 组-孔-视野的信息
     QJsonArray arr; // "group"的值是个列表 arr group=[{},{},{}]
@@ -463,11 +467,16 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
 static QByteArray assembleExportExperEvent(QCVariantMap m)
 {// 导出实验配置(不参与tcp通讯),和启动实验相比多了很多东西: 如组颜色,组的一些信息,视野尺寸等,是全部的信息都导出
     auto wellinfo = m[WellBoxTitle].value<WellInfo>();
-    auto toolinfo = m[PreviewToolField].value<PreviewToolInfo>();
-    auto wellpatterninfo = m[PreviewPatternField].value<WellPatternInfo>();
-    auto wellpatternsize = wellpatterninfo[HoleSizeField].toSize();
-    auto wellgroupinfo = wellpatterninfo[GroupField].value<WellPatternInfo>();
-    auto experinfo = m[ExperToolField].value<ExperToolInfo>();
+    auto objectiveinfo = m[ObjectiveBoxTitle].value<ObjectiveInfo>();
+    auto viewmodeinfo = m[ViewModeBoxTitle].value<ViewModeInfo>();
+    auto wellgroupinfo = m[WellPatternField].value<WellPatternInfo>();
+    auto wellpatternsize = m[HoleSizeField].toSize();
+    auto channelinfo = m[ChannelBoxTitle].value<ChannelInfo>();
+    auto camerafocusinfo = m[CameraFocusBoxTitle].value<CameraFocusInfo>();
+    auto timeinfo = m[TimeBoxTitle].value<TimeInfo>();
+    auto focusinfo = m[FocusBoxTitle].value<FocusInfo>();
+    auto zstackinfo = m[ZStackBoxField].value<ZStackInfo>();
+
     QJsonObject object;
     {
         // wellbox
@@ -476,29 +485,33 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
         object[FieldExportExperEvent.wellsize] = wellinfo[FieldExportExperEvent.wellsize].toInt();
 
         // objectivebox
-        object[FieldExportExperEvent.objective_location] = toolinfo[FieldExportExperEvent.objective_location].toInt();
-        object[FieldExportExperEvent.objective_descrip] = toolinfo[FieldExportExperEvent.objective_descrip].toString();//就是传递原字符串不需要改
-        object[FieldExportExperEvent.objective] = getIndexFromFields(toolinfo[FieldExportExperEvent.objective].toString()).toInt();
-        object[FieldExportExperEvent.objective_type] = toolinfo[FieldExportExperEvent.objective_type].toInt();
+        object[FieldExportExperEvent.objective_location] = objectiveinfo[FieldExportExperEvent.objective_location].toInt();
+        object[FieldExportExperEvent.objective_descrip] = objectiveinfo[FieldExportExperEvent.objective_descrip];//就是传递原字符串不需要改
+        object[FieldExportExperEvent.objective] = getIndexFromFields(objectiveinfo[FieldExportExperEvent.objective]).toInt();
+        object[FieldExportExperEvent.objective_type] = objectiveinfo[FieldExportExperEvent.objective_type].toInt();
 
-        // camerabox
-        auto capture_channels = toolinfo[FieldExportExperEvent.capture_channel].toStringList(); // 设置过相机参数的所有通道
+        // viewmodebox
+        object[FieldExportExperEvent.viewmode] = viewmodeinfo[FieldExportExperEvent.viewmode].toInt();
+        object[FieldExportExperEvent.current_group] = viewmodeinfo[FieldExportExperEvent.current_group];
+
+        // channelbox(不需要)
+
+        // camerafocusbox
+        auto save_channels = camerafocusinfo[FieldExportExperEvent.save_channels].toStringList(); // 设置过相机参数的所有通道
         QJsonArray channelCameraInfo; // 组列表
-        if (!capture_channels.isEmpty()) { // 例如channels= {"PH","GFP"}
+        if (!save_channels.isEmpty()) { // 例如channels= {"PH","GFP"}
 
             QJsonArray channelInfoArr; // 保存所有通道信息的列表,这个是"PH"/"BR"等通道字段的值
 
-            for(auto currentChannel: capture_channels) {
+            for(auto currentChannel: save_channels) {
                 // 通道信息用QVarintMap保存的,有4个key,channel,exposure,gain,bright
-                auto channelInfo = toolinfo[currentChannel].value<QVariantMap>();
+                auto channelInfo = camerafocusinfo[currentChannel].value<QVariantMap>();
 
-                Q_ASSERT(currentChannel == channelInfo[ChannelField]);
                 auto exposure = channelInfo[ExposureField].toInt();
                 auto gain = channelInfo[GainField].toInt();
                 auto bright = channelInfo[BrightField].toInt();
-                //LOG<<exposure<<gain<<bright;
 
-                QJsonObject currentChannelInfoObject; // 每个通道的3个信息
+                QJsonObject currentChannelInfoObject; // 每个通道的4个信息,为了导入确定是哪个通道,需要channel标识符
                 currentChannelInfoObject[ChannelField] = getIndexFromFields(currentChannel).toInt(); // 如PH转为0
                 currentChannelInfoObject[ExposureField] = exposure;
                 currentChannelInfoObject[GainField] = gain;
@@ -509,25 +522,22 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
 
             object[CameraChannelField] = channelInfoArr; // camera_channel字段,存储了所有通道的配置信息
         }
+        object[FieldExportExperEvent.focus] = camerafocusinfo[FieldExportExperEvent.focus].toDouble();
+        object[FieldExportExperEvent.focus_step] = camerafocusinfo[FieldExportExperEvent.focus_step].toDouble();
+
+        // timebox
+        object[FieldExportExperEvent.total_time] = timeinfo[FieldExportExperEvent.total_time].toInt();
+        object[FieldExportExperEvent.duration_time] = timeinfo[FieldExportExperEvent.duration_time].toInt();
+        object[FieldExportExperEvent.start_time] = timeinfo[FieldExportExperEvent.start_time];
+        object[FieldExportExperEvent.channel] = timeinfo[FieldExportExperEvent.channel];
+        object[FieldExportExperEvent.is_schedule] = timeinfo[FieldExportExperEvent.is_schedule].toInt();
 
         // focusbox
-        object[FieldExportExperEvent.focus] = toolinfo[FieldExportExperEvent.focus].toDouble();
-        object[FieldExportExperEvent.focus_step] = toolinfo[FieldExportExperEvent.focus_step].toDouble();
+
 
         // zstackbox
-        object[FieldExportExperEvent.zstack] = experinfo[FieldExportExperEvent.zstack].toInt();
-        object[FieldExportExperEvent.stitch] = experinfo[FieldExportExperEvent.stitch].toInt();
-
-        // experbox
-        object[FieldExportExperEvent.total_time] = experinfo[FieldExportExperEvent.total_time].toInt();
-        object[FieldExportExperEvent.duration_time] = experinfo[FieldExportExperEvent.duration_time].toInt();
-        object[FieldExportExperEvent.start_time] = experinfo[FieldExportExperEvent.start_time].toString();
-        object[FieldExportExperEvent.channel] = experinfo[FieldExportExperEvent.channel].toString();
-        object[FieldExportExperEvent.is_schedule] = experinfo[FieldExportExperEvent.is_schedule].toInt();
-
-        // viewmodebox
-        object[FieldExportExperEvent.viewmode] = toolinfo[FieldExportExperEvent.viewmode].toInt();
-        object[FieldExportExperEvent.current_group] = toolinfo[FieldExportExperEvent.current_group].toString();
+        object[FieldExportExperEvent.zstack] = zstackinfo[FieldExportExperEvent.zstack].toInt();
+        object[FieldExportExperEvent.stitch] = zstackinfo[FieldExportExperEvent.stitch].toInt();
 
         // 其它全局信息
         object[FieldExportExperEvent.app] = m[FieldExportExperEvent.app].toInt();
@@ -619,8 +629,7 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
         arr.append(groupObject);
     }
     object[FieldExportExperEvent.group] = arr;
-    object[FieldExportExperEvent.holesize] =
-            QString(PairArgsField).arg(wellpatternsize.width()).arg(wellpatternsize.height());
+    object[FieldExportExperEvent.holesize] = QString(PairArgsField).arg(wellpatternsize.width()).arg(wellpatternsize.height());
     TcpAssemblerDoc.setObject(object);
     return TcpAssemblerDoc.toJson();
 }

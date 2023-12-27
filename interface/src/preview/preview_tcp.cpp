@@ -2,7 +2,7 @@
  * @Author: chenbei97 chenbei_electric@163.com
  * @Date: 2023-10-31 14:06:48
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-17 16:16:08
+ * @LastEditTime: 2023-12-27 15:42:56
  * @FilePath: \EOS\interface\src\preview\preview_tcp.cpp
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
@@ -410,23 +410,23 @@ void Preview::previewHoleEvent(const QPoint &holePoint)
 
 void Preview::loadExper()
 {
-    auto patterninfo = wellpattern->patternInfo();
-    //auto toolinfo = previewtool->toolInfo();
-    //auto experinfo = expertool->toolInfo();
     auto channels = timebox->selectedChannels();
     auto totalViews = wellpattern->numberOfViews();
     auto totalChannels = channels.count("1"); // 为1的是勾选上的
     auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
     LOG<<"总的孔视野数 = "<<totalViews<<"勾选的通道数 = "<<totalChannels<<" 预计占据空间 = "<<estimateSpace<<"MB";
 
+    previewinfo[EstimatedSpaceField] = estimateSpace;
     previewinfo[WellBoxTitle].setValue(wellbox->wellInfo());
     previewinfo[ObjectiveBoxTitle].setValue(objectivebox->objectiveInfo());
-    previewinfo[ChannelBoxTitle].setValue(channelbox->channelInfo());
-
-    previewinfo[PreviewPatternField] = patterninfo;
-    //previewinfo[PreviewToolField] = toolinfo;
-    //previewinfo[ExperToolField] = experinfo;
-    previewinfo[EstimatedSpaceField] = estimateSpace;
+    previewinfo[ViewModeBoxTitle].setValue(viewModeBox->viewModeInfo());
+    previewinfo[WellPatternField] = wellpattern->patternInfo();
+    //previewinfo[HoleSizeField] = wellpattern->patternSize();
+    //previewinfo[ChannelBoxTitle].setValue(channelbox->channelInfo());
+    previewinfo[CameraFocusBoxTitle].setValue(camerabox->cameraFocusInfo());
+    previewinfo[TimeBoxTitle].setValue(timebox->timeInfo());
+    previewinfo[FocusBoxTitle].setValue(focusbox->focusInfo());
+    previewinfo[ZStackBoxField].setValue(zstackbox->zstackInfo());
 
     auto dlg = new SummaryDialog(previewinfo);
     setWindowAlignCenter(dlg);
@@ -459,52 +459,20 @@ void Preview::exportExperConfig(const QString& path)
 { // 导出实验配置
     previewinfo[WellBoxTitle].setValue(wellbox->wellInfo());
     previewinfo[ObjectiveBoxTitle].setValue(objectivebox->objectiveInfo());
-    previewinfo[PreviewPatternField] = wellpattern->patternInfo();
-    //previewinfo[PreviewToolField] = previewtool->toolInfo();
-    //previewinfo[ExperToolField] = expertool->toolInfo();
+    previewinfo[ViewModeBoxTitle].setValue(viewModeBox->viewModeInfo());
+    previewinfo[WellPatternField] = wellpattern->patternInfo();
+    previewinfo[HoleSizeField] = wellpattern->patternSize();
+    //previewinfo[ChannelBoxTitle].setValue(channelbox->channelInfo());
+    previewinfo[CameraFocusBoxTitle].setValue(camerabox->cameraFocusInfo());
+    previewinfo[TimeBoxTitle].setValue(timebox->timeInfo());
+    previewinfo[FocusBoxTitle].setValue(focusbox->focusInfo());
+    previewinfo[ZStackBoxField].setValue(zstackbox->zstackInfo());
+
     auto json = assembleExportExperEvent(previewinfo);
     JsonReadWrite m; // 借助工具类写到文件内
     m.writeJson(path,json);
     // 存数据库,直接存整个json文件是最简单的
 }
-
-//void Preview::importExperConfigV1(const QString& path)
-//{// 导入实验配置,对于camera_channel和group字段要特殊解析
-//
-//    ConfigReadWrite m; // 借助工具类读取文件
-//    auto json = m.readJson(path);
-//
-//    m.parseJson(json);
-//    auto result = m.map();
-//
-//    LOG<<result[GroupField];
-//
-//    previewtool->importExperConfig(result);
-//#ifdef usetab
-//    expertool->importExperConfig(result);
-//#endif
-//
-//    auto brand = result[BrandField].toUInt();
-//    auto manufacturer = result[ManufacturerField].toUInt();
-//    auto objective = result[ObjectiveField].toUInt();
-//    auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];
-//
-//    auto info = result[GroupField].value<QVariantMap>();
-//    for(auto group:info.keys()){
-//        auto groupinfo = info[group].value<QVariantMap>();
-//                foreach(auto hole,groupinfo.keys()) {
-//                auto holeinfo = groupinfo[hole].value<QVariantMap>();
-//                //LOG<<holeinfo;
-//                auto holepoint = holeinfo[HoleCoordinateField].toPoint();
-//                auto viewpoints = holeinfo[PointsField].value<QPointFVector>();
-//
-//                // 把holePoint这个孔的信息更改(和wellsize有关,所以需要先更新wellpattern的信息就不会越界了)
-//                wellpattern->importHoleInfoV1(holepoint,group,viewpoints,viewsize);
-//                wellview->importViewInfoV1(holepoint,viewpoints,viewsize);
-//            }
-//
-//    }
-//}
 
 void Preview::importExperConfig(const QString &path)
 {
@@ -518,8 +486,7 @@ void Preview::importExperConfig(const QString &path)
     auto manufacturer = result[ManufacturerField].toInt();
     wellbox->importWellInfo(manufacturer,brand);
 
-    // 2. 导入工具栏信息,要在导入孔板视野之前
-    //previewtool->importExperConfig()
+    // 2. 导入
 
     // 3. 导入孔板视野信息
     auto groupInfos = result[GroupField].value<QVariantMap>();

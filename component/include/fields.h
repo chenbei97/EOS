@@ -11,10 +11,6 @@
 
 #include "alias.h"
 
-static const char* PreviewToolField = "previewtool";
-static const char* ExperToolField = "expertool";
-static const char* PreviewPatternField = "previewpattern";
-
 // wellbox涉及的数据类型
 static const char* ManufacturerField = "manufacturer";
 static const char* BrandField = "brand";
@@ -213,9 +209,8 @@ enum class ChannelType {
 };
 static const char* ChannelField = "channel";
 static const char* ChannelFieldLabel = "channel: ";
-static const char* CurrentInfoField = "current_info";
 static const char* CurrentChannelField = "current_channel";
-static const char* CaptureChannelField = "capture_channel";
+static const char* SaveChannelsField = "save_channels";
 static const char* CaptureField = "capture";
 static const char* BRField = "BR";
 static const char* PHField = "PH";
@@ -276,12 +271,15 @@ enum class ObjectiveLocationType {
 static const char* ObjectiveLocationField = "objective_loc";
 static const char* CameraChannelField = "camera_channel";
 static const char* ExposureField = "exposure";
+static const char* CurrentExposureField = "current_exposure";
 static const char* ExposureFieldLabel = "exp: ";
 static const char* ExposureFieldUnit = "ms";
 static const char* GainField = "gain";
+static const char* CurrentGainField = "current_gain";
 static const char* GainFieldLabel = "gain: ";
 static const char* GainFieldUnit = "%";
 static const char* BrightField = "bright";
+static const char* CurrentBrightField = "current_bright";
 static const char* BrightFieldLabel = "bright: ";
 static const char* FocusToolFocusLabel = "focus: ";
 static const char* FocusToolStepLabel = "step: ";

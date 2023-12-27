@@ -15,7 +15,7 @@ ViewModeBox::ViewModeBox(QWidget *parent) : GroupBox(parent)
     initAttributes();
     initLayout();
 
-    setTitle(tr(ViewSelectBoxTitle));
+    setTitle(tr(ViewModeBoxTitle));
     connect(groupMode,&RadioGroup::radioClicked,this, &ViewModeBox::radioClick);
     connect(triangleMove,&TriangleMove::triangleClicked,this,&ViewModeBox::triangleClick);
     connect(enableGroupBtn,&PushButton::clicked,this,&ViewModeBox::enableGroup);

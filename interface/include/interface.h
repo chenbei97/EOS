@@ -21,7 +21,6 @@
 //#include "recordbox.h"
 //#include "wellview.h"
 //#include "wellpattern.h"
-//#include "previewtool.h"
 //#include "historybox.h"
 //#include "wellbox.h"
 //#include "focusbox.h"

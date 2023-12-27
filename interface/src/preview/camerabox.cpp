@@ -253,6 +253,35 @@ MultiCameraInfo CameraBox::multiCameraInfo() const
     return camerainfo;
 }
 
+CameraFocusInfo CameraBox::cameraFocusInfo() const
+{
+    CameraFocusInfo m;
+
+    // ui上的参数
+    m[CurrentExposureField].setValue(exposure());
+    m[CurrentGainField].setValue(bright());
+    m[CurrentBrightField].setValue(bright());
+    m[FocusField] = focusValue();
+    m[FocusStepField] = focusStep();
+
+    // 保存的每个通道参数
+    QStringList save_channels;
+    if (!camerainfo.isEmpty()) {
+        for(auto channel: camerainfo.keys()) { // channel=PH,BR
+            CameraInfo val = camerainfo[channel];// 每个通道的信息
+
+            QVariantMap tmp;//把每个通道的信息转成QVarintMap
+            tmp[ExposureField] = val[ExposureField];
+            tmp[GainField] = val[GainField];
+            tmp[BrightField] = val[BrightField];
+            m[channel] = tmp;
+            save_channels << channel;
+        }
+    }
+    m[SaveChannelsField] = save_channels;
+    return m;
+}
+
 CameraInfo CameraBox::cameraInfo() const
 { // 当前UI的
     CameraInfo info;
@@ -285,12 +314,4 @@ double CameraBox::focusStep() const
 double CameraBox::focusValue() const
 {
     return focusslider->value();
-}
-
-FocusInfo CameraBox::focusInfo() const
-{
-    FocusInfo info;
-    info[FocusField] = QString::number(focusValue());
-    info[FocusStepField] = QString::number(focusStep());
-    return info;
 }

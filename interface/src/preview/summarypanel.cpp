@@ -22,11 +22,16 @@ SummaryPanel::SummaryPanel(const QVariantMap &m, QWidget *parent) : QWidget(pare
 
 void SummaryPanel::setData(const QVariantMap &m)
 {
-    auto wellinfo = m[WellBoxTitle].value<WellInfo>();
-    auto toolinfo = m[PreviewToolField].value<QVariantMap>();
-    auto patterninfo = m[PreviewPatternField].value<QVariantMap>();
-    auto experinfo = m[ExperToolField].value<QVariantMap>();
     auto estimatedSpace = m[EstimatedSpaceField].toString();
+    auto wellinfo = m[WellBoxTitle].value<WellInfo>();
+    auto objectiveinfo = m[ObjectiveBoxTitle].value<ObjectiveInfo>();
+    auto wellgroupinfo = m[WellPatternField].value<WellPatternInfo>();
+    auto channelinfo = m[ChannelBoxTitle].value<ChannelInfo>();
+    auto camerafocusinfo = m[CameraFocusBoxTitle].value<CameraFocusInfo>();
+    auto timeinfo = m[TimeBoxTitle].value<TimeInfo>();
+    auto focusinfo = m[FocusBoxTitle].value<FocusInfo>();
+    auto zstackinfo = m[ZStackBoxField].value<ZStackInfo>();
+
     edit->clear();
     QString indent = "      ";
     QString indent2x = indent+indent;
@@ -66,8 +71,8 @@ void SummaryPanel::setData(const QVariantMap &m)
 
         // 2. objectivebox
         {
-            auto cameraloc = ObjectiveLocationFields[toolinfo[FieldLoadExperEvent.objective_location].toInt()];
-            auto objective = toolinfo[FieldLoadExperEvent.objective].toString();//就是传递原字符串不需要改
+            auto cameraloc = ObjectiveLocationFields[objectiveinfo[FieldLoadExperEvent.objective_location].toInt()];
+            auto objective = objectiveinfo[FieldLoadExperEvent.objective];//就是传递原字符串不需要改
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(2)Objective Info:</font></strong>"));
             //edit->setIndent(moveLength,indent);
@@ -75,16 +80,18 @@ void SummaryPanel::setData(const QVariantMap &m)
             edit->append(tr("<strong><font color = #00A2E8>2.objective: %1</font></strong>").arg(objective));
         }
 
-        // 3. camerabox
+        // 3. viewmodebox 不展示
+
+        // 4. camerafocusbox
         {
-            auto capture_channels = toolinfo[FieldLoadExperEvent.capture_channel].toStringList(); // 设置过相机参数的所有通道
+            auto save_channels = camerafocusinfo[FieldLoadExperEvent.save_channels].toStringList(); // 设置过相机参数的所有通道
             edit->append("");
-            if (!capture_channels.isEmpty()) {
+            if (!save_channels.isEmpty()) {
                 edit->append(tr("<strong><font color = #00A2E8>(3)Channel Info:</font></strong>"));
                 int count = 0;
-                for(auto currentChannel: capture_channels) { // 保存过设置的所有通道
+                for(auto currentChannel: save_channels) { // 保存过设置的所有通道
                     count++;
-                    auto channelInfo = toolinfo[currentChannel].value<QVariantMap>(); // 存储某个通道的是QVariantMap
+                    auto channelInfo = camerafocusinfo[currentChannel].value<QVariantMap>(); // 存储某个通道的是QVariantMap
                     auto exposure = channelInfo[ExposureField].toString();
                     auto gain = channelInfo[GainField].toString();
                     auto bright = channelInfo[BrightField].toString();
@@ -98,35 +105,23 @@ void SummaryPanel::setData(const QVariantMap &m)
             }
         }
 
-        // 4. focusbox
+        // 5. camerafocusbox+focusbox
         {
-            auto focus = toolinfo[FieldLoadExperEvent.focus].toString();
-            auto step = toolinfo[FieldLoadExperEvent.focus_step].toString();
+            auto focus = camerafocusinfo[FieldLoadExperEvent.focus].toString();
+            auto step = camerafocusinfo[FieldLoadExperEvent.focus_step].toString();
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(4)Focus Info:</font></strong>"));
             edit->append(tr("<strong><font color = #00A2E8>1.focus: %1</font></strong>").arg(focus));
             edit->append(tr("<strong><font color = #00A2E8>2.step: %1</font></strong>").arg(step));
         }
 
-        // 5. zstackbox
+        // 6. timebox
         {
-            auto zstack = experinfo[FieldLoadExperEvent.zstack].toBool();
-            auto stitch = experinfo[FieldLoadExperEvent.stitch].toBool();
-            auto app = AppFields[m[FieldLoadExperEvent.app].toInt()];
-            edit->append("");
-            edit->append(tr("<strong><font color = #00A2E8>(5)Other Info:</font></strong>"));
-            edit->append(tr("<strong><font color = #00A2E8>1.zstack: %1</font></strong>").arg(zstack));
-            edit->append(tr("<strong><font color = #00A2E8>2.stitch: %1</font></strong>").arg(stitch));
-            edit->append(tr("<strong><font color = #00A2E8>3.app: %1</font></strong>").arg(app));
-        }
-
-        // 6. experbox
-        {
-            auto is_schedule = experinfo[FieldLoadExperEvent.is_schedule].toBool();
-            auto duration = experinfo[FieldLoadExperEvent.duration_time].toLongLong()*1.0;
-            auto total = experinfo[FieldLoadExperEvent.total_time].toLongLong()*1.0;
-            auto start_time = experinfo[FieldLoadExperEvent.start_time].toString();
-            auto channels = experinfo[FieldLoadExperEvent.channel].toString().split(",",QString::SkipEmptyParts);
+            auto is_schedule = timeinfo[FieldLoadExperEvent.is_schedule].toInt();
+            auto duration = timeinfo[FieldLoadExperEvent.duration_time].toLongLong()*1.0;
+            auto total = timeinfo[FieldLoadExperEvent.total_time].toLongLong()*1.0;
+            auto start_time = timeinfo[FieldLoadExperEvent.start_time];
+            auto channels = timeinfo[FieldLoadExperEvent.channel].split(",",QString::SkipEmptyParts);
             edit->append("");
             edit->append(tr("<strong><font color = #00A2E8>(6)Exper Info:</font></strong>"));
             edit->append(tr("<strong><font color = #00A2E8>1.is_schedule?: %1</font></strong>").arg(is_schedule));
@@ -147,16 +142,16 @@ void SummaryPanel::setData(const QVariantMap &m)
             else edit->append(tr("<strong><font color = #00A2E8>5.channels: no channel selected</font></strong>"));
 
             // 做些提示,已经勾选的通道是否保存过参数
-            auto capture_channels = toolinfo[FieldLoadExperEvent.capture_channel].toStringList();
+            auto save_channels = camerafocusinfo[FieldLoadExperEvent.save_channels].toStringList();
             if (!channel.isEmpty()) {
-                if (capture_channels.isEmpty()) {
+                if (save_channels.isEmpty()) {
                     edit->append(tr("<strong><font color = #FF1E27>Warning: the channel you have checked [%1] none of the camera parameters have been saved, "
                                     "and will be executed with default parameters!</font></strong>").arg(channel));
                 } else {
                     for(int idx = 0; idx < channels.count(); ++idx) {
                         if(channels[idx].toUInt()) {
                             auto c =  ChannelFields[idx];
-                            if (!capture_channels.contains(c)) {
+                            if (!save_channels.contains(c)) {
                                 // 勾选的这个实验通道没在保存过的通道里
                                 edit->append(tr("<strong><font color = #FF1E27>Warning: the channel you have checked [%1] none of the camera parameters have been saved,"
                                                 "and will be executed with default parameters!</font></strong>").arg(c));
@@ -167,20 +162,31 @@ void SummaryPanel::setData(const QVariantMap &m)
             }
         }
 
-        // 7.孔组视野信息
+        // 7. zstackbox
+        {
+            auto zstack = zstackinfo[FieldLoadExperEvent.zstack].toInt();
+            auto stitch = zstackinfo[FieldLoadExperEvent.stitch].toInt();
+            auto app = AppFields[m[FieldLoadExperEvent.app].toInt()];
+            edit->append("");
+            edit->append(tr("<strong><font color = #00A2E8>(5)Other Info:</font></strong>"));
+            edit->append(tr("<strong><font color = #00A2E8>1.zstack: %1</font></strong>").arg(zstack));
+            edit->append(tr("<strong><font color = #00A2E8>2.stitch: %1</font></strong>").arg(stitch));
+            edit->append(tr("<strong><font color = #00A2E8>3.app: %1</font></strong>").arg(app));
+        }
+
+        // 8.孔组视野信息
         edit->append("");
-        auto patternGroupInfo = patterninfo[GroupField].value<WellPatternInfo>();
-        if (patternGroupInfo.keys().isEmpty()) {
+        if (wellgroupinfo.keys().isEmpty()) {
             edit->append(tr("<strong><font color = #20A848>[2]Hole Info:No grouping</font></strong>"));
         }else {
             edit->append(tr("<strong><font color = #20A848>[2]Hole Info:</font></strong>"));
 
             int count = 0;
-            for(auto group: patternGroupInfo.keys()) {
+            for(auto group: wellgroupinfo.keys()) {
                 count++;
-                auto groupinfo = patternGroupInfo[group].value<QVariantMap>();
+                auto groupinfo = wellgroupinfo[group].value<WellGroupInfo>();
                 // 每个组拿第1个孔的信息就可以了,至少1个孔
-                auto holeinfo = groupinfo.value(groupinfo.firstKey()).value<QVariantMap>();
+                auto holeinfo = groupinfo.value(groupinfo.firstKey()).value<WellHoleInfo>();
 
                 auto medicine = holeinfo[HoleMedicineField].toString();
                 auto dose = holeinfo[HoleDoseField].toString();
@@ -191,13 +197,13 @@ void SummaryPanel::setData(const QVariantMap &m)
             }
         }
 
-        //8.磁盘剩余可用空间和本次实验预计占据的空间
-//        edit->append("");
-//        edit->append(tr("<strong><font color = #20A848>[2]Disk Info:</font></strong>"));
-//        foreach(auto p,systemDrivers()) {
-//                edit->append(tr("<strong><font color = #FF1E27>\"%1\": totoal[%2MB] free[%3MB] percent[%4%]</font></strong>").arg(p).arg(
-//                        getDiskSpace(p, false)).arg(getDiskSpace(p)).arg(100.0*getDiskSpace(p)/ getDiskSpace(p, false)));
-//        }
-//        edit->append(tr("<strong><font color = #FF1E27>estimated space: %1MB</font></strong>").arg(estimatedSpace));
+        //9.磁盘剩余可用空间和本次实验预计占据的空间
+        edit->append("");
+        edit->append(tr("<strong><font color = #20A848>[2]Disk Info:</font></strong>"));
+        foreach(auto p,systemDrivers()) {
+                edit->append(tr("<strong><font color = #FF1E27>\"%1\": totoal[%2MB] free[%3MB] percent[%4%]</font></strong>").arg(p).arg(
+                        getDiskSpace(p, false)).arg(getDiskSpace(p)).arg(100.0*getDiskSpace(p)/ getDiskSpace(p, false)));
+        }
+        edit->append(tr("<strong><font color = #FF1E27>estimated space: %1MB</font></strong>").arg(estimatedSpace));
     }
 }

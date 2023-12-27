@@ -146,10 +146,10 @@ static const char* Z_StackField = "z_stack";
 static const char* StitchImageField = "stitch_image";
 
 static const char* PreviewDockHoleTitle = "Select Hole Inside View";
-static const char* PreviewDockSlideTitle = "Select Slide Inside View";
 static const char* PreviewWellDockTitle = "Hole(%1,%2)-Group(%3)";
 static const char* PreviewNoGroupWellDockTitle = "Group not set";
-static const char* ViewSelectBoxTitle = "Capture Mode";
+static const char* WellPatternField = "wellpattern";
+static const char* ViewModeBoxTitle = "ViewMode";
 static const char* WellBoxTitle = "Well";
 static const char* ChannelBoxTitle = "Channel";
 static const char* RecordBoxTitle = "Record";
@@ -157,8 +157,10 @@ static const char* CameraFocusBoxTitle ="Camera/Focus";
 static const char * FocusBoxTitle = "Focus";
 static const char * ObjectiveBoxTitle = "Objective";
 static const char * SaveBoxTitle = "Save";
-static const char * ExperimentBoxTitle = "Experiment";
-static const char* OtherBoxField = "Other";
+static const char * TimeBoxTitle = "Experiment";
+static const char * ExperimentTabTitle = "Experiment";
+static const char * PreviewTabTitle = "Preview";
+static const char * ZStackBoxField = "ZStack/Stitch";
 
 static const char*  SaveViewActTitle = "Select View";
 static const char*  RemoveViewActTitle = "Remove View";
