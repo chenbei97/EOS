@@ -77,7 +77,7 @@ void Preview::toggleBrand(int option)
     }
 
     // 1.更新视野的尺寸
-    auto objective = previewtool->currentObjective();
+    auto objective = objectivebox->currentObjective();
     auto brand = wellbox->wellBrand();
     auto manufacturer = wellbox->wellManufacturer();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
@@ -95,7 +95,7 @@ void Preview::toggleBrand(int option)
         // 4.切换厂家setPattenSize已经都清理完了,无需再调用
 
         // 5. 对NA物镜的特殊处理放最后,因为viewpattern->clearAllViewWindowCache被调用在前
-        auto objective_descrip = previewtool->currentObjectiveDescription();
+        auto objective_descrip = objectivebox->currentObjectiveDescription();
         if (objective_descrip == NA40x095Field) { // 只能选择1个孔
             wellpattern->setDisableHoles();
             wellpattern->setDisableHole(QPoint(0,0),false);//默认只允许(0,0)可选
@@ -125,7 +125,7 @@ void Preview::toggleObjective(const QString& obj)
     
     // (1) 更新wellpattern-wellview
     // 1.更新视野的尺寸
-    auto objective = previewtool->currentObjective();
+    auto objective = objectivebox->currentObjective();
     auto brand = wellbox->wellBrand();
     auto manufacturer = wellbox->wellManufacturer();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
@@ -186,14 +186,14 @@ void Preview::openWellViewWindow(const QVariantMap& m)
     auto groupname = m[HoleGroupNameField].toString();
     if (groupname.isEmpty()) {
         groupname = tr(PreviewNoGroupWellDockTitle);
-        auto gname = previewtool->currentGroup(); // camerabox的组别下拉框当前选项
+        auto gname = viewModeBox->currentGroup(); // camerabox的组别下拉框当前选项
         groupinfo->setGroupName(gname); // 如果点击的空是空的是可以分组的,要让此时的groupinfo要跟随当前的组别设置
     }
 
     // 2.根据当前brand/objective更新视野的尺寸
     wellview->drawGroupText(tr(PreviewWellDockTitle).arg(QChar(holepoint.x()+65)).arg(holepoint.y()+1).arg(groupname));
 
-    auto objective = previewtool->currentObjective();
+    auto objective = objectivebox->currentObjective();
     auto brand = wellbox->wellBrand();
     auto manufacturer = wellbox->wellManufacturer();
     auto size = ViewCircleMapFields[manufacturer][brand][objective];
@@ -214,7 +214,7 @@ void Preview::openWellViewWindow(const QVariantMap& m)
         wellview->setViewInfo(nm);
 
     // 6. 对NA物镜的特殊处理要放在最后,setViewInfo会重新初始化视野尺寸
-    auto objective_descrip = previewtool->currentObjectiveDescription();
+    auto objective_descrip = objectivebox->currentObjectiveDescription();
     if (objective_descrip == NA20x05Field)
         wellview->setDisableRect(0.1);
     else if (objective_descrip == NA20x08Field)
@@ -256,10 +256,10 @@ WellPatternInfo Preview::patternInfo() const
     return wellpattern->patternInfo();
 }
 
-PreviewToolInfo Preview::toolInfo() const
-{
-    return previewtool->toolInfo();
-}
+//PreviewToolInfo Preview::toolInfo() const
+//{
+//    return previewtool->toolInfo();
+//}
 
 void Preview::playVideo(const QString& path)
 {
@@ -285,37 +285,49 @@ void Preview::pauseVideo()
 
 void Preview::initLayout()
 {
-    // 1.右侧布局
-    auto play = new QVBoxLayout;
-    play->addWidget(stack_view_pattern);
-    holebox->setLayout(play);
-    auto rlay = new QVBoxLayout;
-    rlay->addWidget(historybox);// 1.1
-    rlay->addWidget(wellbox);// 1.2
-    rlay->addWidget(holebox);// 1.3
-    rlay->addWidget(scrollarea); // 1.4
-    scrollarea->setWidget(previewtool);
+    auto stacklay = new QVBoxLayout;
+    stacklay->addWidget(stack_view_pattern);
+    stackbox->setLayout(stacklay); // 给stack_view_pattern套个框
 
-    auto rbox = new GroupBox;
-    rbox->setLayout(rlay);
-    rbox->setMaximumWidth(PreviewToolBarMaxWidth);
+    // 1.右侧布局(2个tab放在2个滚动区域内)
+    auto previewtab = new GroupBox;
+    auto previewlay = new QVBoxLayout;
+    previewlay->addWidget(historybox);
+    previewlay->addWidget(wellbox);
+    previewlay->addWidget(objectivebox);
+    previewlay->addWidget(viewModeBox);
+    previewlay->addWidget(stackbox);
+    previewlay->addWidget(channelbox);
+    previewlay->addWidget(camerabox);
+    previewlay->addWidget(recordbox);
+    previewlay->addStretch();
+    //previewlay->addWidget(previewtool);
+    previewtab->setLayout(previewlay);
+    scrollarea_preview->setWidget(previewtab);
+
+    auto expertab = new GroupBox;
+    auto experlay = new QVBoxLayout;
+    experlay->addWidget(focusbox);
+    experlay->addWidget(timebox);
+    experlay->addWidget(zstackbox);
+    experlay->addWidget(savebox);
+    experlay->addStretch();
+    expertab->setLayout(experlay);
+    scrollarea_experiment->setWidget(expertab);
 
     // 2.左侧布局
-    auto llay = new QVBoxLayout;
-    llay->addWidget(canvasmode);
-    llay->addWidget(stackcanvas);
-    auto lbox = new GroupBox;
-    lbox->setLayout(llay);
+    auto canvaslay = new QVBoxLayout;
+    canvaslay->addWidget(canvasmode);
+    canvaslay->addWidget(stackcanvas);
+    canvasbox->setLayout(canvaslay);
 
     // 3.总布局
-    tab->addTab(rbox,tr("Preview"));
-    tab->addTab(expertool,tr("Experiment"));
+    tab->addTab(scrollarea_preview,tr("Preview"));
+    tab->addTab(scrollarea_experiment,tr("Experiment"));
 
     auto lay = new QHBoxLayout;
-//    lay->addWidget(lbox);
-//    lay->addWidget(tab);
     auto splitter = new Splitter(Qt::Horizontal);
-    splitter->addWidget(lbox);
+    splitter->addWidget(canvasbox);
     splitter->addWidget(tab);
     lay->addWidget(splitter);
     setLayout(lay);
@@ -356,14 +368,15 @@ void Preview::initAttributes()
     stack_view_pattern->addWidget(wellview); // stack=>stack1+wellview;stack1=>wellpattern+slidepattern
 
     tab->setMaximumWidth(PreviewToolBarMaxWidth);
-    scrollarea->setWidgetResizable(true);
+    scrollarea_preview->setWidgetResizable(true);
+    scrollarea_experiment->setWidgetResizable(true);
+    recordbox->hide();
 }
 
 void Preview::initObjects()
 {
+    // 1. 左边布局
     canvasmode = new CanvasMode;
-    groupinfo = new GroupInfo;
-
 #ifdef uselabelcanvas
     livecanvas = new LabelTriangle;
 #else
@@ -372,11 +385,22 @@ void Preview::initObjects()
     photocanvas = new PhotoCanvas;
     videocanvas = new VideoWidget;
     stackcanvas = new QStackedWidget;
+    canvasbox = new GroupBox;
 
-    holebox = new GroupBox(tr("Hole/View Selection"));
+    // 2. 右侧布局
+    stackbox = new GroupBox(tr("Hole/View Selection"));
     historybox = new HistoryBox;
     wellbox = new WellBox;
-
+    objectivebox = new ObjectiveBox;
+    viewModeBox = new ViewModeBox;
+    channelbox = new ChannelBox;
+    camerabox = new CameraBox;
+    recordbox = new RecordBox;
+    timebox = new TimeBox;
+    zstackbox = new ZStackBox;
+    savebox = new SaveBox;
+    focusbox = new FocusBox;
+    
     wellpattern = new WellPattern(2,3);
     slidepattern = new SlidePattern;
     stackpattern = new QStackedWidget;
@@ -384,41 +408,20 @@ void Preview::initObjects()
     wellview = new WellView;
     stack_view_pattern = new QStackedWidget;
 
+    // 3. 总布局
     tab = new QTabWidget;
-    expertool = new ExperTool;
-    previewtool = new PreviewTool;
-    scrollarea = new QScrollArea;
+    //expertool = new ExperTool;
+//    previewtool = new PreviewTool;
+    scrollarea_preview = new QScrollArea;
+    scrollarea_experiment = new QScrollArea;
+
+    // 4. 其它
+    groupinfo = new GroupInfo;
 }
 
 void Preview::initConnections()
 {
-    // (1) previewtool/expertool => preview 信号-槽函数直连
-    connect(previewtool,&PreviewTool::objectiveChanged,this,&Preview::toggleObjective);
-    connect(previewtool,&PreviewTool::objectiveToggled,this,&Preview::adjustObjective);
-    connect(previewtool,&PreviewTool::playVideo,this,&Preview::playVideo);
-    connect(previewtool,&PreviewTool::stopVideo,this,&Preview::stopVideo);
-    connect(previewtool,&PreviewTool::pauseVideo,this,&Preview::pauseVideo);
-    connect(previewtool,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
-    connect(previewtool,&PreviewTool::brightAdjusted,this,&Preview::adjustBright);
-    connect(previewtool,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
-    connect(previewtool,&PreviewTool::slideStitching,this,&Preview::stitchSlide);
-    connect(previewtool,&PreviewTool::focusChanged,this,&Preview::adjustFocus);
-    connect(previewtool,&PreviewTool::autoFocus,this,&Preview::autoFocus);
-    connect(previewtool,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
-    connect(previewtool,&PreviewTool::channelClosed,this,&Preview::closeChannel);
-    connect(previewtool,&PreviewTool::modeSelected,this,&Preview::setViewMode);
-    connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
-    connect(previewtool,&PreviewTool::triangleClicked,this,&Preview::adjustLens);
-    connect(previewtool,&PreviewTool::enableWellPattern,wellpattern,&WellPattern::setEnabled);
-    connect(previewtool,&PreviewTool::enableWellPattern,wellview,&WellView::setEnabled);
-    //connect(previewtool,&PreviewTool::enableWellPattern,holebox,&GroupBox::setVisible);//暂时不加
-    connect(previewtool,&PreviewTool::groupTypeChanged,groupinfo,&GroupInfo::setGroupName);
-    connect(previewtool,&PreviewTool::groupColorChanged,groupinfo,&GroupInfo::setGroupColor);
-    connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);
-    connect(expertool,&ExperTool::loadExper,this,&Preview::loadExper);
-    connect(expertool,&ExperTool::stopExper,this,&Preview::stopExper);
-
-    // (2) preview内部信号-槽函数
+    // (1) preview内部信号-槽函数
     connect(canvasmode,&CanvasMode::cameraModeChanged,this,[=](int option){stackcanvas->setCurrentIndex(option);});
 #ifdef uselabelcanvas
     connect(livecanvas,&LabelTriangle::triangleClicked,this,&Preview::adjustLens);
@@ -426,14 +429,43 @@ void Preview::initConnections()
     connect(historybox,&HistoryBox::importFilePath,this,&Preview::importExperConfig);
     connect(wellbox,&WellBox::wellbrandChanged,this,&Preview::toggleBrand);
     connect(wellbox,&WellBox::welltypeChanged,this,&Preview::toggleStack);
-    connect(wellbox,&WellBox::welltypeChanged,previewtool,&PreviewTool::wellbrandChanged);
+    connect(channelbox,&ChannelBox::channelChanged,this,&Preview::toggleChannel);
+    connect(channelbox,&ChannelBox::channelClosed,this,&Preview::closeChannel);
+    connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::updateChannelText);
+    connect(camerabox,&CameraBox::cameraAdjusted,this,&Preview::adjustCamera);
+    connect(camerabox,&CameraBox::brightAdjusted,this,&Preview::adjustBright);
+    connect(camerabox,&CameraBox::photoTaking,this,&Preview::takingPhoto);
+    connect(camerabox,&CameraBox::slideStitching,this,&Preview::stitchSlide);
+    connect(camerabox,&CameraBox::focusChanged,this,&Preview::adjustFocus);
+    connect(camerabox,&CameraBox::autoFocusing,this,&Preview::autoFocus);
+    connect(objectivebox,&ObjectiveBox::objectiveChanged,this,&Preview::toggleObjective);
+    connect(objectivebox,&ObjectiveBox::objectiveToggled,this,&Preview::adjustObjective);
+    connect(objectivebox,&ObjectiveBox::objectiveChanged,timebox,&TimeBox::disableChannel);
+    connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBox::disableChannel);
+    //connect(objectivebox,&ObjectiveBox::objectiveChanged,channelbox,&ChannelBox::disableChannel);
+    connect(wellbox,&WellBox::welltypeChanged,viewModeBox,&ViewModeBox::setViewEnabled);
+    connect(viewModeBox,&ViewModeBox::modeSelected,this,&Preview::setViewMode);
+    connect(viewModeBox,&ViewModeBox::triangleClicked,this,&Preview::adjustLens);
+    connect(viewModeBox,&ViewModeBox::enableWellPattern,wellpattern,&WellPattern::setEnabled);
+    connect(viewModeBox,&ViewModeBox::enableWellPattern,wellview,&WellView::setEnabled);
+    connect(viewModeBox,&ViewModeBox::groupTypeChanged,groupinfo,&GroupInfo::setGroupName);
+    connect(viewModeBox,&ViewModeBox::groupColorChanged,groupinfo,&GroupInfo::setGroupColor);
+    //connect(viewModeBox,&ViewModeBox::enableWellPattern,holebox,&GroupBox::setVisible);//暂时不加
+    connect(recordbox,&RecordBox::pauseVideo,this,&Preview::pauseVideo);
+    connect(recordbox,&RecordBox::playVideo,this,&Preview::playVideo);
+    connect(recordbox,&RecordBox::stopVideo,this,&Preview::stopVideo);
+    connect(savebox,&SaveBox::exportFilePath,this,&Preview::exportExperConfig);
+    connect(savebox,&SaveBox::loadExper,this,&Preview::loadExper);
+    connect(savebox,&SaveBox::stopExper,this,&Preview::stopExper);
 
+    connect(groupinfo,&GroupInfo::groupSetted,viewModeBox,&ViewModeBox::updateGroupItemIcon);
+
+    connect(wellpattern,&WellPattern::groupChanged,viewModeBox,&ViewModeBox::resetGroupItemIcon);
     connect(wellpattern,&WellPattern::openWellViewWindow,this,&Preview::openWellViewWindow); // 打开和更新视野窗口
     connect(wellpattern,&WellPattern::openWellGroupWindow,this,&Preview::openWellGroupWindow);// 打开分组窗口
     connect(wellpattern,&WellPattern::holeClicked,this,&Preview::previewHoleEvent); // 点击孔也触发预览
     connect(wellpattern,&WellPattern::removeHole,wellview,&WellView::removeHole);//删孔时清除该孔的缓存信息
     connect(wellpattern,&WellPattern::toggleWellStack,wellview,&WellView::quitView);
-    connect(wellpattern,&WellPattern::groupChanged,previewtool,&PreviewTool::groupChanged);
     connect(slidepattern,&SlidePattern::previewEvent,this,&Preview::previewSlideEvent);
     connect(slidepattern,&SlidePattern::normRectUpdated,photocanvas,&PhotoCanvas::updateRect);
 
@@ -445,12 +477,43 @@ void Preview::initConnections()
     //connect(wellview,&WellView::triangleClicked,this,&Preview::adjustLens); // 点模式微调,取消在这里,改为viewmode那里去调
     connect(wellview,&WellView::quitView,[=]{stack_view_pattern->setCurrentWidget(stackpattern);});
 
-    connect(groupinfo,&GroupInfo::groupSetted,previewtool,&PreviewTool::groupSetted);
-
     // (3) 外部信号=>preview/previewtool
     connect(ParserPointer,&ParserControl::parseResult,this,&Preview::parseResult);
     connect(ToupCameraPointer,&ToupCamera::imageCaptured,this,&Preview::showCapturedImage);
-    connect(ToupCameraPointer,&ToupCamera::imageCaptured,previewtool,&PreviewTool::imageCaptured);
-    connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,previewtool,&PreviewTool::exposureGainCaptured);
-    connect(this,&Preview::objectiveSettingChanged,previewtool,&PreviewTool::objectiveSettingChanged);//调整物镜位置
+    connect(ToupCameraPointer,&ToupCamera::imageCaptured,recordbox,&RecordBox::recordImage);
+    connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,camerabox,&CameraBox::captureExposureGain);
+    connect(this,&Preview::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
+
+    // (1) previewtool/expertool => preview 信号-槽函数直连
+//    connect(expertool,&ExperTool::exportFilePath,this,&Preview::exportExperConfig);
+//    connect(expertool,&ExperTool::loadExper,this,&Preview::loadExper);
+//    connect(expertool,&ExperTool::stopExper,this,&Preview::stopExper);
+//    connect(previewtool,&PreviewTool::playVideo,this,&Preview::playVideo);
+//    connect(previewtool,&PreviewTool::stopVideo,this,&Preview::stopVideo);
+//    connect(previewtool,&PreviewTool::pauseVideo,this,&Preview::pauseVideo);
+//    connect(previewtool,&PreviewTool::channelChanged,this,&Preview::toggleChannel);
+//    connect(previewtool,&PreviewTool::channelClosed,this,&Preview::closeChannel);
+//    connect(previewtool,&PreviewTool::objectiveChanged,this,&Preview::toggleObjective);
+//    connect(previewtool,&PreviewTool::objectiveToggled,this,&Preview::adjustObjective);
+//    connect(previewtool,&PreviewTool::objectiveChanged,expertool,&ExperTool::objectiveChanged);
+    //connect(wellpattern,&WellPattern::groupChanged,previewtool,&PreviewTool::groupChanged);
+    //connect(groupinfo,&GroupInfo::groupSetted,previewtool,&PreviewTool::groupSetted);
+    //connect(wellbox,&WellBox::welltypeChanged,previewtool,&PreviewTool::wellbrandChanged);
+    //connect(this,&Preview::objectiveSettingChanged,previewtool,&PreviewTool::objectiveSettingChanged);//调整物镜位置
+    //    connect(previewtool,&PreviewTool::modeSelected,this,&Preview::setViewMode);
+//    connect(previewtool,&PreviewTool::triangleClicked,this,&Preview::adjustLens);
+//    connect(previewtool,&PreviewTool::enableWellPattern,wellpattern,&WellPattern::setEnabled);
+//    connect(previewtool,&PreviewTool::enableWellPattern,wellview,&WellView::setEnabled);
+//    //connect(previewtool,&PreviewTool::enableWellPattern,holebox,&GroupBox::setVisible);//暂时不加
+//    connect(previewtool,&PreviewTool::groupTypeChanged,groupinfo,&GroupInfo::setGroupName);
+//    connect(previewtool,&PreviewTool::groupColorChanged,groupinfo,&GroupInfo::setGroupColor);
+    //connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,previewtool,&PreviewTool::exposureGainCaptured);
+//    connect(previewtool,&PreviewTool::cameraAdjusted,this,&Preview::adjustCamera);
+//    connect(previewtool,&PreviewTool::brightAdjusted,this,&Preview::adjustBright);
+//    connect(previewtool,&PreviewTool::photoTaking,this,&Preview::takingPhoto);
+//    connect(previewtool,&PreviewTool::slideStitching,this,&Preview::stitchSlide);
+//    connect(previewtool,&PreviewTool::focusChanged,this,&Preview::adjustFocus);
+//    connect(previewtool,&PreviewTool::autoFocus,this,&Preview::autoFocus);
+    //connect(ToupCameraPointer,&ToupCamera::imageCaptured,previewtool,&PreviewTool::imageCaptured);
+
 }

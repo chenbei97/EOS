@@ -178,46 +178,77 @@ void WellView::adjustViewPoint(int option)
 void WellView::importViewInfo(const QHoleInfoVector& vec,ViewMode mode)
 { // 如果是区域模式: rect,viewpoints都有意义,但viewpoints可以通过rect得到,且更简便,不使用viewpoints
     // 如果是点模式,rect为空,使用viewpoints
-    setViewMode(mode);
+    mSelectMode = mode;
     mMousePos = {-1.0,-1.0};
     mValidMousePos = {-1.0,-1.0};
     mMouseRect = QRectF();
     mDrapRectF = QRectF();
 
-    if (mSelectMode == ViewMode::RectMode) {
-        for(auto holeInfo: vec) {
-            mViewInfo[HoleCoordinateField] = holeInfo.coordinate;
-            mViewInfo[HoleGroupNameField] = holeInfo.group;
-            mViewInfo[HoleGroupColorField] = holeInfo.color;
-            mViewInfo[HoleViewRectsField].setValue(holeInfo.viewrects);
-            mViewInfo[HoleViewPointsField].setValue(holeInfo.viewpoints);
+    for(auto holeInfo: vec) {
+        mViewInfo[HoleCoordinateField] = holeInfo.coordinate;
+        mViewInfo[HoleGroupNameField] = holeInfo.group;
+        mViewInfo[HoleGroupColorField] = holeInfo.color;
+        mViewInfo[HoleViewRectsField].setValue(holeInfo.viewrects); // 只用于区域模式
+        //HoleViewPointsField是电机坐标,区域模式下这个无用因为总是会通过getMachinePointsFromViewRect重新计算
+        mViewInfo[HoleViewPointsField].setValue(holeInfo.viewpoints); // 点模式有用,区域模式无用
 
 #ifdef viewRowColUnEqual
-            mViewInfo[HoleViewSizeField].setValue(holeInfo.dimension);
+        mViewInfo[HoleViewSizeField].setValue(holeInfo.dimension);
             mDimension = holeInfo.dimension;
 #else
-            mViewInfo[HoleViewSizeField] = holeInfo.viewsize;
-            mSize = holeInfo.viewsize;
+        mViewInfo[HoleViewSizeField] = holeInfo.viewsize;
+        mSize = holeInfo.viewsize;
 #endif
-            // 这4行代码只是单纯过checkField()函数,没有特定含义
-            mViewInfo[HoleViewUiPointsField].setValue(QPointFVector());
-            mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
-            mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
-            mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
-            // uipoints,allgroups,allholes,groupholes都无需更新,特点都是可以自行更新
-            // 其中uipoints是通过mViewRectDispersedPoints更新的
-            // 在dispersedViewRects()已经完成mViewRects,mViewRectDispersedPoints,mMachinePoints的更新
+        // 这4行代码只是单纯过checkField()函数,没有特定含义
+        mViewInfo[HoleViewUiPointsField].setValue(QPointFVector());
+        mViewInfo[HoleGroupCoordinatesField].setValue(QPointVector());
+        mViewInfo[HoleAllGroupsField].setValue(QSet<QString>());
+        mViewInfo[HoleAllCoordinatesField].setValue(QPoint2DVector());
+        // uipoints,allgroups,allholes,groupholes都无需更新,特点都是可以自行更新
+        // 其中uipoints是通过mViewRectDispersedPoints更新的
+        // 在dispersedViewRects()已经完成mViewRects,mViewRectDispersedPoints,mMachinePoints的更新
 
-            if (!holeInfo.viewrects.isEmpty()) {
-                Q_ASSERT(holeInfo.viewrects.count() == 1);
-                mDrapRectF = holeInfo.viewrects[0]; // 不为空的话一定有1个视野
-            } else mDrapRectF = QRectF();// 为空是点模式或者区域模式忘了选视野
+        if (!holeInfo.viewrects.isEmpty()) { // 如果是区域模式这里一般不会为空
+            Q_ASSERT(holeInfo.viewrects.count() == 1);// 不为空的话一定只有1个视野
+            mDrapRectF = holeInfo.viewrects[0];
+        } else mDrapRectF = QRectF();// 为空是点模式或者区域模式忘了选视野
 
-            saveviewact->trigger(); // 去更新mViewRects从而绘图,同时还能映射到wellPattern
+        //saveviewact->trigger(); // 不要借助这个,本函数是顺序执行,信号是异步执行会出问题
+        // 去更新mViewRects或者/mViewPoints,然后间接更新mMachinePoints,同时还能映射到wellPattern
+        auto id = holeInfo.coordinate.x()*PointToIDCoefficient+holeInfo.coordinate.y();
+        if (mSelectMode == ViewMode::RectMode) {
+            if (!mDrapRectF.isEmpty()) {
+                if (mViewRects[id].isEmpty())
+                    mViewRects[id].append(mDrapRectF);
+                else mViewRects[id][0] = mDrapRectF; // 但是懒得改以前的代码设计,兼容一下
+            } else {
+                if (mViewRects[id].isEmpty())
+                    mViewRects[id].append(mMouseRect);
+                else mViewRects[id][0] = mMouseRect; // 变为覆盖处理
+            }
+            mTmpRects[id] = mViewRects[id];
+            dispersedViewRects(); // 区域模式通过此函数内部把mMachinePoints算出来
         }
-    }
-    else if (mSelectMode == ViewMode::PointMode) {
+        else if (mSelectMode == ViewMode::PointMode) {
+            mViewPoints[id] = holeInfo.viewpoints;
+            mTmpPoints[id] = mViewPoints[id]; // 需要重叠一定比例
+            mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
+        }
 
+        //applyholeact->trigger(); // 这是异步可能有问题
+        QVariantMap m;
+        m[HoleGroupNameField] = mViewInfo[HoleGroupNameField];// 组装组名称,方便pattern依据组名查找所有孔
+        m[HoleGroupColorField] = mViewInfo[HoleGroupColorField]; // 组装组颜色,可以让pattern把同组内其他可能不相同的颜色全部统一
+        m[HoleCoordinateField] = mViewInfo[HoleCoordinateField]; // 坐标信息顺带组装
+        m[HoleAllGroupsField] = mViewInfo[HoleAllGroupsField]; // 孔板所有组名信息顺带组装
+        m[HoleAllCoordinatesField] = mViewInfo[HoleAllCoordinatesField]; // 孔板所有选择的孔坐标信息顺带组装
+        m[HoleViewSizeField] = mViewInfo[HoleViewSizeField]; // 组装视野窗口尺寸
+        if (mSelectMode == ViewMode::RectMode) {
+            m[HoleViewRectsField].setValue(mViewRects[id]); // 视野窗口的区域信息
+            m[HoleViewUiPointsField].setValue(mViewRectDispersedPoints[id]);
+        }
+        m[HoleViewPointsField].setValue(mViewMachinePoints);
+        emit applyHoleEvent(m);
     }
     update();
 }
@@ -382,7 +413,7 @@ void WellView::onSaveViewAct()
             else mViewRects[id][0] = mMouseRect; // 变为覆盖处理
         }
         mTmpRects[id] = mViewRects[id];
-        dispersedViewRects(); // 区域模式通过此函数内部把电机坐标算出来
+        dispersedViewRects(); // 区域模式通过此函数内部把电机坐标通过viewRect算出来
         mMouseRect = QRectF();
     } else if (mSelectMode == ViewMode::PointMode){
         if (isValidPoint(mValidMousePos)) {
@@ -411,7 +442,7 @@ void WellView::onSaveViewAct()
 }
 
 void WellView::dispersedViewRects()
-{ // 把保存的视野区域离散化得到离散区域的所有归一化视野坐标,以及电机坐标
+{ // 只用于区域模式=>保存的视野区域离散化得到离散区域的所有归一化视野坐标,以及电机坐标
   // 区别在于离散电机的掩码尺寸取决于mSize,离散视野的掩码尺寸固定是DefaultUiMaskSize,后者更精细用于绘图
     auto id = holeID();
     auto viewRects = mViewRects[id];
@@ -441,7 +472,7 @@ void WellView::dispersedViewRects()
     mTmpRectDispersedPoints[id] = mViewRectDispersedPoints[id];
 
     // 2. 获取离散电机坐标
-    auto points = getViewPoints(id);
+    auto points = getMachinePointsFromViewRect(id);
 
     // 3. 重叠一定比例映射
     mViewMachinePoints = overlap(points,overlapRate);
@@ -450,8 +481,8 @@ void WellView::dispersedViewRects()
     <<" view point count = "<<mViewMachinePoints.count();
 }
 
-QPointFVector WellView::getViewPoints(int id,bool norm) const
-{ // 只用于区域模式
+QPointFVector WellView::getMachinePointsFromViewRect(int id,bool norm) const
+{ // 只用于区域模式,从离散区域获取中心的重叠的坐标作为电机坐标
     Q_ASSERT(mSelectMode == ViewMode::RectMode);
     auto viewRects = mViewRects[id];
     auto diameter = getCircleRadius() * 2.0;
@@ -573,7 +604,7 @@ void WellView::paintEvent(QPaintEvent *event)
             }
         }
 
-        auto points = getViewPoints(id);
+        auto points = getMachinePointsFromViewRect(id);
         if (!points.isEmpty()) {
             pen.setWidth(DefaultPainterPenWidth*2);
             pen.setColor(PurpleEA3FF7);
@@ -746,7 +777,7 @@ void WellView::setViewMode(ViewMode mode)
         for (auto hole: holes) {
             auto pt_idx = holeID(hole);
             if (mSelectMode == ViewMode::RectMode) {
-                m[HoleViewPointsField].setValue(overlap(getViewPoints(pt_idx), overlapRate));
+                m[HoleViewPointsField].setValue(overlap(getMachinePointsFromViewRect(pt_idx), overlapRate));
             }
             else if (mSelectMode == ViewMode::PointMode) {
                 m[HoleViewPointsField].setValue(overlap(mViewPoints[pt_idx],overlapRate));

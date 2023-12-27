@@ -10,7 +10,7 @@
 #define EOSI_PREVIEW_H
 
 #include "window.h"
-#include "previewtool.h"
+//#include "previewtool.h"
 #include "canvasmode.h"
 #include "photocanvastriangle.h"
 #include "wellpattern.h"
@@ -22,6 +22,17 @@
 #include "toupcamera.h"
 #include "expertool.h"
 #include "historybox.h"
+#include "objectivebox.h"
+#include "objectivebox.h"
+#include "viewmode.h"
+#include "channelbox.h"
+#include "camerabox.h"
+#include "recordbox.h"
+#include "timebox.h"
+#include "zstackbox.h"
+#include "savebox.h"
+#include "focusbox.h"
+
 //#define uselabelcanvas 0
 
 class INTERFACE_IMEXPORT Preview : public QWidget
@@ -31,7 +42,7 @@ public:
     explicit Preview(QWidget*parent= nullptr);
     void setAppInfo(int app);// 用于appselect传递当前app信息
     WellPatternInfo patternInfo() const; // WellPattern的数据
-    PreviewToolInfo toolInfo() const;
+//    PreviewToolInfo toolInfo() const;
 private:
     PreviewInfo previewinfo;
     CanvasMode * canvasmode;
@@ -45,11 +56,21 @@ private:
     PhotoCanvas * photocanvas;
     VideoWidget * videocanvas;
     QStackedWidget * stackcanvas;
+    GroupBox * canvasbox;
 
     HistoryBox * historybox;
     WellBox * wellbox;
+    ObjectiveBox * objectivebox;
+    ViewModeBox * viewModeBox;
+    ChannelBox * channelbox;
+    CameraBox * camerabox;
+    RecordBox * recordbox;
+    TimeBox * timebox;
+    ZStackBox * zstackbox;
+    SaveBox * savebox;
+    FocusBox * focusbox;
 
-    GroupBox * holebox;
+    GroupBox * stackbox;
     WellPattern * wellpattern;
     SlidePattern * slidepattern;
     QStackedWidget * stackpattern;
@@ -57,9 +78,10 @@ private:
     QStackedWidget * stack_view_pattern;
 
     QTabWidget * tab;
-    ExperTool * expertool;
-    PreviewTool * previewtool;
-    QScrollArea * scrollarea;
+    //ExperTool * expertool;
+    //PreviewTool * previewtool;
+    QScrollArea * scrollarea_preview;
+    QScrollArea * scrollarea_experiment;
 private:
     void initObjects();
     void initAttributes();

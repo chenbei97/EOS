@@ -80,7 +80,7 @@ void ConfigReadWrite::parseGroupField(const QJsonValue &key, const QJsonValue &v
 
         Q_ASSERT(object.keys().count() == 1);
         auto groupName = object.keys().at(0); // 用户的组名称
-        auto groupHoleInfo = object[groupName].toArray();// "A组"的值是个列表,列表的每个值都是该组的所有孔信息
+        auto groupHoleInfo = object[groupName].toArray();// "Negative Control 2"的值是个列表,列表的每个值都是该组的所有孔信息
 
         WellGroupInfo groupInfoMap;
         for(int i = 0; i < groupHoleInfo.count(); ++i) {
@@ -105,15 +105,16 @@ void ConfigReadWrite::parseGroupField(const QJsonValue &key, const QJsonValue &v
             holeInfo.viewsize = holeInfoObject[HoleViewSizeField].toInt();
 #endif
             auto rect_str = holeInfoObject[HoleViewRectsField].toString();
-            if (rect_str.isEmpty()) holeInfo.viewrects = QRectFVector(); // 点模式下一定为空,区域模式可能没选视野也为空
-            else holeInfo.viewrects = QRectFVector()<<convertToRectF(rect_str);
+            if (rect_str.isEmpty())
+                holeInfo.viewrects = QRectFVector(); // 点模式下一定为空,区域模式可能没选视野也为空
+            else holeInfo.viewrects = QRectFVector()<<convertToRectF(rect_str); // (0.71,0.205,0.1725,0.35)
             auto viewpt_str = holeInfoObject[HoleViewPointsField].toString();
             if (!viewpt_str.isEmpty()) // 有可能用户分了组但是却忘记选择视野导致viewpoints是空的
                 holeInfo.viewpoints = convertToPointFVector(viewpt_str);
             else holeInfo.viewpoints = QPointFVector();
             //没有uipoints不导入
 
-            groupInfoMap[holeInfoObject[HoleCoordinateField].toString()].setValue(holeInfo); // 用坐标做关键字
+            groupInfoMap[holeInfoObject[HoleCoordinateField].toString()].setValue(holeInfo); // 用孔坐标做本孔信息的指代名称
         }
 
         m[groupName] = groupInfoMap;

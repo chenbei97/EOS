@@ -11,6 +11,7 @@
 
 #include "window.h"
 #include "cameratool.h"
+#include "toupcamera.h"
 
 class INTERFACE_IMEXPORT CameraBox : public GroupBox
 {
@@ -49,11 +50,14 @@ private:
     void initAttributes();
     void initLayout();
 private slots:
+    void initCamera(unsigned exp,unsigned gain);
     void addFocus();
     void subtractFocus();
     void saveCamera();
     void adjustBright();
     void adjustCamera();
+    void autoFocus();
+    void saveFocus();
 signals:
     void cameraInfoChanged(const MultiCameraInfo &);
     void photoTaking();
@@ -61,5 +65,6 @@ signals:
     void cameraAdjusted(int exposure,int gain);
     void brightAdjusted(int bright);
     void focusChanged(double val);
+    void autoFocusing();
 };
 #endif //EOSI_CAMERABOX_H

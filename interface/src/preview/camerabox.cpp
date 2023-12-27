@@ -15,6 +15,7 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     initLayout();
     setTitle(tr(CameraFocusBoxTitle));
 
+    connect(ToupCameraPointer,&ToupCamera::defaultExposureGain,this,&CameraBox::initCamera);
     connect(savecamerabtn,&PushButton::clicked,this,&CameraBox::saveCamera);
     connect(capturebtn,&PushButton::clicked,this,&CameraBox::photoTaking);
     connect(stitchbtn,&PushButton::clicked,this,&CameraBox::slideStitching);
@@ -24,6 +25,17 @@ CameraBox::CameraBox(QWidget*parent): GroupBox(parent)
     connect(topbtn,&PushButton::clicked,this,&CameraBox::addFocus);
     connect(bottombtn,&PushButton::clicked,this,&CameraBox::subtractFocus);
     connect(focusslider,&DoubleSlider::sliderReleased,this,&CameraBox::focusChanged);
+    connect(autofocusbtn,&PushButton::clicked,this,&CameraBox::autoFocus);
+    connect(savefocusbtn,&PushButton::clicked,this,&CameraBox::saveFocus);
+}
+
+void CameraBox::initCamera(unsigned exp,unsigned gain)
+{ // 打开相机时有个默认的参数
+    LOG<<"adjust exp gain slider init val"<<exp<<gain;
+    cameratool->blockSignals(true);
+    cameratool->setGain(gain);
+    cameratool->setExposure(exp);
+    cameratool->blockSignals(false);
 }
 
 void CameraBox::initLayout()
@@ -134,6 +146,16 @@ void CameraBox::importExperConfig(const QVariantMap &m,const QString& objective)
 
     setBrightEnabled(false); // 导入配置时默认都不可滑动,上述代码之后
     emit cameraInfoChanged(camerainfo);
+}
+
+void CameraBox::autoFocus()
+{
+    emit autoFocusing();
+}
+
+void CameraBox::saveFocus()
+{
+
 }
 
 void CameraBox::adjustCamera()

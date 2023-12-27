@@ -59,4 +59,5 @@ stack_view_pattern => stack_pattern => wellpattern
 (5) 修改previewtool->toolInfo(),删除wellbox的相关逻辑,增加PreviewTool的方便读函数
 (6) 增加移动电机检测是否已开灯,没开灯就帮助开默认的通道BR或者PH
 (7) 增加AutoFocus在expertool的功能
+(8) previewtool/expertool的所有功能转移到了preview内去写,比较简单方便,少了间接的过程
 

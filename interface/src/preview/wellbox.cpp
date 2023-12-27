@@ -25,7 +25,7 @@ WellBox::WellBox(QWidget*parent): GroupBox(parent)
     connect(manufacturerCombo,QOverload<int>::of(&ComboBox::currentIndexChanged),this,&WellBox::onManufacturerChanged);
 }
 
-void WellBox::importExperConfig(int manufacturer, int brand)
+void WellBox::importWellInfo(int manufacturer, int brand)
 {
     manufacturerCombo->setCurrentIndex(manufacturer); // 先更新厂家
     wellbrandCombo->setCurrentIndex(brand); // 再更新品牌

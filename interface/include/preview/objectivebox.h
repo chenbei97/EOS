@@ -18,6 +18,8 @@ public:
     explicit ObjectiveBox(QWidget*parent= nullptr);
     void importExperConfig(const QString&objectiveDescrip);
     ObjectiveInfo objectiveInfo() const;
+    int currentObjective() const;
+    QString currentObjectiveDescription() const;
 public slots:
     void onObjectiveSettingChanged(const LocationObjectiveInfo& m);
 private:

@@ -258,3 +258,8 @@ ChannelInfo ChannelBox::channelInfo() const
 
     return m;
 }
+
+QString ChannelBox::currentChannel() const
+{
+    return channelInfo()[CurrentChannelField];
+}

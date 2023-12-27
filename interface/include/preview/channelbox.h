@@ -15,6 +15,7 @@ class INTERFACE_IMEXPORT ChannelBox: public GroupBox
 public:
     explicit ChannelBox(QWidget*parent= nullptr);
     ChannelInfo channelInfo() const;
+    QString currentChannel() const;
     void disableChannel(const QString& obj);
     void openDefaultChannel();
     void takePhoto(const QImage& img,const QString& channel);

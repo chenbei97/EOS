@@ -69,11 +69,11 @@ PreviewToolInfo PreviewTool::toolInfo() const
     info[ObjectiveDescripField] = objectiveinfo[ObjectiveDescripField]; // br4x
     info[ObjectiveTypeField] = objectiveinfo[ObjectiveTypeField];
 
-    // 2. channel
+     //2. channel
     auto channelinfo = channelbox->channelInfo();//这个属于临时信息,其实没用(拍照这里有用,当前拍的通道)
     info[CurrentChannelField] = channelinfo[CurrentChannelField]; // 实际字符串BR,PH,如果都没开灯是空字符串
 
-    // 3. camerainfo,分不同通道,保存了gain,exposure,bright
+     //3. camerainfo,分不同通道,保存了gain,exposure,bright
     auto camerainfo = camerabox->multiCameraInfo();
     info[CurrentInfoField].setValue(camerabox->cameraInfo());
     info[FocusField] = camerabox->focusValue();
@@ -101,24 +101,24 @@ PreviewToolInfo PreviewTool::toolInfo() const
     info[ViewModeField] = viewmodeinfo[ViewModeField];
     info[CurrentGroupField] = viewmodeinfo[CurrentGroupField];
 
-    //LOG<<"tool info = "<<info;
+    LOG<<"tool info = "<<info;
     return info;
 }
 
 void PreviewTool::importExperConfig(const QVariantMap &m)
 {
     // 2. objectivebox
-    auto objective = m[ObjectiveDescripField].toString(); // br4x
-    objectivebox->importExperConfig(objective);
+//    auto objective = m[ObjectiveDescripField].toString(); // br4x
+//    objectivebox->importExperConfig(objective);
     // camera_loc自动跟随objective的设置,无需导入
 
 
-    { // 6. 相机通道参数的导入
-        auto camerainfo = m[CameraChannelField].value<QVariantMap>();
-        if (!camerainfo.isEmpty()) { // 可能没保存过参数
-            camerabox->importExperConfig(camerainfo,objective);
-        }
-    }
+//    { // 6. 相机通道参数的导入
+//        auto camerainfo = m[CameraChannelField].value<QVariantMap>();
+//        if (!camerainfo.isEmpty()) { // 可能没保存过参数
+//            camerabox->importExperConfig(camerainfo,objective);
+//        }
+//    }
 
 }
 

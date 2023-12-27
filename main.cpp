@@ -32,6 +32,12 @@ int main(int argc, char *argv[]) {
     //SocketPointer->exec_queue(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()));
     //QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
     LOG<<"[sync] activate code is "<<ParserResult.toString();
+
+    // 相机也有信号需要等mainwindow建立
+    Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持
+    if (!ToupCameraPointer->isOpen()){
+        ToupCameraPointer->openCamera();
+    };
     return QApplication::exec();
 }
 
@@ -60,14 +66,8 @@ void initApp(QApplication& a)
     qRegisterMetaType<QRequestMsg>("QRequestMsg");
     qRegisterMetaType<QRequestQueue>("QRequestQueue");
 
-    // 4. camera
-    Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持
-    if (!ToupCameraPointer->isOpen()){
-        ToupCameraPointer->openCamera();
-    };
-
 #ifdef use_python
-    // 5. python
+    // 4. python
     // 这段Python进程的代码移动到initApp去写而不是在mainwindow.cpp的构造函数去写
     // 因为mainwindow.cpp构造完成之前可能已经触发了某些信号给服务端发送命令,例如独立于mainwindow构造的setting
     // 这样setting有关的信号发送的时候python进程尚未启动(mainwindow并未构造完)导致服务端没收到消息
@@ -85,7 +85,7 @@ void initApp(QApplication& a)
         LOG<<"python process is kill? "<<!process->isOpen();
     });
 #endif
-    // 6. quit thread
+    // 5. quit thread
     QObject::connect(qApp, &QCoreApplication::aboutToQuit, [=]() {
         if (TimerBroadCastThreadPointer->isRunning()) {
             TimerBroadCastThreadPointer->stopThread();

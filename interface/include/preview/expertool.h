@@ -7,8 +7,8 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 
-#ifndef EOS_MAIN_CORE_PY_EXPERTOOL_H
-#define EOS_MAIN_CORE_PY_EXPERTOOL_H
+#ifndef EOS_EXPERTOOL_H
+#define EOS_EXPERTOOL_H
 
 #include "window.h"
 #include "timebox.h"
@@ -43,4 +43,4 @@ signals:
     void objectiveChanged(const QString& obj);
 };
 
-#endif //EOS_MAIN_CORE_PY_EXPERTOOL_H
+#endif //EOS_EXPERTOOL_H

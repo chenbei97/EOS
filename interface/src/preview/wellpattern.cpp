@@ -354,19 +354,22 @@ void WellPattern::clearViewInfo()
 void WellPattern::importHoleInfo(const QHoleInfoVector& vec,ViewMode mode)
 {
     setViewMode(mode);
+//    if (!vec.isEmpty()) { // 还是不动电机,因为此时应该是禁用状态
+//        mMousePos = vec.at(0).coordinate;
+//        emit holeClicked(mMousePos);
+//    }
     for(auto holeInfo: vec) {
         auto x = holeInfo.coordinate.x();
         auto y = holeInfo.coordinate.y();
         mHoleInfo[x][y] = holeInfo; // importHoleInfo之前已经调用setPatternSize不会越界
     }
-    auto allgroups = getAllGroups();
+    auto allgroups = getAllGroups(); // 把组名信息和所有孔信息导入后重新计算
     auto allholes = getAllHoles();
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
-            mHoleInfo[row][col].allcoordinate = allholes;
+            mHoleInfo[row][col].allcoordinate = allholes; // 再赋值
             mHoleInfo[row][col].allgroup = allgroups;
         }
     }
     update();
-    //openviewact->trigger(); // 把组信息等传给viewpattern
 }

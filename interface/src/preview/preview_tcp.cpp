@@ -79,6 +79,7 @@ void Preview::previewSlideEvent(const QPointF& point)
 void Preview::stitchSlide()
 { // slide 拼图功能
     auto brand = wellbox->wellInfo()[BrandField].toUInt();
+    LOG<<brand<<SlideIndexInBrand;
     if(brand == SlideIndexInBrand) { // 品牌是载玻片才响应
         canvasmode->changeMode(CanvasMode::PhotoMode);
         photocanvas->setStrategy(PhotoCanvas::GridPixmap);
@@ -220,7 +221,7 @@ void Preview::closeChannel(int option)
 
 void Preview::toggleChannel(int option)
 {
-    auto current_channel = previewtool->currentChannel();
+    auto current_channel = channelbox->currentChannel();
 
     if (current_channel.isEmpty()) {
         LOG<<"not have channel is open";
@@ -229,7 +230,7 @@ void Preview::toggleChannel(int option)
         return; // 灯全灭的情况直接返回
     }
 
-    auto current_info = previewtool->cameraInfo();
+    auto current_info = camerabox->cameraInfo();
 
     QVariantMap m;
     m[CurrentChannelField] = getIndexFromFields(current_channel).toInt();
@@ -268,7 +269,7 @@ void Preview::adjustLens(int option)
 void Preview::adjustBright(int br)
 { // 4
 
-    auto current_channel = previewtool->currentChannel();
+    auto current_channel = channelbox->currentChannel();
 
     if (current_channel.isEmpty()) {
         LOG<<"没有通道的灯被打开,不执行滑动条的参数调整!";
@@ -298,15 +299,15 @@ void Preview::adjustCamera(int exp,int gain)
 
 void Preview::takingPhoto()
 {
-    int exp = previewtool->currentExposure();
-    int ga = previewtool->currentGain();
+    int exp = camerabox->exposure();
+    int ga = camerabox->gain();
 
     ToupCameraPointer->setExposure(exp);
     ToupCameraPointer->setGain(ga);
     auto pix = ToupCameraPointer->capture();
-    auto current_channel = previewtool->currentChannel();
-    previewtool->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道,以及显示到缩略图
-    LOG<<"current (exp,gain,bright) is ("<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain()<<previewtool->currentBright()<<")";
+    auto current_channel = channelbox->currentChannel();
+    camerabox->captureImage(pix,current_channel); // 把当前通道拍到的图像传回去用于后续合成通道,以及显示到缩略图
+    LOG<<"current (exp,gain,bright) is ("<<ToupCameraPointer->exposure()<<ToupCameraPointer->gain()<<camerabox->bright()<<")";
 
     canvasmode->changeMode(CanvasMode::PhotoMode);
     photocanvas->setStrategy(PhotoCanvas::SinglePixmap);
@@ -323,17 +324,17 @@ void Preview::takingPhoto()
 
 void Preview::previewViewEvent(const QPointF &viewpoint)
 { // 预览事件需要的参数:1
-    auto objective = previewtool->currentObjective();
+    auto objective = objectivebox->currentObjective();
     auto brand = wellbox->wellBrand();
     auto manufacturer = wellbox->wellManufacturer();
     auto wellsize = wellbox->wellSize();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
     auto holecoordinate = wellview->viewInfo()[HoleCoordinateField].toPoint();
-    auto bright = previewtool->currentBright();
+    auto bright = camerabox->bright();
 
     // 自己需要的相机参数
-    int exp = previewtool->currentExposure();
-    int ga = previewtool->currentGain();
+    int exp = camerabox->exposure();
+    int ga = camerabox->gain();
     ToupCameraPointer->setExposure(exp);
     ToupCameraPointer->setGain(ga);
     QVariantMap m;
@@ -359,29 +360,29 @@ void Preview::previewViewEvent(const QPointF &viewpoint)
     } else LOG<<"[sync] move to view point "<<viewpoint<<"failed!";
 }
 
-void Preview::previewHoleEvent(const QPoint &holepoint)
+void Preview::previewHoleEvent(const QPoint &holePoint)
 {// 预览事件需要的参数:1
-    if (holepoint == QPoint(-1,-1))
+    if (holePoint == QPoint(-1,-1))
         return;
 
-    auto channel = previewtool->currentChannel();
+    auto channel = channelbox->currentChannel();
     if (channel.isEmpty()) {
         // 没有开灯,默认就开明场的灯
-        previewtool->openDefaultChannel();
+        channelbox->openDefaultChannel();
     }
 
     // 预览事件需要的参数
-    auto objective = previewtool->currentObjective();
+    auto objective = objectivebox->currentObjective();
     auto brand = wellbox->wellBrand();
     auto manufacturer = wellbox->wellManufacturer();
     auto wellsize = wellbox->wellSize();
     auto viewsize = ViewCircleMapFields[manufacturer][brand][objective];//点孔触发预览的时候需要传递viewsize
-    auto holecoordinate = holepoint;
-    auto bright = previewtool->currentBright();
+    auto holecoordinate = holePoint;
+    auto bright = camerabox->bright();
 
     // 自己需要的相机参数
-    int exp = previewtool->currentExposure();
-    int ga = previewtool->currentGain();
+    int exp = camerabox->exposure();
+    int ga = camerabox->gain();
     ToupCameraPointer->setExposure(exp);
     ToupCameraPointer->setGain(ga);
     QVariantMap m;
@@ -401,29 +402,30 @@ void Preview::previewHoleEvent(const QPoint &holepoint)
 
     AssemblerPointer->assemble(TcpFramePool.previewEvent,m);
     auto msg = AssemblerPointer->message();
-    LOG<<"exec "<<holepoint;
     SocketPointer->exec(TcpFramePool.previewEvent,msg);
     if (ParserResult.toBool()) {
-        LOG<<"move to hole point "<<holepoint<<" successful!";
-    } else LOG<<"move to hole point "<<holepoint<<" failed!";
+        LOG<<"move to hole point "<<holePoint<<" successful!";
+    } else LOG<<"move to hole point "<<holePoint<<" failed!";
 }
 
 void Preview::loadExper()
 {
     auto patterninfo = wellpattern->patternInfo();
-    auto toolinfo = previewtool->toolInfo();
-    auto experinfo = expertool->toolInfo();
-    auto wellinfo = wellbox->wellInfo();
-    auto channels = expertool->currentSelectedChannels();
+    //auto toolinfo = previewtool->toolInfo();
+    //auto experinfo = expertool->toolInfo();
+    auto channels = timebox->selectedChannels();
     auto totalViews = wellpattern->numberOfViews();
     auto totalChannels = channels.count("1"); // 为1的是勾选上的
     auto estimateSpace = calculateExperSpaceMB(totalViews,totalChannels);
     LOG<<"总的孔视野数 = "<<totalViews<<"勾选的通道数 = "<<totalChannels<<" 预计占据空间 = "<<estimateSpace<<"MB";
 
-    previewinfo[WellBoxTitle].setValue(wellinfo);
+    previewinfo[WellBoxTitle].setValue(wellbox->wellInfo());
+    previewinfo[ObjectiveBoxTitle].setValue(objectivebox->objectiveInfo());
+    previewinfo[ChannelBoxTitle].setValue(channelbox->channelInfo());
+
     previewinfo[PreviewPatternField] = patterninfo;
-    previewinfo[PreviewToolField] = toolinfo;
-    previewinfo[ExperToolField] = experinfo;
+    //previewinfo[PreviewToolField] = toolinfo;
+    //previewinfo[ExperToolField] = experinfo;
     previewinfo[EstimatedSpaceField] = estimateSpace;
 
     auto dlg = new SummaryDialog(previewinfo);
@@ -456,9 +458,10 @@ void Preview::loadExper()
 void Preview::exportExperConfig(const QString& path)
 { // 导出实验配置
     previewinfo[WellBoxTitle].setValue(wellbox->wellInfo());
+    previewinfo[ObjectiveBoxTitle].setValue(objectivebox->objectiveInfo());
     previewinfo[PreviewPatternField] = wellpattern->patternInfo();
-    previewinfo[PreviewToolField] = previewtool->toolInfo();
-    previewinfo[ExperToolField] = expertool->toolInfo();
+    //previewinfo[PreviewToolField] = previewtool->toolInfo();
+    //previewinfo[ExperToolField] = expertool->toolInfo();
     auto json = assembleExportExperEvent(previewinfo);
     JsonReadWrite m; // 借助工具类写到文件内
     m.writeJson(path,json);
@@ -510,11 +513,20 @@ void Preview::importExperConfig(const QString &path)
     m.parseJson(json);
     auto result = m.map();
 
+    // 1. 导入厂家和品牌信息
+    auto brand = result[BrandField].toInt();
+    auto manufacturer = result[ManufacturerField].toInt();
+    wellbox->importWellInfo(manufacturer,brand);
+
+    // 2. 导入工具栏信息,要在导入孔板视野之前
+    //previewtool->importExperConfig()
+
+    // 3. 导入孔板视野信息
     auto groupInfos = result[GroupField].value<QVariantMap>();
     auto patterSize = convertToPointF(result[HoleSizeField].toString());
     auto viewMode = result[ViewModeField].toInt();
 
-    QHoleInfoVector holeInfoVec;
+    QHoleInfoVector holeInfoVec; // 把所有孔的信息整合成列表
     for(auto var1: groupInfos.values()) {
         auto groupInfo = var1.value<WellGroupInfo>();
         for(auto var2: groupInfo.values()) {
@@ -522,7 +534,7 @@ void Preview::importExperConfig(const QString &path)
             holeInfoVec.append(holeInfo);
         }
     }
-    wellpattern->setPatternSize(patterSize.x(),patterSize.y());
+    wellpattern->setPatternSize(patterSize.x(),patterSize.y()); // 先设置再导入孔信息否则会越界
     wellpattern->importHoleInfo(holeInfoVec,ViewMode(viewMode));
     wellview->importViewInfo(holeInfoVec,ViewMode(viewMode));
 }

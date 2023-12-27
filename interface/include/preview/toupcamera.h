@@ -67,7 +67,7 @@ private:
     void exposureEvent();
     void print_imageInfo(ToupcamFrameInfoV3* info);
 signals:
-    //void imageCaptured(const ImageInfo& info);
+    void defaultExposureGain(unsigned exp,unsigned gain);
     void imageCaptured(const QImage& img);
     void exposureGainCaptured(unsigned exp,unsigned gain);
 signals:

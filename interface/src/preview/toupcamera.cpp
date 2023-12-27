@@ -103,15 +103,16 @@ void ToupCamera::openCamera()
             setRgbBit(0); // 24bit
             setByteOrder(0); // rgb
             setExposureOption(0); // 初始设置是不使用自动曝光
-            setExposure(244);
-            setGain(120);
+            setExposure(300);
+            setGain(100);
 //            if (imgdata) {
 //                delete[] imgdata;
 //                imgdata = nullptr;
 //            }
             allocateImageBuffer();
             if (SUCCEEDED(Toupcam_StartPullModeWithCallback(toupcam,eventCallBack,this))){
-                LOG<<"start camera successful!";
+                LOG<<"start camera successful! now exp ="<<exposure()<<"gain ="<<gain();
+                emit defaultExposureGain(exposure(),gain());
             } else {
                 LOG<<"start camera failed!";
                 closeCamera();

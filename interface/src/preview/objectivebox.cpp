@@ -204,6 +204,16 @@ ObjectiveInfo ObjectiveBox::objectiveInfo() const
     return m;
 }
 
+int ObjectiveBox::currentObjective() const
+{
+    return getIndexFromFields(objectiveInfo()[ObjectiveField]).toUInt();
+}
+
+QString ObjectiveBox::currentObjectiveDescription() const
+{
+    return objectiveInfo()[ObjectiveDescripField];
+}
+
 void ObjectiveBox::importExperConfig(const QString &objectiveDescrip)
 { // objectiveDescrip = br4x
     QStringList objectives = {rbtn_loc1->text(),rbtn_loc2->text(),

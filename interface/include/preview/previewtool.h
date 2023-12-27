@@ -49,8 +49,6 @@ private:
     RecordBox * recordbox;
     QVBoxLayout * lay;
 signals:
-    void objectiveChanged(const QString& obj);
-    void objectiveToggled(int objective,int objective_loc,int isPh);
     void channelChanged(int option);// 通道切换
     void channelClosed(int option); // 通道关闭
     void cameraInfoChanged(const MultiCameraInfo&m);// 通道配置改变
@@ -59,23 +57,25 @@ signals:
     void pauseVideo();
     void photoTaking();// 只有camerabox的拍照会触发该信号
     void slideStitching(); // slide下允许拼图
-    void triangleClicked(int option); // 移动镜头
-    void enableWellPattern(bool enable);
-    void groupTypeChanged(const QString& group);
-    void groupColorChanged(const QColor& color);
     void focusChanged(double val);
     void autoFocus();
     void cameraAdjusted(int exposure,int gain); // 调整相机参数
     void brightAdjusted(int bright); // 调整bright
+    void objectiveChanged(const QString& obj);
+    void objectiveToggled(int objective,int objective_loc,int isPh);
+    void triangleClicked(int option); // 移动镜头
+    void enableWellPattern(bool enable);
+    void groupTypeChanged(const QString& group);
+    void groupColorChanged(const QColor& color);
     void modeSelected(int mode); // 视野选择模式
-signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
-    void captureImage(const QImage& img,const QString& channel);
-    void exposureGainCaptured(unsigned exp,unsigned gain);
-    void imageCaptured(const QImage& img);
     void groupSetted(const QString& text);
     void groupChanged(const QSet<QString>& groups);
     void wellbrandChanged(int option);
+signals:
+    void captureImage(const QImage& img,const QString& channel);
+    void exposureGainCaptured(unsigned exp,unsigned gain);
+    void imageCaptured(const QImage& img);
 };
 
 #endif //EOSI_PREVIEWTOOL_H

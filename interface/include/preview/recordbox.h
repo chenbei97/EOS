@@ -7,8 +7,8 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 
-#ifndef EOS_MAIN_CORE_PY_RECORDBOX_H
-#define EOS_MAIN_CORE_PY_RECORDBOX_H
+#ifndef EOS_RECORDBOX_H
+#define EOS_RECORDBOX_H
 
 #include "window.h"
 
@@ -42,4 +42,4 @@ signals:
     void pauseVideo();
 };
 
-#endif //EOS_MAIN_CORE_PY_RECORDBOX_H
+#endif //EOS_RECORDBOX_H
