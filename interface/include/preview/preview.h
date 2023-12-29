@@ -31,7 +31,8 @@
 #include "savebox.h"
 #include "focusbox.h"
 
-//#define uselabelcanvas 0
+//#define uselabelcanvas 1
+#define usegraphicscanvas 1
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -47,6 +48,8 @@ private:
     QTimer timer;
 #ifdef uselabelcanvas
     LabelTriangle * livecanvas;
+#elif defined(usegraphicscanvas)
+    PhotoGraphics * livecanvas;
 #else
     PhotoCanvasTriangle * livecanvas;
 #endif

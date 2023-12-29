@@ -15,6 +15,7 @@
 #include "preview.h"
 #include "setting.h"
 #include "toupcam.h"
+#include "dataWidget.h"
 
 class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 {

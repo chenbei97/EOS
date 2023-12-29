@@ -66,6 +66,7 @@ class ParseManager:
             "9": self.__parse0x0009,
             "10": self.__parse0x0010,
             "11": self.__parse0x0011,
+            "12": self.__parse0x0012,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -288,8 +289,20 @@ class ParseManager:
         print("0x0011回复: ", reponse)
         #time.sleep(1)
         self.__socket.sendall(response.encode("utf-8"))
+
+    def __parse0x0012(self,msg:dict):
+        frame = msg[self.frame]
+        path = msg[self.path]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        reponse[self.state] = "ok"
+        response = json.dumps(reponse)
+        response += self.separate
+        print("0x0012回复: ", reponse)
+        time.sleep(3)
+        self.__socket.sendall(response.encode("utf-8"))
 class SocketServerManger:
-    def __init__(self, port=3000):  # 测试本地链接,只需要提供端口
+    def __init__(self, port=9999):  # 测试本地链接,只需要提供端口
         self.__port = port
         self.__hostName = "localhost"
         self.__msgQueue = Queue()

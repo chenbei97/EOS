@@ -40,6 +40,10 @@
 #include "qradiobutton.h"
 #include "qbuttongroup.h"
 
+#include "qgraphicsview.h"
+#include "qgraphicsscene.h"
+#include "qgraphicsitem.h"
+
 #include "qfiledialog.h"
 #include "qfile.h"
 #include "qfileinfo.h"

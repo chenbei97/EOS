@@ -1,0 +1,64 @@
+<1> item
+item的中心永远是(0,0),向下/右为正
+item的场景坐标是指图形左上角在场景的坐标,setPos()设置的就是这个坐标
+为了方便,以后称item的场景坐标就是指图形左上角
+pos()获取的是item的在父项的坐标,没有父项时就是场景坐标和scenePos()含义相同
+(1) 图形和图形的坐标变换
+    1) QPointF mapFromItem(const QGraphicsItem *item, const QPointF &point)
+    a.mapFromItem(item,pt): 把item坐标系下的点pt映射到a的坐标系下
+    例如item的场景坐标(图形左上角)是(120,120),宽度高度都是40,故中心的场景坐标是(140,140)
+    item坐标系下有个点是(20,20),pt场景坐标就是(140+20,140+20)
+    假设a的场景坐标是(100,100),故中心场景坐标是(120,120)
+    在a的坐标系来看,相对坐标就是pt场景坐标减去a的中心场景坐标,即(40,40)
+
+    QGraphicsRectItem * item1 = new QGraphicsRectItem(0,0,40,40);
+    QGraphicsRectItem * item2 = new QGraphicsRectItem(0,0,40,40);
+    scene->addItem(item1);
+    scene->addItem(item2);
+    item1->setPos(100,100);
+    item2->setPos(120,120);
+    qDebug()<<item1->mapFromItem(item2,QPointF(20,20)); // (40,40)
+
+    2) QPolygonF mapFromItem(const QGraphicsItem *item, const QRectF &rect)
+    含义类似,只不过是矩形到矩形
+    qDebug()<<item1->mapFromItem(item2,QRect(-10,-10,20,20));
+    // QPolygonF(QPointF(10,10)QPointF(30,10)QPointF(30,30)QPointF(10,30)QPointF(10,10))
+
+    同含义的函数: QRectF mapRectFromItem(const QGraphicsItem *item, const QRectF &rect)
+    qDebug()<<item1->mapRectFromItem(item2,QRect(-10,-10,20,20));
+    // QRectF(10,10 20x20) 只是不是返回多边形,而是矩形
+
+    item2的左上角和item1的中心重合,以item2中心画1个边长20的正方形
+    这个正方形的左上角(-10,-10)恰好是item1四等分右下角矩形区域的中心(10,10)
+    左下角(-10,10) => (10,30) 右上角(10,-10) => (30,10) 右下角(10,10)=>(30,30)
+
+    3) QPainterPath mapFromItem(const QGraphicsItem *item, const QPainterPath &path)
+    含义类似
+
+    4) 图形和父项的坐标变换: 图形父项坐标系的点映射到本图形项,不常使用
+        QPointF mapFromParent(const QPointF &point)
+        QPolygonF mapFromParent(const QRectF &rect) / mapRectFromParent
+        QPolygonF mapFromParent(const QPolygonF &polygon)
+        QPainterPath mapFromParent(const QPainterPath &path)
+
+(2) 图形和场景的坐标变换
+    1) QPointF mapFromScene(const QPointF &point) : 把场景中的某个点映射到图形坐标系
+       QPolygonF mapFromScene(const QRectF &rect) / QRectF mapRectFromScene(const QRectF &rect)
+        其它重载函数类似含义,这里要注意除非图形项事先设置过setPos才可以得到正确的位置,否则都是得到(0,0)
+        这是因为addEllipse(QRect(100,100,200,200))规定的是item的rect的坐标而不是item本身的坐标
+            auto rec = scene->addEllipse(QRect(100,100,200,200));
+            qDebug()<<rec->pos()<<rec->scenePos();//(0,0),(0,0) 没设置过都是(0,0)
+            rec->setPos(300,300);
+            qDebug()<<rec->mapFromScene(0,0)<<rec->boundingRect()<<rec->pos();
+            // QPointF(-300,-300) QRectF(99.5,99.5 201x201) QPointF(300,300) QPointF(300,300)
+            // 此时pos才是(300,300),可以看出scenePos和pos一个意思
+
+以上都是from系列函数,都是从别的坐标系的点、矩形映射自己坐标系
+to系列函数反之,自己坐标系的点、矩形映射到别的坐标系
+只举例常见的:
+QPoint mapToItem(const QGraphicsItem *item, const QPoint &)
+QPoint mapToScene(const QPoint &rect)
+
+qDebug()<<item1->mapToItem(item2,QPointF(10,10)); // item1(10,10)的位置在item2来看是(-10,-10)
+qDebug()<<item1->mapFromScene(0,0);//QPointF(-100,-100) item1设置过场景位置(100,100)故中心相对场景(0,0)是负的
+qDebug()<<item1->mapToScene(0,0);//QPointF(100,100) 其实就是求item的场景坐标 <=> scenePos(),pos()

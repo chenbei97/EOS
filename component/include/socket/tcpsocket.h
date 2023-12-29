@@ -22,6 +22,7 @@
 #define WaitMessageBoxSlideStitchMsg  "please wait stitching slide image...\n[has stitched %1 images]"
 #define WaitMessageBoxWaitStitchMsg  "please wait stitching slide image...]"
 #define use_queuethread 1
+#define use_testport 1
 
 class COMPONENT_IMEXPORT TcpSocket: public QObject
 {

@@ -241,6 +241,8 @@ void Preview::showCapturedImage(const QImage& image)
     auto pix = QPixmap::fromImage(img).scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
     livecanvas->setPixmap(pix);
     livecanvas->repaint();
+#elif defined(usegraphicscanvas)
+    livecanvas->setImage(image,10); // 10张图片显示1次
 #else
     livecanvas->setImage(image,10); // 10张图片显示1次
 #endif
@@ -336,6 +338,8 @@ void Preview::initAttributes()
 #ifdef uselabelcanvas
     livecanvas->setAlignment(Qt::AlignCenter);
     livecanvas->setScaledContents(true);
+#elif defined(usegraphicscanvas)
+
 #else
     livecanvas->drawTriangle(false);
     livecanvas->setStrategy(PhotoCanvas::SinglePixmap);
@@ -362,7 +366,7 @@ void Preview::initAttributes()
     tab->setMaximumWidth(PreviewToolBarMaxWidth);
     scrollarea_preview->setWidgetResizable(true);
     scrollarea_experiment->setWidgetResizable(true);
-    recordbox->hide();
+    //recordbox->hide();
 }
 
 void Preview::initObjects()
@@ -371,6 +375,8 @@ void Preview::initObjects()
     canvasmode = new CanvasMode;
 #ifdef uselabelcanvas
     livecanvas = new LabelTriangle;
+#elif defined(usegraphicscanvas)
+    livecanvas = new PhotoGraphics;
 #else
     livecanvas = new PhotoCanvasTriangle;
 #endif

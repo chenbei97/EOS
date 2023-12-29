@@ -77,6 +77,9 @@
 #include "videowidget.h"
 #include "view.h"
 #include "viewapply.h"
+#include "photographic.h"
+#include "graphicsview.h"
+#include "graphicspixitem.h"
 
 // (2) 常量定义
 #endif //EOSI_PUBLIC_H

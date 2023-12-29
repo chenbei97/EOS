@@ -251,7 +251,8 @@ struct FieldManualFocusEvent {
 };
 
 struct FieldAutoFocusEvent {
-
+    const QString path = PathField;
+    const QString state = StateField;
 };
 
 struct FieldChannelMergeEvent {
@@ -831,6 +832,7 @@ static QByteArray assembleAutoFocusEvent(QCVariantMap m)
 {// 自动调焦事件
     QJsonObject object;
     object[FrameField] = AutoFocusEvent;
+    object[PathField] = m[PathField].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
@@ -839,7 +841,9 @@ static QByteArray assembleAutoFocusEvent(QCVariantMap m)
 static QVariant parseAutoFocusEvent(QCVariantMap m)
 {// 手动调焦事件
     if (!m.keys().contains(FrameField)) return false;
-    return false;
+    if (!m.keys().contains(FieldAutoFocusEvent.state)) return false;
+    auto state = m[StateField].toString();
+    return state == OkField;
 }
 
 static QByteArray assembleChannelMergeEvent(QCVariantMap m)

@@ -21,8 +21,8 @@ qml
 cmakePresets.json
 cmakeUserPresets.json
 cmake-build-debug
+cmake-build-release
 python310
-eos_I
 .idea
 mediaservice
 sqldrivers

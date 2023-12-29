@@ -263,6 +263,9 @@ TcpSocket& TcpSocket::instance()
 
 void TcpSocket::connectToHost(const QString &hostName, quint16 port)
 {
+#ifdef use_testport
+    port = SocketTestPort;
+#endif
     socket->connectToHost(hostName,port,QIODevice::ReadWrite);
     socket->waitForConnected(SocketWaitTime);//等待连接上
 }

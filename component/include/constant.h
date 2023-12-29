@@ -49,6 +49,7 @@ static const int DefaultThreadSleepMs = 100;
 #define DefaultPainterPixelHeight (DefaultPainterMetric.height()) //指定font下文字像素的高度
 #define DefaultColorAlpha 125
 #define SocketPort 3000
+#define SocketTestPort 9999
 #define LocalHost "localhost"
 #define SocketWaitTime 60000
 #define DefaultNativeColor QColor("#F0F0F0")
@@ -56,7 +57,7 @@ static const int DefaultThreadSleepMs = 100;
 #define TakePhotoTempPath (CURRENT_PATH+"/temp/photo/")
 #define MergeChannelTempPath (CURRENT_PATH+"/temp/merge/")
 #define RecordVideoDefaultTempPath (CURRENT_PATH+"/temp/video/")
-#define AutoFocusTempPath (CURRENT_PATH+"/temp/focus/")
+#define AutoFocusTempPath (CURRENT_PATH+"/temp/autofocus/")
 static const char* PairArgsField = "(%1,%2)";
 static const char* ApplyField = "apply";
 static const char* AllChannelsField = "allchannels";

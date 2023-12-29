@@ -65,6 +65,11 @@ void Preview::parseResult(const QString & f,const QVariant & d)
         } else LOG<<"[async] exper is not finished";
     }
 
+    if (f == TcpFramePool.loadExperEvent) {
+        d.toBool()?LOG<<"[async] start experiment successful!":
+        LOG<<"[async] start experiment failed!";
+    }
+
 
     if (f == "test0x2") {
         d.toBool()?LOG<<"[async] auto focus successful!":LOG<<"[async] auto focus failed!";
@@ -144,35 +149,39 @@ void Preview::adjustFocus(double val)
 
 void Preview::autoFocus()
 {
-    //    QJsonObject object;
-//    object[FrameField] = AutoFocusEvent;
-//    TcpAssemblerDoc.setObject(object);
-//    auto msg = AppendSeparateField(TcpAssemblerDoc.toJson());
-//    SocketPointer->exec(TcpFramePool.autoFocusEvent,msg);
-
-    auto f = "test0x2";
+    createPath(AutoFocusTempPath);
     QJsonObject object;
-    object[FrameField] = f;
+    object[FrameField] = AutoFocusEvent; // "test0x2"
     object[PathField] = "";
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     json = AppendSeparateField(json);
+    QString path;
     unsigned i = 0;
     SocketPointer->setWaitText(WaitMessageBoxWaitFocusMsg);
-    SocketPointer->exec(f,json);
+    SocketPointer->exec(TcpFramePool.autoFocusEvent,json);
     while (i < 10 && ParserResult.toBool()) {
+        path.clear();
+        auto pix = ToupCameraPointer->capture();
+        if (!pix.isNull()) {
+            path = AutoFocusTempPath
+                   +QDateTime::currentDateTime().toString(DefaultImageSaveDateTimeFormat)+JPGSuffix;
+            pix.save(path,JPGField,DefaultImageQuality);
+        }
+
         if (i == 0) {
             LOG<<"[sync] ready auto focus";
         } else {
-            LOG<<"[sync] send"<<i<<".jpg successful";
+            LOG<<"[sync] send"<<path<<" successful";
         }
-        object[PathField] = QString("%1.jpg").arg(i);
+
+        object[PathField] = path;
         TcpAssemblerDoc.setObject(object);
         json = AppendSeparateField(TcpAssemblerDoc.toJson());
-        SocketPointer->exec(f,json,i);
+        SocketPointer->exec(TcpFramePool.autoFocusEvent,json,i);
         ++i;
     }
-    LOG<<"[sync] send"<<i<<".jpg successful";
+    LOG<<"[sync] send"<<path<<".jpg successful";
     SocketPointer->resetWaitText();
 }
 

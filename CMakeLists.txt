@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
-
-project(EOS LANGUAGES CXX)
+set(ProgramName EOS)
+project(${ProgramName} LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -68,6 +68,9 @@ set(LIBGLESV2_PATH ${CMAKE_PREFIX_PATH}/bin/libGLESv2.dll)
 set(LIBEGLD_PATH ${CMAKE_PREFIX_PATH}/bin/libEGLd.dll)
 set(LIBGLESV2D_PATH ${CMAKE_PREFIX_PATH}/bin/libGLESv2d.dll)
 
+#set(DATA_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/data.lib")
+#set(DATA_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/data)
+
 set(COMPONENT_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/component/include
         ${PROJECT_SOURCE_DIR}/component/include/widgets
@@ -103,10 +106,14 @@ find_package(Qt5 COMPONENTS Core Gui Widgets Sql Network
         Concurrent Multimedia MultimediaWidgets OpenGL REQUIRED)
 
 add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES}) # ${THEME_PATH}
-
+set_target_properties(
+        ${ProgramName}
+        PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE" # debug可以弹出控制台log,release不弹出
+        LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
+)
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
-          ${TOUPCAM_INCLUDE_PATH})
+          ${TOUPCAM_INCLUDE_PATH} ) # ${DATA_INCLUDE_PATH}
 # if (${USE_PYTHON})
 # target_include_directories(${PROJECT_NAME} PUBLIC ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
 # endif ()
@@ -256,7 +263,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::QuickTemplates2 Qt5::Qml Qt5::QuickWidgets Qt5::Quick Qt5::QmlModels Qt5::QuickControls2 Qt5::QmlWorkerScript
         component interface  # mingw必须显示指定python310,msvc指定与否都可
         ${TOUPCAM_LIB_PATH}# opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
-
+#        ${DATA_LIB_PATH}
         )
 # if (${USE_PYTHON})
 # target_link_libraries(${PROJECT_NAME} PRIVATE ${PYTHON310_LIB_PATH_python310} ${PYTHON310_LIB_PATH_python310d})

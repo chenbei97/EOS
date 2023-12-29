@@ -105,6 +105,7 @@ void RecordBox::selectVideo()
         return;
     else selectvideo->setElidedText(path);
     //LOG<<selectvideo->elidedText();
+    playvideo->click(); // 直接播放
 }
 
 void RecordBox::changeSavePath()
