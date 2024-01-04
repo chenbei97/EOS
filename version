@@ -65,3 +65,4 @@ v1.0.4
 (1) 由于去除了previewtool/expertool,对loadExper,export/importExperConfig函数全部重写
     把previewtool,expertool移入过时不再参与编译
 (2) 增加graphicsview的功能,支持图像旋转和缩放
+(3) 去除wellpattern的mouse和updateui文件,合并到一起
