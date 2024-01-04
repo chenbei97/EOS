@@ -66,3 +66,4 @@ v1.0.4
     把previewtool,expertool移入过时不再参与编译
 (2) 增加graphicsview的功能,支持图像旋转和缩放
 (3) 去除wellpattern的mouse和updateui文件,合并到一起
+(4) 增加自动聚焦,通道合并事件
