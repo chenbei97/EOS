@@ -44,7 +44,7 @@ private:
     ComboBox * doseunit;
     PushButton * btn;
     ColorButton * cbtn;
-
+    QSet<QString> allGroups;
 signals:
     void groupSetted(const QString& text);
 };

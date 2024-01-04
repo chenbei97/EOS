@@ -30,6 +30,9 @@ public:
     int holeID() const;
     int holeID(const QPoint& holePoint) const;
 
+    void setViewClickEvent(bool enable);
+    void setMouseEvent(bool enable);
+
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -51,6 +54,8 @@ public:
     void drawDisableLines(QPainter& painter,const QRectF& rect,const QColor& color,Qt::Orientation oriention);
 protected:
     ViewMode mSelectMode = ViewMode::PointMode;
+    bool mMouseEvent = false;
+    bool mViewClickEvent = false;
     ViewInfo mViewInfo;
 #ifdef viewRowColUnEqual
     Dimension2D mDimension;

@@ -11,8 +11,8 @@
 Preview::Preview(QWidget*parent): QWidget(parent)
 {
     initObjects();
-    initAttributes();
     initConnections();
+    initAttributes();
     initLayout();
 }
 
@@ -73,6 +73,7 @@ void Preview::toggleBrand(int option)
             break;
         case SlideIndexInBrand:
             stackpattern->setCurrentWidget(slidepattern);
+            viewModeBox->resetAllGroupItemIcon(); // 组的下拉框要全部恢复使能和"√"图案
             break;
     }
 
@@ -226,6 +227,7 @@ void Preview::openWellViewWindow(const QVariantMap& m)
 void Preview::openWellGroupWindow(const QVariantMap &m)
 {
     // 1. 更新分组窗口的ui信息
+    auto info = m;
     groupinfo->setGroupInfo(m);
 
     // 2. 分组窗口设置的组信息去更新孔的数据
@@ -233,19 +235,6 @@ void Preview::openWellGroupWindow(const QVariantMap &m)
     if (ret == QDialog::Accepted ) {
         wellpattern->updateHoleInfo(groupinfo->groupInfo()); // 用当前的组信息去更新孔的颜色
     }
-}
-
-void Preview::showCapturedImage(const QImage& image)
-{ // 来自照相机的捕捉图像事件传来的live图像显示
-#ifdef uselabelcanvas
-    auto pix = QPixmap::fromImage(img).scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
-    livecanvas->setPixmap(pix);
-    livecanvas->repaint();
-#elif defined(usegraphicscanvas)
-    livecanvas->setImage(image,10); // 10张图片显示1次
-#else
-    livecanvas->setImage(image,10); // 10张图片显示1次
-#endif
 }
 
 void Preview::setAppInfo(int app)
@@ -289,16 +278,15 @@ void Preview::initLayout()
     // 1.右侧布局(2个tab放在2个滚动区域内)
     auto previewtab = new GroupBox;
     auto previewlay = new QVBoxLayout;
+    previewlay->addWidget(stackbox);
     previewlay->addWidget(historybox);
     previewlay->addWidget(wellbox);
     previewlay->addWidget(objectivebox);
     previewlay->addWidget(viewModeBox);
-    previewlay->addWidget(stackbox);
     previewlay->addWidget(channelbox);
     previewlay->addWidget(camerabox);
     previewlay->addWidget(recordbox);
     previewlay->addStretch();
-    //previewlay->addWidget(previewtool);
     previewtab->setLayout(previewlay);
     scrollarea_preview->setWidget(previewtab);
 
@@ -354,6 +342,7 @@ void Preview::initAttributes()
 
     // 2. 右侧布局
     wellpattern->setEnabled(false);
+    wellpattern->setPatternSize(8,12);
     wellview->drawTriangle(false);
     wellview->setEnabled(false);
     stackpattern->addWidget(wellpattern);
@@ -428,7 +417,6 @@ void Preview::initConnections()
     connect(channelbox,&ChannelBox::channelChanged,this,&Preview::toggleChannel);
     connect(channelbox,&ChannelBox::channelClosed,this,&Preview::closeChannel);
     connect(channelbox,&ChannelBox::channelChanged,camerabox,&CameraBox::updateChannelText);
-    connect(camerabox,&CameraBox::cameraAdjusted,this,&Preview::adjustCamera);
     connect(camerabox,&CameraBox::brightAdjusted,this,&Preview::adjustBright);
     connect(camerabox,&CameraBox::photoTaking,this,&Preview::takingPhoto);
     connect(camerabox,&CameraBox::slideStitching,this,&Preview::stitchSlide);
@@ -445,6 +433,10 @@ void Preview::initConnections()
     connect(viewModeBox,&ViewModeBox::enableWellPattern,wellview,&WellView::setEnabled);
     connect(viewModeBox,&ViewModeBox::groupTypeChanged,groupinfo,&GroupInfo::setGroupName);
     connect(viewModeBox,&ViewModeBox::groupColorChanged,groupinfo,&GroupInfo::setGroupColor);
+    connect(viewModeBox,&ViewModeBox::viewEnableChanged,wellpattern,&WellPattern::setOpenViewEnabled);
+    connect(viewModeBox,&ViewModeBox::viewEnableChanged,wellview,&WellView::setOpenViewEnabled);
+    //connect(viewModeBox,&ViewModeBox::viewEnableChanged,wellview,&WellView::setMouseEvent);
+
     //connect(viewModeBox,&ViewModeBox::enableWellPattern,stackbox,&GroupBox::setVisible);//暂时不加
     connect(recordbox,&RecordBox::pauseVideo,this,&Preview::pauseVideo);
     connect(recordbox,&RecordBox::playVideo,this,&Preview::playVideo);
@@ -452,6 +444,7 @@ void Preview::initConnections()
     connect(savebox,&SaveBox::exportFilePath,this,&Preview::exportExperConfig);
     connect(savebox,&SaveBox::loadExper,this,&Preview::loadExper);
     connect(savebox,&SaveBox::stopExper,this,&Preview::stopExper);
+
 
     connect(groupinfo,&GroupInfo::groupSetted,viewModeBox,&ViewModeBox::updateGroupItemIcon);
 

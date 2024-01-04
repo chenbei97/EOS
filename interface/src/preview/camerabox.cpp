@@ -162,7 +162,12 @@ void CameraBox::adjustCamera()
 { // cameratool's ui调节时更改相机的2个参数
     auto exp = cameratool->exposure().toUInt();
     auto gain = cameratool->gain().toUInt();
-    emit cameraAdjusted(exp,gain);
+    LOG<<"adjust camera exp to"<<exp<<"gain to"<<gain;
+    //LOG<<"exposureOption = "<<ToupCameraPointer->exposureOption();
+    if (!ToupCameraPointer->exposureOption()) {
+        ToupCameraPointer->setExposure(exp);
+        ToupCameraPointer->setGain(gain);
+    }
 }
 
 void CameraBox::adjustBright()
@@ -193,14 +198,6 @@ void CameraBox::subtractFocus()
     auto val = focusstep->value();
     if (val == 0.0) return;
     focusslider->subtractValue(val);
-}
-
-void CameraBox::captureImage(const QImage &img, const QString &channel)
-{ // 拍照返回来的图像和通道
-    //LOG<<channel;
-    if (channel.isEmpty()) return; // 都没开灯拍的黑图不存储
-    imageinfo[channel] = img;
-    //LOG<<imageinfo;
 }
 
 void CameraBox::captureExposureGain(unsigned int exp, unsigned int gain)
@@ -314,4 +311,9 @@ double CameraBox::focusStep() const
 double CameraBox::focusValue() const
 {
     return focusslider->value();
+}
+
+void CameraBox::updateFocus(double focus)
+{ // 用于自动聚焦时反馈的focus值去更新ui显示
+    focusslider->setValue(focus);
 }

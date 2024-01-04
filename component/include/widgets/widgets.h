@@ -94,4 +94,5 @@
 #define ChannelPictureLabelMinHeight 100
 #define ChannelPictureLabelMaxWidth 150
 #define ChannelPictureLabelDefaultWidth 400
+#define WhiteColor (QColor(Qt::white))
 #endif //EOS_WIDGETS_H

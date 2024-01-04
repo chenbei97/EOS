@@ -20,6 +20,7 @@ public:
     WellPatternInfo patternInfo() const;
     void setPatternSize(int rows,int cols) override;
     void setViewMode(ViewMode mode);
+    void setOpenViewEnabled(bool enable);
 
     void initDrapHoles(); // 清除拖拽区域
     void initDisableHoles(); // 初始化置灰区域
@@ -30,7 +31,6 @@ public:
     int drapHoleCount() const; // 计算拖拽区域包含的孔个数
     void initHoleInfo(); // 初始化孔信息
     void clearViewInfo();
-    //void importHoleInfoV1(QCPoint point,QCString group,QCPointFVector viewpoints,int viewsize);
     void importHoleInfo(const QHoleInfoVector& vec,ViewMode mode);
 
     void paintEvent(QPaintEvent *event) override;

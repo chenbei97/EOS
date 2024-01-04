@@ -35,9 +35,6 @@ SaveBox::SaveBox(QWidget *parent) : GroupBox(parent)
     setLayout(lay);
     setTitle(tr(SaveBoxTitle));
 
-//    loadbtn->setMinimumWidth(200);
-//    stopbtn->setMinimumWidth(200);
-
     connect(exportToFile,&CheckBox::checkedChanged,this,&SaveBox::showExport);
     connect(exportallbtn,&PushButton::clicked,this,&SaveBox::exportFile);
     connect(loadbtn,&PushButton::clicked,this,&SaveBox::loadExper);

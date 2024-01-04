@@ -42,7 +42,7 @@ void ObjectiveSetting::saveSetting()
     }
 
     // 4. 遍历其它位置选过的镜头,如果有选过,提示占用
-    foreach(auto other_objective,info.values()) {
+    for(auto other_objective: info.values()) {
         if (current_objective == other_objective) {
             int ret = QMessageBox::warning(this,WarningChinese,
                                            tr("The lens is already occupied, do you want to replace it?")
@@ -56,7 +56,7 @@ void ObjectiveSetting::saveSetting()
 
     // 5. 没有被占用或者继续更换就更新数据和tipinfo
     info[current_loc] = current_objective;
-    foreach(auto loc,info.keys(current_objective)) {
+    for(auto loc: info.keys(current_objective)) {
         if (loc != current_loc) {
             info[loc] = NoneField; // 其它位置选了当前镜头设置的都清除掉
         }
@@ -74,8 +74,8 @@ void ObjectiveSetting::moveMachine()
 
     SocketPointer->exec(TcpFramePool.moveMachineEvent,AssemblerMessage);
     if (ParserResult.toBool()) {
-        LOG<<"move machine to "<<m[ObjectiveLocationField].toInt()<<"successful!";
-    } else LOG<<"move machine to "<<m[ObjectiveLocationField].toInt()<<"failed!";
+        LOG<<"[sync] move machine to "<<m[ObjectiveLocationField].toInt()<<"successful!";
+    } else LOG<<"[sync] move machine to "<<m[ObjectiveLocationField].toInt()<<"failed!";
 }
 
 void ObjectiveSetting::updateCheckedState()

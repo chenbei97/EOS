@@ -11,6 +11,8 @@
 
 View::View(QWidget *parent) : QWidget(parent)
 {
+    mMouseEvent = false;
+    mViewClickEvent = false;
     highcolor  = Qt::green;
     highcolor.setAlpha(DefaultColorAlpha);
     trianglen = ViewTriangleLength;
@@ -189,96 +191,119 @@ int View::holeID(const QPoint& holePoint) const
     return holePoint.x() * PointToIDCoefficient + holePoint.y();
 }
 
+void View::setMouseEvent(bool enable)
+{
+    mMouseEvent  = enable;
+}
+
+void View::setViewClickEvent(bool enable)
+{
+    mViewClickEvent = enable;
+}
+
 void View::mousePressEvent(QMouseEvent *event)
 {
     // 1.框选后随机点一下要清除框选框(只能拖拽生成),同时出现单击框
-    if (event->button() == Qt::LeftButton) {
-        mMousePos = event->pos();
-        if (isValidPoint(mMousePos)) {
-            mValidMousePos = mMousePos;
-        }
+    if (mMouseEvent) {
+        if (event->button() == Qt::LeftButton) {
+            mMousePos = event->pos();
+            if (isValidPoint(mMousePos)) {
+                mValidMousePos = mMousePos;
+            }
 
-        mDrapRectF = QRectF();
+            mDrapRectF = QRectF();
 
-        auto diameter = width()>=height()?height():width();
-        auto mouseRect_topleft = mValidMousePos-QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
-        auto mouseRect_bottomright = mValidMousePos+QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
+            auto diameter = width()>=height()?height():width();
+            auto mouseRect_topleft = mValidMousePos-QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
+            auto mouseRect_bottomright = mValidMousePos+QPointF(getInnerRectWidth()/2,getInnerRectHeight()/2);
 
-        if (isValidRect(QRectF(mouseRect_topleft,mouseRect_bottomright))) {
-            mMouseRect = mapFromSize(QRectF(mouseRect_topleft,mouseRect_bottomright),
-                                     getExternalRectTopLeftPoint(),diameter,diameter);
+            if (isValidRect(QRectF(mouseRect_topleft,mouseRect_bottomright))) {
+                mMouseRect = mapFromSize(QRectF(mouseRect_topleft,mouseRect_bottomright),
+                                         getExternalRectTopLeftPoint(),diameter,diameter);
+            }
+            update();
+        } else if (event->button() == Qt::RightButton) {
+            if (mViewInfo[HoleGroupNameField].toString().isEmpty()) { //
+                applyallact->setEnabled(false);
+                applygroupact->setEnabled(false);
+                saveviewact->setEnabled(false);
+                removeviewact->setEnabled(false);
+            } else {
+                applyallact->setEnabled(true);
+                applygroupact->setEnabled(true);
+                saveviewact->setEnabled(true);
+                removeviewact->setEnabled(true);
+                if (mSelectMode == ViewMode::WholeMode) {
+                    saveviewact->setEnabled(false);
+                    removeviewact->setEnabled(false);
+                }
+            }
         }
         update();
-    } else if (event->button() == Qt::RightButton) {
-        if (mViewInfo[HoleGroupNameField].toString().isEmpty()) { //
-            applyallact->setEnabled(false);
-            applygroupact->setEnabled(false);
-            saveviewact->setEnabled(false);
-            removeviewact->setEnabled(false);
-        } else {
-            applyallact->setEnabled(true);
-            applygroupact->setEnabled(true);
-            saveviewact->setEnabled(true);
-            removeviewact->setEnabled(true);
-        }
     }
-    update();
     event->accept();
 }
 
 void View::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (mDrapRectF.isEmpty() && event->button() == Qt::LeftButton) { // 释放时判断如果是拖动事件或者是右键不发射移动电机
-        auto pos = mapFromPointF(mMousePos);
-        if (isValidPoint(mMousePos))
-            emit previewEvent(pos);//注意:这里不能用mValidMousePos,他可能没变,鼠标点击无效区域也触发了,另外只能左键
+    if (mMouseEvent) {
+        if (mDrapRectF.isEmpty() && event->button() == Qt::LeftButton) { // 释放时判断如果是拖动事件或者是右键不发射移动电机
+            auto pos = mapFromPointF(mMousePos);
+            if (isValidPoint(mMousePos)) {
+                if (mViewClickEvent)
+                    emit previewEvent(pos);//注意:这里不能用mValidMousePos,他可能没变,鼠标点击无效区域也触发了,另外只能左键
+            }
+        }
+        update();
     }
-    update();
     event->accept();
 }
 
 void View::mouseMoveEvent(QMouseEvent *event)
 {
-    if (event->buttons() & Qt::LeftButton){
-        auto end = event->pos(); // 鼠标停下的点
-        if (!isValidRect(QRectF(mValidMousePos,end)))
-            return; // 框选到无效区域
-        mMouseRect = QRectF();
-        auto diameter = getCircleRadius()*2.0;
-        // 鼠标形成的矩形框将其等比例缩放到0-1
-        mDrapRectF = mapFromSize(QRectF(mValidMousePos,end),
-                                 getExternalRectTopLeftPoint(),diameter,diameter);
+    if (mMouseEvent) {
+        if (event->buttons() & Qt::LeftButton){
+            auto end = event->pos(); // 鼠标停下的点
+            if (!isValidRect(QRectF(mValidMousePos,end)))
+                return; // 框选到无效区域
+            mMouseRect = QRectF();
+            auto diameter = getCircleRadius()*2.0;
+            // 鼠标形成的矩形框将其等比例缩放到0-1
+            mDrapRectF = mapFromSize(QRectF(mValidMousePos,end),
+                                     getExternalRectTopLeftPoint(),diameter,diameter);
+        }
+        update();
     }
-    update();
     event->accept();
 }
 
 void View::paintEvent(QPaintEvent *event)
 {
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    auto pen = painter.pen();
-    pen.setWidth(DefaultPainterPenWidth);
-    painter.setPen(pen);
-    auto gc = QColor(Qt::gray);
-    gc.setAlpha(DefaultColorAlpha);
-    painter.fillRect(rect(),gc);
+    if (mMouseEvent) {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        auto pen = painter.pen();
+        pen.setWidth(DefaultPainterPenWidth);
+        painter.setPen(pen);
+        auto gc = QColor(Qt::gray);
+        gc.setAlpha(DefaultColorAlpha);
+        painter.fillRect(rect(),gc);
 
-    if (isDrawTriangle) {
-        mSelectMode == ViewMode::PointMode? trianglen = ViewTriangleLength: trianglen = 0;
-    } else trianglen = 0;
+        if (isDrawTriangle) {
+            mSelectMode == ViewMode::PointMode? trianglen = ViewTriangleLength: trianglen = 0;
+        } else trianglen = 0;
 
-    auto radius = getCircleRadius();
-    auto diameter = radius * 2.0;
-    QPainterPath path;
-    path.addEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
-    painter.drawPath(path);
-    painter.fillPath(path,DefaultNativeColor);
+        auto radius = getCircleRadius();
+        auto diameter = radius * 2.0;
+        QPainterPath path;
+        path.addEllipse(QPointF(width()/2.0,height()/2.0),radius,radius);
+        painter.drawPath(path);
+        painter.fillPath(path,DefaultNativeColor);
 
-    drawDisableLines(painter,getLeftDisableRect(),gc,Qt::Horizontal);
-    drawDisableLines(painter,getRightDisableRect(),gc,Qt::Horizontal);
-    drawDisableLines(painter,getTopDisableRect(),gc,Qt::Vertical);
-    drawDisableLines(painter,getBottomDisableRect(),gc,Qt::Vertical);
+        drawDisableLines(painter,getLeftDisableRect(),gc,Qt::Horizontal);
+        drawDisableLines(painter,getRightDisableRect(),gc,Qt::Horizontal);
+        drawDisableLines(painter,getTopDisableRect(),gc,Qt::Vertical);
+        drawDisableLines(painter,getBottomDisableRect(),gc,Qt::Vertical);
 
 
 //    auto topleft = getExternalRectTopLeftPoint()+QPointF(mDisableRectRates[Qt::AlignLeft]*diameter,mDisableRectRates[Qt::AlignTop]*diameter);
@@ -290,40 +315,41 @@ void View::paintEvent(QPaintEvent *event)
 //        painter.drawRect(validRect);
 //    else painter.drawRect(innerRect);
 
-    if (isDrawTriangle) {
-        auto left = getLeftTrianglePoints();
-        auto right = getRightTrianglePoints();
-        auto top = getTopTrianglePoints();
-        auto bottom = getBottomTrianglePoints();
+        if (isDrawTriangle) {
+            auto left = getLeftTrianglePoints();
+            auto right = getRightTrianglePoints();
+            auto top = getTopTrianglePoints();
+            auto bottom = getBottomTrianglePoints();
 
-        painter.drawPolygon(left);
-        painter.drawPolygon(right);
-        painter.drawPolygon(top);
-        painter.drawPolygon(bottom);
+            painter.drawPolygon(left);
+            painter.drawPolygon(right);
+            painter.drawPolygon(top);
+            painter.drawPolygon(bottom);
 
-        // 绘制点击三角形高亮又取消的效果
-        if (!mViewInfo[HoleGroupNameField].toString().isEmpty()) {
-            if (isHighlight) {
-                path.clear();
-                if (left.containsPoint(mMousePos,Qt::WindingFill))
-                    path.addPolygon(left);
-                else if (right.containsPoint(mMousePos,Qt::WindingFill))
-                    path.addPolygon(right);
-                else if (top.containsPoint(mMousePos,Qt::WindingFill))
-                    path.addPolygon(top);
-                else if (bottom.containsPoint(mMousePos,Qt::WindingFill))
-                    path.addPolygon(bottom);
+            // 绘制点击三角形高亮又取消的效果
+            if (!mViewInfo[HoleGroupNameField].toString().isEmpty()) {
+                if (isHighlight) {
+                    path.clear();
+                    if (left.containsPoint(mMousePos,Qt::WindingFill))
+                        path.addPolygon(left);
+                    else if (right.containsPoint(mMousePos,Qt::WindingFill))
+                        path.addPolygon(right);
+                    else if (top.containsPoint(mMousePos,Qt::WindingFill))
+                        path.addPolygon(top);
+                    else if (bottom.containsPoint(mMousePos,Qt::WindingFill))
+                        path.addPolygon(bottom);
 
-                painter.fillPath(path,highcolor);
+                    painter.fillPath(path,highcolor);
+                }
             }
-        }
-        else {
-            path.clear();
-            path.addPolygon(left);
-            path.addPolygon(right);
-            path.addPolygon(bottom);
-            path.addPolygon(top);
-            painter.fillPath(path,gc);
+            else {
+                path.clear();
+                path.addPolygon(left);
+                path.addPolygon(right);
+                path.addPolygon(bottom);
+                path.addPolygon(top);
+                painter.fillPath(path,gc);
+            }
         }
     }
     event->accept();

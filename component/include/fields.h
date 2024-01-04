@@ -11,6 +11,12 @@
 
 #include "alias.h"
 
+// setting涉及的
+static const char* loc1_ = "[loc1]";
+static const char* loc2_ = "[loc2]";
+static const char* loc3_ = "[loc3]";
+static const char* loc4_ = "[loc4]";
+
 // wellbox涉及的数据类型
 static const char* ManufacturerField = "manufacturer";
 static const char* BrandField = "brand";
@@ -212,22 +218,20 @@ static const char* ChannelFieldLabel = "channel: ";
 static const char* CurrentChannelField = "current_channel";
 static const char* SaveChannelsField = "save_channels";
 static const char* CaptureField = "capture";
+static const char* BRPathField = "br_path";
+static const char* PHPathField = "ph_path";
+static const char* RFPPathField = "rfp_path";
+static const char* GFPPathField = "gfp_path";
+static const char* DAPIPathField = "dapi_path";
+static const char* MergePathField = "merge_path";
 static const char* BRField = "BR";
 static const char* PHField = "PH";
 static const char* GFPField = "GFP";
 static const char* RFPField = "RFP";
 static const char* DAPIField = "DAPI";
-static const char* Bright4xField = "br4x";
-static const char* PH4xField = "ph4x";
 static const char* _4xPHField = "4xPH";
-static const char* Bright10xField = "br10x";
-static const char* PH10xField = "ph10x";
 static const char* _10xPHField = "10xPH";
-static const char* Bright20xField = "br20x";
-static const char* PH20xField = "ph20x";
 static const char* _20xPHField = "20xPH";
-static const char* Bright40xField = "br40x";
-static const char* PH40xField = "ph40x";
 static const char* _40xPHField = "40xPH";
 static const char* NA20x05Field = "NA20x0.5";
 static const char* NA20x08Field = "NA20x0.8";
@@ -349,7 +353,7 @@ static const char* HoleAllCoordinatesField = "hole_allcoordinates"; // 孔板已
 static const char* IsHoleField = "ishole"; // 是孔坐标触发还是视野坐标触发
 
 static const QStringList GroupDoseUnitFields =  {
-        "mg/mL","mg/L","g/mL","g/L",
+        "mg/mL","mg/L","g/mL","g/L","μM",
 };
 static const QStringList GroupTypeFields = {
         QObject::tr("Positive Control 1"),QObject::tr("Negative Control 1"),QObject::tr("Treatment 1"),

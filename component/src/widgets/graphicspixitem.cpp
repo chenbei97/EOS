@@ -22,7 +22,12 @@ GraphicsPixmapItem::GraphicsPixmapItem(QGraphicsItem *parent): QGraphicsPixmapIt
 
 void GraphicsPixmapItem::setImage(const QImage &img)
 {
-    auto image = img.scaled(scene()->sceneRect().width(),scene()->sceneRect().height(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
+    auto sx  = scene()->sceneRect().width() / img.width();
+    auto sy = scene()->sceneRect().height() / img.height();
+    auto transform = QTransform::fromScale(sx,sy);
+    auto image= img.transformed(transform,Qt::FastTransformation);
+
+    //auto image = img.scaled(scene()->sceneRect().width(),scene()->sceneRect().height(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
     setPixmap(QPixmap::fromImage(image));
 }
 
@@ -73,5 +78,5 @@ void GraphicsPixmapItem::initAttributes()
     setShapeMode(BoundingRectShape);
     setTransformationMode(Qt::SmoothTransformation);
     setAcceptTouchEvents(true);
-    setToolTip("this is an image item");
+    //setToolTip("this is an image item");
 }

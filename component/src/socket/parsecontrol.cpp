@@ -44,26 +44,28 @@ void ParserControl::async(QCString f,QCVariant d)
 
 QVariant ParserControl::result()
 {
-    auto r = res;
-    res = QVariant();//取走后要清除上次的内容防止下次被使用
-    //LOG<<r;
-    return r;
+//    auto r = res;
+//    res = QVariant();//取走后要清除上次的内容防止下次被使用
+//    return r;
+    return res;
 }
 
 QString ParserControl::frame()
 {
-    auto f = fram;
-    fram.clear();
-    return f;
+//    auto f = fram;
+//    fram.clear();
+//    return f;
+    return fram;
 }
 
 QVariantMap ParserControl::response()
 {
-    auto d = parseresult;
-    d[fram].clear();
-    fram.clear();
-    res = QVariant();
-    return d;
+//    auto d = parseresult;
+//    d[fram].clear();
+//    fram.clear();
+//    res = QVariant();
+//    return d;
+    return parseresult;
 }
 
 ParserControl::~ParserControl()

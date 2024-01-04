@@ -23,6 +23,7 @@ ChannelBox::ChannelBox(QWidget*parent): GroupBox(parent)
     lay->addWidget(gfpchannel);
     lay->addWidget(rfpchannel);
     lay->addWidget(dapichannel);
+    //lay->addStretch();
 
     auto mainlay = new QVBoxLayout;
     mainlay->addLayout(lay);

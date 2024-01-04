@@ -7,6 +7,7 @@ FilePath: \EOS\test\test_socket.py
 Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
 '''
 import os,sys
+import random
 import threading
 from socket import socket
 import json
@@ -28,6 +29,12 @@ class ParseManager:
         self.brand = "brand"
         self.equip = "equip"
         self.path = "path"
+        self.br_path = "br_path"
+        self.ph_path = "ph_path"
+        self.dapi_path = "dapi_path"
+        self.rfp_path = "rfp_path"
+        self.gfp_path = "gfp_path"
+        self.merge_path = "merge_path"
         self.hole_x = "hole_x"
         self.hole_y = "hole_y"
         self.view_x = "view_x"
@@ -67,6 +74,7 @@ class ParseManager:
             "10": self.__parse0x0010,
             "11": self.__parse0x0011,
             "12": self.__parse0x0012,
+            "13": self.__parse0x0013,
         }
     def setSocket(self, sock: socket):
         self.__socket = sock
@@ -290,17 +298,38 @@ class ParseManager:
         #time.sleep(1)
         self.__socket.sendall(response.encode("utf-8"))
 
+    # 自动聚焦事件
     def __parse0x0012(self,msg:dict):
         frame = msg[self.frame]
         path = msg[self.path]
         reponse = defaultdict()
         reponse[self.frame] = frame
         reponse[self.state] = "ok"
+        reponse[self.focus] = random.randint(1,9)
         response = json.dumps(reponse)
         response += self.separate
         print("0x0012回复: ", reponse)
         time.sleep(3)
         self.__socket.sendall(response.encode("utf-8"))
+
+    # 通道合并事件
+    def __parse0x0013(self,msg:dict):
+        frame = msg[self.frame]
+        ph_path = msg[self.ph_path]
+        br_path = msg[self.br_path]
+        rfp_path = msg[self.rfp_path]
+        gfp_path = msg[self.gfp_path]
+        dapi_path = msg[self.dapi_path]
+        reponse = defaultdict()
+        reponse[self.frame] = frame
+        c_path = os.getcwd()+r"\temp\merge\test.jpeg"
+        reponse[self.merge_path] = c_path
+        response = json.dumps(reponse)
+        response += self.separate
+        print("0x0013回复: ", reponse)
+        time.sleep(3)
+        self.__socket.sendall(response.encode("utf-8"))
+
 class SocketServerManger:
     def __init__(self, port=9999):  # 测试本地链接,只需要提供端口
         self.__port = port

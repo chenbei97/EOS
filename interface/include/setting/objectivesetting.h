@@ -36,5 +36,6 @@ private:
     PushButton * savebtn;
 signals:
     void objectiveSettingChanged(const LocationObjectiveInfo& m);
+
 };
 #endif //EOSI_OBJECTIVESETTING_H

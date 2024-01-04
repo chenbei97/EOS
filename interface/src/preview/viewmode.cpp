@@ -21,74 +21,127 @@ ViewModeBox::ViewModeBox(QWidget *parent) : GroupBox(parent)
     connect(enableGroupBtn,&PushButton::clicked,this,&ViewModeBox::enableGroup);
     connect(endGroupBtn,&PushButton::clicked,this,&ViewModeBox::endGroup);
     connect(groupType,&ComboBox::currentTextChanged,this,&ViewModeBox::toggleGroup);
+    connect(enableSelectBtn,&PushButton::clicked,this,&ViewModeBox::enableSelect);
+}
+
+void ViewModeBox::enableSelect()
+{
+    auto btn = qobject_cast<PushButton*>(sender());
+    if (btn->isChecked()) {
+        btn->resetBackGroundColor();
+    } else {
+        btn->setBackGroundColor(Qt::yellow);
+    }
+    if (btn->isEnabled()) {
+        btn->setText(tr("location select[enable]"));
+    } else {
+        btn->setText(tr("location select[disable]"));
+    }
+
+    if (groupMode->checkedID() == 1){ // 点模式下,三角的使能和location_select按钮的checked状态有关
+        triangleMove->setEnabled(btn->isChecked());
+    }
+    // 无论是哪种模式,能否启用wellview的鼠标绘图事件只和enableSelectBtn的checked状态有关
+    emit viewEnableChanged(btn->isChecked());
+}
+
+void ViewModeBox::enableGroup()
+{ // 使能分组
+    enableGroupBtn->setBackGroundColor(Qt::yellow);// 高亮可以分组
+    endGroupBtn->resetBackGroundColor(); // 结束分组取消高亮
+    groupType->setEnabled(true); // 组的下拉框可选
+    endGroupBtn->setEnabled(true); // 结束分组使能
+    enableSelectBtn->setEnabled(false);// 分组时不可以选择视野
+    enableSelectBtn->setText(tr("location select[disable]"));// 分组时按钮文本变化
+    if (groupMode->checkedID() == 1 && enableSelectBtn->isChecked()
+        && enableSelectBtn->isEnabled()){ // 点模式+视野选择按钮使能且checked
+        triangleMove->setEnabled(true); // 才可以移动4个三角
+    } else triangleMove->setEnabled(false);
+
+    emit enableWellPattern(true); // 使能分组后控制wellPattern的使能
+    emit viewEnableChanged(false); // 但是禁用鼠标/绘图事件
+}
+
+void ViewModeBox::endGroup()
+{ // 结束分组
+    endGroupBtn->setBackGroundColor(Qt::yellow); // 结束分组高亮
+    enableGroupBtn->resetBackGroundColor(); // 可以分组取消高亮
+    groupType->setEnabled(false); // 组下拉框不可选
+    enableSelectBtn->setEnabled(true); // 可以启用选择视野
+    enableSelectBtn->setText(tr("location select[enable]")); // 修改按钮文本
+    //emit enableWellPattern(false); // 不要控制图案的使能禁止,因为还要继续选点
+    //emit viewEnableChanged(true); // 启用鼠标/绘图事件不由endGroup决定,而是enableSelect
 }
 
 void ViewModeBox::radioClick(int mode)
-{
-    if (mode == 1) { // 点模式且确实开启分组功能 可用三角图案
-        if (groupType->isEnabled()) {
-            triangleMove->setEnabled(true);
-        }
-    } else {
+{ // 切换选视野模式,可能之前都是使能,切到非点模式后要进行调整
+    if (mode == 1 && enableSelectBtn->isEnabled()) { // 切到点模式时,且选择视野使能状态
+            triangleMove->setEnabled(enableSelectBtn->isChecked());//如果当前是checked那么三角可用否则不可用
+            // 这种情况是区域模式切到三角时可能enableSelectBtn已经高亮,三角应该跟随
+    } else { // 非点模式不允许三角,
+        //enableSelectBtn->resetBackGroundColor(); // 不需要帮助取消高亮和置unchecked,区域模式也可以看视野
         triangleMove->setEnabled(false);
     }
+    emit viewEnableChanged(enableSelectBtn->isChecked());//需要刷新进入视野动作菜单的状态
     emit modeSelected(mode);
 }
 
 void ViewModeBox::triangleClick(int option)
-{
-    if (groupMode->checkedID() == 1 && groupType->isEnabled()) {
-        emit triangleClicked(option);
+{ // 点击4个三角,这是以防万一的一层保障
+    if (groupMode->checkedID() == 1 && enableSelectBtn->isEnabled()
+        && enableSelectBtn->isChecked()) {
+        emit triangleClicked(option); // 点模式且启用视野后可以
     }
-}
-
-void ViewModeBox::enableGroup()
-{
-    groupType->setEnabled(true);
-    if (groupMode->checkedID() == 1)
-        triangleMove->setEnabled(true);
-    emit enableWellPattern(true);
-}
-
-void ViewModeBox::endGroup()
-{
-    groupType->setEnabled(false);
-    triangleMove->setEnabled(false);
-    emit enableWellPattern(false);
 }
 
 void ViewModeBox::toggleGroup(const QString &text)
 {
-    emit groupTypeChanged(text);
     auto idx = groupType->currentIndex();
     auto color = groupType->itemData(idx,Qt::BackgroundRole).toString();
+    // 把当前组的类型和组的颜色传递给groupinfo
+    emit groupTypeChanged(text);
     emit groupColorChanged(QColor(color));
-    groupType->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color));
+    groupType->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color));//让下拉框当前项跟随颜色
 }
 
-void ViewModeBox::updateGroupItemIcon(const QString &text)
+void ViewModeBox::updateGroupItemIcon(const QString &group)
 { // groupInfo点击确定后,更新这里的下拉栏图标,表示不能再选了
     auto cmodel = static_cast<QStandardItemModel*>(groupType->model());
     for(int i = 0; i < cmodel->rowCount(); ++i) {
         auto item = cmodel->item(i);
-        if (item->text() == text) {
+        if (item->text() == group) {
             cmodel->item(i)->setIcon(QIcon(":/images/radiobutton_unchecked.png"));
+            item->setEnabled(false);
             break;
         }
     }
 }
 
-void ViewModeBox::resetGroupItemIcon(const QSet<QString> texts)
-{ // 每次删孔都要检测是否某个组的孔删完了,如果删完了texts就没有那个组,对应的图标恢复
-    LOG<<texts;
+void ViewModeBox::resetGroupItemIcon(const QSet<QString> groups)
+{ // 每次删孔都要检测是否某个组的孔删完了,如果删完了groups就没有那个组,对应的图标恢复
+    LOG<<groups;
     auto cmodel = static_cast<QStandardItemModel*>(groupType->model());
     for(int i = 0; i < cmodel->rowCount(); ++i) {
         auto item = cmodel->item(i);
-        if (texts.contains(item->text())) {
+        if (groups.contains(item->text())) {
             cmodel->item(i)->setIcon(QIcon(":/images/radiobutton_unchecked.png"));
+            cmodel->item(i)->setEnabled(false); // 不能选的禁用
         } else {
             cmodel->item(i)->setIcon(QIcon(":/images/radiobutton_checked.png"));
+            cmodel->item(i)->setEnabled(true);
         }
+    }
+}
+
+void ViewModeBox::resetAllGroupItemIcon()
+{ // 切换到slide时需要重置所有组的下拉框选项恢复使能
+    auto cmodel = static_cast<QStandardItemModel*>(groupType->model());
+    Q_ASSERT(cmodel->rowCount() <= GroupTypeColors.count());
+    for(int i = 0; i < cmodel->rowCount(); ++i) {
+        cmodel->item(i)->setBackground(GroupTypeColors[i]);
+        cmodel->item(i)->setData(GroupTypeColors[i],Qt::BackgroundRole);
+        cmodel->item(i)->setIcon(QIcon(":/images/radiobutton_checked.png"));
+        cmodel->item(i)->setEnabled(true);
     }
 }
 
@@ -98,7 +151,9 @@ void ViewModeBox::initAttributes()
     triangleMove->setTriangleGap(0);
     triangleMove->setEnabled(false);
     groupType->setEnabled(false);
-    groupType->setCurrentIndex(-1);
+    groupType->setCurrentIndex(0);
+    enableSelectBtn->setEnabled(false);
+    endGroupBtn->setEnabled(false);
     auto cmodel = static_cast<QStandardItemModel*>(groupType->model());
     Q_ASSERT(cmodel->rowCount() <= GroupTypeColors.count());
     for(int i = 0; i < cmodel->rowCount(); ++i) {
@@ -122,6 +177,7 @@ void ViewModeBox::initLayout()
     rightlay->addWidget(enableGroupBtn);
     rightlay->addWidget(groupType);
     rightlay->addWidget(endGroupBtn);
+    rightlay->addWidget(enableSelectBtn);
     rightbox->setLayout(rightlay);
 
     // 3. mainlay
@@ -140,17 +196,31 @@ void ViewModeBox::initObjects()
     triangleMove = new TriangleMove;
     groupType = new ComboBox(GroupTypeFields);
     enableGroupBtn = new PushButton(tr("create group"));
-    endGroupBtn = new PushButton(tr("done"));
+    endGroupBtn = new PushButton(tr("group done"));
+    enableSelectBtn = new PushButton(tr("location select"));
 }
 
 void ViewModeBox::setViewEnabled(int option)
-{ // 0表示孔板类型,1表示载玻片类型
+{ // 0表示孔板类型,1表示载玻片类型 来自wellTypeChanged
     groupMode->setEnabled(1,!option);
     groupMode->setEnabled(2,true); // 区域模式任何时候都可用
     groupMode->setEnabled(3,!option);
     if (option) {
         groupMode->setChecked(2,true); // 如果是载玻片,区域模式的checked要设置上
         groupMode->emitSignals(2);// 这样才能触发信号
+
+        enableGroupBtn->setEnabled(false); // 禁用分组
+        groupType->setEnabled(false); // 禁用组下拉框
+        endGroupBtn->setEnabled(false); // 禁用结束分组
+        enableSelectBtn->setEnabled(false);// 禁用选择视野
+        enableSelectBtn->setText(tr("location select[disable]"));// 分组时按钮文本变化
+        // areaMode已经控制了三角禁用无需再控制
+    } else {
+        enableGroupBtn->setEnabled(true); // 启用分组
+        enableGroupBtn->resetBackGroundColor(); // 颜色可能之前是高亮先恢复高亮
+        groupType->setEnabled(false); // 启用分组去控制,初始false
+        endGroupBtn->setEnabled(true); // 启用结束分组
+        endGroupBtn->resetBackGroundColor(); // 同理先恢复高亮
     }
 }
 

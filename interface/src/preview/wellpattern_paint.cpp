@@ -9,58 +9,103 @@
 
 #include "wellpattern.h"
 
-QRectF2DVector WellPattern::getHoleRectsOnViewSize(const QPoint &coordinate) const
-{// 拿到某个孔基于视野窗口尺寸来划分的所有小矩形区域
+void WellPattern::mouseReleaseEvent(QMouseEvent *event)
+{ // 框选数量大于1不允许打开视野窗口,只能基于特定孔
+    if (mMouseEvent) {
 
-    // 1. 获取孔内圆的半径+圆心坐标
-    auto cell_size = getInnerRectSize();
-    double cell_w = cell_size.width();
-    double cell_h = cell_size.height();
-    double radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
-    radius = radius * 0.75; // 这个圆的半径
-    auto  centerPts = getCenterPoints();
-    auto center  = centerPts[coordinate.x()][coordinate.y()]; // 圆心
-
-    // 2. 根据圆心和内圆半径拿到内圆外接正方形区域
-    auto rect = QRectF(center,QSize(radius*2,radius*2)); // 这个孔内圆的外接正方形
-
-    // 3. 拿到这个孔存储的视野尺寸信息
-#ifdef viewRowColUnEqual
-    auto viewrows = mHoleInfo[coordinate.x()][coordinate.y()].dimension.rows;
-    auto viewcols = mHoleInfo[coordinate.x()][coordinate.y()].dimension.cols;
-#else
-    auto viewrows = mHoleInfo[coordinate.x()][coordinate.y()].viewsize;
-    auto viewcols = viewrows;
-#endif
-    // 4. 得到外接正方形根据视野尺寸划分后每个小矩形的长度和宽度
-    QRectF2DVector m;
-    auto hoffset = 2 * radius / viewcols *1.0; // 整个外接正方形的尺寸就是2*radius
-    auto voffset = 2 * radius / viewrows *1.0;
-
-    // 4.拿到外界正方形的左上角顶点
-    auto start = center-QPointF(radius,radius); // 圆心坐标减去水平垂直距离radius即可
-
-    // 5. 有了左上角起点+每次水平垂直移动的小矩形尺寸就可以得到所有小矩形的区域
-    for(int i = 0 ; i < viewrows; ++i) {
-        QRectFVector vec;
-        for(int j = 0; j < viewcols; ++j) { // j*offset加在x坐标也就是水平方向
-            auto topleft = start + QPointF(j*hoffset,i*voffset); // x, x+d，j依次取0,1; y先不变在后
-            auto bottomright = topleft + QPointF(hoffset,voffset);
-            vec.append(QRectF(topleft,bottomright));
+        // 1. 点到边缘位置不能打开视野窗口和设置分组信息
+        if (!isValidPoint(mLastPos) || mMousePos == QPoint(-1,-1)){
+            openviewact->setEnabled(false);
+            opengroupact->setEnabled(false);
+            removeholeact->setEnabled(false);
+            return;
         }
-        m.append(vec);
+
+        // 2.点到不可选的孔也不能打开
+        if (mDisableHoles[mMousePos.x()][mMousePos.y()]) {
+            openviewact->setEnabled(false);
+            opengroupact->setEnabled(false);
+            removeholeact->setEnabled(false);
+            return;
+        }
+
+        // 3. 点到其它可用的孔且非边缘位置就可以打开分组窗口
+        opengroupact->setEnabled(true);
+        removeholeact->setEnabled(true);
+
+        // 4. 框选的数量大于1个不允许打开视野动作使能,打开视野只能基于特定孔打开
+        if (mEnterViewEvent) { // 允许进入视野窗口
+            int count = drapHoleCount();
+            if (count > 1) // 只框选了1个不会弹
+                openviewact->setEnabled(false);
+            else openviewact->setEnabled(true);
+        }
     }
-    return m;
+    event->accept();
 }
 
-QRectF2DVector WellPattern::getHoleRectsOnViewSize(int x,int y) const
-{
-    return getHoleRectsOnViewSize(QPoint(x,y));
+void WellPattern::mouseMoveEvent(QMouseEvent *event)
+{// 得到框选孔的区域
+    if (mMouseEvent) {
+        if (event->buttons() & Qt::LeftButton)
+        {
+            initDrapHoles(); // 清除拖拽区域
+            auto end = event->pos(); // 鼠标停下的点
+            mDrapRect = QRectF(mLastPos,end); // 鼠标形成的矩形框
+            auto rects = getAllInnerRects();
+            for(int row = 0; row < mrows; ++row)
+                for(int col = 0; col < mcols; ++col) {
+                    if(mDrapRect.intersects(rects[row][col])// 小矩形区域在这个推拽区域内有交集
+                       && !mDisableHoles[row][col]){ // 根源在mDrapPoints直接限制好,paintEvent不加
+                        mDrapHoles[row][col] = true; //!mDisableHoles[row][col]判断也可以
+                    }
+                }
+
+        }
+    }
+    update();
+    event->accept();
+}
+
+void WellPattern::mousePressEvent(QMouseEvent *event)
+{ // 点左键要取消框选
+    Pattern::mousePressEvent(event);
+    if (mMouseEvent) {
+        if (event->button() == Qt::LeftButton) {
+            initDrapHoles(); // 框选后，如果左键点一下应该取消框选
+            mDrapRect = QRectF();
+            update();
+        } // 右键是菜单
+    }
+    event->accept();
+}
+
+void WellPattern::mouseDoubleClickEvent(QMouseEvent*event)
+{ // 双击也能打开视野窗口
+    Pattern::mouseDoubleClickEvent(event);
+    if (mMouseEvent) {
+        // 点到不可选的孔也不能打开,这样wellpattern的限制就禁止了viewpattern的打开,viewpattern不再需要针对置灰功能写逻辑
+        if (mMousePos == QPoint(-1,-1) || mDisableHoles[mMousePos.x()][mMousePos.y()]) {
+            openviewact->setEnabled(false);
+            opengroupact->setEnabled(false);
+            removeholeact->setEnabled(false);
+            return;
+        }
+        opengroupact->setEnabled(true);
+        removeholeact->setEnabled(true);
+        if (mEnterViewEvent) { // 允许进入视野事件
+            openviewact->setEnabled(true);
+            openviewact->trigger(); // 双击打开视野窗口触发一下
+        }
+
+    }
 }
 
 void WellPattern::paintEvent(QPaintEvent *event)
 {
     Pattern::paintEvent(event);
+
+    if (!mMouseEvent) return;
 
     auto cell_size = getInnerRectSize();
     auto cell_w = cell_size.width();
@@ -199,3 +244,54 @@ void WellPattern::paintEvent(QPaintEvent *event)
         painter.setPen(pen);
     }
 }
+
+QRectF2DVector WellPattern::getHoleRectsOnViewSize(const QPoint &coordinate) const
+{// 拿到某个孔基于视野窗口尺寸来划分的所有小矩形区域
+
+    // 1. 获取孔内圆的半径+圆心坐标
+    auto cell_size = getInnerRectSize();
+    double cell_w = cell_size.width();
+    double cell_h = cell_size.height();
+    double radius = cell_w>=cell_h? cell_h/2: cell_w/2; // 选较小的确保圆在矩形内
+    radius = radius * 0.75; // 这个圆的半径
+    auto  centerPts = getCenterPoints();
+    auto center  = centerPts[coordinate.x()][coordinate.y()]; // 圆心
+
+    // 2. 根据圆心和内圆半径拿到内圆外接正方形区域
+    auto rect = QRectF(center,QSize(radius*2,radius*2)); // 这个孔内圆的外接正方形
+
+    // 3. 拿到这个孔存储的视野尺寸信息
+#ifdef viewRowColUnEqual
+    auto viewrows = mHoleInfo[coordinate.x()][coordinate.y()].dimension.rows;
+    auto viewcols = mHoleInfo[coordinate.x()][coordinate.y()].dimension.cols;
+#else
+    auto viewrows = mHoleInfo[coordinate.x()][coordinate.y()].viewsize;
+    auto viewcols = viewrows;
+#endif
+    // 4. 得到外接正方形根据视野尺寸划分后每个小矩形的长度和宽度
+    QRectF2DVector m;
+    auto hoffset = 2 * radius / viewcols *1.0; // 整个外接正方形的尺寸就是2*radius
+    auto voffset = 2 * radius / viewrows *1.0;
+
+    // 4.拿到外界正方形的左上角顶点
+    auto start = center-QPointF(radius,radius); // 圆心坐标减去水平垂直距离radius即可
+
+    // 5. 有了左上角起点+每次水平垂直移动的小矩形尺寸就可以得到所有小矩形的区域
+    for(int i = 0 ; i < viewrows; ++i) {
+        QRectFVector vec;
+        for(int j = 0; j < viewcols; ++j) { // j*offset加在x坐标也就是水平方向
+            auto topleft = start + QPointF(j*hoffset,i*voffset); // x, x+d，j依次取0,1; y先不变在后
+            auto bottomright = topleft + QPointF(hoffset,voffset);
+            vec.append(QRectF(topleft,bottomright));
+        }
+        m.append(vec);
+    }
+    return m;
+}
+
+QRectF2DVector WellPattern::getHoleRectsOnViewSize(int x,int y) const
+{
+    return getHoleRectsOnViewSize(QPoint(x,y));
+}
+
+

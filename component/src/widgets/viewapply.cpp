@@ -11,17 +11,33 @@
 
 ViewApply::ViewApply(QWidget *parent): QDialog(parent)
 {
-    auto lay = new QHBoxLayout;
-    current = new PushButton(ApplyHoleActTitle);
-    group = new PushButton(ApplyGroupActTitle);
-    all = new PushButton(ApplyAllActTitle);
-    lay->addWidget(current);
-    lay->addWidget(group);
-    lay->addWidget(all);
+    mmode = 0;
+//    auto lay = new QHBoxLayout;
+//    current = new PushButton(ApplyHoleActTitle);
+//    group = new PushButton(ApplyGroupActTitle);
+//    all = new PushButton(ApplyAllActTitle);
+//    lay->addWidget(current);
+//    lay->addWidget(group);
+//    lay->addWidget(all);
+//    connect(current,&PushButton::clicked,this,&ViewApply::apply);
+//    connect(group,&PushButton::clicked,this,&ViewApply::apply);
+//    connect(all,&PushButton::clicked,this,&ViewApply::apply);
+//    setLayout(lay);
+
+    // 改用下边的
+    radioGroup = new RadioGroup(3,Qt::Horizontal);
+    radioGroup->setText(QStringList()<<ApplyHoleActTitle<<ApplyGroupActTitle<<ApplyAllActTitle);
+    applyBtn = new PushButton(ApplyField);
+    connect(radioGroup,&RadioGroup::radioClicked,[=](auto id){id--;mmode=id;});
+    connect(applyBtn,&PushButton::clicked,this,&ViewApply::apply);
+    auto lay = new QVBoxLayout;
+    auto btnlay = new QHBoxLayout;
+    btnlay->addStretch();
+    btnlay->addWidget(applyBtn);
+    lay->addWidget(radioGroup);
+    lay->addLayout(btnlay);
+    lay->addStretch();
     setLayout(lay);
-    connect(current,&PushButton::clicked,this,&ViewApply::apply);
-    connect(group,&PushButton::clicked,this,&ViewApply::apply);
-    connect(all,&PushButton::clicked,this,&ViewApply::apply);
 }
 
 int ViewApply::mode() const
@@ -31,12 +47,12 @@ int ViewApply::mode() const
 
 void ViewApply::apply()
 {
-    if (sender() == current) {
-        mmode = 0;
-    } else if (sender() == group) {
-        mmode = 1;
-    } else if (sender() == all) {
-        mmode = 2;
-    }
+//    if (sender() == current) {
+//        mmode = 0;
+//    } else if (sender() == group) {
+//        mmode = 1;
+//    } else if (sender() == all) {
+//        mmode = 2;
+//    }
     accept();
 }

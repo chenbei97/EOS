@@ -23,6 +23,9 @@ class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 public:
     explicit MainWindow(QWidget*parent= nullptr);
     void closeEvent(QCloseEvent*event);
+    void keyPressEvent(QKeyEvent *event);
+    void askConnectState();
+    void askActivateCode();
 private:
     NavigBar * navigbar;
     AppSelect * appselect;
@@ -30,6 +33,8 @@ private:
     Setting * setting;
     QStackedWidget * stack;
     QWidget* mDataWidget;
+    QAction * quitfullscreen;
+    QAction * enterfullscreen;
 private:
     void navigbarSelect(int id);
 };

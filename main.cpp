@@ -20,18 +20,11 @@ int main(int argc, char *argv[]) {
     initApp(a);
     MainWindow w;
     setWindowAlignCenter(&w);
-    w.show();
+    w.showMaximized();
 
     // mainwindow建立后再执行,否则异步消息会收不到,同步不影响
-    SocketPointer->exec(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()),true);
-    //SocketPointer->exec_queue(TcpFramePool.askConnectedStateEvent,assembleAskConnectedStateEvent(QVariantMap()));
-    //QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
-    if (ParserResult.toBool()) LOG<<"[sync] socket is connect successful!";
-    else LOG<<"[sync] socket is connect failed!";
-    SocketPointer->exec(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()),true);
-    //SocketPointer->exec_queue(TcpFramePool.askActivateCodeEvent,assembleAskActivateCodeEvent(QVariantMap()));
-    //QMetaObject::invokeMethod(SocketPointer,"processRequestQueue",Qt::DirectConnection);
-    LOG<<"[sync] activate code is "<<ParserResult.toString();
+    w.askConnectState();
+    w.askActivateCode();
 
     // 相机也有信号需要等mainwindow建立
     Toupcam_GigeEnable(nullptr, nullptr);// 初始化对相机的支持

@@ -12,6 +12,7 @@
 
 #include "widgets.h"
 #include "pushbutton.h"
+#include "radiogroup.h"
 
 class COMPONENT_IMEXPORT ViewApply: public QDialog
 {
@@ -23,6 +24,8 @@ private:
     PushButton * current;
     PushButton * group;
     PushButton * all;
+    RadioGroup * radioGroup;
+    PushButton * applyBtn;
     void apply();
     int mmode = 0;
 };

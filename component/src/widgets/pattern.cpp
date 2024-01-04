@@ -45,7 +45,8 @@ void Pattern::mousePressEvent(QMouseEvent *event)
                 if (tmp != QPoint(-1,-1)) { // 点击的不是无效位置
                     if(tmp != mMousePos) { // mMousePos是上次点击的有效位置
                         mMousePos = tmp;
-                        emit holeClicked(mMousePos); // 新位置和原来位置不同才动电机
+                        if (mHoleClickEvent)
+                            emit holeClicked(mMousePos); // 新位置和原来位置不同才动电机
                     }
                 }
             }
@@ -68,7 +69,8 @@ void Pattern::mouseDoubleClickEvent(QMouseEvent*event)
                     if (rects[row][col].contains(mLastPos))
                         mMousePos = {row,col};
             update();
-            emit doubleClicked(mMousePos);
+            if (mEnterViewEvent)
+                emit doubleClicked(mMousePos);
         }
     }
     event->accept();
@@ -245,9 +247,23 @@ QSize Pattern::patternSize() const
     return QSize(mrows,mcols);
 }
 
+void Pattern::setHoleClickEvent(bool enable)
+{
+    mHoleClickEvent = enable;
+    update();
+}
+
+void Pattern::setEnterViewEvent(bool enable)
+{
+    mEnterViewEvent = enable;
+    update();
+}
+
 Pattern::Pattern(int rows, int cols,QWidget*parent):mrows(rows),mcols(cols),QWidget(parent)
 {
+    mHoleClickEvent = false;
     mMouseEvent = false;
+    mEnterViewEvent = false;
     mMousePos = {-1,-1};
     mLastPos = {-1,-1};
     mInnerCircleColor.setAlpha(DefaultColorAlpha);

@@ -19,6 +19,7 @@ class COMPONENT_IMEXPORT PhotoGraphics: public QWidget
 {
     Q_OBJECT
 public:
+    enum MirrorType {NoMirror,HorMirror,VerMirror,AllMirror};
     explicit PhotoGraphics(QWidget*parent= nullptr);
     void resizeEvent(QResizeEvent*event) override;
     void wheelEvent(QWheelEvent*event) override;
@@ -31,13 +32,20 @@ private:
     const double zoomOutRate = 1.05;
     const double zoomInRate = 0.95;
     const double sceneMargin = 50.;
+    MirrorType mirrorType = NoMirror;
     GraphicsView * graphicsview;
     QGraphicsScene * graphicsscene;
     GraphicsPixmapItem * pix;
     QAction * rotateact;
     QAction * resetact;
+    QAction * hormirroract;
+    QAction * vermirroract;
+    QAction * allmirroract;
+    QAction * nomirroract;
     void rotate();
     void reset();
+    void mirror(QAction*act);
+
 };
 
 #endif //EOS_PHOTOGRAPHIC_H

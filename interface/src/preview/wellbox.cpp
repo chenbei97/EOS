@@ -12,10 +12,12 @@ WellBox::WellBox(QWidget*parent): GroupBox(parent)
 {
     wellbrandCombo = new ComboBox(Brand1Fields);
     manufacturerCombo = new ComboBox(ManufacturerFields);
+    wellbrandCombo->setCurrentIndex(2);
 
     auto lay = new QHBoxLayout;
     lay->addWidget(manufacturerCombo);
     lay->addWidget(wellbrandCombo);
+    lay->addStretch();
 
     setLayout(lay);
     setTitle(tr(WellBoxTitle));
@@ -42,6 +44,7 @@ void WellBox::onWellbrandChanged(int option)
 void WellBox::onManufacturerChanged(int option)
 {
     wellbrandCombo->blockSignals(true);
+    auto idx = wellbrandCombo->currentIndex(); // 原来的位置
     wellbrandCombo->clear();
     switch (option) {
         case 0:
@@ -57,6 +60,7 @@ void WellBox::onManufacturerChanged(int option)
             wellbrandCombo->addItems(Brand4Fields);
             break;
     }
+    wellbrandCombo->setCurrentIndex(idx); // 切换厂家时要恢复原来的位置
     wellbrandCombo->blockSignals(false);
 }
 

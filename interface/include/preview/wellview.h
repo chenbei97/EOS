@@ -22,6 +22,7 @@ public:
     //void importViewInfoV1(QCPoint holePoint, QCPointFVector viewPoints,int viewSize);
     void importViewInfo(const QHoleInfoVector& vec,ViewMode mode);
     void setViewMode(ViewMode mode);
+    void setOpenViewEnabled(bool enable);
 private:
     // 区域模式: 电机坐标!=UI离散坐标,但是等于从viewRect获取的坐标
     QMap<int,QPointFVector> mViewRectDispersedPoints; // UI离散坐标dispersedViewRects当中计算

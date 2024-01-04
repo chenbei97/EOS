@@ -41,6 +41,8 @@ public:
     explicit Preview(QWidget*parent= nullptr);
     void setAppInfo(int app);// 用于appselect传递当前app信息
     WellPatternInfo patternInfo() const; // WellPattern的数据
+    void askConnectState();
+    void askActivateCode();
 private:
     PreviewInfo previewinfo;
     CanvasMode * canvasmode;
@@ -99,7 +101,6 @@ private:
     void takingPhoto();
     void stitchSlide();
     void adjustObjective(int objective,int objective_loc,int isPh);
-    void adjustCamera(int exp,int gain);
     void adjustBright(int br);
     void adjustLens(int option);
     void adjustFocus(double val);

@@ -428,7 +428,6 @@ void WellView::onSaveViewAct()
     }
 
     viewApply->exec();
-    LOG<<viewApply->mode();
     switch (viewApply->mode()) {
         case 0:applyholeact->trigger();
             break;
@@ -552,6 +551,9 @@ QPointFVector WellView::getMachinePointsFromViewRect(int id,bool norm) const
 void WellView::paintEvent(QPaintEvent *event)
 {
     View::paintEvent(event);
+
+    if (!mMouseEvent) return;
+
     QPainter painter(this);
     painter.drawRect(rect());
     auto pen = painter.pen();
@@ -626,8 +628,8 @@ void WellView::paintEvent(QPaintEvent *event)
         }
 
         // 4. 绘制圆,外接正方形和便于区分的灰色网格线
-        painter.drawLine(topleft,bottomleft);
-        painter.drawLine(topright,bottomright);
+        //painter.drawLine(topleft,bottomleft);// 已经绘制过整体的正方形外框,
+        //painter.drawLine(topright,bottomright); // 这样会加粗2条左右框线不好看不需要画了
         painter.drawLine(topleft,topright);
         painter.drawLine(bottomleft,bottomright);
         pen.setStyle(Qt::SolidLine);
@@ -651,9 +653,9 @@ void WellView::paintEvent(QPaintEvent *event)
         for (int i = 1; i <= mSize; ++i) {
             auto top = topleft + QPointF(i*hor_offset,0);
             auto bottom = bottomleft + QPointF(i*hor_offset,0);
-            painter.drawLine(top,bottom);
+            painter.drawLine(top,bottom); // 绘制垂直灰色线
         }
-        auto ver_offset = getInnerRectHeight();// 绘制水平线,2个x坐标固定
+        auto ver_offset = getInnerRectHeight();// 绘制灰色水平线,2个x坐标固定
         for (int i = 1; i <= mSize; ++i){
             auto left = topleft + QPointF(0,ver_offset*i);
             auto right = topright + QPointF(0,ver_offset*i);
@@ -700,7 +702,7 @@ void WellView::paintEvent(QPaintEvent *event)
         painter.setPen(pen);
     } else { // wholeMode
         auto grayc = QColor(Qt::gray);
-        grayc.setAlpha(DefaultColorAlpha);
+        grayc.setAlpha(DefaultColorAlpha); //填充整个颜色为灰色代替setEnable(false),否则动作菜单也禁用无法quitView
         painter.fillRect(QRectF(getExternalRectTopLeftPoint(),QSize(diameter,diameter)),grayc);
     }
     // 画圆
@@ -725,29 +727,33 @@ void WellView::paintEvent(QPaintEvent *event)
 void WellView::mousePressEvent(QMouseEvent *event)
 {
     View::mousePressEvent(event);
-    if (mSelectMode == ViewMode::PointMode) {
-        if (event->button() == Qt::LeftButton) {
-            if (isGrouped()) {
-                if (getLeftTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)){
-                    isHighlight = true;
-                    LOG<<"left triangle is clicked";
-                    emit leftTriangleClicked();
-                    emit triangleClicked(0);
-                } else if (getRightTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
-                    isHighlight = true;
-                    LOG<<"right triangle is clicked";
-                    emit rightTriangleClicked();
-                    emit triangleClicked(2);
-                } else if (getTopTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
-                    LOG<<"top triangle is clicked";
-                    isHighlight = true;
-                    emit topTriangleClicked();
-                    emit triangleClicked(1);
-                } else if (getBottomTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
-                    LOG<<"bottom triangle is clicked";
-                    isHighlight = true;
-                    emit bottomTriangleClicked();
-                    emit triangleClicked(3);
+    if (mMouseEvent) {
+        if (mSelectMode == ViewMode::PointMode) {
+            if (event->button() == Qt::LeftButton) {
+                if (isGrouped()) {
+                    if (mViewClickEvent) {
+                        if (getLeftTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)){
+                            isHighlight = true;
+                            LOG<<"left triangle is clicked";
+                            emit leftTriangleClicked();
+                            emit triangleClicked(0);
+                        } else if (getRightTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
+                            isHighlight = true;
+                            LOG<<"right triangle is clicked";
+                            emit rightTriangleClicked();
+                            emit triangleClicked(2);
+                        } else if (getTopTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
+                            LOG<<"top triangle is clicked";
+                            isHighlight = true;
+                            emit topTriangleClicked();
+                            emit triangleClicked(1);
+                        } else if (getBottomTrianglePoints().containsPoint(mMousePos,Qt::WindingFill)) {
+                            LOG<<"bottom triangle is clicked";
+                            isHighlight = true;
+                            emit bottomTriangleClicked();
+                            emit triangleClicked(3);
+                        }
+                    }
                 }
             }
         }
@@ -757,7 +763,9 @@ void WellView::mousePressEvent(QMouseEvent *event)
 void WellView::mouseReleaseEvent(QMouseEvent *event)
 {
     View::mouseReleaseEvent(event);
-    isHighlight = false;
+    if (mMouseEvent) {
+        isHighlight = false;
+    }
     update();
 }
 
@@ -787,9 +795,13 @@ void WellView::setViewMode(ViewMode mode)
         }
     }
 
-    if (mode == ViewMode::WholeMode)
-        setEnabled(false);
-    else setEnabled(true);
+    if (mode == ViewMode::WholeMode) {
+        setOpenViewEnabled(false);
+//        saveviewact->setEnabled(false); // 这里不用设置,使能只会在右键释放时候去判断
+//        removeviewact->setEnabled(false);
+    }
+    else {
+    }
 
     update();
 }
@@ -797,6 +809,15 @@ void WellView::setViewMode(ViewMode mode)
 WellView::WellView(QWidget *parent) : View(parent)
 {
     viewApply = new ViewApply;
+    setMouseEvent(true);
+    setViewClickEvent(true);
     //adjustViewPoint应该在preview的adjustLens电机到位后再执行
     //connect(this,&WellView::triangleClicked,this,&WellView::adjustViewPoint);
+}
+
+void WellView::setOpenViewEnabled(bool enable)
+{ // 是否允许点击事件
+    setViewClickEvent(enable);
+    if (!enable)
+        emit quitView(); // 如果不允许要退出去
 }

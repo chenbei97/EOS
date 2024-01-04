@@ -29,8 +29,6 @@ private:
     RadioButton *  rbtn_loc4;
     QMap<QString,RadioButton*> location_button;
     void onClicked();
-    QString convertTo(const QString& text) const;
-    QString convertFrom(const QString& text) const;
 signals:
     void objectiveChanged(const QString& obj);
     void objectiveToggled(int objective,int objective_loc,int isPh);

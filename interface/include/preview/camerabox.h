@@ -19,7 +19,6 @@ class INTERFACE_IMEXPORT CameraBox : public GroupBox
 public:
     explicit CameraBox(QWidget*parent= nullptr);
     void importExperConfig(const QVariantMap& m,const QString&objective);
-    void captureImage(const QImage&img,const QString& channel);
     void captureExposureGain(unsigned exp,unsigned gain);
     void setBrightEnabled(bool enabled);
     void updateChannelText(int option);
@@ -27,6 +26,7 @@ public:
     MultiCameraInfo multiCameraInfo() const;
     double focusValue() const;
     double focusStep() const;
+    void updateFocus(double focus);
     CameraInfo cameraInfo() const;
     int exposure() const;
     int gain() const;
@@ -62,7 +62,7 @@ signals:
     void cameraInfoChanged(const MultiCameraInfo &);
     void photoTaking();
     void slideStitching();
-    void cameraAdjusted(int exposure,int gain);
+//    void cameraAdjusted(int exposure,int gain);
     void brightAdjusted(int bright);
     void focusChanged(double val);
     void autoFocusing();

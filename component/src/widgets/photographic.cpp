@@ -8,9 +8,11 @@
  */
 
 #include "photographic.h"
+#include "qactiongroup.h"
 
 PhotoGraphics::PhotoGraphics(QWidget *parent) : QWidget(parent)
 {
+    mirrorType = NoMirror;
     pix = new GraphicsPixmapItem(QPixmap());
     graphicsscene = new QGraphicsScene();
     graphicsscene->setSceneRect(sceneRefX,sceneRefY,sceneWidth,sceneHeight);
@@ -26,11 +28,36 @@ PhotoGraphics::PhotoGraphics(QWidget *parent) : QWidget(parent)
 
     rotateact = new QAction("rotate");
     resetact =  new QAction("reset");
+    auto sep = new QAction();
+    sep->setSeparator(true);
+    nomirroract = new QAction("no mirror");
+    hormirroract = new QAction("horizontal mirror");
+    vermirroract = new QAction("vertical mirror");
+    allmirroract = new QAction("all mirror");
+
+    QActionGroup * actionGroup = new QActionGroup(this);
+    actionGroup->addAction(nomirroract);
+    actionGroup->addAction(hormirroract);
+    actionGroup->addAction(vermirroract);
+    actionGroup->addAction(allmirroract);
+    actionGroup->setExclusive(true);
+    nomirroract->setCheckable(true);
+    hormirroract->setCheckable(true);
+    vermirroract->setCheckable(true);
+    allmirroract->setCheckable(true);
+    nomirroract->setChecked(true);
+
     addAction(rotateact);
     addAction(resetact);
+    addAction(sep);
+    addAction(nomirroract);
+    addAction(hormirroract);
+    addAction(vermirroract);
+    addAction(allmirroract);
     setContextMenuPolicy(Qt::ActionsContextMenu);
     connect(rotateact,&QAction::triggered,this,&PhotoGraphics::rotate);
     connect(resetact,&QAction::triggered,this,&PhotoGraphics::reset);
+    connect(actionGroup,&QActionGroup::triggered,this,&PhotoGraphics::mirror);
 
     auto lay = new QHBoxLayout;
     lay->addWidget(graphicsview);
@@ -47,6 +74,8 @@ void PhotoGraphics::reset()
 #else
     pix->reset();
 #endif
+    mirrorType = NoMirror;
+    nomirroract->setChecked(true);
 }
 
 void PhotoGraphics::rotate()
@@ -60,6 +89,20 @@ void PhotoGraphics::rotate()
 #endif
 }
 
+void PhotoGraphics::mirror(QAction *act)
+{
+    if (act == nomirroract) {
+        mirrorType = NoMirror;
+    } else if (act == hormirroract) {
+        mirrorType = HorMirror;
+    } else if (act == vermirroract) {
+        mirrorType = VerMirror;
+    } else if (act == allmirroract) {
+        mirrorType = AllMirror;
+    }
+    graphicsview->update();
+}
+
 void PhotoGraphics::setImage(const QImage &img, int duration)
 {
     static long long count = 0;
@@ -70,7 +113,25 @@ void PhotoGraphics::setImage(const QImage &img, int duration)
 //                <<graphicsscene->sceneRect().size() // 固定不变了
 //                <<pix->scenePos()<<pix->pos() // pix的场景坐标就是(sceneRefX,sceneRefY)
 //                <<pix->boundingRect(); // pix的起点和场景已经一样,缩放的尺寸又是场景的尺寸,所有恰好填充场景
-            pix->setImage(img);
+            auto img_ = img;
+            switch (mirrorType) {
+                case NoMirror:
+                    //LOG<<"no mirror";
+                    break;
+                case HorMirror:
+                    img_ = img.mirrored(true,false);
+                    //LOG<<"hor mirror";
+                    break;
+                case VerMirror:
+                    img_ = img.mirrored(false,true);
+                    //LOG<<"ver mirror";
+                    break;
+                case AllMirror:
+                    img_ = img.mirrored(true,true);
+                    //LOG<<"all mirror";
+                    break;
+            }
+            pix->setImage(img_);
         }
         else
             pix->setPixmap(QPixmap());

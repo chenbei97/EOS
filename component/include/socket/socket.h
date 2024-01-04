@@ -253,10 +253,16 @@ struct FieldManualFocusEvent {
 struct FieldAutoFocusEvent {
     const QString path = PathField;
     const QString state = StateField;
+    const QString focus = FocusField;
 };
 
 struct FieldChannelMergeEvent {
-
+    const QString br_path = BRPathField;
+    const QString ph_path = PHPathField;
+    const QString rfp_path = RFPPathField;
+    const QString gfp_path = GFPPathField;
+    const QString dapi_path = DAPIPathField;
+    const QString merge_path = MergePathField;
 };
 
 struct FieldExperFinishedEvent {
@@ -303,15 +309,8 @@ static const TcpFieldList TcpFieldPool;
 #define FieldChannelMergeEvent TcpFieldPool.fieldChannelMergeEvent
 #define FieldExperFinishedEvent TcpFieldPool.fieldExperFinishedEvent
 
-static QVariant parsePreviewEvent(QCVariantMap m)
-{ // 预览事件
-    if (!m.keys().contains(FieldPreviewEvent.state)) return false;
-    if (!m.keys().contains(FrameField)) return false;
-    return m[StateField].toString() == OkField;
-}
-
 static QByteArray assemblePreviewEvent(QCVariantMap m)
-{// 预览事件
+{// 预览事件 帧头:1
     QJsonObject object;
     object[FrameField] = PreviewEvent;
 
@@ -339,15 +338,15 @@ static QByteArray assemblePreviewEvent(QCVariantMap m)
     return AppendSeparateField(json);
 }
 
-static QVariant parseLoadExperEvent(QCVariantMap m)
-{// 启动实验
-    if (!m.keys().contains(FieldLoadExperEvent.state)) return false;
+static QVariant parsePreviewEvent(QCVariantMap m)
+{ // 预览事件
+    if (!m.keys().contains(FieldPreviewEvent.state)) return false;
     if (!m.keys().contains(FrameField)) return false;
     return m[StateField].toString() == OkField;
 }
 
 static QByteArray assembleLoadExperEvent(QCVariantMap m)
-{// 启动实验
+{// 启动实验 帧头:1
     auto wellinfo = m[WellBoxTitle].value<WellInfo>();
     auto objectiveinfo = m[ObjectiveBoxTitle].value<ObjectiveInfo>();
     auto viewmodeinfo = m[ViewModeBoxTitle].value<ViewModeInfo>();
@@ -463,6 +462,13 @@ static QByteArray assembleLoadExperEvent(QCVariantMap m)
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
+}
+
+static QVariant parseLoadExperEvent(QCVariantMap m)
+{// 启动实验
+    if (!m.keys().contains(FieldLoadExperEvent.state)) return false;
+    if (!m.keys().contains(FrameField)) return false;
+    return m[StateField].toString() == OkField;
 }
 
 static QByteArray assembleExportExperEvent(QCVariantMap m)
@@ -635,16 +641,8 @@ static QByteArray assembleExportExperEvent(QCVariantMap m)
     return TcpAssemblerDoc.toJson();
 }
 
-static QVariant parseAskConnectedStateEvent(QCVariantMap m)
-{ // 用于询问是否连接的命令,只要有回复不为空就ok,随便发
-    if (!m.keys().contains(FieldAskConnectedStateEvent.state)) return false;
-    if (!m.keys().contains(FrameField)) return false;
-    auto text = m[FieldAskConnectedStateEvent.state].toString();
-    return text == OkField;
-}
-
 static QByteArray assembleAskConnectedStateEvent(QCVariantMap m)
-{ // 用于询问是否连接的命令,只要有回复不为空就ok,随便发
+{ // 用于询问是否连接的命令,只要有回复不为空就ok,随便发 帧头:2
     Q_UNUSED(m);
     QJsonObject object;
     object[FrameField] = AskConnectedStateEvent;
@@ -659,16 +657,16 @@ static QByteArray assembleAskConnectedStateEvent(QCVariantMap m)
     return AppendSeparateField(json);
 }
 
-static QVariant parseAskActivateCodeEvent(QCVariantMap m)
-{ // 询问设备激活码,回复激活码
-    if (!m.keys().contains(FieldAskActivateCodeEvent.activate_code)) return QVariant();
-    if (!m.keys().contains(FrameField)) return QVariant();
-    auto code = m[FieldAskActivateCodeEvent.activate_code].toString();
-    return code;
+static QVariant parseAskConnectedStateEvent(QCVariantMap m)
+{ // 用于询问是否连接的命令,只要有回复不为空就ok,随便发
+    if (!m.keys().contains(FieldAskConnectedStateEvent.state)) return false;
+    if (!m.keys().contains(FrameField)) return false;
+    auto text = m[FieldAskConnectedStateEvent.state].toString();
+    return text == OkField;
 }
 
 static QByteArray assembleAskActivateCodeEvent(QCVariantMap m)
-{ // 询问设备激活码,回复激活码
+{ // 询问设备激活码,回复激活码 帧头: 3
     Q_UNUSED(m);
     QJsonObject object;
     object[FrameField] = AskActivateCodeEvent;
@@ -678,8 +676,16 @@ static QByteArray assembleAskActivateCodeEvent(QCVariantMap m)
     return AppendSeparateField(json);
 }
 
+static QVariant parseAskActivateCodeEvent(QCVariantMap m)
+{ // 询问设备激活码,回复激活码
+    if (!m.keys().contains(FieldAskActivateCodeEvent.activate_code)) return QVariant();
+    if (!m.keys().contains(FrameField)) return QVariant();
+    auto code = m[FieldAskActivateCodeEvent.activate_code].toString();
+    return code;
+}
+
 static QByteArray assembleAdjustBrightEvent(QCVariantMap m)
-{ // 调节bright参数
+{ // 调节bright参数 帧头: 4
     QJsonObject object;
     object[FrameField] = AdjustBrightEvent;
     object[FieldAdjustBrightEvent.bright] = m[BrightField].toDouble();
@@ -697,7 +703,7 @@ static QVariant parseAdjustBrightEvent(QCVariantMap m)
 }
 
 static QByteArray assembleToggleChannelEvent(QCVariantMap m)
-{ // 切换通道
+{ // 切换通道 帧头: 5
     QJsonObject object;
     object[FrameField] = ToggleChannelEvent;
     object[FieldToggleChannelEvent.bright] = m[BrightField].toDouble();
@@ -717,7 +723,7 @@ static QVariant parseToggleChannelEvent(QCVariantMap m)
 }
 
 static QByteArray assembleAdjustLensEvent(QCVariantMap m)
-{ // 移动镜头
+{ // 移动镜头 帧头: 6
     QJsonObject object;
     object[FrameField] = AdjustLensEvent;
     object[FieldAdjustLensEvent.direction] = m[DirectionField].toInt();
@@ -735,7 +741,7 @@ static QVariant parseAdjustLensEvent(QCVariantMap m)
 }
 
 static QByteArray assembleMoveMachineEvent(QCVariantMap m)
-{ // 移动电机到指定位置
+{ // 移动电机到指定位置 帧头: 7
     QJsonObject object;
     object[FrameField] = MoveMachineEvent;
     object[FieldMoveMachineEvent.objective_loc] = m[ObjectiveLocationField].toInt();
@@ -753,7 +759,7 @@ static QVariant parseMoveMachineEvent(QCVariantMap m)
 }
 
 static QByteArray assembleStopExperEvent(QCVariantMap m)
-{ // 停止实验
+{ // 停止实验 帧头: 8
     QJsonObject object;
     object[FrameField] = StopExperEvent;
     object[FieldStopExperEvent.stop] = m[StopField].toInt();
@@ -771,7 +777,7 @@ static QVariant parseStopExperEvent(QCVariantMap m)
 }
 
 static QByteArray assembleToggleObjectiveEvent(QCVariantMap m)
-{ // 切物镜动电机事件
+{ // 切物镜动电机事件 帧头: 9
     QJsonObject object;
     object[FrameField] = ToggleObjectiveEvent;
     object[FieldToggleObjectiveEvent.objective_loc] = m[ObjectiveLocationField].toInt();
@@ -791,7 +797,7 @@ static QVariant parseToggleObjectiveEvent(QCVariantMap m)
 }
 
 static QByteArray assembleRecordVideoEvent(QCVariantMap m)
-{ // 录制视频事件
+{ // 录制视频事件 帧头: 10
     QJsonObject object;
     object[FrameField] = RecordVideoEvent;
     object[FieldRecordVideoEvent.path] = m[PathField].toString();
@@ -811,7 +817,7 @@ static QVariant parseRecordVideoEvent(QCVariantMap m)
 }
 
 static QByteArray assembleManualFocusEvent(QCVariantMap m)
-{// 手动调焦事件
+{// 手动调焦事件 帧头: 11
     QJsonObject object;
     object[FrameField] = ManualFocusEvent;
     object[FieldManualFocusEvent.focus] = m[FocusField].toDouble(); // focus注意传浮点数
@@ -829,7 +835,7 @@ static QVariant parseManualFocusEvent(QCVariantMap m)
 }
 
 static QByteArray assembleAutoFocusEvent(QCVariantMap m)
-{// 自动调焦事件
+{// 自动调焦事件 帧头: 12
     QJsonObject object;
     object[FrameField] = AutoFocusEvent;
     object[PathField] = m[PathField].toString();
@@ -840,29 +846,42 @@ static QByteArray assembleAutoFocusEvent(QCVariantMap m)
 
 static QVariant parseAutoFocusEvent(QCVariantMap m)
 {// 手动调焦事件
-    if (!m.keys().contains(FrameField)) return false;
-    if (!m.keys().contains(FieldAutoFocusEvent.state)) return false;
+    QVariant var;
+    auto pair = qMakePair(false,-1.0);
+    var.setValue(pair);
+    if (!m.keys().contains(FrameField)) return var;
+    if (!m.keys().contains(FieldAutoFocusEvent.state)) return var;
+    if (!m.keys().contains(FieldAutoFocusEvent.focus)) return var;
     auto state = m[StateField].toString();
-    return state == OkField;
+    auto focus = m[FieldAutoFocusEvent.focus].toDouble();
+    var.setValue(qMakePair(state==OkField,focus));
+    return var;
 }
 
 static QByteArray assembleChannelMergeEvent(QCVariantMap m)
-{// 通道合并事件
+{// 通道合并事件 帧头: 13
     QJsonObject object;
-    object[FrameField] = AutoFocusEvent;
+    object[FrameField] = ChannelMergeEvent;
+    object[FieldChannelMergeEvent.br_path] = m[FieldChannelMergeEvent.br_path].toString();
+    object[FieldChannelMergeEvent.ph_path] = m[FieldChannelMergeEvent.ph_path].toString();
+    object[FieldChannelMergeEvent.rfp_path] = m[FieldChannelMergeEvent.rfp_path].toString();
+    object[FieldChannelMergeEvent.dapi_path] = m[FieldChannelMergeEvent.dapi_path].toString();
+    object[FieldChannelMergeEvent.gfp_path] = m[FieldChannelMergeEvent.gfp_path].toString();
     TcpAssemblerDoc.setObject(object);
     auto json = TcpAssemblerDoc.toJson();
     return AppendSeparateField(json);
 }
 
 static QVariant parseChannelMergeEvent(QCVariantMap m)
-{// 通道事件
+{// 通道合并事件 帧头: 13
     if (!m.keys().contains(FrameField)) return false;
-    return false;
+    if (!m.keys().contains(FieldChannelMergeEvent.merge_path)) return false;
+    auto path = m[FieldChannelMergeEvent.merge_path].toString();
+    return path;
 }
 
 static QVariant parseExperFinishedEvent(QCVariantMap m)
-{ // 实验结束-服务端主动给客户端发
+{ // 实验结束-服务端主动给客户端发 帧头: 14
     if (!m.keys().contains(FrameField)) return false;
     if (!m.keys().contains(FieldExperFinishedEvent.exper_finished)) return false;
     auto isFinished = m[FieldExperFinishedEvent.exper_finished].toInt();

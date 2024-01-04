@@ -300,7 +300,7 @@ typedef QMap<QString,QString> CameraInfo;
 typedef QMap<QString,QString> RecordInfo;
 typedef QMap<QString,QString> ViewModeInfo;
 typedef QMap<QString,CameraInfo> MultiCameraInfo;
-typedef QMap<QString,QImage> ChannelImageInfo;
+typedef QMap<QString,QString> ChannelImageInfo;
 typedef QVariantMap CameraFocusInfo;
 typedef QVariantMap WellPatternInfo;
 typedef QVariantMap WellGroupInfo;

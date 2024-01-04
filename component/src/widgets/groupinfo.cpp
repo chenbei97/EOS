@@ -15,8 +15,9 @@ GroupInfo::GroupInfo(QWidget *parent) : QDialog(parent)
     resize(DefaultWindowSize.width(),DefaultWindowSize.height()-100);
     connect(btn,&PushButton::clicked,this,&GroupInfo::onClick);
     grouptype->setEnabled(false); // 只能外部去更改
-    grouptype->setCurrentIndex(-1);
+    grouptype->setCurrentIndex(0);
     cbtn->hide();
+    setWindowFlags(windowFlags()& ~Qt::WindowContextHelpButtonHint);
 }
 
 QVariantMap GroupInfo::groupInfo() const
@@ -45,8 +46,8 @@ void GroupInfo::setGroupInfo(const QVariantMap &m)
     setGroupMedicine(medicine);
     setGroupDose(dose);
     setGroupDoseUnit(unit);
+    allGroups = m[HoleAllGroupsField].value<QSet<QString>>();//目的是每次confirm检测当前的分组是否已经被使用过
 }
-
 
 void GroupInfo::initObjects()
 {
@@ -113,10 +114,14 @@ void GroupInfo::setGroupName(const QString &name)
 
 void GroupInfo::setGroupColor(const QColor &color)
 {
-    if (color != Qt::white) { // wellpattern_holeinfo默认是黑色,首次是白色的话不要设置
+    LOG<<"group color ="<<color;
+    // wellpattern_holeinfo默认是白色,首次打开对话框会把白色传递给这里
+    // 这个白色并不是从分组那里来的所以不要传递给grouptype
+    if (color != WhiteColor) {
         // cbtn->setColor(color);
         grouptype->setItemData(0,color,Qt::BackgroundRole);
-        grouptype->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color.name()));
+        // 颜色就不设置了
+        //grouptype->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color.name()));
     }
 }
 
@@ -138,8 +143,18 @@ void GroupInfo::setGroupDoseUnit(const QString &unit)
 void GroupInfo::onClick()
 {
     if (grouptype->currentIndex() != -1) {
-        accept();
-        emit groupSetted(grouptype->currentText());
+        if (allGroups.contains(grouptype->currentText())) { // 重复分组的情况提示是否继续
+            int ret = QMessageBox::information(this,InformationChinese,
+                     tr("The current group has already been used. Do you still want to continue?"),
+                     QMessageBox::Yes | QMessageBox::Cancel);
+            if (ret == QMessageBox::Yes) {
+                accept();
+                emit groupSetted(grouptype->currentText());
+            }
+        } else {
+            accept();
+            emit groupSetted(grouptype->currentText());
+        }
     } else {
         QMessageBox::warning(this,WarningChinese,"Group Not Set!");
         reject();
