@@ -70,3 +70,11 @@ void SaveBox::showExport(bool enable)
     exportallbtn->setVisible(enable);
 }
 
+void SaveBox::setChildWidgetsEnabled(bool enable)
+{ // 启动实验后只有stop使能其他禁用,结束实验其它恢复,stopbtn不受影响
+    filenameedit->setEnabled(enable);
+    exportallbtn->setEnabled(enable);
+    exportToFile->setEnabled(enable);
+    loadbtn->setEnabled(enable);
+    stopbtn->setEnabled(true);
+}

@@ -17,6 +17,105 @@ PhotoCanvasTriangle::PhotoCanvasTriangle(QWidget*parent): PhotoCanvas(parent)
     highcolor.setAlpha(DefaultColorAlpha);
     trianglen = PhotoCanvasTriangleLength;
     trianggap = PhotoCanvasTriangleGap;
+
+    rotateAct = new QAction(tr(RotateField));
+    resetAct = new QAction(tr(ResetField));
+    nomirroract = new QAction(tr(NoMirrorField));
+    hormirroract = new QAction(tr(HorizontalMirrorField));
+    vermirroract = new QAction(tr(VerticalMirrorField));
+    allmirroract = new QAction(tr(AllMirrorField));
+    auto sep = new QAction();
+    sep->setSeparator(true);
+
+    addAction(rotateAct);
+    addAction(resetAct);
+    addAction(sep);
+    addAction(nomirroract);
+    addAction(hormirroract);
+    addAction(vermirroract);
+    addAction(allmirroract);
+
+    QActionGroup * actionGroup = new QActionGroup(this);
+    actionGroup->addAction(nomirroract);
+    actionGroup->addAction(hormirroract);
+    actionGroup->addAction(vermirroract);
+    actionGroup->addAction(allmirroract);
+    actionGroup->setExclusive(true);
+    nomirroract->setCheckable(true);
+    hormirroract->setCheckable(true);
+    vermirroract->setCheckable(true);
+    allmirroract->setCheckable(true);
+    nomirroract->setChecked(true);
+    setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    connect(rotateAct,&QAction::triggered,this,&PhotoCanvasTriangle::rotate);
+    connect(resetAct,&QAction::triggered,this,&PhotoCanvasTriangle::reset);
+    connect(actionGroup,&QActionGroup::triggered,this,&PhotoCanvasTriangle::mirror);
+    connect(CpuMemoryMonitorPointer,&CpuMemoryMonitor::monitorValue,this,&PhotoCanvasTriangle::updateCpuMemoryValue);
+    CpuMemoryMonitorPointer->start(1000);
+    installEventFilter(this);
+}
+
+void PhotoCanvasTriangle::reset()
+{
+    zoomRate = 1.0;
+    rotateAngle = 0.0;
+    mirrorType = MirrorType::NoMirror;
+    nomirroract->setChecked(true);
+    this->move(0,0);
+    update();
+}
+
+void PhotoCanvasTriangle::rotate()
+{
+    rotateAngle += 90.0;
+    if (rotateAngle == 360.0)
+        rotateAngle = 0.0;
+    update();
+}
+
+void PhotoCanvasTriangle::mirror(QAction *act)
+{
+    if (act == nomirroract) {
+        mirrorType = MirrorType::NoMirror;
+    } else if (act == hormirroract) {
+        mirrorType = MirrorType::HorMirror;
+    } else if (act == vermirroract) {
+        mirrorType = MirrorType::VerMirror;
+    } else if (act == allmirroract) {
+        mirrorType = MirrorType::AllMirror;
+    }
+    update();
+}
+
+void PhotoCanvasTriangle::updateCpuMemoryValue(quint64 cpu, quint64 memory)
+{
+    cpu_percent = cpu;
+    memory_percent = memory;
+    update();
+}
+
+bool PhotoCanvasTriangle::eventFilter(QObject *watched, QEvent *event)
+{
+    auto type = event->type();
+    if (type == QEvent::MouseMove) {
+        auto mouseEvent = static_cast<QMouseEvent*>(event);
+        int dx = mouseEvent->pos().x() - mLastPos.x();
+        int dy = mouseEvent->pos().y() - mLastPos.y();
+        this->move(this->x() + dx, this->y() + dy);
+        return true;
+    } else if (type == QEvent::Wheel && mStrategy == SinglePixmap) {
+        auto wheelEvent = static_cast<QWheelEvent*>(event);
+        auto pixel = wheelEvent->angleDelta();
+        if (pixel.y() > 0) {
+            zoomRate = zoomRate * 1.05;
+        } else {
+            zoomRate = zoomRate * 0.95;
+        }
+        update();
+        return true;
+    }
+    return PhotoCanvas::eventFilter(watched, event);
 }
 
 void PhotoCanvasTriangle::mousePressEvent(QMouseEvent *event)
@@ -62,13 +161,20 @@ void PhotoCanvasTriangle::paintEvent(QPaintEvent *event)
 {
     PhotoCanvas::paintEvent(event);
 
-    if (!isDraw) return;
-
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     auto pen = painter.pen();
     pen.setWidth(2);
+    auto font = painter.font();
+    auto pointsize = font.pointSize(); // 像素比例
+    double rate = 0.3;
+    font.setPointSize(16);
     painter.setPen(pen);
+    painter.setFont(font);
+    painter.drawText(width()-height() * rate,100,QString("cpu: %1% memory: %2%").arg(cpu_percent).arg(memory_percent));
+    font.setPixelSize(pointsize);
+    painter.setFont(font);
+    if (!isDraw) return;
 
     auto left = getLeftTrianglePoints();
     auto right = getRightTrianglePoints();

@@ -28,8 +28,12 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
             break;
         case SinglePixmap:
             if(!mimage.isNull()) {
-                painter.drawImage(QRect(0,0,width(),height()),mimage);
-                //painter.drawPixmap(targetRect,QPixmap::fromImage(mimage));
+//                painter.drawImage(QRectF(width()*(1.0-zoomRate)/2.0,height()*(1.0-zoomRate)/2.0,
+//                                         width()*zoomRate,height()*zoomRate),mimage);
+                painter.translate(width()/2,height()/2); // 或者把画笔挪到中间再画
+                painter.drawImage(QRectF(-width()*zoomRate/2,-height()*zoomRate/2,
+                                         width()*zoomRate,height()*zoomRate),mimage);
+                painter.translate(0,0); // 防止对继承的或者后面的产生影响
             }
             break;
         case GridPixmap:
@@ -208,18 +212,39 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
         // 一种除了定时update辅助减少界面刷新的功能,10张图显示1次
 #ifdef use_imagetransformthread
         if (!img.isNull()) {
-            ImageTransformThreadPointer->setImage(img);
+            //LOG<<rotateAngle<<(int)mirrorType;
+            ImageTransformThreadPointer->setImage(img,rotateAngle,mirrorType);
         }
         else
-            ImageTransformThreadPointer->setImage(QImage());
+            ImageTransformThreadPointer->setImage(QImage(),0.0,MirrorType::NoMirror);
 #else
         if (!img.isNull()) {
-//            auto image = img.mirrored(true,false);
-//            QMatrix matrix;
-//            matrix.rotate(270.0);
-//            mimage = image.transformed(matrix,Qt::FastTransformation);
-//            mimage = mimage.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
-            mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+            switch (mirrorType) {
+                case MirrorType::NoMirror:
+                    //LOG<<"no mirror";
+                    mimage = img;
+                    break;
+                case MirrorType::HorMirror:
+                    mimage = img.mirrored(true,false);
+                    //LOG<<"hor mirror";
+                    break;
+                case MirrorType::VerMirror:
+                    mimage = img.mirrored(false,true);
+                    //LOG<<"ver mirror";
+                    break;
+                case MirrorType::AllMirror:
+                    mimage = img.mirrored(true,true);
+                    //LOG<<"all mirror";
+                    break;
+            }
+            if (rotateAngle > 0.0 && rotateAngle < 360.0) {
+                QTransform transform;
+                transform.rotate(rotateAngle);
+                transform.scale(width()*1.0/img.width(),height()*1.0/img.height());
+                mimage = mimage.transformed(transform,Qt::FastTransformation);
+            } else {
+                mimage = mimage.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+            }
         }
         else
             mimage = QImage();
@@ -234,10 +259,15 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
 }
 
 void PhotoCanvas::setImage(const QImage &img)
-{ // 立即updat
+{ // 立即update,本方法不参与变换只用于静态图非live模式因为可能会卡
     Q_ASSERT(mStrategy == SinglePixmap);
-    if (!img.isNull())
-        mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+    if (!img.isNull()) {
+        QTransform transform;
+        //transform.rotate(rotateAngle); //本方法不参与变换
+        transform.scale(width()*1.0/img.width(),height()*1.0/img.height());
+        //mimage = img.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+        mimage = img.transformed(transform,Qt::FastTransformation);
+    }
     else
         mimage = QImage();
     update(); // 这里是立即刷新的可能会卡

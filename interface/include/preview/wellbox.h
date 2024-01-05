@@ -21,6 +21,8 @@ public:
     int wellBrand() const;
     int wellManufacturer() const;
     int wellSize() const;
+    QString wellBrandName() const;
+    QString wellManufacturerName() const;
 private:
     ComboBox * wellbrandCombo;
     ComboBox * manufacturerCombo;

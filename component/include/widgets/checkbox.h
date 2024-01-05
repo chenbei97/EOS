@@ -13,6 +13,7 @@ public:
     void setChecked(bool checked);
     void setText(const QString& text);
     bool isChecked() const;
+    QString text() const;
 //    QSize sizeHint() const override;
 private:
     QCheckBox * checkbox;

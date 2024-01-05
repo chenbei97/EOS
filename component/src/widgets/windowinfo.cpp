@@ -8,7 +8,12 @@
  */
 
 #include "windowinfo.h"
-#include "Windows.h"
+#ifdef Q_OS_WIN
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x502
+#endif
+#include "windows.h"
+#endif
 
 static WindowsMemoryInfo getWindowsMemoryInfo()
 {

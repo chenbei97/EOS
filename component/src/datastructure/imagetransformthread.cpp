@@ -16,25 +16,43 @@ void ImageTransformThread::run()
     {
         QMutexLocker locker(&mutex);
         if (!mimage.isNull()) {
-            //auto img = mimage.mirrored(true,false);
-            //QMatrix matrix;
-            //matrix.rotate(270.0);
-            //img = img.transformed(matrix,Qt::FastTransformation);
-            //mimage = img.scaled(msize,Qt::KeepAspectRatio,Qt::FastTransformation);
+            switch (mirrorType) {
+                case MirrorType::NoMirror:
+                    //LOG<<"no mirror";
+                    break;
+                case MirrorType::HorMirror:
+                    mimage = mimage.mirrored(true,false);
+                    //LOG<<"hor mirror";
+                    break;
+                case MirrorType::VerMirror:
+                    mimage = mimage.mirrored(false,true);
+                    //LOG<<"ver mirror";
+                    break;
+                case MirrorType::AllMirror:
+                    mimage = mimage.mirrored(true,true);
+                    //LOG<<"all mirror";
+                    break;
+            }
+            if (rotateAngle > 0.0 && rotateAngle < 360.0) {
+                QTransform transform;
+                transform.rotate(rotateAngle);
+                mimage = mimage.transformed(transform,Qt::FastTransformation);
+            }
             mimage = mimage.scaled(msize,Qt::KeepAspectRatio,Qt::FastTransformation);
             emit imageTransformed(mimage);
         } else {
-
             emit imageTransformed(QImage());
         }
-        msleep(100);
+        msleep(DefaultThreadSleepMs);
     }
 }
 
-void ImageTransformThread::setImage(const QImage &img)
+void ImageTransformThread::setImage(const QImage &img,double angle,MirrorType type)
 {
     QMutexLocker locker(&mutex);
     mimage = img;
+    rotateAngle = angle;
+    mirrorType = type;
 }
 
 void ImageTransformThread::setImageSize(const QSize &size)

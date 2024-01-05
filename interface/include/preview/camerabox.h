@@ -31,6 +31,7 @@ public:
     int exposure() const;
     int gain() const;
     int bright() const;
+    QStringList save_channels() const;
 private:
     GroupBox * leftbox;
     CameraTool * cameratool;

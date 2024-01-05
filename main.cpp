@@ -13,7 +13,7 @@
 
 LONG CreateDumpFile(EXCEPTION_POINTERS *pException);
 void initApp(QApplication& a);
-#define use_python 1
+//#define use_python 1
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -92,6 +92,11 @@ void initApp(QApplication& a)
         }
 #endif
     });
+
+//    QObject::connect(CpuMemoryMonitorPointer,&CpuMemoryMonitor::monitorValue,[=](auto a1,auto a2){
+//        LOG<<"cpu percent: "<<a1<<"% memory percent: "<<a2<<"%";
+//    });
+    //CpuMemoryMonitorPointer->start(1000);
 
     // 7. socket/tcp
     SocketInit; //注意: 先启动进程再启动连接

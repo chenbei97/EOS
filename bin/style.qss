@@ -80,15 +80,17 @@ QTreeView::item:selected:active{
 QTreeView::item:selected:!active {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);
 }
+QTableWidget::item { padding:0px; }
 
 QTextEdit {
     selection-color: yellow;
     selection-background-color:gray;
     background-attachment: scroll;
-    border-image: url(:/images/textedit_background.png);
+/*    border-image: url(:/images/textedit_background.png);*/
     background-repeat: repeat;
     background-origin: content;
     background-position: top left;
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #AAF0E8, stop: 1 #97F008);
 }
 
 QLineEdit {
@@ -127,11 +129,15 @@ QProgressBar {
     border-radius: 5px;
     text-align: center;
     min-height: 30px;
+    border-width:0px;
+    background-color: rgb(255,255,255);
+/*    border-radius:0px;*/
 }
 QProgressBar::chunk {
     background-color: #05B8CC;
     width: 10px;
     margin: 2px; /*chunk gap margin*/
+    border-radius:0px;
 }
 
 /*QSlider::groove:vertical,QSlider::groove:horizontal {*/

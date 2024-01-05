@@ -19,6 +19,7 @@ class COMPONENT_IMEXPORT GraphicsView : public QGraphicsView
 public:
     explicit GraphicsView(QGraphicsScene*scene,QWidget*parent= nullptr);
     explicit GraphicsView(QWidget*parent= nullptr);
+    void paintEvent(QPaintEvent*event) override;
 private:
     void initAttributes();
 };

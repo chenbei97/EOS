@@ -89,6 +89,22 @@ QStringList TimeBox::selectedChannels() const
     return channels.split(",",QString::SkipEmptyParts);
 }
 
+QStringList TimeBox::selectedChannelNames() const
+{
+    QStringList names;
+    if (brbox->isChecked())
+        names<<brbox->text();
+    if (phbox->isChecked())
+        names<<phbox->text();
+    if (gfpbox->isChecked())
+        names<<gfpbox->text();
+    if (rfpbox->isChecked())
+        names<<rfpbox->text();
+    if (dapibox->isChecked())
+        names<<dapibox->text();
+    return names;
+}
+
 void TimeBox::refreshInfo()
 {
     // 1. 检查时间信息设置是否正确

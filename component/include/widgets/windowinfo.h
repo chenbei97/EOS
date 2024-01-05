@@ -7,8 +7,8 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 
-#ifndef EOS_MAIN_CORE_PY_WINDOWINFO_H
-#define EOS_MAIN_CORE_PY_WINDOWINFO_H
+#ifndef EOS_WINDOWINFO_H
+#define EOS_WINDOWINFO_H
 
 #include "widgets.h"
 #include "utilities.h"
@@ -32,4 +32,4 @@ private:
     QTimer timer;
     void updateInfo();
 };
-#endif //EOS_MAIN_CORE_PY_WINDOWINFO_H
+#endif //EOS_WINDOWINFO_H

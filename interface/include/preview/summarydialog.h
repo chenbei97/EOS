@@ -20,7 +20,8 @@ public:
     explicit SummaryDialog(const QVariantMap &m = QVariantMap(),QWidget*parent = nullptr);
     void setData(const QVariantMap& m);
 private:
-    PushButton * btn;
+    PushButton * start;
+    PushButton * cancel;
     SummaryPanel * panel;
     void load();
 };

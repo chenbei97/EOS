@@ -20,8 +20,6 @@
 #include "qdesktopwidget.h"
 #include "qmainwindow.h"
 #include "qstorageinfo.h"
-//#include "sysinfoapi.h"
-//#include <windows.h>
 
 /*拆分特定字符串转为坐标/区域函数*/
 static QPointF convertToPointF(const QString& text)

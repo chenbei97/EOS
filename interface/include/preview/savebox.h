@@ -17,6 +17,7 @@ class INTERFACE_IMEXPORT SaveBox: public GroupBox
     Q_OBJECT
 public:
     explicit SaveBox(QWidget*parent= nullptr);
+    void setChildWidgetsEnabled(bool enable);
 private:
     PushButton * loadbtn;
     PushButton * stopbtn;

@@ -12,12 +12,15 @@
 
 PhotoGraphics::PhotoGraphics(QWidget *parent) : QWidget(parent)
 {
-    mirrorType = NoMirror;
+    mirrorType = MirrorType::NoMirror;
     pix = new GraphicsPixmapItem(QPixmap());
+    text = new QGraphicsTextItem(QString("cpu: %1% memory: %2%").arg(0).arg(0));
     graphicsscene = new QGraphicsScene();
     graphicsscene->setSceneRect(sceneRefX,sceneRefY,sceneWidth,sceneHeight);
     graphicsscene->addItem(pix);
+    graphicsscene->addItem(text);
     pix->setPos(sceneRefX,sceneRefY); // 将场景的起点坐标映射到pix的坐标系下,这样pix可以在场景的左上角保持一致,pix和场景的起点一样
+    text->setPos(-sceneRefX,sceneRefY);
     // 起点一致后,然后pix缩放到和场景一样就不会出问题了,整体覆盖
     // 如果pix缩放的时候缩放到sceneWidth,sceneHeight的一半,这样pix就在四分区域的左上角
     // 这个时候还想挪到中间,就是让pix的左上角在场景四分左上区域的中心就可以,这个位置就是sceneRefX/2,sceneRefY/2
@@ -26,14 +29,14 @@ PhotoGraphics::PhotoGraphics(QWidget *parent) : QWidget(parent)
     graphicsview = new GraphicsView(graphicsscene);
     graphicsview->fitInView(pix,Qt::KeepAspectRatio); // 确保item紧密的适合视图,
 
-    rotateact = new QAction("rotate");
-    resetact =  new QAction("reset");
+    rotateact = new QAction(tr(RotateField));
+    resetact =  new QAction(tr(ResetField));
     auto sep = new QAction();
     sep->setSeparator(true);
-    nomirroract = new QAction("no mirror");
-    hormirroract = new QAction("horizontal mirror");
-    vermirroract = new QAction("vertical mirror");
-    allmirroract = new QAction("all mirror");
+    nomirroract = new QAction(tr(NoMirrorField));
+    hormirroract = new QAction(tr(HorizontalMirrorField));
+    vermirroract = new QAction(tr(VerticalMirrorField));
+    allmirroract = new QAction(tr(AllMirrorField));
 
     QActionGroup * actionGroup = new QActionGroup(this);
     actionGroup->addAction(nomirroract);
@@ -58,7 +61,8 @@ PhotoGraphics::PhotoGraphics(QWidget *parent) : QWidget(parent)
     connect(rotateact,&QAction::triggered,this,&PhotoGraphics::rotate);
     connect(resetact,&QAction::triggered,this,&PhotoGraphics::reset);
     connect(actionGroup,&QActionGroup::triggered,this,&PhotoGraphics::mirror);
-
+    connect(CpuMemoryMonitorPointer,&CpuMemoryMonitor::monitorValue,this,&PhotoGraphics::updateText);
+    CpuMemoryMonitorPointer->start(1000);
     auto lay = new QHBoxLayout;
     lay->addWidget(graphicsview);
     lay->setMargin(0); // 这个需要否则size()比view的size()稍大
@@ -74,7 +78,7 @@ void PhotoGraphics::reset()
 #else
     pix->reset();
 #endif
-    mirrorType = NoMirror;
+    mirrorType = MirrorType::NoMirror;
     nomirroract->setChecked(true);
 }
 
@@ -92,13 +96,13 @@ void PhotoGraphics::rotate()
 void PhotoGraphics::mirror(QAction *act)
 {
     if (act == nomirroract) {
-        mirrorType = NoMirror;
+        mirrorType = MirrorType::NoMirror;
     } else if (act == hormirroract) {
-        mirrorType = HorMirror;
+        mirrorType = MirrorType::HorMirror;
     } else if (act == vermirroract) {
-        mirrorType = VerMirror;
+        mirrorType = MirrorType::VerMirror;
     } else if (act == allmirroract) {
-        mirrorType = AllMirror;
+        mirrorType = MirrorType::AllMirror;
     }
     graphicsview->update();
 }
@@ -115,18 +119,18 @@ void PhotoGraphics::setImage(const QImage &img, int duration)
 //                <<pix->boundingRect(); // pix的起点和场景已经一样,缩放的尺寸又是场景的尺寸,所有恰好填充场景
             auto img_ = img;
             switch (mirrorType) {
-                case NoMirror:
+                case MirrorType::NoMirror:
                     //LOG<<"no mirror";
                     break;
-                case HorMirror:
+                case MirrorType::HorMirror:
                     img_ = img.mirrored(true,false);
                     //LOG<<"hor mirror";
                     break;
-                case VerMirror:
+                case MirrorType::VerMirror:
                     img_ = img.mirrored(false,true);
                     //LOG<<"ver mirror";
                     break;
-                case AllMirror:
+                case MirrorType::AllMirror:
                     img_ = img.mirrored(true,true);
                     //LOG<<"all mirror";
                     break;
@@ -170,7 +174,14 @@ void PhotoGraphics::resizeEvent(QResizeEvent*event)
     //graphicsview->fitInView(graphicsscene->sceneRect(), Qt::KeepAspectRatio);//不能加这个
     //LOG<<pix->scenePos()<<pix->pos()<<pix->pixmap().size();
     pix->setPos(sceneRefX,sceneRefY);//不知为啥这里直接设置而不是pix->mapFromScene(sceneRefX,sceneRefY)
+    text->setPos(-sceneRefX-200,sceneRefY);
     //LOG<<pix->scenePos()<<pix->pos(); // 确实变化重新计算了
     event->accept();
     update();
+}
+
+void PhotoGraphics::updateText(quint64 cpu, quint64 memory)
+{
+    text->setPlainText(QString("cpu: %1% memory: %2%").arg(cpu).arg(memory));
+    graphicsview->update();
 }

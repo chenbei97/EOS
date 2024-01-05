@@ -10,21 +10,24 @@
 
 SummaryDialog::SummaryDialog(const QVariantMap &m,QWidget*parent):QDialog(parent)
 {
-    btn = new PushButton(tr("start exper"));
+    start = new PushButton(tr("start experiment"));
+    cancel = new PushButton(tr("cancel experiment"));
     panel = new SummaryPanel(m);
     setData(m);
-    setWindowTitle(tr("exper information panel"));
+    setWindowTitle(tr("experiment information panel"));
     resize(MainWindowWidth/2,MainWindowHeight/2);
 
     auto blay = new QHBoxLayout;
     blay->addStretch();
-    blay->addWidget(btn);
+    blay->addWidget(start);
+    blay->addWidget(cancel);
     auto lay = new QVBoxLayout;
     lay->addWidget(panel);
     lay->addLayout(blay);
     setLayout(lay);
 
-    connect(btn,&PushButton::clicked,this,&SummaryDialog::load);
+    connect(start,&PushButton::clicked,this,&SummaryDialog::load);
+    connect(cancel,&PushButton::clicked,this,&SummaryDialog::reject);
 }
 
 void SummaryDialog::setData(const QVariantMap &m)

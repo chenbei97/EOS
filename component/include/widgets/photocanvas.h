@@ -50,6 +50,9 @@ public:
     void enableTransformThread(bool e);
 protected:
     QImage mimage; // 单图模式使用
+    double zoomRate = 1.0;
+    double rotateAngle = 0.0;
+    MirrorType mirrorType = MirrorType::NoMirror;
     void upateImageByThread(const QImage& img);
 protected: // 多图模式使用
     int mGridSize = 0;
@@ -66,6 +69,8 @@ protected:
     QPoint mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
     QColor mMouseClickColor = Qt::green;
     QTimer timer;
+    quint64 cpu_percent = 0;
+    quint64 memory_percent = 0;
 protected:
     QPoint mMousePoint = QPoint(-1,-1);
 signals:

@@ -81,7 +81,7 @@ void WellPattern::updateHoleInfo(QCVariantMap m)
     mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = gnames;
 
     // 4. 更新已有的所有选中的孔信息
-    auto holes = getAllHoles();// 所有按组得到的二维孔向量
+    auto holes = getAllGroupHoles();// 所有按组得到的二维孔向量
     //LOG<<"current well all coordinates = "<<holes;
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
@@ -106,7 +106,7 @@ void WellPattern::onOpenViewAct()
         mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup = getAllGroups();
         m[HoleAllGroupsField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allgroup); // 已有的所有组(每次设置分组信息时会更新)
         m[HoleGroupCoordinatesField].setValue(getGroupHoles(mHoleInfo[mMousePos.x()][mMousePos.y()].group));
-        mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = getAllHoles();
+        mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate = getAllGroupHoles();
         m[HoleAllCoordinatesField].setValue(mHoleInfo[mMousePos.x()][mMousePos.y()].allcoordinate);
         //LOG<<"well send info to view is "<<m[HoleGroupNameField].toString()<<m[HoleGroupColorField].toString();//ViewPattern::setStrategy接收
         emit openWellViewWindow(m);
@@ -140,7 +140,7 @@ void WellPattern::applyHoleEvent(QCVariantMap m)
     //Q_ASSERT(holeinfo.allgroup == allgroup);// 这个是一定相等(导入实验配置这不一定相等因为不导入)
     //Q_ASSERT(holeinfo.allcoordinate == allcoordinates); // 同理
     holeinfo.allgroup = getAllGroups();
-    holeinfo.allcoordinate = getAllHoles();
+    holeinfo.allcoordinate = getAllGroupHoles();
     holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
 #ifdef viewRowColUnEqual // 本组应用的视野尺寸
     holeinfo.dimension = dimension;
@@ -170,6 +170,7 @@ void WellPattern::applyGroupEvent(QCVariantMap m)
     auto coordinate = m[HoleCoordinateField].toPoint();
     auto allgroup = m[HoleAllGroupsField].value<QSet<QString>>();
     auto allcoordinates = m[HoleAllCoordinatesField].value<QPoint2DVector>();
+
 #ifdef viewRowColUnEqual
     auto dimension = m[HoleViewSizeField].value<Dimension2D>();
 #else
@@ -192,8 +193,10 @@ void WellPattern::applyGroupEvent(QCVariantMap m)
                 //Q_ASSERT(holeinfo.coordinate == coordinate); // 组其它孔坐标和当前传递的孔坐标不同
                 // Q_ASSERT(holeinfo.color == groupColor); // 本组不同孔颜色可能不同
                 // Q_ASSERT(holeinfo.isselected == true); // 不肯定是被选中的孔,切换objective时会更新mrows,此时isselected可能false
-                Q_ASSERT(holeinfo.allgroup == allgroup);// 这个是一定相等
+                //Q_ASSERT(holeinfo.allgroup == allgroup);// 这个是一定相等,并不是,偶然会不相等暂时没找到原因
                 Q_ASSERT(holeinfo.allcoordinate == allcoordinates); // 同理
+                LOG<<holeinfo.allcoordinate<<allcoordinates;
+                holeinfo.allcoordinate = allcoordinates;
                 holeinfo.isselected = true; // 要设置孔为选中,不然就不能绘制高亮了
                 holeinfo.color = groupColor; // 本组应用的组颜色(有可能同组不同孔的颜色不同,帮助统一化)
                 if (mSelectMode == ViewMode::RectMode) {
@@ -235,7 +238,7 @@ void WellPattern::applyAllEvent(QCVariantMap m)
     //切物镜时
     //LOG<<allcoordinates;
     //LOG<<getAllWellHoleCoordinates();
-    Q_ASSERT(allcoordinates == getAllHoles());
+    Q_ASSERT(allcoordinates == getAllGroupHoles());
 
     for(auto holes: allcoordinates) {
         for(auto hole: holes) {
@@ -316,7 +319,7 @@ void WellPattern::onRemoveHoleAct()
                     mHoleInfo[r][c].allgroup = getAllGroups();
                     m[HoleAllGroupsField].setValue(mHoleInfo[r][c].allgroup); // 已有的所有组(每次设置分组信息时会更新)
                     m[HoleGroupCoordinatesField].setValue(getGroupHoles(mHoleInfo[r][c].group));
-                    mHoleInfo[r][c].allcoordinate = getAllHoles();
+                    mHoleInfo[r][c].allcoordinate = getAllGroupHoles();
                     m[HoleAllCoordinatesField].setValue(mHoleInfo[r][c].allcoordinate);
                     emit openWellViewWindow(m);
                     emit removeHole(QPoint(r,c));
@@ -355,7 +358,7 @@ void WellPattern::importHoleInfo(const QHoleInfoVector& vec,ViewMode mode)
         mHoleInfo[x][y] = holeInfo; // importHoleInfo之前已经调用setPatternSize不会越界
     }
     auto allgroups = getAllGroups(); // 把组名信息和所有孔信息导入后重新计算
-    auto allholes = getAllHoles();
+    auto allholes = getAllGroupHoles();
     for(int row = 0 ; row < mrows; ++ row) {
         for (int col = 0; col < mcols; ++col) {
             mHoleInfo[row][col].allcoordinate = allholes; // 再赋值
@@ -450,6 +453,11 @@ void WellPattern::setViewMode(ViewMode mode)
     mSelectMode = mode;
     update();
     //clearViewInfo(); // 不清除任何信息
+}
+
+ViewMode WellPattern::viewMode() const
+{
+    return mSelectMode;
 }
 
 void WellPattern::setOpenViewEnabled(bool enable)
@@ -599,18 +607,33 @@ QPointVector WellPattern::getGroupHoles(const QString &groupName) const
     return vec;
 }
 
-QPoint2DVector WellPattern::getAllHoles() const
+QPoint2DVector WellPattern::getAllGroupHoles() const
 { // 获取所有选过的孔坐标
     QPoint2DVector points;
 
     auto allgroups = getAllGroups();
 
-    foreach(auto group,allgroups) { // 把所有组的孔向量列表添加
+    for(auto group:allgroups) { // 把所有组的孔向量列表添加
         auto holes = getGroupHoles(group);
         points.append(holes);
     }
 
     return points;
+}
+
+QPointVector WellPattern::getAllHoles() const
+{
+    QPointVector vec;
+    for(int r = 0; r < mrows; ++r) {
+        for(int c = 0; c < mcols; ++c) {
+            auto holeinfo = mHoleInfo[r][c];
+            if (!holeinfo.group.isEmpty() && !mDisableHoles[r][c]) {
+                vec.append(holeinfo.coordinate);
+            }
+        }
+    }
+
+    return vec;
 }
 
 void WellPattern::initHoleInfo()

@@ -67,6 +67,11 @@ bool CheckBox::isChecked() const
     return checkbox->isChecked();
 }
 
+QString CheckBox::text() const
+{
+    return checkbox->text();
+}
+
 //QSize CheckBox::sizeHint() const
 //{
 //    return QSize(30,30);

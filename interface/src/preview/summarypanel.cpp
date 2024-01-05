@@ -145,7 +145,7 @@ void SummaryPanel::setData(const QVariantMap &m)
             auto save_channels = camerafocusinfo[FieldLoadExperEvent.save_channels].toStringList();
             if (!channel.isEmpty()) {
                 if (save_channels.isEmpty()) {
-                    edit->append(tr("<strong><font color = #FF1E27>Warning: the channel you have checked [%1] none of the camera parameters have been saved, "
+                    edit->append(tr("<strong><font color = #FF1E27>Warning: the channel you have checked [%1] none of the parameters have been saved, "
                                     "and will be executed with default parameters!</font></strong>").arg(channel));
                 } else {
                     for(int idx = 0; idx < channels.count(); ++idx) {
@@ -153,7 +153,7 @@ void SummaryPanel::setData(const QVariantMap &m)
                             auto c =  ChannelFields[idx];
                             if (!save_channels.contains(c)) {
                                 // 勾选的这个实验通道没在保存过的通道里
-                                edit->append(tr("<strong><font color = #FF1E27>Warning: the channel you have checked [%1] none of the camera parameters have been saved,"
+                                edit->append(tr("<strong><font color = #FF1E27>Warning: the channel you have checked [%1] none of the parameters have been saved,"
                                                 "and will be executed with default parameters!</font></strong>").arg(c));
                             }
                         }

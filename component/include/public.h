@@ -34,6 +34,7 @@
 #include "linedelegate.h"
 #include "textedit.h"
 
+#include "cpumemorymonitor.h"
 #include "sqlreadwrite.h"
 #include "mysqlreadwrite.h"
 #include "sqlitereadwrite.h"
@@ -80,6 +81,7 @@
 #include "photographic.h"
 #include "graphicsview.h"
 #include "graphicspixitem.h"
+#include "disksizetable.h"
 
 // (2) 常量定义
 #endif //EOSI_PUBLIC_H

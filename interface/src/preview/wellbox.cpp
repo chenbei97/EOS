@@ -113,3 +113,12 @@ int WellBox::wellManufacturer() const
     return getIndexFromFields(manufacturerCombo->currentText()).toInt();
 }
 
+QString WellBox::wellBrandName() const
+{
+    return wellbrandCombo->currentText();
+}
+
+QString WellBox::wellManufacturerName() const
+{
+    return manufacturerCombo->currentText();
+}

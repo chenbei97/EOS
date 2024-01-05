@@ -11,13 +11,13 @@
 #define EOS_IMAGETRANSFORMTHREAD_H
 
 #include "datastructure.h"
-//extern const int DefaultThreadSleepMs;
+#include "constant.h"
 
 class COMPONENT_IMEXPORT ImageTransformThread : public QThread
 {
     Q_OBJECT
 public:
-    void setImage(const QImage& img);
+    void setImage(const QImage& img,double angle = 0.0,MirrorType type = MirrorType::NoMirror);
     void setImageSize(const QSize& size);
     void startThread();
     void stopThread();
@@ -25,6 +25,8 @@ public:
 private:
     void run() override;
     bool enable = false; // 默认不启用
+    double rotateAngle = 0.0;
+    MirrorType mirrorType = MirrorType::NoMirror;
     QImage mimage;
     QSize msize;
     QMutex mutex;

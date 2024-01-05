@@ -279,6 +279,11 @@ CameraFocusInfo CameraBox::cameraFocusInfo() const
     return m;
 }
 
+QStringList CameraBox::save_channels() const
+{
+    return camerainfo.keys();
+}
+
 CameraInfo CameraBox::cameraInfo() const
 { // 当前UI的
     CameraInfo info;

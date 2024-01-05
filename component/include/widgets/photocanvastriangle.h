@@ -7,10 +7,11 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 
-#ifndef EOS_MAIN_CORE_PY_PHOTOCANVASTRIANGLE_H
-#define EOS_MAIN_CORE_PY_PHOTOCANVASTRIANGLE_H
+#ifndef EOS_PHOTOCANVASTRIANGLE_H
+#define EOS_PHOTOCANVASTRIANGLE_H
 
 #include "photocanvas.h"
+#include "cpumemorymonitor.h"
 
 class COMPONENT_IMEXPORT PhotoCanvasTriangle: public PhotoCanvas
 {
@@ -20,17 +21,28 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent*event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
     void drawTriangle(bool isDraw = true);
 private:
     QPolygonF getLeftTrianglePoints() const;
     QPolygonF getRightTrianglePoints() const;
     QPolygonF getTopTrianglePoints() const;
     QPolygonF getBottomTrianglePoints() const;
+    void updateCpuMemoryValue(quint64 cpu,quint64 memory);
 private:
     double trianglen = PhotoCanvasTriangleLength; // 三角的边长
     double trianggap = PhotoCanvasTriangleGap; // 三角形到边缘的距离
     QColor highcolor  = Qt::green;
     bool isDraw = true;
+    QAction * rotateAct;
+    QAction * resetAct;
+    QAction * hormirroract;
+    QAction * vermirroract;
+    QAction * allmirroract;
+    QAction * nomirroract;
+    void reset();
+    void rotate();
+    void mirror(QAction *act);
 signals:
     void leftTriangleClicked();
     void rightTriangleClicked();
@@ -39,4 +51,4 @@ signals:
     void triangleClicked(int option);
 };
 
-#endif //EOS_MAIN_CORE_PY_PHOTOCANVASTRIANGLE_H
+#endif //EOS_PHOTOCANVASTRIANGLE_H

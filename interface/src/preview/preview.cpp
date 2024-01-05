@@ -154,7 +154,7 @@ void Preview::toggleObjective(const QString& obj)
 #endif
 
 
-    // 3. 对NA物镜的特殊处理要放在最后,因为上边的代码viewpattern->clearAllViewWindowCache会重新初始化视野尺寸
+    // 3. 对NA物镜的特殊处理要放在最后
     if (obj == NA40x095Field) { // 只能选择1个孔
         wellpattern->setDisableHoles();
         wellpattern->setDisableHole(QPoint(0,0),false);//默认只允许(0,0)可选
@@ -292,10 +292,17 @@ void Preview::initLayout()
 
     auto expertab = new GroupBox;
     auto experlay = new QVBoxLayout;
+    auto diskbox = new GroupBox;
+    auto disklay = new QVBoxLayout;
+    disklay->setSpacing(0);
+    disklay->setMargin(0);
+    disklay->addWidget(diskTable);
+    diskbox->setLayout(disklay);
     experlay->addWidget(focusbox);
     experlay->addWidget(timebox);
     experlay->addWidget(zstackbox);
     experlay->addWidget(savebox);
+    experlay->addWidget(diskbox);
     experlay->addStretch();
     expertab->setLayout(experlay);
     scrollarea_experiment->setWidget(expertab);
@@ -402,6 +409,7 @@ void Preview::initObjects()
 
     // 4. 其它
     groupinfo = new GroupInfo;
+    diskTable = new DiskSizeTable;
 }
 
 void Preview::initConnections()

@@ -20,6 +20,7 @@ public:
     WellPatternInfo patternInfo() const;
     void setPatternSize(int rows,int cols) override;
     void setViewMode(ViewMode mode);
+    ViewMode viewMode() const;
     void setOpenViewEnabled(bool enable);
 
     void initDrapHoles(); // 清除拖拽区域
@@ -46,6 +47,9 @@ public:
     int numberOfViews(const QString& group); // 这个组的视野数
     int numberOfViews(const QPoint& holepoint); // 这个孔的视野数
     QSet<QString> getAllGroups() const;// 返回所有分过的组,不重复
+    QPoint2DVector getAllGroupHoles() const; // 按组获取所有组的孔
+    QPointVector  getAllHoles() const; // 按顺序获取所有孔
+    QPointVector getGroupHoles(const QString& groupName) const;// 获取某个组的所有孔
     void updateHoleInfo(QCVariantMap m);// 右击打开分组窗口的信息(color+name)拿去更新孔数据
     void applyHoleEvent(QCVariantMap m); // 删点保存点的映射
     void applyGroupEvent(QCVariantMap m); // 应用到组-视野窗口的信息拿去更新数据(PreviewPhotoCanvas::onApplyGroupAct())
@@ -65,8 +69,6 @@ protected:
     void onSetGroupAct();// 当前孔的所属组颜色和名称传递给分组窗口去更新ui信息,触发openSetGroupWindow信号
     void onOpenViewAct();//打开选择视野窗口的事件,需要传递当前孔的coordinate+group+color+grouppoints+allgroups,触发openViewWindow信号
     void onRemoveHoleAct();
-    QPointVector getGroupHoles(const QString& groupName) const;// 获取组内的所有孔坐标传递给视野窗口在应用到本组时可以更新其它孔的视野数据区信息
-    QPoint2DVector getAllHoles() const;
 signals:
     void openWellGroupWindow(const QVariantMap& m); // 打开分组窗口事件,分组动作触发传递当前孔的color+group
     void openWellViewWindow(const QVariantMap& m); // 打开视野窗口的信号

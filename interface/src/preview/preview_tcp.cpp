@@ -22,6 +22,19 @@ void Preview::parseResult(const QString & f,const QVariant & d)
         if (d.toBool()) {
             LOG<<"[async] start experiment successful!";
             QMessageBox::information(this,InformationChinese,tr("Start the experiment successfully !"));
+            bool enable = false;
+            historybox->setEnabled(enable);
+            wellbox->setEnabled(enable);
+            objectivebox->setEnabled(enable);
+            viewModeBox->setEnabled(enable);
+            channelbox->setEnabled(enable);
+            stack_view_pattern->setEnabled(enable);
+            camerabox->setEnabled(enable);
+            timebox->setEnabled(enable);
+            focusbox->setEnabled(enable);
+            recordbox->setEnabled(enable);
+            zstackbox->setEnabled(enable);
+            savebox->setChildWidgetsEnabled(enable);
         } else {
             LOG<<"[async] start experiment failed!";
             QMessageBox::information(this,InformationChinese,tr("Start the experiment failed!"));
@@ -96,6 +109,19 @@ void Preview::parseResult(const QString & f,const QVariant & d)
             LOG<<"[async] exper is finished, ready open camera";
             if (!ToupCameraPointer->isOpen())
                 ToupCameraPointer->openCamera();
+            bool enable = true;
+            historybox->setEnabled(enable);
+            wellbox->setEnabled(enable);
+            objectivebox->setEnabled(enable);
+            viewModeBox->setEnabled(enable);
+            channelbox->setEnabled(enable);
+            stack_view_pattern->setEnabled(enable);
+            camerabox->setEnabled(enable);
+            timebox->setEnabled(enable);
+            focusbox->setEnabled(enable);
+            recordbox->setEnabled(enable);
+            zstackbox->setEnabled(enable);
+            savebox->setChildWidgetsEnabled(enable);
         } else LOG<<"[async] exper is not finished, not open camera";
     }
 
@@ -139,6 +165,7 @@ void Preview::previewViewEvent(const QPointF &viewpoint)
     SocketPointer->exec(TcpFramePool.previewEvent,msg);
     if (ParserResult.toBool()) {
         LOG<<"[sync] move to view point "<<viewpoint<<"successful!";
+        //autoFocus();
     } else LOG<<"[sync] move to view point "<<viewpoint<<"failed!";
 }
 
@@ -187,11 +214,65 @@ void Preview::previewHoleEvent(const QPoint &holePoint)
     SocketPointer->exec(TcpFramePool.previewEvent,msg);
     if (ParserResult.toBool()) {
         LOG<<"move to hole point "<<holePoint<<" successful!";
+        //autoFocus();
     } else LOG<<"move to hole point "<<holePoint<<" failed!";
 }
 
 void Preview::loadExper()
 { // 帧头: 1
+
+    { // 警告或者错误信息检验
+
+
+        if (!wellbox->wellBrandName().contains(SlideField)) { // 孔板的情况下
+            // (1) 分组或者选点情况
+            if (wellpattern->getAllGroups().isEmpty()) {
+                QMessageBox::critical(this,CriticalChinese,
+                                      tr("The orifice plate has not been divided into groups and cannot start the experiment!"),QMessageBox::Abort);
+                return;
+            } else {
+                for(auto hole: wellpattern->getAllHoles()) {
+                    if (!wellpattern->numberOfViews(hole)) {
+                        QMessageBox::warning(this,WarningChinese,
+                                              tr("Detected that the orifice plate position [%1,%2] has not selected a valid field of view point!").arg(hole.x()).arg(hole.y()),QMessageBox::Yes);
+                    }
+                }
+            }
+
+            // (2) 整孔模式时提供警告
+            if (wellpattern->viewMode() == ViewMode::WholeMode) {
+                QMessageBox::warning(this,WarningChinese,
+                                      tr("Please note that you have selected the whole hole mode, which will ignore all grouping and field of view points!"),QMessageBox::Yes);
+            }
+        }
+
+        // (3) 保存的通道参数和勾选的通道不一致
+        auto save_channels = camerabox->save_channels();
+        if (save_channels.isEmpty()) {
+            QMessageBox::warning(this,WarningChinese,
+                                 tr("No channel has saved parameters, default exp, gain, bright will be executed!"),
+                                 QMessageBox::Ok);
+        } else {
+            QString unsave_channels;
+            for(auto channel: timebox->selectedChannelNames()) {
+                if (!save_channels.contains(channel))
+                    unsave_channels += channel+",";
+            }
+            unsave_channels.chop(1);
+            if (!unsave_channels.isEmpty()) { // 没有没保存过的
+                QMessageBox::warning(this,WarningChinese,
+                                     tr("The channels you have checked [%1] not save parameters, default exp, gain, bright will be executed!").arg(unsave_channels),
+                                     QMessageBox::Ok);
+            }
+        }
+
+        if (!timebox->checkTime()) { // 时间不符合要求
+            QMessageBox::critical(this,CriticalChinese,
+                                  tr("The experimental time setting is incorrect, please verify the prompt!"),QMessageBox::Abort);
+            return;
+        }
+    }
+
     auto channels = timebox->selectedChannels();
     auto totalViews = wellpattern->numberOfViews();
     auto totalChannels = channels.count("1"); // 为1的是勾选上的
@@ -379,6 +460,19 @@ void Preview::stopExper()
         if (!ToupCameraPointer->isOpen()) {
             ToupCameraPointer->openCamera();
         }
+        bool enable = true;
+        historybox->setEnabled(enable);
+        wellbox->setEnabled(enable);
+        objectivebox->setEnabled(enable);
+        viewModeBox->setEnabled(enable);
+        channelbox->setEnabled(enable);
+        stack_view_pattern->setEnabled(enable);
+        camerabox->setEnabled(enable);
+        timebox->setEnabled(enable);
+        focusbox->setEnabled(enable);
+        recordbox->setEnabled(enable);
+        zstackbox->setEnabled(enable);
+        savebox->setChildWidgetsEnabled(enable);
     } else LOG<<"[sync] stop experiment failed!";
 }
 

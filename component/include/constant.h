@@ -19,7 +19,12 @@
 
 enum class SQLType {Mysql,Sqlite};
 Q_ENUMS(SQLType)
+enum class MirrorType {NoMirror,HorMirror,VerMirror,AllMirror};
+Q_ENUMS(MirrorType)
 
+static const int KB = 1024;
+static const int MB = 1024*1024;
+static const int GB = 1024 * 1024 * 1024;
 static const int DefaultPrecisionBit = 6;
 static const int DefaultDrawPointWidth = 8;
 static const int DefaultPainterPenWidth = 2;
@@ -89,6 +94,12 @@ static const char * DateTimeField = "datetime";
 static const char * FlagField = "flag";
 static const char * AutoFocusField = "auto focus";
 static const char * SaveFocusField = "save focus";
+static const char * RotateField = "rotate";
+static const char * ResetField = "reset";
+static const char * NoMirrorField = "no mirror";
+static const char * HorizontalMirrorField = "horizontal mirror";
+static const char * VerticalMirrorField = "vertical mirror";
+static const char * AllMirrorField = "all mirror";
 
 static const char * AdminField = "admin";
 static const char * DefalutPwdField = "123456";
@@ -141,8 +152,8 @@ static const char* MergeField = "merge";
 static const char* SaveCurrentChannelSettingLabelField = "save current channel settings";
 static const char* ApplyHistoryConfigLabelField = "apply historical config?";
 static const char* SelectConfigLabelField = "select config file";
-static const char* StartExperField = "start exper";
-static const char* StopExperField = "stop exper";
+static const char* StartExperField = "start experiment";
+static const char* StopExperField = "stop experiment";
 static const char* Z_StackField = "z_stack";
 static const char* StitchImageField = "stitch_image";
 
@@ -150,7 +161,7 @@ static const char* PreviewDockHoleTitle = "Select Hole Inside View";
 static const char* PreviewWellDockTitle = "Hole(%1,%2)-Group(%3)";
 static const char* PreviewNoGroupWellDockTitle = "Group not set";
 static const char* WellPatternField = "wellpattern";
-static const char* ViewModeBoxTitle = "ViewMode";
+static const char* ViewModeBoxTitle = "Group/View";
 static const char* WellBoxTitle = "Well";
 static const char* ChannelBoxTitle = "Channel";
 static const char* RecordBoxTitle = "Record";

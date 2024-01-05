@@ -159,9 +159,18 @@ class ParseManager:
         reponse[self.frame] = frame
         reponse[self.state] = "ok"
         response = json.dumps(reponse)
-        response+=self.separate
+        response += self.separate
         print("0x0001回复: ", reponse)
         #time.sleep(5)
+        self.__socket.sendall(response.encode("utf-8"))
+
+        reponse = defaultdict()
+        reponse["frame"] = 14 # 实验结束
+        reponse["exper_finished"] = 1
+        response = json.dumps(reponse)
+        response += self.separate
+        time.sleep(5)
+        print("0x0014回复: ", reponse)
         self.__socket.sendall(response.encode("utf-8"))
 
     # 询问连接状态
@@ -369,13 +378,7 @@ class SocketServerManger:
 
     def __sendMessage(self):
         while self.__isConnected:
-            reponse = defaultdict()
-            reponse["frame"] = 14 # 实验结束
-            reponse["exper_finished"] = 1
-            response = json.dumps(reponse)
-            response += "@@@"
-            time.sleep(20)
-            #self.client.sendall(response.encode("utf-8"))
+            pass
 
     def __recvFromClient(self):
         while self.__isConnected:

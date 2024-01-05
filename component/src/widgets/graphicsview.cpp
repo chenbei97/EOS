@@ -41,3 +41,12 @@ void GraphicsView::initAttributes()
     setWindowOpacity(0.2);
     setContentsMargins(0,0,0,0);
 }
+
+void GraphicsView::paintEvent(QPaintEvent *event)
+{
+    QGraphicsView::paintEvent(event);
+    //QPainter painter(this->viewport()); // 好像不起作用
+    //painter.drawText(width()-10,height()+10,QString("cpu: %1% memory: %2%").arg(30).arg(40));
+    event->accept();
+
+}

@@ -13,13 +13,12 @@
 #include "widgets.h"
 #include "graphicsview.h"
 #include "graphicspixitem.h"
-
+#include "cpumemorymonitor.h"
 //#define use_transform_view 1
 class COMPONENT_IMEXPORT PhotoGraphics: public QWidget
 {
     Q_OBJECT
 public:
-    enum MirrorType {NoMirror,HorMirror,VerMirror,AllMirror};
     explicit PhotoGraphics(QWidget*parent= nullptr);
     void resizeEvent(QResizeEvent*event) override;
     void wheelEvent(QWheelEvent*event) override;
@@ -32,10 +31,11 @@ private:
     const double zoomOutRate = 1.05;
     const double zoomInRate = 0.95;
     const double sceneMargin = 50.;
-    MirrorType mirrorType = NoMirror;
+    MirrorType mirrorType = MirrorType::NoMirror;
     GraphicsView * graphicsview;
     QGraphicsScene * graphicsscene;
     GraphicsPixmapItem * pix;
+    QGraphicsTextItem * text;
     QAction * rotateact;
     QAction * resetact;
     QAction * hormirroract;
@@ -45,7 +45,7 @@ private:
     void rotate();
     void reset();
     void mirror(QAction*act);
-
+    void updateText(quint64 cpu,quint64 memory);
 };
 
 #endif //EOS_PHOTOGRAPHIC_H

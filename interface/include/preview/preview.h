@@ -32,7 +32,7 @@
 #include "focusbox.h"
 
 //#define uselabelcanvas 1
-#define usegraphicscanvas 1
+//#define usegraphicscanvas 1
 
 class INTERFACE_IMEXPORT Preview : public QWidget
 {
@@ -71,6 +71,7 @@ private:
     ZStackBox * zstackbox;
     SaveBox * savebox;
     FocusBox * focusbox;
+    DiskSizeTable * diskTable;
 
     GroupBox * stackbox;
     WellPattern * wellpattern;
