@@ -11,11 +11,36 @@
 
 LabelTriangle::LabelTriangle(QWidget*parent):Label(parent)
 {
+    drawTriangle = false;
     mLastPos = QPoint(-1,-1);
     highcolor  = Qt::green;
     highcolor.setAlpha(DefaultColorAlpha);
     trianglen = PhotoCanvasTriangleLength;
     trianggap = PhotoCanvasTriangleGap;
+    installEventFilter(this);
+}
+
+bool LabelTriangle::eventFilter(QObject *watched, QEvent *event)
+{
+    auto type = event->type();
+    if (type == QEvent::MouseMove) {
+        auto mouseEvent = static_cast<QMouseEvent*>(event);
+        int dx = mouseEvent->pos().x() - mLastPos.x();
+        int dy = mouseEvent->pos().y() - mLastPos.y();
+        this->move(this->x() + dx, this->y() + dy);
+        return true;
+    } else if (type == QEvent::Wheel) {
+        auto wheelEvent = static_cast<QWheelEvent*>(event);
+        auto pixel = wheelEvent->angleDelta();
+        if (pixel.y() > 0) {
+            zoomRate = zoomRate * 1.05;
+        } else {
+            zoomRate = zoomRate * 0.95;
+        }
+        update();
+        return true;
+    }
+    return Label::eventFilter(watched, event);
 }
 
 void LabelTriangle::mouseReleaseEvent(QMouseEvent *event)
@@ -28,28 +53,29 @@ void LabelTriangle::mousePressEvent(QMouseEvent *event)
 {
     mLastPos = event->pos();
     update();
+    if (drawTriangle) {
+        auto leftpoly = getLeftTrianglePoints();
+        auto rightpoly = getRightTrianglePoints();
+        auto toppoly = getTopTrianglePoints();
+        auto bottompoly = getBottomTrianglePoints();
 
-    auto leftpoly = getLeftTrianglePoints();
-    auto rightpoly = getRightTrianglePoints();
-    auto toppoly = getTopTrianglePoints();
-    auto bottompoly = getBottomTrianglePoints();
-
-    if (leftpoly.containsPoint(mLastPos,Qt::WindingFill)) {
-        LOG <<"left Triangle";
-        emit leftTriangleClicked();
-        emit triangleClicked(0);
-    } else if (rightpoly.containsPoint(mLastPos,Qt::WindingFill)) {
-        LOG <<"right Triangle";
-        emit rightTriangleClicked();
-        emit triangleClicked(2);
-    } else if (toppoly.containsPoint(mLastPos,Qt::WindingFill)) {
-        LOG <<"top Triangle";
-        emit topTriangleClicked();
-        emit triangleClicked(1);
-    } else if (bottompoly.containsPoint(mLastPos,Qt::WindingFill)) {
-        LOG <<"botttom Triangle";
-        emit bottomTriangleClicked();
-        emit triangleClicked(3);
+        if (leftpoly.containsPoint(mLastPos,Qt::WindingFill)) {
+            LOG <<"left Triangle";
+            emit leftTriangleClicked();
+            emit triangleClicked(0);
+        } else if (rightpoly.containsPoint(mLastPos,Qt::WindingFill)) {
+            LOG <<"right Triangle";
+            emit rightTriangleClicked();
+            emit triangleClicked(2);
+        } else if (toppoly.containsPoint(mLastPos,Qt::WindingFill)) {
+            LOG <<"top Triangle";
+            emit topTriangleClicked();
+            emit triangleClicked(1);
+        } else if (bottompoly.containsPoint(mLastPos,Qt::WindingFill)) {
+            LOG <<"botttom Triangle";
+            emit bottomTriangleClicked();
+            emit triangleClicked(3);
+        }
     }
 
     event->accept();
@@ -59,35 +85,37 @@ void LabelTriangle::paintEvent(QPaintEvent *event)
 {
     Label::paintEvent(event);
 
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    auto pen = painter.pen();
-    pen.setWidth(2);
-    painter.setPen(pen);
+    if (drawTriangle) {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        auto pen = painter.pen();
+        pen.setWidth(2);
+        painter.setPen(pen);
 
-    auto left = getLeftTrianglePoints();
-    auto right = getRightTrianglePoints();
-    auto top = getTopTrianglePoints();
-    auto bottom = getBottomTrianglePoints();
+        auto left = getLeftTrianglePoints();
+        auto right = getRightTrianglePoints();
+        auto top = getTopTrianglePoints();
+        auto bottom = getBottomTrianglePoints();
 
-    painter.drawPolygon(left);
-    painter.drawPolygon(right);
-    painter.drawPolygon(top);
-    painter.drawPolygon(bottom);
+        painter.drawPolygon(left);
+        painter.drawPolygon(right);
+        painter.drawPolygon(top);
+        painter.drawPolygon(bottom);
 
-    if (mLastPos == QPoint(-1,-1)) return;
+        if (mLastPos == QPoint(-1,-1)) return;
 
-    QPainterPath path;
-    if (left.containsPoint(mLastPos,Qt::WindingFill))
-        path.addPolygon(left);
-    else if (right.containsPoint(mLastPos,Qt::WindingFill))
-        path.addPolygon(right);
-    else if (top.containsPoint(mLastPos,Qt::WindingFill))
-        path.addPolygon(top);
-    else if (bottom.containsPoint(mLastPos,Qt::WindingFill))
-        path.addPolygon(bottom);
+        QPainterPath path;
+        if (left.containsPoint(mLastPos,Qt::WindingFill))
+            path.addPolygon(left);
+        else if (right.containsPoint(mLastPos,Qt::WindingFill))
+            path.addPolygon(right);
+        else if (top.containsPoint(mLastPos,Qt::WindingFill))
+            path.addPolygon(top);
+        else if (bottom.containsPoint(mLastPos,Qt::WindingFill))
+            path.addPolygon(bottom);
 
-    painter.fillPath(path,highcolor);
+        painter.fillPath(path,highcolor);
+    }
 }
 
 

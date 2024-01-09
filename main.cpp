@@ -13,14 +13,15 @@
 
 LONG CreateDumpFile(EXCEPTION_POINTERS *pException);
 void initApp(QApplication& a);
-//#define use_python 1
+#define use_python 1
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+    //auto image = test_splitImage(Qt::red);
     initApp(a);
     MainWindow w;
     setWindowAlignCenter(&w);
-    w.showMaximized();
+   w.showMaximized();
 
     // mainwindow建立后再执行,否则异步消息会收不到,同步不影响
     w.askConnectState();

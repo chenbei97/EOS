@@ -2,8 +2,8 @@
 Author: chenbei97 chenbei_electric@163.com
 Date: 2023-10-19 15:25:08
 LastEditors: chenbei97 chenbei_electric@163.com
-LastEditTime: 2023-12-18 14:18:35
-FilePath: \EOS\test\test_socket.py
+LastEditTime: 2024-01-09 16:19:28
+FilePath: \EOS\bin\test_socket.py
 Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
 '''
 import os,sys
@@ -340,7 +340,7 @@ class ParseManager:
         self.__socket.sendall(response.encode("utf-8"))
 
 class SocketServerManger:
-    def __init__(self, port=9999):  # 测试本地链接,只需要提供端口
+    def __init__(self, port=5000):  # 测试本地链接,只需要提供端口
         self.__port = port
         self.__hostName = "localhost"
         self.__msgQueue = Queue()

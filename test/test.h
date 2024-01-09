@@ -11,10 +11,100 @@
 
 #include "interface.h"
 #include <thread>
+#include <iostream>
+//#define STB_IMAGE_IMPLEMENTATION
+//#include "stb/stb_image.h"
+//#define STB_IMAGE_WRITE_IMPLEMENTATION
+//#include "stb/stb_image_write.h"
 using std::thread;
 using std::async;
 using std::promise;
 using std::future;
+
+static QImage test_splitImage(Qt::GlobalColor color)
+{
+    QImage img(CURRENT_PATH+"/images/cell.png");
+
+    auto mat = qimageToMat(img);
+    std::vector<cv::Mat> channels;
+    cv::split(mat,channels); // b,g,r
+    std::vector<cv::Mat> new_channels;
+    cv::Mat res;
+    auto image = QImage();
+    auto lab = new Label;
+    lab->setScaledContents(true);
+    lab->setAttribute(Qt::WA_DeleteOnClose);
+    lab->resize(DefaultWindowSize);
+    if (color == Qt::red) {
+        new_channels = {
+                        cv::Mat::zeros(mat.size(),CV_8UC1),
+                        cv::Mat::zeros(mat.size(),CV_8UC1),
+                        channels[2]
+                        };
+        cv::merge(new_channels,res);
+        image = matToqimage(res);
+        lab->setWindowTitle("red image");
+    } else if (color == Qt::green) {
+        new_channels = {cv::Mat::zeros(mat.size(),CV_8UC1),
+                        channels[1],
+                        cv::Mat::zeros(mat.size(),CV_8UC1)};
+        cv::merge(new_channels,res);
+        image = matToqimage(res);
+        lab->setWindowTitle("green image");
+    } else if (color == Qt::blue){
+        new_channels = {
+                        channels[0],
+                        cv::Mat::zeros(mat.size(),CV_8UC1),
+                        cv::Mat::zeros(mat.size(),CV_8UC1),
+        };
+        cv::merge(new_channels,res);
+        image = matToqimage(res);
+        lab->setWindowTitle("blue image");
+    }
+//    LOG<<img;
+//    LOG<<image;
+//    LOG<<matToqimage(channels[2]); // 32,888,null
+    lab->setPixmap(QPixmap::fromImage(image));
+    lab->show();
+    return image;
+}
+
+//static QImage test_stb(const QString& path)
+//{
+//    int width, height, channels;
+//    auto p = path.toLocal8Bit();
+//    LOG<<p<<path;
+//    unsigned char* data = stbi_load(p, &width, &height, &channels, STBI_rgb_alpha);
+//    if (!data) {
+//        std::cout << "无法读取灰度图像" << std::endl;
+//        return QImage();
+//    }
+//
+//// 创建彩色图像矩阵
+//    LOG<<width<<height<<channels;
+//    unsigned char* colorImage = new unsigned char[width * height * channels];
+//
+//// 将灰度图像转换为绿色彩色图像
+//    for (int i = 0; i < width * height; i++) {
+//        colorImage[i * 3] = data[i]; // 绿色通道
+//        colorImage[i * 3 + 1] = 0; // 红色通道设置为0
+//        colorImage[i * 3 + 2] = 0; // 蓝色通道设置为0
+//    }
+//
+//    // 释放stb_image加载的图像数据
+//
+//    stbi_image_free(data);
+//    auto pix = QImage(colorImage, width, height, QImage::Format_RGB888);
+//    // 将彩色图像保存为文件
+//    //const chaoutputPath = "color_image.jpg";
+//    //    //channels = 3; // RGB通道数
+//    //    //int rowAlign = 4; // 每行像素的对齐字节数r*
+//    //stbi_write_png(outputPath, width, height, channels, colorImage, width * channels);
+//
+//// 释放彩色图像数据内存
+//    delete[] colorImage;
+//    return pix;
+//}
 
 static void test_sharepointer()
 {

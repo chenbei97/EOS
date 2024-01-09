@@ -10,6 +10,7 @@
 #define EOSI_PHOTOCANVAS_H
 
 #include "widgets.h"
+#include "utilities.h"
 
 #define use_imagetransformthread 1
 #ifdef use_imagetransformthread
@@ -38,7 +39,7 @@ public:
     QPixmap pixmap() const;
     QImage image() const;
 
-    void optimizePaint(int ms = 100);
+    void optimizePaint(bool enable,int ms = 100);
     void stopOptimizePaint();
 
     void mouseDoubleClickEvent(QMouseEvent* event) override;
@@ -46,6 +47,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event) override;// 绘制拖拽框
     void mouseReleaseEvent(QMouseEvent *event) override;// 拖拽区域点个数为0才是预览事件
     void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent*event) override;
 
     void enableTransformThread(bool e);
 protected:
@@ -53,6 +55,7 @@ protected:
     double zoomRate = 1.0;
     double rotateAngle = 0.0;
     MirrorType mirrorType = MirrorType::NoMirror;
+    bool enableOptimize = false;
     void upateImageByThread(const QImage& img);
 protected: // 多图模式使用
     int mGridSize = 0;

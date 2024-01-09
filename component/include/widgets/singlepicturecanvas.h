@@ -8,16 +8,16 @@
  */
 
 
-#ifndef EOS_PICTURECANVAS_H
-#define EOS_PICTURECANVAS_H
+#ifndef EOS_SINGLEPICTURECANVAS_H
+#define EOS_SINGLEPICTURECANVAS_H
 
 #include "widgets.h"
 
-class COMPONENT_IMEXPORT PictureCanvas: public QWidget
+class COMPONENT_IMEXPORT SinglePictureCanvas: public QWidget
 {
     Q_OBJECT
 public:
-    explicit PictureCanvas(QWidget*parent= nullptr);
+    explicit SinglePictureCanvas(QWidget*parent= nullptr);
     void mousePressEvent(QMouseEvent *event) override;
     //void mouseReleaseEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
@@ -30,4 +30,4 @@ private:
     QPoint mLastPos = QPoint(-1,-1);
 };
 
-#endif //EOS_PICTURECANVAS_H
+#endif //EOS_SINGLEPICTURECANVAS_H

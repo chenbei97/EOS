@@ -102,6 +102,8 @@ typedef const QVector<QVector<QBoolColorPair>>& QCBoolColorPair2DVector;
 
 typedef QPair<QRectF,QImage> QPairImage;
 typedef QVector<QPair<QRectF,QImage>> QPairImageVector;
+typedef QPair<QImage,QString> QImageInfo;
+typedef QVector<QImageInfo> QImageVectorInfo;
 
 extern const char* PairArgsField;
 struct Dimension2D
@@ -221,7 +223,7 @@ struct ValueRangeUnSigned{
     }
 };
 
-//#define viewRowColUnEqual 1
+#define viewRowColUnEqual 1
 struct HoleInfo {
     // 分组窗口去更新的信息
     QString group; // 本孔分配的组

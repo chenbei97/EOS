@@ -22,9 +22,6 @@ set(TOUPCAM_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/toupcam.lib")
 #set(PYTHON310_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/bin/python310/include)
 #endif ()
 
-set(DATA_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/data.lib")
-set(DATA_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/data)
-
 #set(USE_OPENCV 1) # 要和window.h的use_opencv2一致,如果引入这里要设置1
 #if (${USE_OPENCV})
 #set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
@@ -73,16 +70,16 @@ target_include_directories(${DLLNAME}
         ${PROJECT_SOURCE_DIR}/component/include
         ${PROJECT_SOURCE_DIR}/interface/include
         ${PROJECT_SOURCE_DIR}/interface/include/preview
+        ${PROJECT_SOURCE_DIR}/interface/include/data
         ${PROJECT_SOURCE_DIR}/interface/include/setting
         ${PROJECT_SOURCE_DIR}/interface/include/mainwindow
         ${TOUPCAM_INCLUDE_PATH}
-        ${DATA_INCLUDE_PATH}
         )
 # if (${USE_PYTHON})
 # target_include_directories(${DLLNAME} PUBLIC ${PYTHON310_INCLUDE_PATH})
 # endif ()
 #if (${USE_OPENCV})
-#target_include_directories(${DLLNAME} PUBLIC ${PROJECT_SOURCE_DIR}/interface/include/opencv2)
+#target_include_directories(${DLLNAME} PUBLIC ${PROJECT_SOURCE_DIR}/component/include/opencv2)
 #endif()
 
 target_link_libraries(${DLLNAME}
@@ -104,7 +101,6 @@ target_link_libraries(${DLLNAME}
         Qt5::QuickTemplates2
         component
         ${TOUPCAM_LIB_PATH}
-        ${DATA_LIB_PATH}
         )
 # if (${USE_PYTHON})
 # target_link_libraries(${DLLNAME}

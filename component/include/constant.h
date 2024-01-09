@@ -54,7 +54,7 @@ static const int DefaultThreadSleepMs = 100;
 #define DefaultPainterPixelHeight (DefaultPainterMetric.height()) //指定font下文字像素的高度
 #define DefaultColorAlpha 125
 #define SocketPort 3000
-#define SocketTestPort 9999
+#define SocketTestPort 5000
 #define LocalHost "localhost"
 #define SocketWaitTime 60000
 #define DefaultNativeColor QColor("#F0F0F0")
@@ -123,6 +123,7 @@ static const char* HoursFieldSuffix = " hours";
 static const char* MinutesFieldSuffix = " minutes";
 static const char* JPGSuffix = ".jpg";
 static const char* JPGField = "jpg";
+static const char* JPGSuffixFilter = "*.jpg";
 static const char* StateField = "state";
 static const char* ImageField = "image";
 static const char* GridSizeField = "gridsize";

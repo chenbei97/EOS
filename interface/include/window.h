@@ -19,9 +19,6 @@
 #include "qdatetimeedit.h"
 #include "qprocess.h"
 #include <cmath>
-//#include <opencv2/opencv.hpp>
-//#include <opencv2/highgui.hpp>
-//#include <opencv2/xfeatures2d.hpp>
 using std::modf;
 
 // (2) 导出定义
@@ -70,16 +67,9 @@ using std::modf;
     #define AppSelectMoveVerDistance (AppSelectButtonVerGap+AppSelectButtonHeight) // 垂直方向下一个按钮相对移动距离=verbtngap+btnheight
     #define AppSelectButtonRoundRadius 25 // 圆角半径
 
-    #define PreviewToolBarMaxWidth 850 // 预览界面工具栏的最大宽度
-    #define PreviewPatternMinHeight 450 // 是工具栏也是Pattern的最小宽度
     #define FocusToolStepSpinMaxWidth 100 // 设置焦距中间的step步进spibox设置的宽度不能太宽
-
     #define CameraBoxLeftBoxMinWidth 350 // 让滑动条看起来不要太窄
     #define CameraModeHeight 40 // 切换相机模式部件的高度
-
-    #define TimeBoxSpinBoxMaxWidth 100 // timebox不想让spinbox太长
-    #define TimeBoxDateTimeEditMaxWidth 200
-
     #define ObjectiveSettingLeftSpacing 150
 
 #endif
