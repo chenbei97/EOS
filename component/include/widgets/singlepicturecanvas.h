@@ -24,6 +24,7 @@ public:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void setImage(const QImage&img);
     void setPixmap(const QPixmap& pix);
+    void setImage(const QString& path);
 private:
     QImage mimage; // 单图模式使用
     double zoomRate = 1.0;

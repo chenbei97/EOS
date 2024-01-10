@@ -67,6 +67,12 @@ void SinglePictureCanvas::setPixmap(const QPixmap &pix)
     update();
 }
 
+void SinglePictureCanvas::setImage(const QString &path)
+{
+    mimage.load(path);
+    update();
+}
+
 SinglePictureCanvas::SinglePictureCanvas(QWidget *parent) : QWidget(parent)
 {
 

@@ -7,7 +7,7 @@ GridPictureCanvas::GridPictureCanvas(QWidget *parent) : QWidget(parent)
     imagedelegate = new ImageDelegate;
     imageview->setModel(imagemodel);
     imageview->horizontalHeader()->setVisible(false);
-    imageview->verticalHeader()->setVisible(false);
+    //imageview->verticalHeader()->setVisible(false);
     imagemodel->setRowCount(rows);
     imagemodel->setColumnCount(cols);
     imageview->setItemDelegate(imagedelegate);

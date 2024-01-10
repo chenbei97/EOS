@@ -10,7 +10,7 @@
 #ifndef EOS_DATA_H
 #define EOS_DATA_H
 
-#include "window.h"
+#include "expertable.h"
 
 class INTERFACE_IMEXPORT DataWidget: public QWidget
 {
@@ -29,6 +29,7 @@ private:
     GridPictureCanvas * gridPictureCanvas;
     Splitter * leftSplitter;
     GroupBox * rightBox;
+    ExperTable * experTable;
 private slots:
     void toggleCanvas(int idx);
 };

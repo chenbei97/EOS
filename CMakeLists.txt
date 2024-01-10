@@ -68,8 +68,6 @@ set(LIBGLESV2_PATH ${CMAKE_PREFIX_PATH}/bin/libGLESv2.dll)
 set(LIBEGLD_PATH ${CMAKE_PREFIX_PATH}/bin/libEGLd.dll)
 set(LIBGLESV2D_PATH ${CMAKE_PREFIX_PATH}/bin/libGLESv2d.dll)
 
-#set(STB_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/stb)
-
 set(COMPONENT_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/component/include
         ${PROJECT_SOURCE_DIR}/component/include/widgets
@@ -85,7 +83,6 @@ set(INTERFACE_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/interface/include/setting
         )
 
-#file(GLOB STB_FILES  "${PROJECT_SOURCE_DIR}/stb/*.h" "${PROJECT_SOURCE_DIR}/stb/*.cpp")
 file(GLOB MAIN_FILES  "${PROJECT_SOURCE_DIR}/*.h" "${PROJECT_SOURCE_DIR}/*.cpp")
 file(GLOB TESTFILES  "${PROJECT_SOURCE_DIR}/test/*.h" "${PROJECT_SOURCE_DIR}/test/*.cpp")
 
@@ -115,7 +112,7 @@ set_target_properties(
 )
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
-          ${TOUPCAM_INCLUDE_PATH}  ) # ${STB_INCLUDE_PATH}
+          ${TOUPCAM_INCLUDE_PATH}  ) 
 # if (${USE_PYTHON})
 # target_include_directories(${PROJECT_NAME} PUBLIC ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
 # endif ()

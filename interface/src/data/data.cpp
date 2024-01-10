@@ -34,6 +34,7 @@ void DataWidget::initLayout()
 
     // 2. 右侧布局
     auto grouplay = new QVBoxLayout;
+    grouplay->addWidget(experTable);
     rightBox->setLayout(grouplay);
 
     // 3. 总布局
@@ -53,6 +54,7 @@ void DataWidget::initConnections()
 void DataWidget::initAttributes()
 {
     stackCanvas->addWidget(pictureCanvas);
+    pictureCanvas->setImage(CURRENT_PATH+"/images/cell.png");
 }
 
 void DataWidget::initObjects()
@@ -62,6 +64,7 @@ void DataWidget::initObjects()
     gridPictureCanvas = new GridPictureCanvas;
     leftSplitter = new Splitter(Qt::Vertical);
     rightBox = new GroupBox;
+    experTable = new ExperTable;
 }
 
 void DataWidget::resizeEvent(QResizeEvent *event)
