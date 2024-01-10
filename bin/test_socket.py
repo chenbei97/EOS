@@ -378,7 +378,14 @@ class SocketServerManger:
 
     def __sendMessage(self):
         while self.__isConnected:
-            pass
+            reponse = defaultdict()
+            reponse["frame"] = "test0x4"
+            c_path = os.getcwd()+r"\images\cell.png"
+            reponse["path"] = c_path
+            response = json.dumps(reponse)
+            response += "@@@"
+            time.sleep(1)
+            self.client.sendall(response.encode("utf-8"))
 
     def __recvFromClient(self):
         while self.__isConnected:

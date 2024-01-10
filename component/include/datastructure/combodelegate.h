@@ -1,19 +1,11 @@
-/*** 
- * @Author: chenbei97 chenbei_electric@163.com
- * @Date: 2023-11-16 16:15:45
- * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2023-11-16 16:22:36
- * @FilePath: \EOS\component\include\datastructure\textdelegate.h
- * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
- */
-
-#ifndef EOS_MAIN_CORE_PY_TEXTDELEGATE_H
-#define EOS_MAIN_CORE_PY_TEXTDELEGATE_H
+﻿
+#ifndef EOS_COMBODELEGATE_H
+#define EOS_COMBODELEGATE_H
 
 #include "datastructure.h"
-#include "textedit.h"
+#include "combobox.h"
 
-class COMPONENT_IMEXPORT TextDelegate : public QStyledItemDelegate
+class COMPONENT_IMEXPORT ComboDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
@@ -26,5 +18,9 @@ public:
                               const QModelIndex &index) const override;
     bool editorEvent(QEvent *event, QAbstractItemModel *model,
                      const QStyleOptionViewItem &option, const QModelIndex &index) override;
+    void addItems(const QStringList& texts);
+private:
+    QStringList mComboItems;
 };
-#endif //EOS_MAIN_CORE_PY_TEXTDELEGATE_H
+
+#endif //EOS_COMBODELEGATE_H

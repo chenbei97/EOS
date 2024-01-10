@@ -1,18 +1,17 @@
 ﻿/*** 
  * @Author: chenbei97 chenbei_electric@163.com
- * @Date: 2024-01-09 17:26:46
+ * @Date: 2024-01-10 09:51:59
  * @LastEditors: chenbei97 chenbei_electric@163.com
- * @LastEditTime: 2024-01-10 08:35:28
- * @FilePath: \EOS\interface\src\data\expertable.cpp
+ * @LastEditTime: 2024-01-10 17:26:33
+ * @FilePath: \EOS\interface\src\data\timetable.cpp
  * @Copyright (c) 2024 by ${chenbei}, All Rights Reserved. 
  */
+#include "timetable.h"
 
-#include "expertable.h"
-
-ExperTable::ExperTable(QWidget*parent): GroupBox(parent)
+TimeTable::TimeTable(QWidget*parent): GroupBox(parent)
 {
     view = new TableView;
-    model = new StandardItemModel;
+    model = new DataTableModel;
     view->setModel(model);
     auto lay = new QHBoxLayout;
     lay->addWidget(view);
@@ -20,10 +19,19 @@ ExperTable::ExperTable(QWidget*parent): GroupBox(parent)
     lay->setSpacing(0);
     setLayout(lay);
 
-    tableHeader<<"Name"<<"Status"<<"Start Time"<<"Objective"<<"Channels"
-        <<"Focus"<<"Stitch"<<"ZStack";
+    initTable();
+}
+
+void TimeTable::initTable()
+{
+    tableHeader<<"TimeStamp"<<"Image";
     model->setRowCount(5);
-    model->setColumnCount(8);
+    model->setColumnCount(2);
     model->setHorizontalHeaderLabels(tableHeader);
 }
 
+void TimeTable::initFilterItem()
+{
+    const int row = 1; // 第2行
+
+}

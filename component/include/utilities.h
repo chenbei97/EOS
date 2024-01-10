@@ -478,6 +478,20 @@ static QPixmap loadPixmapByImageReader(QCString imgpath, qreal scale_w, qreal sc
     return pix;
 }
 
+static QImage loadImageByImageReader(QCString imgpath, qreal scale_w, qreal scale_h)
+{
+    QImageReader reader;
+    reader.setFileName(imgpath);
+    reader.setAutoTransform(true); // reader.read()会自动进行元数据转换
+
+    auto source_size = reader.size();
+    auto target_size = source_size.scaled(scale_w,scale_h,Qt::KeepAspectRatio); // 原尺寸=>目标尺寸的保持纵横比尺寸
+
+    reader.setScaledSize(target_size);
+    auto pix = QPixmap::fromImageReader(&reader);
+    return pix.toImage();
+}
+
 /*路径*/
 static bool pathExisted(QCString path) noexcept
 {

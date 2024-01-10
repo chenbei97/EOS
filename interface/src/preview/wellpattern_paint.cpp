@@ -76,6 +76,8 @@ void WellPattern::mousePressEvent(QMouseEvent *event)
             mDrapRect = QRectF();
             update();
         } // 右键是菜单
+        if (mHoleClickEvent)
+                emit holeClicked(mMousePos); // 新位置和原来位置不同才动电机
     }
     event->accept();
 }
@@ -96,6 +98,7 @@ void WellPattern::mouseDoubleClickEvent(QMouseEvent*event)
         if (mEnterViewEvent) { // 允许进入视野事件
             openviewact->setEnabled(true);
             openviewact->trigger(); // 双击打开视野窗口触发一下
+            emit doubleClicked(mMousePos);
         }
 
     }

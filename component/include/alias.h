@@ -37,6 +37,7 @@ typedef const QColor& QCColor;
 typedef const QRect& QCRect;
 typedef const QRectF& QCRectF;
 
+typedef QVector<QVariant> QVariantVector;
 typedef QVector<QColor> QColorVector;
 typedef const QVector<QColor>& QCColorVector;
 typedef QVector<QPoint> QPointVector;

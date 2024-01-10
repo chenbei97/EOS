@@ -112,7 +112,7 @@ set_target_properties(
 )
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
-          ${TOUPCAM_INCLUDE_PATH}  ) 
+          ${TOUPCAM_INCLUDE_PATH}  )
 # if (${USE_PYTHON})
 # target_include_directories(${PROJECT_NAME} PUBLIC ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
 # endif ()

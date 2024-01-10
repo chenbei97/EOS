@@ -686,4 +686,15 @@ void WellPattern::clearViewInfo()
     update();
 }
 
+void WellPattern::setEnterViewEvent(bool enable)
+{
+    mEnterViewEvent = enable;
+    update();
+}
+
+void WellPattern::setHoleClickEvent(bool enable)
+{
+    mHoleClickEvent = enable;
+    update();
+}
 

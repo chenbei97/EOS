@@ -10,7 +10,11 @@
 #ifndef EOS_DATA_H
 #define EOS_DATA_H
 
-#include "expertable.h"
+#include "datatable.h"
+#include "datapattern.h"
+#include "dataimage.h"
+#include "patterntable.h"
+#include "timetable.h"
 
 class INTERFACE_IMEXPORT DataWidget: public QWidget
 {
@@ -24,14 +28,24 @@ private:
     void initLayout();
     void initConnections();
 private:
-    QStackedWidget * stackCanvas;
+    QStackedWidget * topCanvas;
     SinglePictureCanvas * pictureCanvas;
-    GridPictureCanvas * gridPictureCanvas;
+
+    QStackedWidget * bottomCanvas;
+    GridPictureCanvas * gridRunningCanvas;
+    GridPictureCanvas * gridCompeleCanvas;
+
     Splitter * leftSplitter;
     GroupBox * rightBox;
-    ExperTable * experTable;
+    DataTable * dataTable;
+    DataPattern * dataPattern;
+    PatternTable * patternTable;
+    TimeTable * timeTable; // 2个水平表
+    DataImage * dataImage; // 图后期处理
 private slots:
     void toggleCanvas(int idx);
+    void toggleExperiment(int row, bool isRunning);
+    void parseResult(const QString & f,const QVariant & d);
 };
 
 #endif //EOS_DATA_H

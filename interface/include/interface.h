@@ -33,6 +33,11 @@
 //#include "summarypanel.h"
 //#include "summarydialog.h"
 //#include "viewmode.h"
+
+//#include "data.h"
+//#include "datapattern.h"
+//#include "expertable.h"
+
 //
 //#include "setting.h"
 //#include "settingnotifier.h"

@@ -34,6 +34,7 @@
 #include "linedelegate.h"
 #include "imagedelegate.h"
 #include "textedit.h"
+#include "combodelegate.h"
 
 #include "cpumemorymonitor.h"
 #include "sqlreadwrite.h"
