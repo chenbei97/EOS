@@ -46,7 +46,17 @@ QVector<PlateImageInfo> DataTable::createTestData() const
             image.setHoleCoordinate(generator.bounded(0,8),generator.bounded(0,12)):
             image.setHoleCoordinate(generator.bounded(0,4),generator.bounded(0,6));
             auto tmp = generator.bounded(1.0);
-            tmp>0.5? image.channel = BRField: image.channel = DAPIField;
+            if (tmp>=0.0 && tmp <= 0.3) {
+                image.setHoleGroup("A组");
+                image.channel = BRField;
+            } else if (tmp > 0.3 && tmp < 0.7) {
+                image.setHoleGroup("B组");
+                image.channel = DAPIField;
+            } else {
+                image.setHoleGroup("C组");
+                image.channel = GFPField;
+            }
+
             for(int k = 0; k < 5; ++k) { // 每个孔设置5个点,注意如果有孔重复了,这个孔就会得到10个视野而不是5个
                 image.setViewCoordinate(generator.bounded(1.0),generator.bounded(1.0));
                 for(int m = 0; m < 5; ++m)
@@ -55,7 +65,7 @@ QVector<PlateImageInfo> DataTable::createTestData() const
                     image.stamp = QDateTime::currentDateTime().addSecs(generator.bounded(24*60*60));
                     info.images.append(image);
 //                    LOG<<"current exper:"<<j<<"current hole:"<<image.getHoleCoordinate()<<"current view:"<<image.getViewCoordinate()
-//                        <<"stamp:"<<image.stamp;
+//                        <<"stamp:"<<image.stamp <<"group:"<<image.getHoleGroup();
                 }
             }
             //LOG<<QPointF(image.view.x,image.view.y)<<image.stamp;

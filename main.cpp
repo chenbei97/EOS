@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 void initApp(QApplication& a)
 {
     // 1. basic info
+    qRegisterMetaType<QVector<int>>("QVector<int>()");
     LOG <<"UserScreen Width:" << UserScreenWidth << "UserScreen Height:" << UserScreenHeight;
     LOG<<"main thread is "<<CURRENT_THREAD;
     LOG<<"current path = "<<CURRENT_PATH;

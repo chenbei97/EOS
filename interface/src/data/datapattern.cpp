@@ -54,24 +54,25 @@ void DataPattern::paintEvent(QPaintEvent *event)
         for (int col = 0; col < mcols; ++col) {
             auto center  = QPointF(mGap+cell_w/2+mSpace+(cell_w+mSpace)*col,
                                    mGap+cell_h/2+mSpace+(cell_h+mSpace)*row);
-            // (1) 绘制鼠标点击的高亮
-            //启用了鼠标事件mMousePos才会被赋值,否则是(-1,-1),所以这里不用再判断是否启用了鼠标事件
-            if (mMousePos.x() == row && mMousePos.y() == col
-                && !mHoleInfo[row][col].isSelected// 已绘制的点不要绘制鼠标选中高亮
-                && !mDisableHoles[row][col]) { // 置灰不可选的点不要绘制鼠标高亮
-                path.clear();
-                path.moveTo(center);
-                path.addEllipse(center, radius * 0.75, radius * 0.75);
-                painter.fillPath(path, mMouseClickColor);
-            }
 
-            // (2) 绘制确实选中的孔
+            // (1) 绘制确实选中的孔
             if (mHoleInfo[row][col].isSelected && !mDisableHoles[row][col]) //  绘制确定选中的点,不可选的孔不允许绘制
             {
                 path.clear();
                 path.moveTo(center);
                 path.addEllipse(center,radius*0.75,radius*0.75);
                 painter.fillPath(path,Qt::red);
+            }
+
+            // (2) 绘制鼠标点击的高亮
+            //启用了鼠标事件mMousePos才会被赋值,否则是(-1,-1),所以这里不用再判断是否启用了鼠标事件
+            if (mMousePos.x() == row && mMousePos.y() == col
+                //&& !mHoleInfo[row][col].isSelected// 已绘制的点不要绘制鼠标选中高亮
+                && !mDisableHoles[row][col]) { // 置灰不可选的点不要绘制鼠标高亮
+                path.clear();
+                path.moveTo(center);
+                path.addEllipse(center, radius * 0.75, radius * 0.75);
+                painter.fillPath(path, Qt::blue);
             }
 
             // (3) 绘制不可选置灰的点,将其高亮颜色变为灰色,并画个x
@@ -95,7 +96,7 @@ void DataPattern::paintEvent(QPaintEvent *event)
 void DataPattern::initHoleInfo(const PlateImageInfo &info)
 {
     for(auto image: info.images) {
-        auto hole_coordinate = image.view.hole;
+        auto hole_coordinate = image.view.hole.getCoordinate();
         //LOG<<hole_coordinate<<patternSize();
         mHoleInfo[hole_coordinate.x()][hole_coordinate.y()].isSelected = true;
         mHoleInfo[hole_coordinate.x()][hole_coordinate.y()].info = info;

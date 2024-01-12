@@ -68,3 +68,4 @@ v1.0.4
 (3) 去除wellpattern的mouse和updateui文件,合并到一起
 (4) 增加自动聚焦,通道合并事件
 (5) Data界面初步完成
+(6) 重新引入opencv,后续需要对livecanvas上色

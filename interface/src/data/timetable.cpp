@@ -18,8 +18,6 @@ void TimeTable::refreshTable(const ImageInfoVector& info)
         QStringList rowTexts;
         rowTexts << stamp.toString(DefaultImageDateTimeFormat);
         rowTexts << path;
-        rowTexts << "A";
-        rowTexts << "青霉素";
         //LOG<<rowTexts;
         model->appendRowTexts(rowTexts);
     }

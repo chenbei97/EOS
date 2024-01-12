@@ -14,7 +14,7 @@
 #include "datatablemodel.h"
 
 static const QStringList TimeTableHeaders = {
-       TimeStampFieldUpper,ImageFieldUpper,GroupFieldUpper,InfoFieldUpper
+       TimeStampFieldUpper,ImageFieldUpper
 };
 #define TimeTableStampColumn TimeTableHeaders.indexOf(TimeStampFieldUpper)
 #define TimeTableImageColumn TimeTableHeaders.indexOf(ImageFieldUpper)

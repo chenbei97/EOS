@@ -74,7 +74,20 @@ using std::modf;
 
 #endif
 
-typedef QPoint HoleCoordinate;
+struct HoleCoordinate
+{
+    int x = 0;
+    int y = 0;
+    QString group;
+    QString medicine;
+    QString dose;
+    QString unit;
+
+    QPoint getCoordinate() {
+        return QPoint(x,y);
+    }
+};
+
 struct ViewCoordinate
 {
     double x = 0.0;
@@ -89,17 +102,28 @@ struct ImageInfo
     QString channel;
     ViewCoordinate view;
 
-    void setHoleCoordinate(const HoleCoordinate& hole) {
-        view.hole = hole;
+    void setHoleCoordinate(const QPoint& hole) {
+        view.hole.x = hole.x();
+        view.hole.y = hole.y();
     }
 
-    HoleCoordinate getHoleCoordinate() const {
-        return view.hole;
+    QPoint getHoleCoordinate() const {
+        return QPoint(view.hole.x,view.hole.y);
     }
 
     void setHoleCoordinate(int x,int y) {
-        view.hole = HoleCoordinate(x,y);
+        view.hole.x = x;
+        view.hole.y = y;
     }
+
+    void setHoleGroup(const QString& group) {
+        view.hole.group = group;
+    }
+
+    QString getHoleGroup() const {
+        return view.hole.group;
+    }
+
     void setViewCoordinate(double x,double y) {
         view.x = x;
         view.y = y;
@@ -134,7 +158,7 @@ struct PlateImageInfo
     QPointVector holeCoordinates() const {
         QPointVector vec;
         for(auto image: images) {
-            vec.append(image.view.hole);
+            vec.append(image.view.hole.getCoordinate());
         }
         return vec;
     }
@@ -143,7 +167,7 @@ struct PlateImageInfo
     QPointFVector viewCoordinates(int x, int y) const {
         QPointFVector vec;
         for(auto image: images) {
-            if (image.view.hole == QPoint(x,y)) {
+            if (image.view.hole.getCoordinate() == QPoint(x,y)) {
                 if (!vec.contains(QPointF(image.view.x,image.view.y)))
                     vec.append(QPointF(image.view.x,image.view.y));
             }
@@ -156,7 +180,7 @@ struct PlateImageInfo
     {
         ImageInfoVector vec;
         for(auto image: images) {
-            if (image.view.hole.x() == hole_x && image.view.hole.y() == hole_y) {
+            if (image.view.hole.x == hole_x && image.view.hole.y == hole_y) {
                 vec.append(image);
             }
         }
@@ -167,7 +191,7 @@ struct PlateImageInfo
     ImageInfoVector viewImages(int hole_x,int hole_y,double view_x,double view_y) const {
         ImageInfoVector vec;
         for(auto image: images) {
-            if (image.view.hole.x() == hole_x && image.view.hole.y() == hole_y) { // 指定孔
+            if (image.view.hole.x == hole_x && image.view.hole.y == hole_y) { // 指定孔
                 //qDebug()<<(QString::number(0.000000000011) == QString::number(0.0000000000111));
                 if (qAbs(view_x - image.view.x) < 1e-6
                     && qAbs(view_y - image.view.y) < 1e-6) { // 指定视野
@@ -182,7 +206,7 @@ struct PlateImageInfo
     ImageInfoVector viewChannelImages(int hole_x,int hole_y,double view_x,double view_y, const QString& channel) {
         ImageInfoVector vec;
         for(auto image: images) {
-            if (image.view.hole.x() == hole_x && image.view.hole.y() == hole_y && channel == image.channel) { // 指定孔和通道
+            if (image.view.hole.x == hole_x && image.view.hole.y == hole_y && channel == image.channel) { // 指定孔和通道
 //                LOG<< image.getViewCoordinate() << QPointF(view_x,view_y)
 //                    <<(qAbs(view_x - image.view.x) < 1e-6)<<(qAbs(view_y - image.view.y) < 1e-6);
                 if (qAbs(view_x - image.view.x) < 1e-6
@@ -194,7 +218,7 @@ struct PlateImageInfo
         return vec;
     }
 
-    ImageInfoVector viewChannelImages(const HoleCoordinate& hole,const QPointF& view, const QString& channel) {
+    ImageInfoVector viewChannelImages(const QPoint& hole,const QPointF& view, const QString& channel) {
         return viewChannelImages(hole.x(),hole.y(),view.x(),view.y(),channel);
     }
 
@@ -202,7 +226,7 @@ struct PlateImageInfo
     QStringList getViewChannels(int hole_x,int hole_y,double view_x,double view_y) const {
         QStringList vec;
         for(auto image: images) {
-            if (image.view.hole.x() == hole_x && image.view.hole.y() == hole_y
+            if (image.view.hole.x == hole_x && image.view.hole.y == hole_y
                 && qAbs(view_x - image.view.x) < 1e-6
                 && qAbs(view_y - image.view.y) < 1e-6) { // 指定孔和视野
                 if (!vec.contains(image.channel))
@@ -211,6 +235,21 @@ struct PlateImageInfo
         }
         return vec;
     }
+
+    // 获取指定孔的视野属于哪个组
+    QString getViewGroup(int hole_x,int hole_y,double view_x,double view_y) const {
+        QString tmpGroup;
+        for(auto image: images) {
+            if (image.view.hole.x == hole_x && image.view.hole.y == hole_y
+                && qAbs(view_x - image.view.x) < 1e-6
+                && qAbs(view_y - image.view.y) < 1e-6) { // 指定孔和视野
+                tmpGroup = image.getHoleGroup(); // 同一个孔的视野都是一样的组
+                break;
+            }
+        }
+        return tmpGroup;
+    }
+
 };
 
 struct DataPatternHoleInfo
