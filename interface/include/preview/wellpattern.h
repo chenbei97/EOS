@@ -33,6 +33,8 @@ public:
     void initHoleInfo(); // 初始化孔信息
     void clearViewInfo();
     void importHoleInfo(const QHoleInfoVector& vec,ViewMode mode);
+    void setEnterViewEvent(bool enable);
+    void setHoleClickEvent(bool enable);
 
     void paintEvent(QPaintEvent *event) override;
     QRectF2DVector getHoleRectsOnViewSize(QCPoint coordinate) const; // 拿到某个孔基于视野窗口尺寸来划分的所有小矩形区域
@@ -63,6 +65,8 @@ protected:
     QBool2DVector mDisableHoles; // 置灰区域,不可选的区域
     QHoleInfo2DVector mHoleInfo; // 每个孔的所有信息用结构体封装
 protected:
+    bool mEnterViewEvent = false; // 是否允许doubleClick触发
+    bool mHoleClickEvent = false; // 是否允许holeClicked信号触发
     QAction * opengroupact;
     QAction * openviewact;
     QAction * removeholeact;

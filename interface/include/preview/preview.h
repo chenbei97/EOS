@@ -31,7 +31,6 @@
 #include "savebox.h"
 #include "focusbox.h"
 
-//#define uselabelcanvas 1
 //#define usegraphicscanvas 1
 
 class INTERFACE_IMEXPORT Preview : public QWidget
@@ -39,6 +38,7 @@ class INTERFACE_IMEXPORT Preview : public QWidget
     Q_OBJECT
 public:
     explicit Preview(QWidget*parent= nullptr);
+    void resizeEvent(QResizeEvent*event) override;
     void setAppInfo(int app);// 用于appselect传递当前app信息
     WellPatternInfo patternInfo() const; // WellPattern的数据
     void askConnectState();

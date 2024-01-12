@@ -33,7 +33,15 @@
 //#include "summarypanel.h"
 //#include "summarydialog.h"
 //#include "viewmode.h"
-//
+
+//#include "data.h"
+//#include "datapattern.h"
+//#include "datagrid.h"
+//#include "datatable.h"
+//#include "patterntable.h"
+//#include "timetable.h"
+//#include "dataimage.h"
+
 //#include "setting.h"
 //#include "settingnotifier.h"
 //#include "objectivesetting.h"

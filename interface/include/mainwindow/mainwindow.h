@@ -14,8 +14,8 @@
 #include "appselect.h"
 #include "preview.h"
 #include "setting.h"
+#include "data.h"
 #include "toupcam.h"
-#include "dataWidget.h"
 
 class INTERFACE_IMEXPORT MainWindow: public QMainWindow
 {
@@ -30,9 +30,9 @@ private:
     NavigBar * navigbar;
     AppSelect * appselect;
     Preview * preview;
+    DataWidget * data;
     Setting * setting;
     QStackedWidget * stack;
-    QWidget* mDataWidget;
     QAction * quitfullscreen;
     QAction * enterfullscreen;
 private:

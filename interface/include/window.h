@@ -19,9 +19,6 @@
 #include "qdatetimeedit.h"
 #include "qprocess.h"
 #include <cmath>
-//#include <opencv2/opencv.hpp>
-//#include <opencv2/highgui.hpp>
-//#include <opencv2/xfeatures2d.hpp>
 using std::modf;
 
 // (2) 导出定义
@@ -70,20 +67,160 @@ using std::modf;
     #define AppSelectMoveVerDistance (AppSelectButtonVerGap+AppSelectButtonHeight) // 垂直方向下一个按钮相对移动距离=verbtngap+btnheight
     #define AppSelectButtonRoundRadius 25 // 圆角半径
 
-    #define PreviewToolBarMaxWidth 850 // 预览界面工具栏的最大宽度
-    #define PreviewPatternMinHeight 450 // 是工具栏也是Pattern的最小宽度
     #define FocusToolStepSpinMaxWidth 100 // 设置焦距中间的step步进spibox设置的宽度不能太宽
-
     #define CameraBoxLeftBoxMinWidth 350 // 让滑动条看起来不要太窄
     #define CameraModeHeight 40 // 切换相机模式部件的高度
-
-    #define TimeBoxSpinBoxMaxWidth 100 // timebox不想让spinbox太长
-    #define TimeBoxDateTimeEditMaxWidth 200
-
     #define ObjectiveSettingLeftSpacing 150
 
 #endif
 
+typedef QPoint HoleCoordinate;
+struct ViewCoordinate
+{
+    double x = 0.0;
+    double y = 0.0;
+    HoleCoordinate hole;
+};
+
+struct ImageInfo
+{
+    QString path;
+    QDateTime stamp;
+    QString channel;
+    ViewCoordinate view;
+
+    void setHoleCoordinate(const HoleCoordinate& hole) {
+        view.hole = hole;
+    }
+
+    HoleCoordinate getHoleCoordinate() const {
+        return view.hole;
+    }
+
+    void setHoleCoordinate(int x,int y) {
+        view.hole = HoleCoordinate(x,y);
+    }
+    void setViewCoordinate(double x,double y) {
+        view.x = x;
+        view.y = y;
+    }
+
+    QPointF getViewCoordinate() const {
+        return QPointF(view.x,view.y);
+    }
+};
+typedef QVector<ImageInfo> ImageInfoVector;
+
+struct PlateImageInfo
+{
+    ImageInfoVector images;
+    bool isRunning = false;
+    QDateTime experTime;
+    QString objective; // 4xBR
+    QSize plateSize;
+    QString experName;
+    // 其它实验信息参数等
+
+    void clear() {
+        images.clear();
+        isRunning = false;
+        experName.clear();
+        objective.clear();
+        plateSize = QSize();
+        experTime = QDateTime();
+    }
+
+    // 获取使用的所有孔坐标
+    QPointVector holeCoordinates() const {
+        QPointVector vec;
+        for(auto image: images) {
+            vec.append(image.view.hole);
+        }
+        return vec;
+    }
+
+    // 获取指定孔的所有不重复视野坐标,因为可能坐标相同只是时间戳不同
+    QPointFVector viewCoordinates(int x, int y) const {
+        QPointFVector vec;
+        for(auto image: images) {
+            if (image.view.hole == QPoint(x,y)) {
+                if (!vec.contains(QPointF(image.view.x,image.view.y)))
+                    vec.append(QPointF(image.view.x,image.view.y));
+            }
+        }
+        return vec;
+    }
+
+    // 获取指定孔所有信息
+    ImageInfoVector holeImages(int hole_x,int hole_y) const
+    {
+        ImageInfoVector vec;
+        for(auto image: images) {
+            if (image.view.hole.x() == hole_x && image.view.hole.y() == hole_y) {
+                vec.append(image);
+            }
+        }
+        return vec;
+    }
+
+    // 获取指定孔内指定点的信息
+    ImageInfoVector viewImages(int hole_x,int hole_y,double view_x,double view_y) const {
+        ImageInfoVector vec;
+        for(auto image: images) {
+            if (image.view.hole.x() == hole_x && image.view.hole.y() == hole_y) { // 指定孔
+                //qDebug()<<(QString::number(0.000000000011) == QString::number(0.0000000000111));
+                if (qAbs(view_x - image.view.x) < 1e-6
+                    && qAbs(view_y - image.view.y) < 1e-6) { // 指定视野
+                    vec.append(image);
+                }
+            }
+        }
+        return vec;
+    }
+
+    // 获取指定孔内指定点且是某个通道的图像,注意不区分时间戳,所以视野坐标可能是相同的
+    ImageInfoVector viewChannelImages(int hole_x,int hole_y,double view_x,double view_y, const QString& channel) {
+        ImageInfoVector vec;
+        for(auto image: images) {
+            if (image.view.hole.x() == hole_x && image.view.hole.y() == hole_y && channel == image.channel) { // 指定孔和通道
+//                LOG<< image.getViewCoordinate() << QPointF(view_x,view_y)
+//                    <<(qAbs(view_x - image.view.x) < 1e-6)<<(qAbs(view_y - image.view.y) < 1e-6);
+                if (qAbs(view_x - image.view.x) < 1e-6
+                    && qAbs(view_y - image.view.y) < 1e-6 ) { // 指定视野和通道
+                    vec.append(image);
+                }
+            }
+        }
+        return vec;
+    }
+
+    ImageInfoVector viewChannelImages(const HoleCoordinate& hole,const QPointF& view, const QString& channel) {
+        return viewChannelImages(hole.x(),hole.y(),view.x(),view.y(),channel);
+    }
+
+    // 获取指定孔的指定视野的照片都涉及哪些通道
+    QStringList getViewChannels(int hole_x,int hole_y,double view_x,double view_y) const {
+        QStringList vec;
+        for(auto image: images) {
+            if (image.view.hole.x() == hole_x && image.view.hole.y() == hole_y
+                && qAbs(view_x - image.view.x) < 1e-6
+                && qAbs(view_y - image.view.y) < 1e-6) { // 指定孔和视野
+                if (!vec.contains(image.channel))
+                    vec.append(image.channel);
+            }
+        }
+        return vec;
+    }
+};
+
+struct DataPatternHoleInfo
+{
+    bool isSelected = false;
+    QPoint hole;
+    PlateImageInfo info;
+};
+typedef QVector<DataPatternHoleInfo> DataPatternHoleInfoVector;
+typedef QVector<DataPatternHoleInfoVector> DataPatternHoleInfo2DVector;
 
 
 #endif //EOSI_WINDOW_H

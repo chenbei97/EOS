@@ -27,6 +27,7 @@ private slots:
     void onDoubleClicked(const QModelIndex &index);
     void onPressed(const QModelIndex &index);
 signals:
+    void currentRowClicked(int row);
     void mouseRightButtonPressed();
     void modelSettled(QAbstractItemModel * model);
     void modelChanged(QAbstractItemModel * model);

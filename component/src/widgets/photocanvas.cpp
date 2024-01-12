@@ -15,7 +15,6 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
     auto pen = painter.pen();
     pen.setWidth(DefaultPainterPenWidth);
     painter.setPen(pen);
-
     /*高频率绘图的注意事项:
      * 1. 不要在paintEvent内做QVariantMap到QImage的变换,会卡死
      * 2. 不要在paintEvent内做QImage的scaled变换
@@ -30,6 +29,7 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
             if(!mimage.isNull()) {
 //                painter.drawImage(QRectF(width()*(1.0-zoomRate)/2.0,height()*(1.0-zoomRate)/2.0,
 //                                         width()*zoomRate,height()*zoomRate),mimage);
+//                painter.drawImage(0,0,mimage);
                 painter.translate(width()/2,height()/2); // 或者把画笔挪到中间再画
                 painter.drawImage(QRectF(-width()*zoomRate/2,-height()*zoomRate/2,
                                          width()*zoomRate,height()*zoomRate),mimage);
@@ -49,7 +49,7 @@ void PhotoCanvas::paintEvent(QPaintEvent *event)
 //        pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
 //        painter.setPen(pen);
 //    }
-
+//    painter.end();
     event->accept();
 }
 
@@ -207,7 +207,7 @@ void PhotoCanvas::appendImage(const QImage &img, const QPointF &point)
 void PhotoCanvas::setImage(const QImage &img, int duration)
 { // 手动掉过duration张然后update
     Q_ASSERT(mStrategy == SinglePixmap);
-    static long long count = 0;
+    static int count = 0;
     if (count % duration == 0) { // 不能能用count % 10取非好像long会有问题
         // 一种除了定时update辅助减少界面刷新的功能,10张图显示1次
 #ifdef use_imagetransformthread
@@ -238,6 +238,7 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
                     break;
             }
             if (rotateAngle > 0.0 && rotateAngle < 360.0) {
+                LOG<<"rotate angle"<<rotateAngle;
                 QTransform transform;
                 transform.rotate(rotateAngle);
                 transform.scale(width()*1.0/img.width(),height()*1.0/img.height());
@@ -245,16 +246,20 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
             } else {
                 mimage = mimage.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
             }
+            mimage = getChannelImage(mimage,Qt::green);
         }
         else
             mimage = QImage();
 #endif
-        //update();
     }
-    count++;
 
+    count++;
     if (count > 1000 ){
         count = 0; // 防止一直累计溢出
+    }
+    //LOG<<"enable optimize? "<<enableOptimize;
+    if (!enableOptimize) {
+        update();
     }
 }
 
@@ -295,6 +300,7 @@ PhotoCanvas::DrawStrategy PhotoCanvas::strategy() const
 
 PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
 {
+    enableOptimize = false;
     mStrategy = NoStrategy;
     mDrapRect = QRect();
     mBoundingRect = QRectF();
@@ -313,6 +319,14 @@ PhotoCanvas::PhotoCanvas(QWidget *parent) : QWidget(parent)
     connect(&timer,&QTimer::timeout,[this]{update();});
 }
 
+void PhotoCanvas::resizeEvent(QResizeEvent *event)
+{
+#ifdef use_imagetransformthread
+    ImageTransformThreadPointer->setImageSize(event->size());
+#endif
+    event->accept();
+}
+
 PhotoCanvas::~PhotoCanvas() noexcept
 {
 #ifdef use_imagetransformthread
@@ -324,12 +338,13 @@ PhotoCanvas::~PhotoCanvas() noexcept
 
 void PhotoCanvas::upateImageByThread(const QImage& img)
 {
-    static long count = 0;
+    static int count = 0;
     static long count_c = 0;
     mimage = img;
     count++;
     //LOG<<"accept image count = "<<count<<" _c = "<<count_c;
-    if (count > LONG_MAX-1)
+    //LOG<<mimage.size();
+    if (count > 100)
     {
         count = 0;
         count_c++;
@@ -382,13 +397,18 @@ bool PhotoCanvas::hasBoundingRect() const
     return !mBoundingRect.isEmpty();
 }
 
-void PhotoCanvas::optimizePaint(int ms)
+void PhotoCanvas::optimizePaint(bool enable,int ms)
 {
-    timer.start(ms);
+    enableOptimize = enable;
+    if (enable) {
+        timer.start(ms);
+    }
 }
 
 void PhotoCanvas::stopOptimizePaint()
 {
+
+    enableOptimize = false;
     timer.stop();
 }
 

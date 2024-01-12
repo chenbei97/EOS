@@ -120,8 +120,8 @@ void GroupInfo::setGroupColor(const QColor &color)
     if (color != WhiteColor) {
         // cbtn->setColor(color);
         grouptype->setItemData(0,color,Qt::BackgroundRole);
-        // 颜色就不设置了
-        //grouptype->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color.name()));
+        // 颜色还是要设置
+        grouptype->setStyleSheet(tr("QComboBox:!editable{background:%1}").arg(color.name()));
     }
 }
 

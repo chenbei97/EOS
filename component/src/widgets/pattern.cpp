@@ -34,22 +34,22 @@ void Pattern::mousePressEvent(QMouseEvent *event)
         if (event->button() == Qt::LeftButton) { // 改为左键才会变化,防止右击也动电机
             //mMousePos = QPoint(-1,-1); // mMousePos是上次的位置不要重置
             mLastPos = event->pos();
-            if (isValidPoint(mLastPos)) {
-                QPoint tmp(-1,-1);
-                auto rects = getAllInnerRects(); // 所有小正方形区域匹配这个坐标
-                for(int row = 0; row < mrows; ++row)
-                    for(int col = 0; col < mcols; ++col)
-                        if (rects[row][col].contains(mLastPos))
-                            tmp = {row,col};
-                //LOG<<mLastPos<<mMousePos<<tmp;
-                if (tmp != QPoint(-1,-1)) { // 点击的不是无效位置
-                    if(tmp != mMousePos) { // mMousePos是上次点击的有效位置
-                        mMousePos = tmp;
-                        if (mHoleClickEvent)
-                            emit holeClicked(mMousePos); // 新位置和原来位置不同才动电机
-                    }
-                }
-            }
+//            if (isValidPoint(mLastPos)) {
+//                QPoint tmp(-1,-1);
+//                auto rects = getAllInnerRects(); // 所有小正方形区域匹配这个坐标
+//                for(int row = 0; row < mrows; ++row)
+//                    for(int col = 0; col < mcols; ++col)
+//                        if (rects[row][col].contains(mLastPos))
+//                            tmp = {row,col}; // 找到孔的匹配坐标
+//                //LOG<<mLastPos<<mMousePos<<tmp;
+//                if (tmp != QPoint(-1,-1)) { // 点击的不是无效位置,确实是某个孔
+//                    if(tmp != mMousePos) { // mMousePos是上次点击的有效位置,而且不是重复点相同的孔
+//                        mMousePos = tmp;
+//                        if (mHoleClickEvent)
+//                            emit holeClicked(mMousePos); // 新位置和原来位置不同才动电机
+//                    }
+//                }
+//            }
             update();
         }
     }
@@ -69,8 +69,6 @@ void Pattern::mouseDoubleClickEvent(QMouseEvent*event)
                     if (rects[row][col].contains(mLastPos))
                         mMousePos = {row,col};
             update();
-            if (mEnterViewEvent)
-                emit doubleClicked(mMousePos);
         }
     }
     event->accept();
@@ -247,23 +245,9 @@ QSize Pattern::patternSize() const
     return QSize(mrows,mcols);
 }
 
-void Pattern::setHoleClickEvent(bool enable)
-{
-    mHoleClickEvent = enable;
-    update();
-}
-
-void Pattern::setEnterViewEvent(bool enable)
-{
-    mEnterViewEvent = enable;
-    update();
-}
-
 Pattern::Pattern(int rows, int cols,QWidget*parent):mrows(rows),mcols(cols),QWidget(parent)
 {
-    mHoleClickEvent = false;
     mMouseEvent = false;
-    mEnterViewEvent = false;
     mMousePos = {-1,-1};
     mLastPos = {-1,-1};
     mInnerCircleColor.setAlpha(DefaultColorAlpha);
@@ -271,7 +255,7 @@ Pattern::Pattern(int rows, int cols,QWidget*parent):mrows(rows),mcols(cols),QWid
     //setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
 }
 
-//QSize Pattern::sizeHint() const
-//{
-//    return QSize(PatternSizeHintWidth,PatternSizeHintHeight);
-//}
+QSize Pattern::minimumSizeHint() const
+{
+    return DefaultWindowSize;
+}

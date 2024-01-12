@@ -54,7 +54,6 @@ static const int DefaultThreadSleepMs = 100;
 #define DefaultPainterPixelHeight (DefaultPainterMetric.height()) //指定font下文字像素的高度
 #define DefaultColorAlpha 125
 #define SocketPort 3000
-#define SocketTestPort 9999
 #define LocalHost "localhost"
 #define SocketWaitTime 60000
 #define DefaultNativeColor QColor("#F0F0F0")
@@ -123,9 +122,27 @@ static const char* HoursFieldSuffix = " hours";
 static const char* MinutesFieldSuffix = " minutes";
 static const char* JPGSuffix = ".jpg";
 static const char* JPGField = "jpg";
+static const char* JPGSuffixFilter = "*.jpg";
+static const char* PNGSuffixFilter = "*.png";
+static const char* TIFSuffixFilter = "*.tif";
+static const char* TIFSuffix = ".tif";
 static const char* StateField = "state";
 static const char* ImageField = "image";
+static const char* ImageFieldUpper = "Image";
+static const char* TimeStampFieldUpper = "TimeStamp";
 static const char* GridSizeField = "gridsize";
+static const char* NameFieldUpper = "Name";
+static const char* StatusFieldUpper = "Status";
+static const char* StartTimeFieldUpper = "Start Time";
+static const char* CoordinateFieldUpper = "Coordinate";
+static const char* InfoFieldUpper = "Info";
+static const char* ObjectiveFieldUpper = "Objective";
+static const char* ChannelsFieldUpper = "Channels";
+static const char* CompleteFieldUpper = "Complete";
+static const char* RunningFieldUpper = "Running";
+static const char* FocusFieldUpper = "Focus";
+static const char* StitchFieldUpper = "Stitch";
+static const char* ZStackFieldUpper = "ZStack";
 static const char* StopField = "stop";
 static const char* ExperFinishedField = "exper_finished";
 static const char* ActivateCodeField = "activate_code";

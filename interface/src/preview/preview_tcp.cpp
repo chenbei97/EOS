@@ -10,7 +10,7 @@
 
 void Preview::parseResult(const QString & f,const QVariant & d)
 { // 任何来自服务端的消息都在这里
-    LOG<<"[async] frame:"<<f<<"result:"<<d;
+    //LOG<<"[async] frame:"<<f<<"result:"<<d;
     // 0
     if (f == TcpFramePool.previewEvent) {
         d.toBool()?
@@ -310,7 +310,8 @@ void Preview::loadExper()
     auto json = AssemblerPointer->message();
     LOG<<"发送启动实验命令";
     SocketPointer->exec(TcpFramePool.loadExperEvent,json);
-
+    JsonReadWrite m;
+    m.writeJson(CURRENT_PATH+"/load_exper.json",json);
 //    if (ParserResult.toBool()) {
 //        QMessageBox::information(this,InformationChinese,tr("Successfully launched the experiment!"));
 //    }
@@ -596,14 +597,23 @@ void Preview::takingPhoto()
     }
 }
 
+
+
+
 // 其它
 // 实时livecanvas图像
 void Preview::showCapturedImage(const QImage& image)
 { // 来自照相机的捕捉图像事件传来的live图像显示
 #ifdef uselabelcanvas
-    auto pix = QPixmap::fromImage(img).scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
-    livecanvas->setPixmap(pix);
-    livecanvas->repaint();
+    static int count = 0;
+    if (count % 10 == 0) {
+        auto pix = QPixmap::fromImage(image).scaled(livecanvas->size(),Qt::KeepAspectRatio,Qt::FastTransformation);
+        livecanvas->setPixmap(pix);
+        livecanvas->repaint();
+    }
+    count++;
+    if (count > 100)
+        count = 0;
 #elif defined(usegraphicscanvas)
     livecanvas->setImage(image,10); // 10张图片显示1次
 #else

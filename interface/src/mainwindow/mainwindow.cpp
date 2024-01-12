@@ -7,24 +7,20 @@
  * @Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
  */
 #include "mainwindow.h"
-#include "dataWidget.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent)
 {
     navigbar = new NavigBar;
     appselect = new AppSelect;
     preview = new Preview;
+    data = new DataWidget;
     setting = new Setting;
     stack = new QStackedWidget;
-    // 加载数据页面
-    dataWidget dataW;
-    mDataWidget = dataW.ShowView();
     navigbar->setMinimumHeight(NavigBarHeight);
 
     stack->addWidget(appselect);
     stack->addWidget(preview);
-    //stack->addWidget(new QWidget);
-    stack->addWidget(mDataWidget);
+    stack->addWidget(data);
     stack->addWidget(new QWidget);
     stack->addWidget(setting);
 
@@ -74,6 +70,10 @@ void MainWindow::navigbarSelect(int id)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     qApp->quit();
+#ifdef use_imagetransformthread
+    ImageTransformThreadPointer->stopThread();
+#endif
+    TimerBroadCastThreadPointer->stopThread();
     event->accept();
 }
 

@@ -34,14 +34,19 @@ void ImageTransformThread::run()
                     break;
             }
             if (rotateAngle > 0.0 && rotateAngle < 360.0) {
+                //LOG<<"is rotate"<<rotateAngle;
                 QTransform transform;
                 transform.rotate(rotateAngle);
+                transform.scale(msize.width()*1.0/mimage.width(),msize.height()*1.0/mimage.height());
                 mimage = mimage.transformed(transform,Qt::FastTransformation);
+            }  else {
+                mimage = mimage.scaled(msize,Qt::KeepAspectRatio,Qt::FastTransformation);
             }
-            mimage = mimage.scaled(msize,Qt::KeepAspectRatio,Qt::FastTransformation);
+            mimage = getChannelImage(mimage,Qt::blue);
             emit imageTransformed(mimage);
+            mimage = QImage(); // 这次的发完了就清除不要再发,否则100ms可能重复发了上次的
         } else {
-            emit imageTransformed(QImage());
+            //emit imageTransformed(QImage());
         }
         msleep(DefaultThreadSleepMs);
     }

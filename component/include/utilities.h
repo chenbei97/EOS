@@ -20,6 +20,106 @@
 #include "qdesktopwidget.h"
 #include "qmainwindow.h"
 #include "qstorageinfo.h"
+#include "opencv2/opencv.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/xfeatures2d.hpp"
+#define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
+
+static cv::Mat qimageToMat(const QImage& image)
+{
+    //LOG<<"image format:"<<image.format();
+    cv::Mat mat;
+    switch (image.format())
+    {
+        case QImage::Format_ARGB32:
+        case QImage::Format_RGB32:
+        case QImage::Format_ARGB32_Premultiplied:
+            mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
+            break;
+        case QImage::Format_RGB888: // 图像是RGB888格式需要把mat先转为rgb,默认是bgr
+            mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
+            cv::cvtColor(mat, mat, cv::COLOR_BGR2RGB);
+            break;
+        case QImage::Format_Indexed8:
+            mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+            break;
+    }
+    //LOG<<"mat type:"<<mat.type();
+    return mat;
+}
+
+static QImage matToqimage(const cv::Mat& mat)
+{
+    //LOG<<"mat type:"<<mat.type();
+    if (mat.type() == CV_8UC1)
+    {
+        QImage image(mat.cols, mat.rows, QImage::Format_Indexed8);
+        image.setColorCount(256);
+        for (int i = 0; i < 256; i++)
+        {
+            image.setColor(i, qRgb(i, i, i));
+        }
+        uchar *pSrc = mat.data;
+        for (int row = 0; row < mat.rows; row++)
+        {
+            uchar *pDest = image.scanLine(row);
+            memcpy(pDest, pSrc, mat.cols);
+            pSrc += mat.step;
+        }
+        //LOG<<"image format:"<<image.format();
+        return image;
+    } else if (mat.type() == CV_8UC3) {
+        auto img = QImage((const unsigned char*)mat.data, mat.cols, mat.rows,
+                   mat.step,QImage::Format_RGB888);
+        img = img.rgbSwapped(); // 交换红蓝2个通道,否则mat原来是BGR
+        //<<"image format:"<<img.format();
+        return img;
+    } else if (mat.type() == CV_8UC4) {
+        const uchar *pSrc = (const uchar*)mat.data;
+        QImage image(pSrc, mat.cols, mat.rows, mat.step, QImage::Format_ARGB32);
+        //LOG<<"image format:"<<image.format();
+        return image.copy();
+    } else {
+        //LOG<<"Error: Mat could not be converted to QImage";
+        return QImage();
+    }
+}
+
+static QImage getChannelImage(const QImage& img,Qt::GlobalColor color)
+{
+    auto mat = qimageToMat(img); // 转为mat
+
+    std::vector<cv::Mat> channels;
+    cv::split(mat,channels); // 把mat的3个通道分出来是BGR
+    std::vector<cv::Mat> new_channels; // 新的通道图像,指定通道为0
+    cv::Mat res;
+    auto image = QImage();
+
+    if (color == Qt::red) {
+        new_channels = {
+                        cv::Mat::zeros(mat.size(),CV_8UC1),
+                        cv::Mat::zeros(mat.size(),CV_8UC1),
+                        channels[2],
+                        };
+        cv::merge(new_channels,res);
+        image = matToqimage(res);
+    } else if (color == Qt::green) {
+        new_channels = {cv::Mat::zeros(mat.size(),CV_8UC1),
+                        channels[1],
+                        cv::Mat::zeros(mat.size(),CV_8UC1)};
+        cv::merge(new_channels,res);
+        image = matToqimage(res);
+    } else if (color == Qt::blue){
+        new_channels = {channels[0],
+                cv::Mat::zeros(mat.size(),CV_8UC1),
+                cv::Mat::zeros(mat.size(),CV_8UC1),
+                };
+        cv::merge(new_channels,res);
+        image = matToqimage(res);
+    }
+
+    return image;
+}
 
 /*拆分特定字符串转为坐标/区域函数*/
 static QPointF convertToPointF(const QString& text)
@@ -376,6 +476,20 @@ static QPixmap loadPixmapByImageReader(QCString imgpath, qreal scale_w, qreal sc
     reader.setScaledSize(target_size);
     auto pix = QPixmap::fromImageReader(&reader);
     return pix;
+}
+
+static QImage loadImageByImageReader(QCString imgpath, qreal scale_w, qreal scale_h)
+{
+    QImageReader reader;
+    reader.setFileName(imgpath);
+    reader.setAutoTransform(true); // reader.read()会自动进行元数据转换
+
+    auto source_size = reader.size();
+    auto target_size = source_size.scaled(scale_w,scale_h,Qt::KeepAspectRatio); // 原尺寸=>目标尺寸的保持纵横比尺寸
+
+    reader.setScaledSize(target_size);
+    auto pix = QPixmap::fromImageReader(&reader);
+    return pix.toImage();
 }
 
 /*路径*/

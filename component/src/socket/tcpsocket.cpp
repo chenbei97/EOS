@@ -20,6 +20,7 @@ void TcpSocket::onReadyReadSlot()
             msgQueue.enqueue(m.toUtf8()); // 将消息添加到队列中
 #else
         message += socket->readAll();
+
         int count = message.count(SeparateField);//出现分隔符就知道有count条完整的消息出现
         //LOG<<"before: "<<message<<" count = "<<count;
         while (count--) {
@@ -105,7 +106,14 @@ void TcpSocket::processMsgQueue()
 {
     while (!msgQueue.isEmpty()) {
         auto message = msgQueue.head();
-        ParserPointer->parse(frame,message);
+
+        if (message.contains(FrameField))
+            ParserPointer->parse(frame,message);
+        else {
+            emit dataResponse(message);
+            //LOG<<"ignore message: "<<message;
+        }
+
         msgQueue.dequeue(); // 从队列中取出消息
     }
 }

@@ -21,11 +21,14 @@ public:
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 private:
     QPoint mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
     double trianglen = PhotoCanvasTriangleLength;
     double trianggap = PhotoCanvasTriangleGap;
     QColor highcolor  = Qt::green;
+    double zoomRate = 1.0;
+    bool drawTriangle = false;
 private:
     QPolygonF getLeftTrianglePoints() const;
     QPolygonF getRightTrianglePoints() const;

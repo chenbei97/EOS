@@ -21,7 +21,6 @@ Picture::Picture(QWidget *parent) : QWidget(parent)
     pix->setStrategy(PhotoCanvas::SinglePixmap);
     info->setAlignment(Qt::AlignCenter);
     info->setScaledContents(true);
-    info->setMaximumHeight(PictureDescriptionMaxHeight);
     showDescribtion(false);
     menu->addAction(experact);
     menu->addAction(originact);
@@ -112,9 +111,10 @@ void Picture::showDescribtion(bool show)
     info->setVisible(show);
 }
 
-void Picture::setDescriptionHeight(int height)
+void Picture::resizeEvent(QResizeEvent *event)
 {
-    info->setMaximumHeight(height);
+    info->setFixedHeight(event->size().height()/5);
+    event->accept();
 }
 
 void Picture::paintEvent(QPaintEvent *event)
@@ -126,4 +126,18 @@ void Picture::paintEvent(QPaintEvent *event)
     painter.setPen(pen);
 
     painter.drawRect(0,0,width(),height());
+}
+
+void Picture::showOriginal(const QString &path)
+{
+    if (path.isEmpty()) return;
+
+    Picture * dlg = new Picture();
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    auto img = QImage(path);
+    dlg->setImage(img,path);
+    dlg->setDescription(path);
+    dlg->setMinimumSize(DefaultWindowSize);
+    dlg->resize(img.size());
+    dlg->show();
 }

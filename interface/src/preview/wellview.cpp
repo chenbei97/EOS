@@ -232,7 +232,8 @@ void WellView::importViewInfo(const QHoleInfoVector& vec,ViewMode mode)
         else if (mSelectMode == ViewMode::PointMode) {
             mViewPoints[id] = holeInfo.viewpoints;
             mTmpPoints[id] = mViewPoints[id]; // 需要重叠一定比例
-            mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
+            //mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
+            mViewMachinePoints = mViewPoints[id];
         }
 
         //applyholeact->trigger(); // 这是异步可能有问题
@@ -391,7 +392,8 @@ void WellView::onRemoveViewAct()
             }
             mViewPoints[id] = points;
             mTmpPoints[id] = points;
-            mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
+            //mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
+            mViewMachinePoints = mViewPoints[id]; // 重叠取消
         }
     }
     applyholeact->trigger();
@@ -423,7 +425,8 @@ void WellView::onSaveViewAct()
             //LOG<<mViewPoints[id].count();
             mTmpPoints[id] = mViewPoints[id]; // 需要重叠一定比例
             // 点模式不是通过dispersedViewRects()计算,就等于选择的视野坐标
-            mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
+            //mViewMachinePoints = overlap(mViewPoints[id],overlapRate);
+            mViewMachinePoints = mViewPoints[id];
         }
     }
 
@@ -473,8 +476,8 @@ void WellView::dispersedViewRects()
     // 2. 获取离散电机坐标
     auto points = getMachinePointsFromViewRect(id);
 
-    // 3. 重叠一定比例映射
-    mViewMachinePoints = overlap(points,overlapRate);
+    // 3. 重叠一定比例映射,服务去做
+    //mViewMachinePoints = overlap(points,overlapRate);
 
     LOG<<"ui count = "<<mViewRectDispersedPoints[id].count()
     <<" view point count = "<<mViewMachinePoints.count();
@@ -667,12 +670,14 @@ void WellView::paintEvent(QPaintEvent *event)
         painter.setPen(pen);
 
         // 5.鼠标单击生成的矩形框
-        auto norm_pos = mapFromPointF(mMousePos);
-        painter.drawText(mMousePos-QPointF(3,3),QString(PairArgsField).arg(norm_pos.x()).arg(norm_pos.y()));
-        painter.drawRect(mapToSize(mMouseRect,topleft,diameter,diameter));
-        pen.setWidth(DefaultPainterPenWidth*2);
-        painter.setPen(pen);
-        painter.drawPoint(mMousePos);
+        if (isValidPoint(mMousePos)) {
+            auto norm_pos = mapFromPointF(mMousePos);
+            painter.drawText(mMousePos-QPointF(3,3),QString(PairArgsField).arg(norm_pos.x()).arg(norm_pos.y()));
+            painter.drawRect(mapToSize(mMouseRect,topleft,diameter,diameter));
+            pen.setWidth(DefaultPainterPenWidth*2);
+            painter.setPen(pen);
+            painter.drawPoint(mMousePos);
+        }
         pen.setWidth(DefaultPainterPenWidth);
         pen.setColor(Qt::black); // 恢复,否则绘制其他的都变颜色了
         painter.setPen(pen);
@@ -785,10 +790,12 @@ void WellView::setViewMode(ViewMode mode)
         for (auto hole: holes) {
             auto pt_idx = holeID(hole);
             if (mSelectMode == ViewMode::RectMode) {
-                m[HoleViewPointsField].setValue(overlap(getMachinePointsFromViewRect(pt_idx), overlapRate));
+                //m[HoleViewPointsField].setValue(overlap(getMachinePointsFromViewRect(pt_idx), overlapRate));
+                m[HoleViewPointsField].setValue(getMachinePointsFromViewRect(pt_idx));
             }
             else if (mSelectMode == ViewMode::PointMode) {
-                m[HoleViewPointsField].setValue(overlap(mViewPoints[pt_idx],overlapRate));
+                //m[HoleViewPointsField].setValue(overlap(mViewPoints[pt_idx],overlapRate));
+                m[HoleViewPointsField].setValue(mViewPoints[pt_idx]);
             } // 只需要使用每个孔已有的信息根据不同模式重新把电机坐标算一下更新给wellpattern
             m[HoleCoordinateField] = hole; // 这个孔坐标装上是wellpattern去更新对应的孔
             emit selectModeChangedEvent(m);

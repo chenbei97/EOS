@@ -32,7 +32,9 @@
 #include "gradienthiddenanimation.h"
 #include "listwidgetitem.h"
 #include "linedelegate.h"
+#include "imagedelegate.h"
 #include "textedit.h"
+#include "combodelegate.h"
 
 #include "cpumemorymonitor.h"
 #include "sqlreadwrite.h"
@@ -82,6 +84,8 @@
 #include "graphicsview.h"
 #include "graphicspixitem.h"
 #include "disksizetable.h"
+#include "singlepicturecanvas.h"
+#include "gridpicturecanvas.h"
 
 // (2) 常量定义
 #endif //EOSI_PUBLIC_H

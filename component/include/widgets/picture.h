@@ -20,6 +20,7 @@ class COMPONENT_IMEXPORT Picture : public QWidget
 public:
     explicit Picture(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent*event) override;
+    void resizeEvent(QResizeEvent *event);
     void setPixmap(const QPixmap& pix,const QString& path = QString());
     void setImage(const QImage& img,const QString& path = QString());
     QPixmap pixmap() const;
@@ -29,6 +30,8 @@ public:
     QString description() const;
     void showDescribtion(bool show);
     void setDescriptionHeight(int height);
+
+    static void showOriginal(const QString& path);
 private:
     PhotoCanvas * pix;
     Label * info;

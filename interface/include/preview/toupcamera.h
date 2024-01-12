@@ -13,7 +13,7 @@
 #include "window.h"
 #include "toupcam.h"
 
-typedef QPair<QImage,ToupcamFrameInfoV3> ImageInfo;
+typedef QPair<QImage,ToupcamFrameInfoV3> ToupcamImageInfo;
 Q_DECLARE_METATYPE(ToupcamFrameInfoV3);
 
 class INTERFACE_IMEXPORT ToupCamera: public QObject
@@ -45,11 +45,11 @@ public:
     void setExposureOption(int option);
     int exposureOption() const;
 
-    ValueRangeUnSigned getExposureRange() const;
+//    ValueRangeUnSigned getExposureRange() const;
     void setExposure(unsigned exp);
     unsigned exposure() const;
 
-    ValueRangeUShort getGainRange() const;
+//    ValueRangeUShort getGainRange() const;
     void setGain(ushort gain);
     ushort gain() const;
 private:

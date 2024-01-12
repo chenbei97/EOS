@@ -12,6 +12,7 @@
 
 #include "datastructure.h"
 #include "constant.h"
+#include "utilities.h"
 
 class COMPONENT_IMEXPORT ImageTransformThread : public QThread
 {

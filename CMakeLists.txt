@@ -35,13 +35,13 @@ set(QRC_PATH bin/images.qrc bin/app.rc)
 #set(MYSQL_DLL_PATH "${MYSQL_INSTALL_PATH}/lib/libmysql.dll")
 #endif ()
 
-#set(USE_OPENCV 0) # interface的cmakelist设置是否引用opencv不影响main.cpp,这里单独去控制
+#set(USE_OPENCV 1) # interface的cmakelist设置是否引用opencv不影响main.cpp,这里单独去控制
 #if (${USE_OPENCV})
 #file(GLOB OPENCV_DLLs_PATH  "C:/opencv-4.6.0/x64/vc17/bin/*.dll")
 #file(GLOB OPENCV_LIBs_PATH  "C:/opencv-4.6.0/x64/vc17/lib/*.lib")
 #set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
 #set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
-#set(OPENCV_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/interface/opencv2)
+#set(OPENCV_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/component/include/opencv2)
 #endif ()
 
 set(SQLDRIVERS_PATH "${CMAKE_PREFIX_PATH}/plugins/sqldrivers")
@@ -68,9 +68,6 @@ set(LIBGLESV2_PATH ${CMAKE_PREFIX_PATH}/bin/libGLESv2.dll)
 set(LIBEGLD_PATH ${CMAKE_PREFIX_PATH}/bin/libEGLd.dll)
 set(LIBGLESV2D_PATH ${CMAKE_PREFIX_PATH}/bin/libGLESv2d.dll)
 
-#set(DATA_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/data.lib")
-#set(DATA_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/data)
-
 set(COMPONENT_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/component/include
         ${PROJECT_SOURCE_DIR}/component/include/widgets
@@ -82,7 +79,9 @@ set(INTERFACE_INCLUDE_PATH
         ${PROJECT_SOURCE_DIR}/interface/include
         ${PROJECT_SOURCE_DIR}/interface/include/mainwindow
         ${PROJECT_SOURCE_DIR}/interface/include/preview
-        ${PROJECT_SOURCE_DIR}/interface/include/setting)
+        ${PROJECT_SOURCE_DIR}/interface/include/data
+        ${PROJECT_SOURCE_DIR}/interface/include/setting
+        )
 
 file(GLOB MAIN_FILES  "${PROJECT_SOURCE_DIR}/*.h" "${PROJECT_SOURCE_DIR}/*.cpp")
 file(GLOB TESTFILES  "${PROJECT_SOURCE_DIR}/test/*.h" "${PROJECT_SOURCE_DIR}/test/*.cpp")
@@ -105,7 +104,7 @@ find_package(Qt5 COMPONENTS Core Gui Widgets Sql Network
         Qml QuickWidgets Quick QmlModels QuickControls2 QuickTemplates2 QmlWorkerScript
         Concurrent Multimedia MultimediaWidgets OpenGL REQUIRED)
 
-add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES}) # ${THEME_PATH}
+add_executable(${PROJECT_NAME} ${MAIN_FILES} ${QRC_PATH} ${TESTFILES} ) # ${THEME_PATH} ${STB_FILES}
 set_target_properties(
         ${ProgramName}
         PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE" # debug可以弹出控制台log,release不弹出
@@ -113,7 +112,7 @@ set_target_properties(
 )
 #（6）包含头文件目录，必须add_executable之后
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMPONENT_INCLUDE_PATH} ${INTERFACE_INCLUDE_PATH}
-          ${TOUPCAM_INCLUDE_PATH} ) # ${DATA_INCLUDE_PATH}
+          ${TOUPCAM_INCLUDE_PATH}  )
 # if (${USE_PYTHON})
 # target_include_directories(${PROJECT_NAME} PUBLIC ${PYTHON310_INCLUDE_PATH} ${PYTHON310_PATH})
 # endif ()
@@ -263,7 +262,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::QuickTemplates2 Qt5::Qml Qt5::QuickWidgets Qt5::Quick Qt5::QmlModels Qt5::QuickControls2 Qt5::QmlWorkerScript
         component interface  # mingw必须显示指定python310,msvc指定与否都可
         ${TOUPCAM_LIB_PATH}# opencv显示连接libs就可以,不需要dll,打赏dll文件需要放在bin下
-#        ${DATA_LIB_PATH}
         )
 # if (${USE_PYTHON})
 # target_link_libraries(${PROJECT_NAME} PRIVATE ${PYTHON310_LIB_PATH_python310} ${PYTHON310_LIB_PATH_python310d})

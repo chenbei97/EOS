@@ -17,10 +17,11 @@ void initApp(QApplication& a);
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+    //auto image = test_splitImage(Qt::red);
     initApp(a);
     MainWindow w;
     setWindowAlignCenter(&w);
-    w.showMaximized();
+   w.showMaximized();
 
     // mainwindow建立后再执行,否则异步消息会收不到,同步不影响
     w.askConnectState();

@@ -21,12 +21,10 @@ public:
     explicit Pattern(int rows, int cols,QWidget*parent= nullptr);
     virtual void setPatternSize(int rows,int cols);
     QSize patternSize() const;
-    void setHoleClickEvent(bool enable);
-    void setEnterViewEvent(bool enable);
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent*event) override;
-//    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 protected:
     QRectF getValidRect() const;
     bool isValidPoint(const QPointF& point) const;
@@ -48,8 +46,6 @@ protected:
     QColor mInnerCircleColor =  Qt::darkGray; // 默认填充内圆的颜色
     QColor mMouseClickColor = Qt::green; // 鼠标点击填充内圆的颜色
     bool mMouseEvent = false; // 是否启用鼠标事件
-    bool mHoleClickEvent = false; // 是否允许holeClicked信号触发
-    bool mEnterViewEvent = false; // 是否允许doubleClick触发
     QPoint mMousePos = QPoint(-1,-1); // 鼠标点击的坐标,不是真实物理坐标
     QPointF mLastPos = QPoint(-1,-1); // 鼠标左键点击的真实物理坐标
 signals:

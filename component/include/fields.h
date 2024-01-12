@@ -46,42 +46,6 @@ static const QFieldList Brand4Fields = {
         "brand4_6","brand4_24","brand4_96","brand4_384","slide"
 };
 static const int SlideIndexInBrand = 4;
-enum class ManufacturerType {
-    Manufacturer1 = 0,
-    Manufacturer2 = 1,
-    Manufacturer3 = 2,
-    Manufacturer4 = 3
-};
-enum class WellBrand1Type {
-    WellBrand1_6 = 0,
-    WellBrand1_24 = 1,
-    WellBrand1_96 = 2,
-    WellBrand1_384 = 3
-};
-enum class WellBrand2Type {
-    WellBrand2_6 = 0,
-    WellBrand2_24 = 1,
-    WellBrand2_96 = 2,
-    WellBrand2_384 = 3
-};
-enum class WellBrand3Type {
-    WellBrand3_6 = 0,
-    WellBrand3_24 = 1,
-    WellBrand3_96 = 2,
-    WellBrand3_384 = 3
-};
-enum class WellBrand4Type {
-    WellBrand4_6 = 0,
-    WellBrand4_24 = 1,
-    WellBrand4_96 = 2,
-    WellBrand4_384 = 3
-};
-enum class WellSizeType {
-    WellSize6 = 0,
-    WellSize24 = 1,
-    WellSize96 = 2,
-    WellSize384 = 3
-};
 /*
     6孔板
     4x: 10*10，
@@ -173,16 +137,6 @@ const QVector<QVector<QVector<int>>> ViewCircleMapFields = {
 };
 
 // objective涉及的数据类型
-enum class ObjectiveMagnification {
-    _4x = 0,
-    _10x = 1,
-    _20x = 2,
-    _40x = 3
-};
-enum class ObjectiveType {
-    BR = 0,
-    PH = 1
-};
 static const char* ObjectiveField = "objective";
 static const char* ObjectiveDescripField = "objective_descrip";
 static const char* ObjectiveTypeField = "objective_type";
@@ -206,14 +160,8 @@ static const QFieldList ObjectiveMagnificationFields = {
 };
 
 // channel涉及的数据类型
-enum class ChannelType {
-    BR = 0,
-    PH = 1,
-    GFP = 2,
-    RFP = 3,
-    DAPI = 4
-};
 static const char* ChannelField = "channel";
+static const char* ChannelFieldUpper = "Channel";
 static const char* ChannelFieldLabel = "channel: ";
 static const char* CurrentChannelField = "current_channel";
 static const char* SaveChannelsField = "save_channels";
@@ -255,12 +203,6 @@ static const QPointVector NA20x08DisablePoints = { // 对于NA0.8-20倍镜需要
 };
 
 // camerabox涉及的
-enum class ObjectiveLocationType {
-    loc1 = 0,
-    loc2 = 1,
-    loc3 = 2,
-    loc4 = 3
-};
 #define ExposureLowLimit 0
 #define ExposureUpLimit 15000
 #define GainLowLimit 100
@@ -385,35 +327,8 @@ static const QFieldList VideoFrameRateFields = {
 };
 
 // ViewSelectBox涉及的
-enum class ViewMode {
-    PointMode = 0,
-    RectMode = 1,
-    WholeMode = 2
-};
 static const char* ViewModeField = "viewmode";
 static const char* CurrentGroupField = "currentgroup";
-
-enum class ImageFormatType {
-    jpg = 0,
-    jpeg = 1,
-    png = 2,
-    ico = 3,
-    bmp = 4,
-    ttf = 5,
-};
-
-enum class VideoFormatType {
-    avi = 0,
-    wmv = 1,
-    mp4 = 2
-};
-
-enum class VideoFrameRateType {
-    _10 = 0,
-    _20 = 1,
-    _30 = 2,
-    _40 = 3
-};
 
 // photocanvas
 static const char* LiveField = "live";
@@ -456,6 +371,7 @@ static const QFieldList NavigBarFields = {
 
 //wellpattern涉及的
 static const char* GroupField = "group";
+static const char* GroupFieldUpper = "Group";
 static const char* XField = "x";
 static const char* YField = "y";
 static const char* PointsField = "points";

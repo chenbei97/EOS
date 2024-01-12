@@ -278,9 +278,9 @@ void Preview::initLayout()
     // 1.右侧布局(2个tab放在2个滚动区域内)
     auto previewtab = new GroupBox;
     auto previewlay = new QVBoxLayout;
+    previewlay->addWidget(wellbox);
     previewlay->addWidget(stackbox);
     previewlay->addWidget(historybox);
-    previewlay->addWidget(wellbox);
     previewlay->addWidget(objectivebox);
     previewlay->addWidget(viewModeBox);
     previewlay->addWidget(channelbox);
@@ -341,7 +341,7 @@ void Preview::initAttributes()
 #ifdef use_imagetransformthread
     livecanvas->enableTransformThread(true);//live默认单图模式启用线程并开启优化
 #endif
-    livecanvas->optimizePaint(50);
+    livecanvas->optimizePaint(false);//true,200
 #endif
     stackcanvas->addWidget(livecanvas);
     stackcanvas->addWidget(photocanvas);
@@ -354,12 +354,10 @@ void Preview::initAttributes()
     wellview->setEnabled(false);
     stackpattern->addWidget(wellpattern);
     stackpattern->addWidget(slidepattern);
-    stackpattern->setMinimumHeight(PreviewPatternMinHeight);
     stack_view_pattern->addWidget(stackpattern);
     stack_view_pattern->addWidget(wellview); // stack=>stack1+wellview;stack1=>wellpattern+slidepattern
 
     // 3. 主布局
-    tab->setMaximumWidth(PreviewToolBarMaxWidth);
     scrollarea_preview->setWidgetResizable(true);
     scrollarea_experiment->setWidgetResizable(true);
     //recordbox->hide();
@@ -479,4 +477,11 @@ void Preview::initConnections()
     connect(ToupCameraPointer,&ToupCamera::imageCaptured,recordbox,&RecordBox::recordImage);
     connect(ToupCameraPointer,&ToupCamera::exposureGainCaptured,camerabox,&CameraBox::captureExposureGain);
     connect(this,&Preview::objectiveSettingChanged,objectivebox,&ObjectiveBox::onObjectiveSettingChanged);
+}
+
+void Preview::resizeEvent(QResizeEvent *event)
+{
+    stackpattern->setFixedHeight(event->size().height()/3);
+    tab->setFixedWidth(event->size().width()/3);
+    event->accept();
 }
