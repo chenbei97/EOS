@@ -13,21 +13,30 @@
 #include "window.h"
 #include "datatablemodel.h"
 
+static const QStringList PatternTableHeaders = {
+        CoordinateFieldUpper, ChannelFieldUpper
+};
+#define PatternTableViewCoordinateColumn PatternTableHeaders.indexOf(CoordinateFieldUpper)
+#define PatternTableChannelColumn PatternTableHeaders.indexOf(ChannelFieldUpper)
 class INTERFACE_IMEXPORT PatternTable: public GroupBox
 {
     Q_OBJECT
 public:
     explicit PatternTable(QWidget*parent=nullptr);
+    void refreshTable(const DataPatternHoleInfo& info);
     void resizeEvent(QResizeEvent*event) override;
 private:
     TableView * view;
     DataTableModel * model;
     ComboDelegate * comboDelegate;
-    QStringList tableHeader;
+    DataPatternHoleInfo currentPatternInfo;
 private:
     void initAttributes();
     void initTable();
-    void initFilterItem();
+    void initConnections();
+    void clickRow(int row);
+signals:
+    void currentHoleViewChannelInfo(const ImageInfoVector& info);
 };
 
 #endif //EOS_PATTERNTABLE_H

@@ -34,20 +34,22 @@ void Pattern::mousePressEvent(QMouseEvent *event)
         if (event->button() == Qt::LeftButton) { // 改为左键才会变化,防止右击也动电机
             //mMousePos = QPoint(-1,-1); // mMousePos是上次的位置不要重置
             mLastPos = event->pos();
-            if (isValidPoint(mLastPos)) {
-                QPoint tmp(-1,-1);
-                auto rects = getAllInnerRects(); // 所有小正方形区域匹配这个坐标
-                for(int row = 0; row < mrows; ++row)
-                    for(int col = 0; col < mcols; ++col)
-                        if (rects[row][col].contains(mLastPos))
-                            tmp = {row,col}; // 找到孔的匹配坐标
-                //LOG<<mLastPos<<mMousePos<<tmp;
-                if (tmp != QPoint(-1,-1)) { // 点击的不是无效位置,确实是某个孔
-                    if(tmp != mMousePos) { // mMousePos是上次点击的有效位置,而且不是重复点相同的孔
-                        mMousePos = tmp;
-                    }
-                }
-            }
+//            if (isValidPoint(mLastPos)) {
+//                QPoint tmp(-1,-1);
+//                auto rects = getAllInnerRects(); // 所有小正方形区域匹配这个坐标
+//                for(int row = 0; row < mrows; ++row)
+//                    for(int col = 0; col < mcols; ++col)
+//                        if (rects[row][col].contains(mLastPos))
+//                            tmp = {row,col}; // 找到孔的匹配坐标
+//                //LOG<<mLastPos<<mMousePos<<tmp;
+//                if (tmp != QPoint(-1,-1)) { // 点击的不是无效位置,确实是某个孔
+//                    if(tmp != mMousePos) { // mMousePos是上次点击的有效位置,而且不是重复点相同的孔
+//                        mMousePos = tmp;
+//                        if (mHoleClickEvent)
+//                            emit holeClicked(mMousePos); // 新位置和原来位置不同才动电机
+//                    }
+//                }
+//            }
             update();
         }
     }

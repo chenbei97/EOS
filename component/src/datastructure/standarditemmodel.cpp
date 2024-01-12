@@ -38,7 +38,7 @@ Qt::ItemFlags StandardItemModel::flags(const QModelIndex& index) const
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
-QVariant StandardItemModel::data(int row, int col, int role)
+QVariant StandardItemModel::data(int row, int col, int role) const
 {
     return data(index(row,col),role);
 }
@@ -79,12 +79,30 @@ void StandardItemModel::setRowData(int row, const QVariantVector &rowValues, int
     }
 }
 
+QVariantVector StandardItemModel::rowData(int row, int role) const
+{
+    QVariantVector vec;
+    for(int c = 0; c < columnCount(); ++c){
+        vec.append(data(row,c,role));
+    }
+    return vec;
+}
+
 void StandardItemModel::setRowTexts(int row, const QStringList &texts)
 { // 快捷方法,设置指定行的文本
     QVariantVector vars;
     for(auto text: texts)
         vars.append(text);
     setRowData(row,vars,Qt::EditRole);
+}
+
+QStringList StandardItemModel::rowTexts(int row) const
+{
+    QStringList texts;
+    for(int c = 0; c < columnCount(); ++c){
+        texts.append(data(row,c,Qt::DisplayRole).toString());
+    }
+    return texts;
 }
 
 void StandardItemModel::appendRowData(const QVariantVector &rowValues,int role)
@@ -120,4 +138,11 @@ void StandardItemModel::appendRowItems()
         rowItems.append(new QStandardItem);
     }
     appendRow(rowItems);
+}
+
+void StandardItemModel::clearRow(int columnCount, const QStringList &headers, Qt::Orientation orientation)
+{
+    clear();
+    setColumnCount(columnCount);
+    setHeaderLabels(headers,orientation);
 }

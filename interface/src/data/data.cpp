@@ -14,98 +14,148 @@ void DataWidget::parseResult(const QString & f,const QVariant & d)
     if (f == "test0x4") {
         auto img_path = d.toString();
         if (!img_path.isEmpty())
-            gridRunningCanvas->appendImage(img_path);
+        {
+            for(int i = 0; i < gridStack->count(); ++i)
+            {
+                auto w = static_cast<GridPictureCanvas*>(gridStack->widget(i));
+                if (w->isRunning()) {
+                    w->appendImage(img_path);
+                }
+            }
+        }
     }
 }
 
-void DataWidget::toggleExperiment(int row, bool isRunning)
+void DataWidget::toggleExperiment(int row, bool isRunning,const PlateImageInfo& info)
 { // 切换实验
-    LOG<<row<<isRunning;
-    isRunning?
-    bottomCanvas->setCurrentWidget(gridRunningCanvas):
-    bottomCanvas->setCurrentWidget(gridCompeleCanvas);
+    gridFilterStack->setCurrentWidget(gridStack);
+    gridStack->setCurrentIndex(row);
+    dataPatternStack->setCurrentIndex(row);
+    patternTableStack->setCurrentIndex(row);
+    timeTableStack->setCurrentIndex(row);
+    static_cast<DataPattern*>(dataPatternStack->currentWidget())->initHoleInfo(info); // 点击时才更新
+    auto w = static_cast<GridPictureCanvas*>(gridStack->currentWidget());
+    Q_ASSERT(isRunning == w->isRunning());
+    if (!isRunning) { // 如果是完成的实验直接显示某个文件夹下的所有图片应该
+        w->showImages(CURRENT_PATH+"/images/images",DataReadImageFormatFilter); // 注意过滤后缀
+    } else { // 如果切到running实验,是根据异步信号不断更新的
+
+    }
+
+
 }
 
-void DataWidget::toggleCanvas(int idx)
+void DataWidget::addStackWidget(const PlateImageInfo& info)
 {
-    Q_UNUSED(idx);
-    auto w = sender();
+    auto isRunning = info.isRunning;
+    auto pattern_w = info.plateSize.width();
+    auto pattern_h = info.plateSize.height();
+
+    // 1. 创建该实验的图像展示画布
+    auto gridcanvas = new GridPictureCanvas;
+    gridcanvas->setState(isRunning);
+
+    gridStack->addWidget(gridcanvas); // 每个实验都有自己的画布用于running时
+
+    // 2. 创建该实验对应的图案
+    auto pattern = new DataPattern(pattern_w,pattern_h);
+    dataPatternStack->addWidget(pattern);
+
+    // 3. 创建该实验对应的2个表
+    auto patternTable = new PatternTable;
+
+    // 点孔切到筛选图片的堆叠面板
+    patternTableStack->addWidget(patternTable);
+
+    auto timeTable = new TimeTable;
+    // 点左表切到筛选图片的堆叠面板
+    timeTableStack->addWidget(timeTable);
+
+    //pattern->initHoleInfo(info); // 创建时不要更新,toggleExperiment切换才去更新
+    connect(gridcanvas,&GridPictureCanvas::imageClicked,pictureCanvas,QOverload<const QImage&,const QString&>::of(&SinglePictureCanvas::setImage));
+    connect(pattern,QOverload<const DataPatternHoleInfo&>::of(&DataPattern::holeClicked),patternTable,&PatternTable::refreshTable);
+    connect(pattern,QOverload<const DataPatternHoleInfo&>::of(&DataPattern::holeClicked),[=]{gridFilterStack->setCurrentWidget(filterGridCanvas);});
+    connect(patternTable,&PatternTable::currentHoleViewChannelInfo,timeTable,&TimeTable::refreshTable);
+    connect(patternTable,&PatternTable::currentHoleViewChannelInfo,filterGridCanvas,&DataGrid::displayImages);
+    connect(patternTable,&PatternTable::currentHoleViewChannelInfo,[=]{gridFilterStack->setCurrentWidget(filterGridCanvas);});
+    connect(timeTable,&TimeTable::imageClicked,pictureCanvas,QOverload<const QString&>::of(&SinglePictureCanvas::setImage));
 }
 
 void DataWidget::initConnections()
 {
-    connect(topCanvas,&QStackedWidget::currentChanged,this,&DataWidget::toggleCanvas);
-    connect(dataTable,&DataTable::currentRowChanged,this,&DataWidget::toggleExperiment);
+    //connect(dataTable,&DataTable::currentRowChanged,this,&DataWidget::toggleExperiment);
+    connect(dataTable,&DataTable::currentRowClicked,this,&DataWidget::toggleExperiment); // 改为点击行触发
+    connect(dataTable,&DataTable::experRecordAppended,this,&DataWidget::addStackWidget);
     connect(ParserPointer,&ParserControl::parseResult,this,&DataWidget::parseResult);
+    connect(filterGridCanvas,&DataGrid::imageClicked,pictureCanvas,QOverload<const QImage&,const QString&>::of(&SinglePictureCanvas::setImage));
 }
 
 void DataWidget::initAttributes()
 {
-    topCanvas->addWidget(pictureCanvas);
-    pictureCanvas->setImage(CURRENT_PATH+"/images/cell.png");
-
-    bottomCanvas->addWidget(gridCompeleCanvas);
-    bottomCanvas->addWidget(gridRunningCanvas);
-    gridRunningCanvas->setState(true);
-    gridCompeleCanvas->setState(false);
+    pictureStack->addWidget(pictureCanvas);
+    pictureCanvas->setImage(CURRENT_PATH+"/images/images/1"+DataReadImageFormat);
+    filterGridCanvas->setState(false);
+    gridFilterStack->addWidget(gridStack);
+    gridFilterStack->addWidget(filterGridCanvas);
 }
 
 void DataWidget::initLayout()
 {
     // 1. 左侧布局
-    leftSplitter->addWidget(topCanvas);
-    leftSplitter->addWidget(bottomCanvas);
-    leftSplitter->setStretchFactor(0,1);
-    leftSplitter->setStretchFactor(1,4);
+    auto leftlay = new QVBoxLayout;
+    leftlay->addWidget(pictureStack);
+    leftlay->addWidget(gridFilterStack);
+    leftBox->setLayout(leftlay);
 
     // 2. 右侧布局
-    auto grouplay = new QVBoxLayout;
-    grouplay->addWidget(dataTable);
-    grouplay->addWidget(dataPattern);
+    auto rightlay = new QVBoxLayout;
+    rightlay->addWidget(dataTable);
+    rightlay->addWidget(dataPatternStack);
     auto tablelay = new QHBoxLayout;
-    tablelay->addWidget(patternTable);
-    tablelay->addWidget(timeTable);
-    grouplay->addLayout(tablelay);
-    grouplay->addWidget(dataImage);
-    rightBox->setLayout(grouplay);
+    tablelay->addWidget(patternTableStack);
+    tablelay->addWidget(timeTableStack);
+    rightlay->addLayout(tablelay);
+    rightlay->addWidget(dataImage);
+    rightBox->setLayout(rightlay);
 
     // 3. 总布局
     auto lay = new QHBoxLayout;
     auto splitter = new Splitter(Qt::Horizontal);
-    splitter->addWidget(leftSplitter);
+    splitter->addWidget(leftBox);
     splitter->addWidget(rightBox);
     lay->addWidget(splitter);
     setLayout(lay);
 }
 
-
 void DataWidget::initObjects()
 {
-    topCanvas = new QStackedWidget;
-    pictureCanvas = new SinglePictureCanvas;
-
-    bottomCanvas = new QStackedWidget;
-    gridRunningCanvas = new GridPictureCanvas;
-    gridCompeleCanvas = new GridPictureCanvas;
-
-    leftSplitter = new Splitter(Qt::Vertical);
+    leftBox = new GroupBox;
     rightBox = new GroupBox;
+    pictureStack = new QStackedWidget;
+    gridStack = new QStackedWidget;
+    dataPatternStack = new QStackedWidget;
+    patternTableStack = new QStackedWidget;
+    timeTableStack = new QStackedWidget;
+
+    filterGridCanvas = new DataGrid; // 共用
+    gridFilterStack = new QStackedWidget;
+    pictureCanvas = new SinglePictureCanvas;
     dataTable = new DataTable;
-    dataPattern = new DataPattern(8,12);
-    patternTable = new PatternTable;
-    timeTable = new TimeTable;
     dataImage = new DataImage;
 }
 
 void DataWidget::resizeEvent(QResizeEvent *event)
 {
-    bottomCanvas->setMaximumHeight(event->size().height()/4);
+    gridFilterStack->setMaximumHeight(event->size().height()/4);
     rightBox->setFixedWidth(event->size().width()/12*5);
-    dataTable->setFixedHeight(event->size().height()/4);
-    dataPattern->setFixedHeight(event->size().height()/4);
-    patternTable->setFixedHeight(event->size().height()/4);
-    timeTable->setFixedHeight(event->size().height()/4);
-    patternTable->setMinimumWidth(rightBox->width()/3*2);
+
+    dataTable->setFixedHeight(event->size().height()/4); // 实验表
+    dataPatternStack->setFixedHeight(event->size().height()/4);//图案
+
+    patternTableStack->setMaximumWidth(rightBox->width()/3);
+    patternTableStack->setFixedHeight(event->size().height()/4); // 左表
+
+    timeTableStack->setFixedHeight(event->size().height()/4); // 右表
     event->accept();
 }
 
@@ -115,4 +165,5 @@ DataWidget::DataWidget(QWidget*parent):QWidget(parent)
     initAttributes();
     initLayout();
     initConnections();
+    dataTable->initTableFromDataBase();
 }

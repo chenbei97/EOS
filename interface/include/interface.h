@@ -36,9 +36,12 @@
 
 //#include "data.h"
 //#include "datapattern.h"
-//#include "expertable.h"
+//#include "datagrid.h"
+//#include "datatable.h"
+//#include "patterntable.h"
+//#include "timetable.h"
+//#include "dataimage.h"
 
-//
 //#include "setting.h"
 //#include "settingnotifier.h"
 //#include "objectivesetting.h"

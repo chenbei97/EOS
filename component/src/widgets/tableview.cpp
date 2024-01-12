@@ -45,9 +45,9 @@ void TableView::initGeneralConfig()
     //verticalHeader()->setMinimumSectionSize(TableWidgetItemMinWidth);//列标题最大高度
     //verticalHeader()->setDefaultSectionSize(TableWidgetItemMinWidth);//默认列宽
 
-    horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents); // 必须设置否则列宽不能自适应
     horizontalHeader()->setHighlightSections(true);
-    horizontalHeader()->setStretchLastSection(false);//最后一列自适应宽度，让表头初始显示时占满行
+    horizontalHeader()->setStretchLastSection(true);//最后一列自适应宽度，让表头初始显示时占满行
 //    horizontalHeader()->setMinimumSectionSize(TableWidgetItemMinWidth);
 //    horizontalHeader()->setDefaultSectionSize(TableWidgetItemHeight);
 
@@ -81,7 +81,7 @@ void TableView::updateGeometries()
 
 void TableView::onClicked(const QModelIndex &index)
 {
-    Q_UNUSED(index);
+    emit currentRowClicked(index.row());
 }
 
 void TableView::onDoubleClicked(const QModelIndex &index)

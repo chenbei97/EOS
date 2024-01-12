@@ -19,11 +19,21 @@ static const QStringList DataExperimentTableHeaders = {
 };
 #define DataExperimentTableStatusColumn DataExperimentTableHeaders.indexOf(StatusFieldUpper)
 
+//#define abc 1
+#ifdef abc
+#define DataReadImageFormat JPGSuffix
+#define DataReadImageFormatFilter JPGSuffixFilter
+#else
+#define DataReadImageFormat TIFSuffix
+#define DataReadImageFormatFilter TIFSuffixFilter
+#endif
+
 class INTERFACE_IMEXPORT DataTable: public GroupBox
 {
     Q_OBJECT
 public:
     explicit DataTable(QWidget*parent=nullptr);
+    void initTableFromDataBase();
 private:
     TableView * view;
     StandardItemModel * model;
@@ -31,11 +41,15 @@ private:
 private:
     void initAttributes();
     void initConnections();
-    void initTableFromDataBase();
-    void initTableFromRunningExperiment();
     void toggleRow(const QModelIndex &current, const QModelIndex &previous);
+    void clickRow(int row);
     bool isRunningState(int row) const;
+private:
+    QVector<PlateImageInfo> createTestData() const;
+    QVector<PlateImageInfo> mPlateImageInfo;
 signals:
-    void currentRowChanged(int row,bool isRunning);
+    void currentRowChanged(int row,bool isRunning,const PlateImageInfo& info);
+    void currentRowClicked(int row,bool isRunning,const PlateImageInfo& info);
+    void experRecordAppended(const PlateImageInfo& info);
 };
 #endif //EOS_DATATABLE_H

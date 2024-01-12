@@ -23,8 +23,9 @@ public:
     void paintEvent(QPaintEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
     void setImage(const QImage&img);
-    void setPixmap(const QPixmap& pix);
     void setImage(const QString& path);
+    void setImage(const QImage&img,const QString& path);
+    void setPixmap(const QPixmap& pix);
 private:
     QImage mimage; // 单图模式使用
     double zoomRate = 1.0;

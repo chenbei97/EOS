@@ -9,12 +9,45 @@
 
 #include "patterntable.h"
 
+void PatternTable::refreshTable(const DataPatternHoleInfo& info)
+{
+    model->clearRow(PatternTableHeaders.count(),PatternTableHeaders);
+    currentPatternInfo = info;
+    if (!info.isSelected) return;
+
+    // 指定孔的所有视野坐标(不重复)
+    auto view_coords = info.info.viewCoordinates(info.hole.x(),info.hole.y());
+    for(auto view_coord: view_coords) { // 只按视野来
+        QStringList rowTexts;
+        rowTexts << QString("(%1,%2)").arg(view_coord.x()).arg(view_coord.y());
+
+        auto supportChannels = info.info.getViewChannels(info.hole.x(),info.hole.y(),view_coord.x(),view_coord.y());
+        if (supportChannels.isEmpty()) // 说明没有一个通道,这是不可能的一般
+            rowTexts << BRField;
+        else rowTexts << supportChannels[0]; // 尽量显示有照片的那个通道
+        model->appendRowTexts(rowTexts);
+    }
+}
+
+void PatternTable::clickRow(int row)
+{
+    auto rowText = model->rowTexts(row);
+    auto view_coord_text = rowText.at(PatternTableViewCoordinateColumn);
+    auto channel_text = rowText.at(PatternTableChannelColumn);
+    auto view_coord = convertToPointF(view_coord_text);
+    Q_ASSERT(currentPatternInfo.isSelected == true);
+    auto info = currentPatternInfo.info.viewChannelImages(currentPatternInfo.hole,view_coord,channel_text);
+    LOG<<"current view:"<<view_coord<<"channel:"<<channel_text<<"image count:"<<info.size();
+    emit currentHoleViewChannelInfo(info);
+}
+
 PatternTable::PatternTable(QWidget*parent): GroupBox(parent)
 {
     view = new TableView;
     model = new DataTableModel;
     comboDelegate = new ComboDelegate;
     initAttributes();
+    initConnections();
 
     auto lay = new QHBoxLayout;
     lay->addWidget(view);
@@ -27,32 +60,23 @@ PatternTable::PatternTable(QWidget*parent): GroupBox(parent)
 
 void PatternTable::initAttributes()
 {
-    tableHeader<<"Coordinate"<<"Group"<<"info"<<"Channel";
     comboDelegate->addItems(ChannelFields);
-    model->setColumnCount(tableHeader.count());
-    model->setHeaderLabels(tableHeader,Qt::Horizontal);
+    model->setColumnCount(PatternTableHeaders.count());
+    model->setHeaderLabels(PatternTableHeaders,Qt::Horizontal);
     model->setEditableColumns(QList<int>()<<model->columnCount()-1); // 最后1列可编辑
     view->setModel(model);
-    view->setItemDelegateForColumn(tableHeader.count()-1,comboDelegate);
+    view->setItemDelegateForColumn(PatternTableHeaders.count()-1,comboDelegate);
     view->setEditTriggers(TableView::DoubleClicked); // 设置禁止的话双击无法触发可编辑
-    view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents); // 必须设置否则列宽不能自适应
     view->setSelectionBehavior(QAbstractItemView::SelectRows); // 按行选择
-    view->horizontalHeader()->setStretchLastSection(true);
 }
 
 void PatternTable::initTable()
 {
-    model->appendRowData(QVariantVector()<<"(0.1,0.2)"<<"Positive Control"<<"青霉素 30uM"<<"BR");
-    model->appendRowData(QVariantVector()<<"(0.2,0.3)"<<"Positive Control"<<"青霉素 30uM"<<"RFP");
-    model->appendRowData(QVariantVector()<<"(0.3,0.4)"<<"Negative Control"<<"阿司匹林 30uM"<<"DAPI");
-    model->appendRowTexts(QStringList()<<"(0.4,0.5)"<<"Negative Control"<<"阿司匹林 30uM"<<"PH");
-
 }
 
-void PatternTable::initFilterItem()
+void PatternTable::initConnections()
 {
-    const int row = 1; // 第2行
-
+    connect(view,&TableView::currentRowClicked,this,&PatternTable::clickRow);
 }
 
 void PatternTable::resizeEvent(QResizeEvent *event)

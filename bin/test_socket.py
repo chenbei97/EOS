@@ -2,7 +2,7 @@
 Author: chenbei97 chenbei_electric@163.com
 Date: 2023-10-19 15:25:08
 LastEditors: chenbei97 chenbei_electric@163.com
-LastEditTime: 2024-01-09 16:19:28
+LastEditTime: 2024-01-12 14:34:15
 FilePath: \EOS\bin\test_socket.py
 Copyright (c) 2023 by ${chenbei}, All Rights Reserved. 
 '''
@@ -340,7 +340,7 @@ class ParseManager:
         self.__socket.sendall(response.encode("utf-8"))
 
 class SocketServerManger:
-    def __init__(self, port=5000):  # 测试本地链接,只需要提供端口
+    def __init__(self, port=4000):  # 测试本地链接,只需要提供端口
         self.__port = port
         self.__hostName = "localhost"
         self.__msgQueue = Queue()
@@ -349,6 +349,7 @@ class SocketServerManger:
         self.__isConnected = False
         self.__parser = ParseManager()
         self.__parseFunctions = self.__parser.parseFunctions
+        self.lock = threading.RLock()
 
     def waitForConnected(self, blockSecs=10):
         print("wait for connection...")
@@ -378,14 +379,21 @@ class SocketServerManger:
 
     def __sendMessage(self):
         while self.__isConnected:
+            self.lock.acquire()
             reponse = defaultdict()
             reponse["frame"] = "test0x4"
-            c_path = os.getcwd()+r"\images\cell.png"
+            c_path = os.getcwd()+r"\images\images\1.tif"
             reponse["path"] = c_path
             response = json.dumps(reponse)
             response += "@@@"
             time.sleep(1)
+            # t1 = time.time()
+            # while(time.time() - t1 < 1) :
+            #     pass
+            print("send image")
             self.client.sendall(response.encode("utf-8"))
+            self.client.sendall("hello qt c++ python@@@".encode("utf-8"))
+            self.lock.release()
 
     def __recvFromClient(self):
         while self.__isConnected:
@@ -409,8 +417,10 @@ class SocketServerManger:
                 #print("队列长度: ",self.__msgQueue.qsize())
                 msg_dict = json.loads(msg)
                 frame = msg_dict[self.__parser.frame] # 客户端传的数字不是字符串了
+                self.lock.acquire()
                 self.__parseFunctions[str(frame)](msg_dict)
                 time.sleep(0.0001) # 由于已经通过@@@区分开了,下方根据{}的程序也就不必了
+                self.lock.release()
 def test_server():
     m = SocketServerManger()
     m.waitForConnected()

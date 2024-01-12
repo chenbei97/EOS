@@ -15,6 +15,7 @@
 #include "dataimage.h"
 #include "patterntable.h"
 #include "timetable.h"
+#include "datagrid.h"
 
 class INTERFACE_IMEXPORT DataWidget: public QWidget
 {
@@ -28,23 +29,23 @@ private:
     void initLayout();
     void initConnections();
 private:
-    QStackedWidget * topCanvas;
-    SinglePictureCanvas * pictureCanvas;
-
-    QStackedWidget * bottomCanvas;
-    GridPictureCanvas * gridRunningCanvas;
-    GridPictureCanvas * gridCompeleCanvas;
-
-    Splitter * leftSplitter;
+    GroupBox * leftBox;
     GroupBox * rightBox;
+    QStackedWidget * pictureStack;
+    QStackedWidget * gridStack;
+    QStackedWidget * dataPatternStack;
+    QStackedWidget * patternTableStack;
+    QStackedWidget * timeTableStack;
+
+    SinglePictureCanvas * pictureCanvas;
     DataTable * dataTable;
-    DataPattern * dataPattern;
-    PatternTable * patternTable;
-    TimeTable * timeTable; // 2个水平表
     DataImage * dataImage; // 图后期处理
+
+    DataGrid * filterGridCanvas; // 共用型
+    QStackedWidget * gridFilterStack; // gridStack + filterGridCanvas
 private slots:
-    void toggleCanvas(int idx);
-    void toggleExperiment(int row, bool isRunning);
+    void toggleExperiment(int row, bool isRunning,const PlateImageInfo& info);
+    void addStackWidget(const PlateImageInfo& info);
     void parseResult(const QString & f,const QVariant & d);
 };
 

@@ -8,18 +8,76 @@
  */
 
 #include "datatable.h"
-
-void DataTable::initTableFromRunningExperiment()
-{ // 已经完成的实验信息都在数据库里,这里去调数据库初始化
-    model->appendRowTexts(QStringList()<<"2024-2-1"<<CompleteFieldUpper);
-    model->appendRowTexts(QStringList()<<"2024-2-2"<<CompleteFieldUpper);
-    model->appendRowTexts(QStringList()<<"2024-2-3"<<CompleteFieldUpper);
-    model->appendRowTexts(QStringList()<<"2024-2-4"<<RunningFieldUpper);
-}
+#include "qrandom.h"
 
 void DataTable::initTableFromDataBase()
 {
+    mPlateImageInfo = createTestData();
+    model->blockSignals(true);
+    view->blockSignals(true); // 初始化表时不要触发更新图案,表和图案
+    selection->blockSignals(true);
+    QStringList rowText;
+    for(auto experInfo: mPlateImageInfo) {
+        rowText.clear();
+        rowText<<experInfo.experName;
+        rowText<<(experInfo.isRunning?RunningFieldUpper:CompleteFieldUpper);
+        rowText<<experInfo.experTime.toString(DefaultDateTimeFormat);
+        rowText<<experInfo.objective;
+        model->appendRowTexts(rowText);
+        emit experRecordAppended(experInfo);
+    };
+    model->blockSignals(false);
+    view->blockSignals(false);
+    selection->blockSignals(false);
+//    view->selectRow(0); // 表格行带有颜色
+//    clickRow(0); // 触发一下刷新图片展示 // 取消选中否则启动会慢
+}
 
+QVector<PlateImageInfo> DataTable::createTestData() const
+{
+    auto time= QTime::currentTime();
+    QRandomGenerator generator(time.msec()+time.second()*1000);
+    QVector<PlateImageInfo> infos;
+    for(int j = 0; j < 6; ++j) { // 6个实验
+        PlateImageInfo info;
+        for(int i = 0; i < 10; ++i){ // 不一定有10个孔,可能随机出来有重复的
+            ImageInfo image;
+            ( j % 2)?
+            image.setHoleCoordinate(generator.bounded(0,8),generator.bounded(0,12)):
+            image.setHoleCoordinate(generator.bounded(0,4),generator.bounded(0,6));
+            auto tmp = generator.bounded(1.0);
+            tmp>0.5? image.channel = BRField: image.channel = DAPIField;
+            for(int k = 0; k < 5; ++k) { // 每个孔设置5个点,注意如果有孔重复了,这个孔就会得到10个视野而不是5个
+                image.setViewCoordinate(generator.bounded(1.0),generator.bounded(1.0));
+                for(int m = 0; m < 5; ++m)
+                {
+                    image.path = CURRENT_PATH+QString("/images/images/%1%2").arg(generator.bounded(1,10)).arg(DataReadImageFormat);
+                    image.stamp = QDateTime::currentDateTime().addSecs(generator.bounded(24*60*60));
+                    info.images.append(image);
+//                    LOG<<"current exper:"<<j<<"current hole:"<<image.getHoleCoordinate()<<"current view:"<<image.getViewCoordinate()
+//                        <<"stamp:"<<image.stamp;
+                }
+            }
+            //LOG<<QPointF(image.view.x,image.view.y)<<image.stamp;
+
+        }
+        if ( j % 2) {
+            info.experName = "10倍镜96孔板明场实验";
+            info.experTime = QDateTime::currentDateTime();
+            info.isRunning = true;
+            info.plateSize = QSize(8,12);
+            info.objective = "br10x";
+        } else {
+            info.experName = "20倍镜24孔板相差实验";
+            info.experTime = QDateTime::currentDateTime();
+            info.isRunning = false;
+            info.plateSize = QSize(4,6);
+            info.objective = "ph20x";
+        }
+        infos.append(info);
+    }
+
+    return infos;
 }
 
 void DataTable::toggleRow(const QModelIndex &current, const QModelIndex &previous)
@@ -27,9 +85,16 @@ void DataTable::toggleRow(const QModelIndex &current, const QModelIndex &previou
     Q_UNUSED(previous);
     if (current.isValid()) {
         bool isRunning = isRunningState(current.row());
-        LOG<<current.row()<<isRunning;
-        emit currentRowChanged(current.row(),isRunning);
+        auto info = mPlateImageInfo[current.row()];
+        emit currentRowChanged(current.row(),isRunning,info);
     }
+}
+
+void DataTable::clickRow(int row)
+{
+    bool isRunning = isRunningState(row);
+    auto info = mPlateImageInfo[row];
+    emit currentRowClicked(row,isRunning,info);
 }
 
 bool DataTable::isRunningState(int row) const
@@ -41,6 +106,7 @@ bool DataTable::isRunningState(int row) const
 void DataTable::initConnections()
 {
     connect(selection,&QItemSelectionModel::currentRowChanged,this,&DataTable::toggleRow);
+    connect(view,&TableView::currentRowClicked,this,&DataTable::clickRow);
 }
 
 void DataTable::initAttributes()
@@ -64,9 +130,8 @@ DataTable::DataTable(QWidget*parent): GroupBox(parent)
     lay->setSpacing(0);
     setLayout(lay);
     initAttributes();
-    initTableFromDataBase();
-    initTableFromRunningExperiment();
     initConnections();
+    //initTableFromDataBase();
 }
 
 

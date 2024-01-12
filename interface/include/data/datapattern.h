@@ -17,6 +17,17 @@ class INTERFACE_IMEXPORT DataPattern: public Pattern
     Q_OBJECT
 public:
     explicit DataPattern(int rows,int cols,QWidget*parent= nullptr);
+    void setPatternSize(int rows, int cols);
+    void mousePressEvent(QMouseEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
+    void initHoleInfo(const PlateImageInfo& info);
+private:
+    DataPatternHoleInfo2DVector mHoleInfo; // 每个孔的所有信息用结构体封装
+    QBool2DVector mDisableHoles; // 置灰区域,不可选的区域
+    void initHoleInfo(); // 初始化孔信息
+    void initDisableHoles();
+signals:
+    void holeClicked(const DataPatternHoleInfo & info);
 };
 
 #endif //EOS_DATAPATTERN_H

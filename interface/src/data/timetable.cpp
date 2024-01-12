@@ -8,30 +8,50 @@
  */
 #include "timetable.h"
 
+void TimeTable::refreshTable(const ImageInfoVector& info)
+{
+    currentViewChannelInfo = info;
+    model->clearRow(TimeTableHeaders.count(),TimeTableHeaders);
+    for(auto image: info) { // 可能视野坐标相同但是时间戳不同
+        auto stamp = image.stamp;
+        auto path = image.path; // 图像路径
+        QStringList rowTexts;
+        rowTexts << stamp.toString(DefaultImageDateTimeFormat);
+        rowTexts << path;
+        rowTexts << "A";
+        rowTexts << "青霉素";
+        //LOG<<rowTexts;
+        model->appendRowTexts(rowTexts);
+    }
+    view->resizeColumnToContents(TimeTableImageColumn); // resizeAll的不起作用
+}
+
+void TimeTable::clickRow(int row)
+{ // 控制单张大图的显示
+    auto path = model->data(row,TimeTableImageColumn).toString();
+    emit imageClicked(path);
+}
+
 TimeTable::TimeTable(QWidget*parent): GroupBox(parent)
 {
     view = new TableView;
     model = new DataTableModel;
-    view->setModel(model);
+    initTable();
+
     auto lay = new QHBoxLayout;
     lay->addWidget(view);
     lay->setMargin(0);
     lay->setSpacing(0);
     setLayout(lay);
-
-    initTable();
 }
 
 void TimeTable::initTable()
 {
-    tableHeader<<"TimeStamp"<<"Image";
-    model->setRowCount(5);
-    model->setColumnCount(2);
-    model->setHorizontalHeaderLabels(tableHeader);
-}
-
-void TimeTable::initFilterItem()
-{
-    const int row = 1; // 第2行
-
+    model->setRowCount(0);
+    model->setColumnCount(TimeTableHeaders.count());
+    model->setHorizontalHeaderLabels(TimeTableHeaders);
+    view->setModel(model);
+    view->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    //view->horizontalHeader()->setStretchLastSection(true);
+    connect(view,&TableView::currentRowClicked,this,&TimeTable::clickRow);
 }

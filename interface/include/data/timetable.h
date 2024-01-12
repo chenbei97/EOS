@@ -13,18 +13,27 @@
 #include "window.h"
 #include "datatablemodel.h"
 
+static const QStringList TimeTableHeaders = {
+       TimeStampFieldUpper,ImageFieldUpper,GroupFieldUpper,InfoFieldUpper
+};
+#define TimeTableStampColumn TimeTableHeaders.indexOf(TimeStampFieldUpper)
+#define TimeTableImageColumn TimeTableHeaders.indexOf(ImageFieldUpper)
+
 class INTERFACE_IMEXPORT TimeTable: public GroupBox
 {
     Q_OBJECT
 public:
     explicit TimeTable(QWidget*parent=nullptr);
+    void refreshTable(const ImageInfoVector& info);
 private:
     TableView * view;
     DataTableModel * model;
-    QStringList tableHeader;
+    ImageInfoVector currentViewChannelInfo;
 private:
     void initTable();
-    void initFilterItem();
+    void clickRow(int row);
+signals:
+    void imageClicked(const QString& path);
 };
 
 #endif //EOS_TIMETABLE_H

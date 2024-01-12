@@ -73,6 +73,13 @@ void SinglePictureCanvas::setImage(const QString &path)
     update();
 }
 
+void SinglePictureCanvas::setImage(const QImage &img, const QString &path)
+{
+    mimage = QImage(path);
+    Q_UNUSED(img); // 加载原图否则不清楚
+    update();
+}
+
 SinglePictureCanvas::SinglePictureCanvas(QWidget *parent) : QWidget(parent)
 {
 

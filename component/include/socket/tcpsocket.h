@@ -24,6 +24,7 @@
 #define WaitMessageBoxChannelMergeMsg "please wait merging channel image..."
 #define use_queuethread 1
 #define use_testport 1
+#define SocketTestPort 4000
 
 class COMPONENT_IMEXPORT TcpSocket: public QObject
 {
@@ -58,5 +59,6 @@ private:
     QTimer looptimer;
     QTimer requesttimer;
 signals:
+    void dataResponse(const QByteArray& msg);
 };
 #endif //EOSI_TCPSOCKET_H

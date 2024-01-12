@@ -75,9 +75,24 @@ void WellPattern::mousePressEvent(QMouseEvent *event)
             initDrapHoles(); // 框选后，如果左键点一下应该取消框选
             mDrapRect = QRectF();
             update();
+
+            if (isValidPoint(mLastPos)) {
+                QPoint tmp(-1,-1);
+                auto rects = getAllInnerRects(); // 所有小正方形区域匹配这个坐标
+                for(int row = 0; row < mrows; ++row)
+                    for(int col = 0; col < mcols; ++col)
+                        if (rects[row][col].contains(mLastPos))
+                            tmp = {row,col}; // 找到孔的匹配坐标
+                //LOG<<mLastPos<<mMousePos<<tmp;
+                if (tmp != QPoint(-1,-1)) { // 点击的不是无效位置,确实是某个孔
+                    if(tmp != mMousePos) { // mMousePos是上次点击的有效位置,而且不是重复点相同的孔
+                        mMousePos = tmp;
+                        if (mHoleClickEvent)
+                             emit holeClicked(mMousePos); // 新位置和原来位置不同才动电机
+                    }
+                }
+            }
         } // 右键是菜单
-        if (mHoleClickEvent)
-                emit holeClicked(mMousePos); // 新位置和原来位置不同才动电机
     }
     event->accept();
 }

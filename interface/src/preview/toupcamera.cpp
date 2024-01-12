@@ -326,18 +326,18 @@ unsigned ToupCamera::exposure() const
     return exp;
 }
 
-ValueRangeUnSigned ToupCamera::getExposureRange() const
-{
-    ValueRangeUnSigned s = {0,0,0};
-    if (!toupcam) return s;
-
-    Toupcam_get_ExpTimeRange(toupcam,
-                             &s.min,
-                             &s.max,
-                             &s.def);
-    //LOG<<"exposure range: "<<s;
-    return s;
-}
+//ValueRangeUnSigned ToupCamera::getExposureRange() const
+//{
+//    ValueRangeUnSigned s = {0,0,0};
+//    if (!toupcam) return s;
+//
+//    Toupcam_get_ExpTimeRange(toupcam,
+//                             &s.min,
+//                             &s.max,
+//                             &s.def);
+//    //LOG<<"exposure range: "<<s;
+//    return s;
+//}
 
 void ToupCamera::setGain(ushort gain)
 {
@@ -356,18 +356,18 @@ ushort ToupCamera::gain() const
     return g;
 }
 
-ValueRangeUShort ToupCamera::getGainRange() const
-{
-    ValueRangeUShort s = {0,0,0};
-    if (!toupcam) return s;
-
-    Toupcam_get_ExpoAGainRange(toupcam,
-                               &s.min,
-                               &s.max,
-                               &s.def);
-    //LOG<<"gain range: "<<s;
-    return s;
-}
+//ValueRangeUShort ToupCamera::getGainRange() const
+//{
+//    ValueRangeUShort s = {0,0,0};
+//    if (!toupcam) return s;
+//
+//    Toupcam_get_ExpoAGainRange(toupcam,
+//                               &s.min,
+//                               &s.max,
+//                               &s.def);
+//    //LOG<<"gain range: "<<s;
+//    return s;
+//}
 
 void ToupCamera::processCallback(unsigned int nEvent)
 {

@@ -2,7 +2,7 @@
 Author: chenbei97 chenbei_electric@163.com
 Date: 2024-01-12 14:14:22
 LastEditors: chenbei97 chenbei_electric@163.com
-LastEditTime: 2024-01-12 14:19:02
+LastEditTime: 2024-01-12 15:19:18
 FilePath: \EOS\rename.py
 Copyright (c) 2024 by ${chenbei}, All Rights Reserved. 
 '''
@@ -16,11 +16,9 @@ def rename():
     for files in filelist:   #遍历所有文件
         i = i + 1
         Olddir = os.path.join(path, files)    #原来的文件路径
-        if os.path.isdir(Olddir):       #如果是文件夹则跳过
-                continue
 
         filetype = os.path.splitext(files)[1] 
-        Newdir = os.path.join(path, str(i) + ".jpg")   #新的文件路径
+        Newdir = os.path.join(path, str(i) + ".tif")   #新的文件路径
         os.rename(Olddir, Newdir)    #重命名
     return True
 

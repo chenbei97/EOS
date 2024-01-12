@@ -21,7 +21,9 @@
 #include "qpair.h"
 #include "qqueue.h"
 #include "qset.h"
+#include "qimage.h"
 #include "qdebug.h"
+#define LOG (qDebug()<<"["<<QTime::currentTime().toString("h:mm:ss:zzz")<<__FUNCTION__<<"] ")
 
 #include <random>
 using std::sort;
@@ -29,6 +31,92 @@ using std::random_device;
 using std::mt19937;
 using std::uniform_int_distribution;
 
+//enum class ManufacturerType {
+//    Manufacturer1 = 0,
+//    Manufacturer2 = 1,
+//    Manufacturer3 = 2,
+//    Manufacturer4 = 3
+//};
+//enum class WellBrand1Type {
+//    WellBrand1_6 = 0,
+//    WellBrand1_24 = 1,
+//    WellBrand1_96 = 2,
+//    WellBrand1_384 = 3
+//};
+//enum class WellBrand2Type {
+//    WellBrand2_6 = 0,
+//    WellBrand2_24 = 1,
+//    WellBrand2_96 = 2,
+//    WellBrand2_384 = 3
+//};
+//enum class WellBrand3Type {
+//    WellBrand3_6 = 0,
+//    WellBrand3_24 = 1,
+//    WellBrand3_96 = 2,
+//    WellBrand3_384 = 3
+//};
+//enum class WellBrand4Type {
+//    WellBrand4_6 = 0,
+//    WellBrand4_24 = 1,
+//    WellBrand4_96 = 2,
+//    WellBrand4_384 = 3
+//};
+//enum class WellSizeType {
+//    WellSize6 = 0,
+//    WellSize24 = 1,
+//    WellSize96 = 2,
+//    WellSize384 = 3
+//};
+//enum class ObjectiveMagnification {
+//    _4x = 0,
+//    _10x = 1,
+//    _20x = 2,
+//    _40x = 3
+//};
+//enum class ObjectiveType {
+//    BR = 0,
+//    PH = 1
+//};
+//enum class ChannelType {
+//    BR = 0,
+//    PH = 1,
+//    GFP = 2,
+//    RFP = 3,
+//    DAPI = 4
+//};
+//enum class ObjectiveLocationType {
+//    loc1 = 0,
+//    loc2 = 1,
+//    loc3 = 2,
+//    loc4 = 3
+//};
+//enum class ImageFormatType {
+//    jpg = 0,
+//    jpeg = 1,
+//    png = 2,
+//    ico = 3,
+//    bmp = 4,
+//    ttf = 5,
+//};
+//
+//enum class VideoFormatType {
+//    avi = 0,
+//    wmv = 1,
+//    mp4 = 2
+//};
+//
+//enum class VideoFrameRateType {
+//    _10 = 0,
+//    _20 = 1,
+//    _30 = 2,
+//    _40 = 3
+//};
+
+enum class ViewMode {
+    PointMode = 0,
+    RectMode = 1,
+    WholeMode = 2
+};
 typedef const QVariant& QCVariant;
 typedef const QString& QCString;
 typedef const QPoint& QCPoint;
@@ -39,6 +127,7 @@ typedef const QRectF& QCRectF;
 
 typedef QVector<QVariant> QVariantVector;
 typedef QVector<QColor> QColorVector;
+typedef QVector<QDateTime> QDateTimeVector;
 typedef const QVector<QColor>& QCColorVector;
 typedef QVector<QPoint> QPointVector;
 typedef const QVector<QPoint>& QCPointVector;
@@ -105,6 +194,7 @@ typedef QPair<QRectF,QImage> QPairImage;
 typedef QVector<QPair<QRectF,QImage>> QPairImageVector;
 typedef QPair<QImage,QString> QImageInfo;
 typedef QVector<QImageInfo> QImageVectorInfo;
+typedef QVector<QImage> QImageVector;
 
 extern const char* PairArgsField;
 struct Dimension2D
@@ -141,45 +231,45 @@ static bool operator!=(const Dimension2D& s1,const Dimension2D& s2)
 }
 Q_DECLARE_METATYPE(Dimension2D);
 
-struct ViewPoint {
-    QString x;
-    QString y;
-
-    ViewPoint(){}
-    ViewPoint(const ViewPoint& s) {
-        x = s.x;
-        y = s.y;
-    }
-    ViewPoint(double x, double y) {
-        this->x = QString::number(x);
-        this->y = QString::number(y);
-    }
-    ViewPoint(int x, int y) {
-        this->x = QString::number(x);
-        this->y = QString::number(y);
-    }
-    friend QDebug operator<<(QDebug debug, const ViewPoint& s) {
-        debug<<QString(PairArgsField).arg(s.x).arg(s.y);
-        return debug;
-    }
-};
-Q_DECLARE_METATYPE(ViewPoint);
-typedef QVector<ViewPoint> ViewPointVector;
-struct ViewRectF {
-    QRectF rect;
-    bool flag;
-    ViewRectF(){}
-    ViewRectF(const QRectF& rect,bool flag) {
-        this->rect = rect;
-        this->flag = flag;
-    }
-    friend QDebug operator<<(QDebug debug, const ViewRectF& s) {
-        debug<<"rect = "<<s.rect<<" flag = "<<s.flag;
-        return debug;
-    }
-};
-Q_DECLARE_METATYPE(ViewRectF);
-typedef QVector<ViewRectF> ViewRectFVector;
+//struct ViewPoint {
+//    QString x;
+//    QString y;
+//
+//    ViewPoint(){}
+//    ViewPoint(const ViewPoint& s) {
+//        x = s.x;
+//        y = s.y;
+//    }
+//    ViewPoint(double x, double y) {
+//        this->x = QString::number(x);
+//        this->y = QString::number(y);
+//    }
+//    ViewPoint(int x, int y) {
+//        this->x = QString::number(x);
+//        this->y = QString::number(y);
+//    }
+//    friend QDebug operator<<(QDebug debug, const ViewPoint& s) {
+//        debug<<QString(PairArgsField).arg(s.x).arg(s.y);
+//        return debug;
+//    }
+//};
+//Q_DECLARE_METATYPE(ViewPoint);
+//typedef QVector<ViewPoint> ViewPointVector;
+//struct ViewRectF {
+//    QRectF rect;
+//    bool flag;
+//    ViewRectF(){}
+//    ViewRectF(const QRectF& rect,bool flag) {
+//        this->rect = rect;
+//        this->flag = flag;
+//    }
+//    friend QDebug operator<<(QDebug debug, const ViewRectF& s) {
+//        debug<<"rect = "<<s.rect<<" flag = "<<s.flag;
+//        return debug;
+//    }
+//};
+//Q_DECLARE_METATYPE(ViewRectF);
+//typedef QVector<ViewRectF> ViewRectFVector;
 
 typedef QQueue<QByteArray> QByteQueue;
 typedef QPair<QString,QByteArray> QRequestMsg;
@@ -188,41 +278,41 @@ typedef const QVariantMap& QCVariantMap;
 typedef QVariant(*TcpParseFuncPointer)(QCVariantMap m);
 typedef QByteArray(*TcpAssembleFuncPointer)(QCVariantMap m);
 
-struct ValueRangeInt{
-    int min;
-    int max;
-    int def;
-    friend QDebug operator<<(QDebug debug, const ValueRangeInt& s) {
-        debug <<"min = "<<s.min<<" ";
-        debug <<"max = "<<s.max<<" ";
-        debug <<"def = "<<s.def;
-        return debug;
-    }
-};
+//struct ValueRangeInt{
+//    int min;
+//    int max;
+//    int def;
+//    friend QDebug operator<<(QDebug debug, const ValueRangeInt& s) {
+//        debug <<"min = "<<s.min<<" ";
+//        debug <<"max = "<<s.max<<" ";
+//        debug <<"def = "<<s.def;
+//        return debug;
+//    }
+//};
 
-struct ValueRangeUShort{
-    ushort min;
-    ushort max;
-    ushort def;
-    friend QDebug operator<<(QDebug debug, const ValueRangeUShort& s) {
-        debug <<"min = "<<s.min<<" ";
-        debug <<"max = "<<s.max<<" ";
-        debug <<"def = "<<s.def;
-        return debug;
-    }
-};
+//struct ValueRangeUShort{
+//    ushort min;
+//    ushort max;
+//    ushort def;
+//    friend QDebug operator<<(QDebug debug, const ValueRangeUShort& s) {
+//        debug <<"min = "<<s.min<<" ";
+//        debug <<"max = "<<s.max<<" ";
+//        debug <<"def = "<<s.def;
+//        return debug;
+//    }
+//};
 
-struct ValueRangeUnSigned{
-    unsigned min;
-    unsigned max;
-    unsigned def;
-    friend QDebug operator<<(QDebug debug, const ValueRangeUnSigned& s) {
-        debug <<"min = "<<s.min<<" ";
-        debug <<"max = "<<s.max<<" ";
-        debug <<"def = "<<s.def;
-        return debug;
-    }
-};
+//struct ValueRangeUnSigned{
+//    unsigned min;
+//    unsigned max;
+//    unsigned def;
+//    friend QDebug operator<<(QDebug debug, const ValueRangeUnSigned& s) {
+//        debug <<"min = "<<s.min<<" ";
+//        debug <<"max = "<<s.max<<" ";
+//        debug <<"def = "<<s.def;
+//        return debug;
+//    }
+//};
 
 #define viewRowColUnEqual 1
 struct HoleInfo {

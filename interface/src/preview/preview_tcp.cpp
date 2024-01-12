@@ -10,7 +10,7 @@
 
 void Preview::parseResult(const QString & f,const QVariant & d)
 { // 任何来自服务端的消息都在这里
-    LOG<<"[async] frame:"<<f<<"result:"<<d;
+    //LOG<<"[async] frame:"<<f<<"result:"<<d;
     // 0
     if (f == TcpFramePool.previewEvent) {
         d.toBool()?
@@ -310,7 +310,8 @@ void Preview::loadExper()
     auto json = AssemblerPointer->message();
     LOG<<"发送启动实验命令";
     SocketPointer->exec(TcpFramePool.loadExperEvent,json);
-
+    JsonReadWrite m;
+    m.writeJson(CURRENT_PATH+"/load_exper.json",json);
 //    if (ParserResult.toBool()) {
 //        QMessageBox::information(this,InformationChinese,tr("Successfully launched the experiment!"));
 //    }
