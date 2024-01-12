@@ -23,7 +23,7 @@
 #define WaitMessageBoxWaitStitchMsg  "please wait stitching slide image..."
 #define WaitMessageBoxChannelMergeMsg "please wait merging channel image..."
 #define use_queuethread 1
-//#define use_testport 1
+#define use_testport 1
 
 class COMPONENT_IMEXPORT TcpSocket: public QObject
 {
