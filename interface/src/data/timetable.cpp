@@ -10,6 +10,7 @@
 
 void TimeTable::refreshTable(const ImageInfoVector& info)
 { // 根据当前孔/当前视野/当前通道筛选出对应的所有时间戳的图片信息
+    // 如果是complete实验,可以从info直接获取,否则只能通过数据库查询得到
     currentViewChannelInfo = info;
     model->clearRow(TimeTableHeaders.count(),TimeTableHeaders);
     for(auto image: info) { // 可能视野坐标相同但是时间戳不同
