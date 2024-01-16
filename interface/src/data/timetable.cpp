@@ -9,7 +9,7 @@
 #include "timetable.h"
 
 void TimeTable::refreshTable(const ImageInfoVector& info)
-{ // 根据当前孔/
+{ // 根据当前孔/当前视野/当前通道筛选出对应的所有时间戳的图片信息
     currentViewChannelInfo = info;
     model->clearRow(TimeTableHeaders.count(),TimeTableHeaders);
     for(auto image: info) { // 可能视野坐标相同但是时间戳不同
