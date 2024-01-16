@@ -218,7 +218,7 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
         else
             ImageTransformThreadPointer->setImage(QImage(),0.0,MirrorType::NoMirror);
 #else
-        if (!img.isNull()) {
+        if (!img1.isNull()) {
             switch (mirrorType) {
                 case MirrorType::NoMirror:
                     //LOG<<"no mirror";
@@ -229,7 +229,7 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
                     //LOG<<"hor mirror";
                     break;
                 case MirrorType::VerMirror:
-                    mimage = img.mirrored(false,true);
+                    mimage = img1.mirrored(false,true);
                     //LOG<<"ver mirror";
                     break;
                 case MirrorType::AllMirror:
@@ -237,15 +237,22 @@ void PhotoCanvas::setImage(const QImage &img, int duration)
                     //LOG<<"all mirror";
                     break;
             }
-            if (rotateAngle > 0.0 && rotateAngle < 360.0) {
-                LOG<<"rotate angle"<<rotateAngle;
-                QTransform transform;
-                transform.rotate(rotateAngle);
-                transform.scale(width()*1.0/img.width(),height()*1.0/img.height());
-                mimage = mimage.transformed(transform,Qt::FastTransformation);
-            } else {
-                mimage = mimage.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
-            }
+
+//            if (lastAngle != rotateAngle) {
+//                transform.reset();
+//                transform.rotate(rotateAngle);
+//                mimage = mimage.transformed(transform,Qt::FastTransformation);
+//                lastAngle = rotateAngle;
+//            } else {
+//                mimage = mimage.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+//            }
+
+            //LOG<<"rotate angle"<<rotateAngle;
+            transform.reset();
+            transform.rotate(rotateAngle);
+            transform.scale(width()*1.0/mimage.width(),height()*1.0/mimage.height());
+            mimage = mimage.transformed(transform,Qt::FastTransformation);
+            //mimage = mimage.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
             mimage = getChannelImage(mimage,Qt::green);
         }
         else

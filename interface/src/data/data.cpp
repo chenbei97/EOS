@@ -42,7 +42,6 @@ void DataWidget::toggleExperiment(int row, bool isRunning,const PlateImageInfo& 
 
     }
 
-
 }
 
 void DataWidget::addStackWidget(const PlateImageInfo& info)
@@ -94,6 +93,7 @@ void DataWidget::initAttributes()
 {
     pictureStack->addWidget(pictureCanvas);
     pictureCanvas->setImage(CURRENT_PATH+"/images/images/1"+DataReadImageFormat);
+    //pictureCanvas->setImage(CURRENT_PATH+"/images/direction.png");
     filterGridCanvas->setState(false);
     gridFilterStack->addWidget(gridStack);
     gridFilterStack->addWidget(filterGridCanvas);
@@ -152,7 +152,7 @@ void DataWidget::resizeEvent(QResizeEvent *event)
     dataTable->setFixedHeight(event->size().height()/4); // 实验表
     dataPatternStack->setFixedHeight(event->size().height()/4);//图案
 
-    patternTableStack->setMaximumWidth(rightBox->width()/3);
+    patternTableStack->setMinimumWidth(rightBox->width()/3);
     patternTableStack->setFixedHeight(event->size().height()/4); // 左表
 
     timeTableStack->setFixedHeight(event->size().height()/4); // 右表

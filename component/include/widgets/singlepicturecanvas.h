@@ -29,7 +29,15 @@ public:
 private:
     QImage mimage; // 单图模式使用
     double zoomRate = 1.0;
+    double rotateAngle = 0.0;
+    double lastAngle = 0.0;
     QPoint mLastPos = QPoint(-1,-1);
+    QTransform transform;
+private:
+    QAction * rotateAct;
+    QAction * resetAct;
+    void reset();
+    void rotate();
 };
 
 #endif //EOS_SINGLEPICTURECANVAS_H

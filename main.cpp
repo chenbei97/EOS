@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 void initApp(QApplication& a)
 {
     // 1. basic info
+    qRegisterMetaType<QVector<int>>("QVector<int>()");
     LOG <<"UserScreen Width:" << UserScreenWidth << "UserScreen Height:" << UserScreenHeight;
     LOG<<"main thread is "<<CURRENT_THREAD;
     LOG<<"current path = "<<CURRENT_PATH;
@@ -71,7 +72,7 @@ void initApp(QApplication& a)
     // 属于进程方式 测试方便,暂时需要保留,以后可以从这开始到代码结束都注释掉
     auto * process = new QProcess;
     // 22987 Lenovo
-    process->start("C:\\Users\\Lenovo\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    process->start("C:\\Users\\22987\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
                    QStringList()<<"test_socket.py");
     process->waitForStarted();
     QObject::connect(qApp, &QCoreApplication::aboutToQuit, [process](){

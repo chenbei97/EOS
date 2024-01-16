@@ -21,6 +21,8 @@ public:
     void addItems(const QStringList& texts);
 private:
     QStringList mComboItems;
+signals:
+    void currentTextChanged(const QString& text,const QModelIndex& index) const;
 };
 
 #endif //EOS_COMBODELEGATE_H

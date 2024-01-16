@@ -17,8 +17,16 @@ file(GLOB_RECURSE COMPONENT_SOURCES "src/*.cpp")
 
 set(USE_OPENCV 1) # 要和window.h的use_opencv2一致,如果引入这里要设置1
 if (${USE_OPENCV})
-    set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
-    set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
+#    set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world460d.lib")
+#    set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash460d.lib")
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+    set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world490d.lib")
+    set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash490d.lib")
+else ()
+    set(OPENCV_opencv_world_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_world490.lib")
+    set(OPENCV_img_hash_LIB_PATH "${PROJECT_SOURCE_DIR}/bin/opencv_img_hash490.lib")
+endif ()
+
 endif ()
 if (${USE_OPENCV})
     link_directories(${OPENCV_opencv_world_LIB_PATH} ${OPENCV_img_hash_LIB_PATH})
@@ -47,7 +55,6 @@ target_include_directories(${DLLNAME}
         ${PROJECT_SOURCE_DIR}/component/include/datastructure
         ${PROJECT_SOURCE_DIR}/component/include/tool
         ${PROJECT_SOURCE_DIR}/component/include/socket
-#        ${PROJECT_SOURCE_DIR}/component/inc/video
         ${PROJECT_SOURCE_DIR}/component/include # 这里要包含,否则main.cpp不能引用目录
         )
 if (${USE_OPENCV})

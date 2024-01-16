@@ -28,6 +28,7 @@ private:
     bool enable = false; // 默认不启用
     double rotateAngle = 0.0;
     MirrorType mirrorType = MirrorType::NoMirror;
+    QTransform transform;
     QImage mimage;
     QSize msize;
     QMutex mutex;

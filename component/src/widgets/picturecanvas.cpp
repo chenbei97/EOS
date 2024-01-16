@@ -19,9 +19,16 @@ void SinglePictureCanvas::paintEvent(QPaintEvent *event)
     if(!mimage.isNull()) {
 //  painter.drawImage(QRectF(width()*(1.0-zoomRate)/2.0,height()*(1.0-zoomRate)/2.0,
 //                            width()*zoomRate,height()*zoomRate),mimage);
+        QImage image = mimage;
+        if (lastAngle != rotateAngle) {
+            transform.reset();
+            transform.rotate(rotateAngle);
+            image = mimage.transformed(transform,Qt::FastTransformation);
+            lastAngle = rotateAngle;
+        }
         painter.translate(width()/2,height()/2); // 或者把画笔挪到中间再画
         painter.drawImage(QRectF(-width()*zoomRate/2,-height()*zoomRate/2,
-                                 width()*zoomRate,height()*zoomRate),mimage);
+                                 width()*zoomRate,height()*zoomRate),image);
         painter.translate(0,0); // 防止对继承的或者后面的产生影响
     }
 }
@@ -43,6 +50,7 @@ bool SinglePictureCanvas::eventFilter(QObject *watched, QEvent *event)
         } else {
             zoomRate = zoomRate * 0.95;
         }
+        LOG<<zoomRate;
         update();
         return true;
     }
@@ -82,6 +90,30 @@ void SinglePictureCanvas::setImage(const QImage &img, const QString &path)
 
 SinglePictureCanvas::SinglePictureCanvas(QWidget *parent) : QWidget(parent)
 {
-
+    mLastPos = QPoint(-1,-1);
+    installEventFilter(this);
+    rotateAct = new QAction(tr(RotateField));
+    resetAct = new QAction(tr(ResetField));
+    addAction(rotateAct);
+    addAction(resetAct);
+    setContextMenuPolicy(Qt::ActionsContextMenu);
+    connect(rotateAct,&QAction::triggered,this,&SinglePictureCanvas::rotate);
+    connect(resetAct,&QAction::triggered,this,&SinglePictureCanvas::reset);
 }
 
+void SinglePictureCanvas::reset()
+{
+    zoomRate = 1.0;
+    rotateAngle = 0.0;
+    lastAngle = 0.0;
+    transform.reset();
+    this->move(0,0);
+    update();
+}
+
+void SinglePictureCanvas::rotate()
+{
+    rotateAngle += 90.0;
+    LOG << rotateAngle;
+    update();
+}

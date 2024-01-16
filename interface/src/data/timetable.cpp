@@ -9,7 +9,7 @@
 #include "timetable.h"
 
 void TimeTable::refreshTable(const ImageInfoVector& info)
-{
+{ // 根据当前孔/
     currentViewChannelInfo = info;
     model->clearRow(TimeTableHeaders.count(),TimeTableHeaders);
     for(auto image: info) { // 可能视野坐标相同但是时间戳不同
@@ -18,8 +18,6 @@ void TimeTable::refreshTable(const ImageInfoVector& info)
         QStringList rowTexts;
         rowTexts << stamp.toString(DefaultImageDateTimeFormat);
         rowTexts << path;
-        rowTexts << "A";
-        rowTexts << "青霉素";
         //LOG<<rowTexts;
         model->appendRowTexts(rowTexts);
     }

@@ -5,15 +5,15 @@ build
 *.ilk
 *.pdb
 *.exp
-# *.lib
+*.lib
 *.pyc
-# *.dll
+*.dll
 *.exe
 *.log
 *.ax
 *crash.dmp
-interface.dll
-component.dll
+!interface.dll
+!component.dll
 interface.lib
 component.lib
 
@@ -34,3 +34,9 @@ temp
 *.wav
 *.mp4
 *.mp3
+bin/opencv_img_hash490d.lib
+bin/opencv_img_hash490d.dll
+bin/opencv_world490d.lib
+bin/opencv_world490d.dll
+bin/opencv_world490.lib
+bin/opencv_world490d.dll

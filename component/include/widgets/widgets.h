@@ -40,6 +40,7 @@
 #include "qradiobutton.h"
 #include "qbuttongroup.h"
 #include "qtablewidget.h"
+#include "qstackedwidget.h"
 
 #include "qgraphicsview.h"
 #include "qgraphicsscene.h"

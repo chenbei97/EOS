@@ -16,6 +16,11 @@ void GridPictureCanvas::appendImage(const QString &path)
     GridPictureParams *pointer = nullptr;
     if (isRunningState) {
         pointer = runningParams;
+        if (pointer->imageCount == 20 ) {
+            pointer->clear();
+            imagemodel->clear();
+            imagemodel->setColumnCount(cols);
+        }
     } else pointer = completeParams;
 
     pointer->imageCount++;
@@ -35,12 +40,13 @@ void GridPictureCanvas::appendImage(const QString &path)
         img_h = height() / rows;
     imagesize = img_w >= img_h ? img_w : img_h; // 取较大者
 
-    auto img = loadImageByImageReader(path, imagesize, imagesize);
+    //auto img = loadImageByImageReader(path, imagesize, imagesize);
+    auto img = QImage(path);
     if (img.isNull()) {LOG<<"load img is null!"<<path;return;};
     //LOG<<"imageCount:"<<pointer->imageCount<<"currentRow:"<<pointer->currentRow<<"loc:"<<r<<c;
     imagemodel->setData(r, c, img, ImageDataRole);
     imagemodel->setData(r, c, path, ImagePathRole); // 显示图像
-    pointer->images.append(img); // 存储图像
+    //pointer->images.append(img); // 存储图像
 
     updateImageSize();
 }

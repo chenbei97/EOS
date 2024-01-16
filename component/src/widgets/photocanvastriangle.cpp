@@ -60,6 +60,8 @@ void PhotoCanvasTriangle::reset()
 {
     zoomRate = 1.0;
     rotateAngle = 0.0;
+    lastAngle = 0.0;
+    transform.reset();
     mirrorType = MirrorType::NoMirror;
     nomirroract->setChecked(true);
     this->move(0,0);
@@ -69,8 +71,6 @@ void PhotoCanvasTriangle::reset()
 void PhotoCanvasTriangle::rotate()
 {
     rotateAngle += 90.0;
-    if (rotateAngle == 360.0)
-        rotateAngle = 0.0;
     update();
 }
 

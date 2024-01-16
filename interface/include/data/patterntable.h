@@ -14,7 +14,7 @@
 #include "datatablemodel.h"
 
 static const QStringList PatternTableHeaders = {
-        CoordinateFieldUpper, ChannelFieldUpper
+        CoordinateFieldUpper,GroupFieldUpper,InfoFieldUpper,ChannelFieldUpper,
 };
 #define PatternTableViewCoordinateColumn PatternTableHeaders.indexOf(CoordinateFieldUpper)
 #define PatternTableChannelColumn PatternTableHeaders.indexOf(ChannelFieldUpper)
@@ -29,12 +29,14 @@ private:
     TableView * view;
     DataTableModel * model;
     ComboDelegate * comboDelegate;
+    QItemSelectionModel * selectionModel;
     DataPatternHoleInfo currentPatternInfo;
 private:
     void initAttributes();
     void initTable();
     void initConnections();
     void clickRow(int row);
+    void toggleRow(const QModelIndex &current,const QModelIndex &previous);
 signals:
     void currentHoleViewChannelInfo(const ImageInfoVector& info);
 };

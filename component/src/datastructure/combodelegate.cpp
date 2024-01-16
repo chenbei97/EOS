@@ -38,8 +38,10 @@ void ComboDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, con
 {
     ComboBox *cb = static_cast<ComboBox*>(editor);
     QString displayData = cb->currentText();
-    QVariant value = cb->currentData();
+    auto lastValue = model->data(index,Qt::DisplayRole).toString();
     model->setData(index, displayData, Qt::DisplayRole);
+    if (lastValue != displayData) // 放在这里发射,setEditor会总是慢一拍
+        emit currentTextChanged(displayData,index);
 }
 
 void ComboDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const

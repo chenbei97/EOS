@@ -54,6 +54,8 @@ protected:
     QImage mimage; // 单图模式使用
     double zoomRate = 1.0;
     double rotateAngle = 0.0;
+    double lastAngle = 0.0;
+    QTransform transform;
     MirrorType mirrorType = MirrorType::NoMirror;
     bool enableOptimize = false;
     void upateImageByThread(const QImage& img);
