@@ -48,6 +48,7 @@ QVector<PlateImageInfo> DataTable::createTestData() const
             auto tmp = generator.bounded(1.0);
             if (tmp>=0.0 && tmp <= 0.3) {
                 image.setHoleGroup("A组");
+<<<<<<< HEAD
                 image.setHoleColor(Qt::yellow);
                 image.channel = BRField;
             } else if (tmp > 0.3 && tmp < 0.7) {
@@ -57,6 +58,14 @@ QVector<PlateImageInfo> DataTable::createTestData() const
             } else {
                 image.setHoleGroup("C组");
                 image.setHoleColor(Qt::cyan);
+=======
+                image.channel = BRField;
+            } else if (tmp > 0.3 && tmp < 0.7) {
+                image.setHoleGroup("B组");
+                image.channel = DAPIField;
+            } else {
+                image.setHoleGroup("C组");
+>>>>>>> 9e95e67eaba8ad5b71dd58dd0ea32c4715aa9da4
                 image.channel = GFPField;
             }
 

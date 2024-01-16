@@ -74,6 +74,7 @@ using std::modf;
 
 #endif
 
+<<<<<<< HEAD
 struct image_info {
     int hole_x = 0;
     int hole_y = 0;
@@ -87,6 +88,8 @@ struct image_info {
 };
 typedef QVector<image_info> imageVector;
 
+=======
+>>>>>>> 9e95e67eaba8ad5b71dd58dd0ea32c4715aa9da4
 struct HoleCoordinate
 {
     int x = 0;
@@ -95,7 +98,10 @@ struct HoleCoordinate
     QString medicine;
     QString dose;
     QString unit;
+<<<<<<< HEAD
     QColor color;
+=======
+>>>>>>> 9e95e67eaba8ad5b71dd58dd0ea32c4715aa9da4
 
     QPoint getCoordinate() {
         return QPoint(x,y);
@@ -134,6 +140,7 @@ struct ImageInfo
         view.hole.group = group;
     }
 
+<<<<<<< HEAD
     void setHoleColor(const QColor& color) {
         view.hole.color = color;
     }
@@ -142,6 +149,8 @@ struct ImageInfo
         return view.hole.color;
     }
 
+=======
+>>>>>>> 9e95e67eaba8ad5b71dd58dd0ea32c4715aa9da4
     QString getHoleGroup() const {
         return view.hole.group;
     }

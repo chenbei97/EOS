@@ -73,6 +73,17 @@ void DataPattern::paintEvent(QPaintEvent *event)
                 painter.fillPath(path, Qt::blue);
             }
 
+            // (2) 绘制鼠标点击的高亮
+            //启用了鼠标事件mMousePos才会被赋值,否则是(-1,-1),所以这里不用再判断是否启用了鼠标事件
+            if (mMousePos.x() == row && mMousePos.y() == col
+                //&& !mHoleInfo[row][col].isSelected// 已绘制的点不要绘制鼠标选中高亮
+                && !mDisableHoles[row][col]) { // 置灰不可选的点不要绘制鼠标高亮
+                path.clear();
+                path.moveTo(center);
+                path.addEllipse(center, radius * 0.75, radius * 0.75);
+                painter.fillPath(path, Qt::blue);
+            }
+
             // (3) 绘制不可选置灰的点,将其高亮颜色变为灰色,并画个x
             if (mDisableHoles[row][col]) {
                 path.clear();
